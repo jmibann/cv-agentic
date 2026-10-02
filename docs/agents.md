@@ -31,7 +31,7 @@ agente, se edita acá.
 | foundation | allow | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | 150 |
 | component-builder | allow, salvo `specs/**` y `docs/memory.md` (deny); skill `sdd` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | 80 |
 | integrator | allow, salvo `specs/**` y `docs/memory.md` (deny); skill `sdd` | verificaciones, build, dev, `git add` y `git commit -m` (sin `--amend`) | deny | 120 |
-| reviewer | deny | solo verificaciones, build, lectura de git y `grep` | deny | 60 |
+| reviewer | deny | solo verificaciones, build, lectura de git y `grep`; único con el MCP `chrome-devtools_*` | deny | 60 |
 
 **Commits (decisiones F3 y #69):** los hacen foundation, component-builder e
 integrator, con `git commit -m`. **Por cada tarea (Tn de `tasks.md`):**
@@ -70,3 +70,34 @@ Usuario ──► orchestrator
 
 El orden y las dependencias de los componentes están en
 [specs/README.md](../specs/README.md).
+
+## Comandos `/sdd-*`
+
+Atajos del flujo SDD en `.opencode/commands/`. Cada uno corre con un agente
+del proyecto (nunca con los nativos `plan`/`build`), así que respeta sus
+permisos, la constitución y la skill `sdd`. El argumento es la carpeta de la
+spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
+
+| Comando | Agente | Qué hace |
+|---|---|---|
+| `/sdd-status <cat>/<Name>` | orchestrator | Fase, tareas hechas y siguiente comando (no modifica nada) |
+| `/sdd-spec <cat>/<Name> <idea>` | orchestrator | Entrevista y redacta una spec nueva (`spec.md` con `ask`) |
+| `/sdd-clarify <cat>/<Name>` | reviewer | QA de la spec: ambigüedades, contradicciones, RF sin test; no resuelve |
+| `/sdd-change <cat>/<Name> <cambio>` | orchestrator | Propone el cambio en la spec (con `ask`); después siguen plan y tareas |
+| `/sdd-plan <cat>/<Name>` | orchestrator | Redacta `plan.md` (puerta de Plan) |
+| `/sdd-task <cat>/<Name>` | orchestrator | Redacta `tasks.md` (puerta de Tareas) |
+| `/sdd-implement <cat>/<Name> Tn` | orchestrator | Delega UNA tarea (test → feat), pide revisión, marca la tarea y para |
+| `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + MCP de Chrome DevTools |
+
+- **`/sdd-validate` y el MCP:** `opencode.json` (raíz) declara el servidor
+  local `chrome-devtools` (`npx -y chrome-devtools-mcp`, requiere Node ≥ 20.19;
+  el proyecto usa 24). Sus herramientas se llaman `chrome-devtools_*`:
+  `opencode.json` las deniega para todos (`"permission": {"chrome-devtools_*": "deny"}`)
+  y **solo el reviewer** las habilita en su encabezado (la regla del agente se
+  aplica después de la global; verificado con `opencode debug agent`). El reviewer no puede iniciar `npm run dev`: si la app no
+  está servida, lo pide; si el MCP no responde, lista esos RF como "sin verificar
+  (QA visual)".
+- **`/constitution`** es el prompt original con el que se redactó
+  `docs/constitution.md`; se conserva tal cual y no forma parte del flujo.
+- Los comandos son opcionales: lo mismo se le puede pedir al orchestrator en
+  lenguaje natural.

@@ -1,15 +1,20 @@
 ---
-description: SDD · Entrevista y genera la spec (uso - /sdd-spec 002-nombre idea inicial)
-agent: plan
+description: "SDD · Entrevista y redacta una spec nueva (uso: /sdd-spec <categoria>/<Name> <idea inicial>)"
+agent: orchestrator
 ---
 
-NO escribas código en ningún momento. Lee `docs/constitution.md` y `docs/memory.md`, y usa la skill `sdd`.
+Carpeta de la spec: `specs/$1/` (por ejemplo `primitives/Badge`).
+Idea inicial: el texto de `$ARGUMENTS` que sigue a `$1`.
 
-Carpeta de la spec: `specs/$1/`  
-Idea inicial (el texto que va después del nombre de la carpeta): `$ARGUMENTS`
+Cargá la skill `sdd` y leé `docs/constitution.md`, `specs/README.md` y `docs/memory.md`.
+**No escribas código.**
 
-Tu trabajo:
-
-1. Hazme preguntas de UNA en UNA para eliminar ambigüedades (casos límite, errores, qué queda fuera de esta versión). Máximo 5 preguntas.
-2. Con mis respuestas, genera `specs/$1/spec.md` siguiendo la plantilla de la skill `sdd`, con los requisitos en EARS y "Estado: borrador".
-3. Solo el QUÉ y el POR QUÉ: nada de stack, arquitectura ni nombres de archivos.
+1. Si `specs/$1/spec.md` ya existe, frená y avisame (para cambiarla se usa `/sdd-change`).
+2. Hacé preguntas de UNA en UNA para eliminar ambigüedades (casos límite, errores, qué queda
+   fuera de esta versión). Máximo 5 preguntas.
+3. Con mis respuestas, redactá `specs/$1/spec.md` con la plantilla de `specs/README.md`
+   (10 secciones + `Estado: borrador` + `## Requisitos (EARS)`). Si es una pieza del kit,
+   incluye API, tokens y estructura HTML; si es una spec de dominio nueva, solo el QUÉ y
+   el POR QUÉ (ver la skill).
+4. Mostrame el contenido y esperá mi aprobación antes de guardar (tu permiso sobre
+   `spec.md` es `ask`).

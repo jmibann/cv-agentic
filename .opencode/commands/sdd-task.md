@@ -1,11 +1,13 @@
 ---
-description: SDD · Divide el plan en tareas pequeñas y verificables
-agent: plan
+description: "SDD · Divide el plan en tareas pequeñas y verificables (uso: /sdd-task <categoria>/<Name>)"
+agent: orchestrator
 ---
 
-A partir de `specs/$1/spec.md` y `specs/$1/plan.md`, genera `specs/$1/tasks.md` siguiendo el formato de la skill `sdd`:
+Cargá la skill `sdd` (sección Tareas). A partir de `specs/$1/spec.md` y `specs/$1/plan.md`
+(aprobado), redactá `specs/$1/tasks.md`:
 
-- Tareas pequeñas (máx. 20-30 min cada una), en orden de dependencia.
+- Tareas pequeñas (máx. 20–30 min cada una), en orden de dependencia, con checkbox.
 - Cada una con los RF que cubre y una línea "Hecho cuando:" verificable.
-- Checkboxes.
-- Intenta que no sean más de 10: si salen más, propón dividir la spec.
+- Si salen más de 10, proponé dividir la spec.
+
+Mostrame las tareas y esperá mi aprobación (puerta de Tareas).

@@ -1,12 +1,14 @@
 ---
-description: SDD · Nuevo requisito - primero la spec, luego el código
-agent: plan
+description: "SDD · Cambio de requisitos: primero la spec, después el código (uso: /sdd-change <categoria>/<Name> <cambio>)"
+agent: orchestrator
 ---
 
-Nuevo requisito para la spec `specs/$1/` (el texto que va después del nombre de la carpeta): `$ARGUMENTS`
+Cambio para `specs/$1/spec.md`: el texto de `$ARGUMENTS` que sigue a `$1`.
 
-**NO toques código.** Usa la skill `sdd`.
+Cargá la skill `sdd` (sección Cambio) y leé `docs/constitution.md`. **No toques código.**
 
-1. Actualiza `specs/$1/spec.md`: nuevo RF (o cambio de uno existente) en EARS, sus casos límite y lo que queda fuera de alcance.
-2. Indica qué partes de `plan.md` y `tasks.md` habría que cambiar después.
-3. Muéstrame el diff de la spec y espera mi aprobación.
+1. Proponé el cambio en `specs/$1/spec.md`: RF nuevos o modificados en EARS, casos límite,
+   lo que queda fuera de alcance y los "Tests esperados" que cambian.
+2. Indicá qué partes de `plan.md` y `tasks.md` habría que cambiar después (no las cambies todavía).
+3. Mostrame el diff de la spec y esperá mi aprobación (tu permiso sobre `spec.md` es `ask`).
+   Con la spec aprobada, el cambio sigue por `/sdd-plan` y `/sdd-task`.

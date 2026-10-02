@@ -1,13 +1,18 @@
 ---
-description: SDD · Implementa UNA tarea, tests primero (uso - /sdd-implement 002-nombre T3)
-agent: build
+description: "SDD · Ejecuta UNA tarea con el flujo de agentes (uso: /sdd-implement <categoria>/<Name> T3)"
+agent: orchestrator
 ---
 
-Implementa SOLO la tarea `$2` de `specs/$1/tasks.md`, siguiendo `specs/$1/plan.md`, `docs/constitution.md` y la skill `sdd`.
+Ejecutá SOLO la tarea `$2` de `specs/$1/tasks.md`, siguiendo la skill `sdd`, `docs/constitution.md`
+y tus secciones "Cómo delegar una tarea" y "Después de cada tarea":
 
-1. Escribe primero los tests y comprueba que fallan.
-2. Escribe el código hasta que pasen.
-3. Ejecuta `npm test` y muéstrame el resultado.
-4. Indica qué RF cubre. **No marques `$2` en `tasks.md`**: la marca el orchestrator cuando el reviewer la aprueba (constitución P2).
+1. Verificá que `spec.md`, `plan.md` y `tasks.md` estén aprobados y que `$2` no esté marcada.
+2. Delegá `$2` al subagente que corresponde (`component-builder` en F2–F3, `integrator` en F4):
+   tests primero (commit `test(<Name>): $2`), implementación (commit `feat(<Name>): $2`).
+3. Confirmá que el repo quede en verde y pedí al `reviewer` la revisión de la tarea contra su
+   "Hecho cuando".
+4. Si el reviewer aprueba, marcá `$2` en `tasks.md` con el hash del commit `feat`. Si rechaza,
+   aplicá la regla de rondas (máximo 3).
+5. Mostrame el resultado: qué RF cubre, commits e informe del reviewer.
 
-Después PÁRATE. No empieces la siguiente tarea.
+Después PARÁ. No empieces la siguiente tarea.

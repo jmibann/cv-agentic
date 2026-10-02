@@ -5,6 +5,9 @@ mode: subagent
 permission:
   edit: deny
   webfetch: deny
+  # MCP de Chrome DevTools: denegado en opencode.json para todos; solo el reviewer
+  # lo usa (QA visual en /sdd-validate y F5).
+  "chrome-devtools_*": allow
   task: deny
   bash:
     "*": deny

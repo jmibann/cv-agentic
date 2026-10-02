@@ -1,14 +1,19 @@
 ---
-description: SDD · Valida la spec RF por RF (tests + Chrome DevTools)
-agent: build
+description: "SDD · Revisión completa de una pieza RF por RF: tests + Chrome DevTools (uso: /sdd-validate <categoria>/<Name>)"
+agent: reviewer
 ---
 
-Recorre `specs/$1/spec.md` requisito por requisito. Para cada RF indica qué test lo cubre y el resultado de ejecutarlo con `npm test`.
+Hacé la **revisión completa de la pieza** `specs/$1/spec.md` (tu checklist + skill `sdd`,
+sección Validación), con contexto limpio. **No arregles nada.**
 
-Los RF de interfaz que no se puedan testear con `npm test`, verifícalos con el MCP de Chrome DevTools (incluida la vista móvil de 375 px).
+1. Recorré la spec requisito por requisito. Para cada RF indicá qué test lo cubre y el
+   resultado de `npm test`.
+2. Los RF de interfaz que no se puedan verificar con `npm test`, verificalos con el MCP de
+   Chrome DevTools (configurado en `opencode.json`), incluida la vista móvil de 375 px y
+   ambos temas. Necesitás la app servida: si no hay un servidor corriendo, pedime que
+   levante `npm run dev` (vos no podés iniciarlo). Si el MCP no responde, listá esos RF como
+   "sin verificar (QA visual)".
+3. Comprobá los criterios de finalización de la pieza y que todas las tareas de `tasks.md`
+   estén marcadas.
 
-Si algún RF no está cubierto o falla, dilo claramente. **NO arregles nada todavía.**
-
-Después comprueba los criterios de finalización y dame un veredicto:
-
-**¿La spec está cumplida?**
+Veredicto con tu formato de informe: **¿la spec está cumplida?**

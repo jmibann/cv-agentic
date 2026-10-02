@@ -36,6 +36,7 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - F1 (foundation): scaffold de la app, tooling, tokens, providers.
 - **Unidad de trabajo por tarea** (decisión #69): `test(<Name>): Tn` → `feat(<Name>): Tn`; `feat`/`fix` no tocan
   tests y `test` solo agrega; el orchestrator escribe `plan.md`/`tasks.md` y marca cada Tn tras el OK del reviewer.
-- Pendientes: `## No hacer` en 9 specs; comandos `/sdd-*` (agentes `plan`/`build`, `/constitution` en inglés,
-  MCP de Chrome DevTools); `npm run validate:content` en reviewer/integrator; `edit` por ruta en foundation;
-  `opencode.json`.
+- Comandos `/sdd-*` integrados (decisión #71): orchestrator o reviewer, argumento `<categoria>/<Name>`;
+  MCP `chrome-devtools` solo para el reviewer (`/sdd-validate`); `/constitution` sin cambios.
+- Pendientes: `## No hacer` en 9 specs; `npm run validate:content` en reviewer/integrator; `edit` por ruta
+  en foundation; fricción de puertas; QA visual.

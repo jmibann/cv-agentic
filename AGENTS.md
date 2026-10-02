@@ -16,6 +16,9 @@ cv-agentic/
 ├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (primitives, controls, layout, content, pages, hooks)
 ├─ data/                      cv.schema.json (fuente de verdad), constants.ts, ejemplos JSON y *.generated.* (alias @data)
 ├─ .opencode/agents/          los 5 agentes (orchestrator, foundation, component-builder, integrator, reviewer)
+├─ .opencode/skills/sdd/      skill del flujo SDD (SKILL.md)
+├─ .opencode/commands/        comandos /sdd-* (atajos del flujo; ver docs/agents.md) y /constitution
+├─ opencode.json              config de OpenCode: MCP de Chrome DevTools (denegado salvo para el reviewer)
 ├─ package.json               scripts: dev, lint, typecheck, test, build (los crea la Fase 1)
 ├─ index.html                 incluye el script anti-flash (tema, idioma y theme-color)
 ├─ public/                    images/ (placeholders del contenido de ejemplo)

@@ -894,3 +894,28 @@ orchestrator sin permiso sobre la real.
 (agentes `plan`/`build`, `/constitution`, MCP), `npm run validate:content` en
 reviewer/integrator, `edit` por ruta en foundation, fricción de puertas,
 `## No hacer` en 9 specs, `opencode.json` y QA visual.
+
+---
+
+## N. Comandos `/sdd-*` integrados (2026-10-02)
+
+**Origen:** decisión 3 de la auditoría de salud. Los 8 comandos usaban los
+agentes nativos `plan`/`build` (sin los permisos ni los controles del
+proyecto), argumentos `NNN-nombre` y textos de otro dominio.
+
+| Archivo | Cambio |
+|---|---|
+| `sdd-status`, `sdd-spec`, `sdd-change`, `sdd-plan`, `sdd-task`, `sdd-implement` | `agent: orchestrator`. Argumento `<categoria>/<Name>`; `$ARGUMENTS` descripto como "lo que sigue a `$1`"; "nada de stack" solo para specs de dominio nuevas; "hoy" solo si la lógica depende de la fecha; `sdd-implement` delega una Tn (test → feat), pide revisión, marca la tarea y para |
+| `sdd-clarify`, `sdd-validate` | `agent: reviewer` (solo lectura, contexto limpio). `sdd-validate`: revisión completa de la pieza con `npm test` + MCP Chrome DevTools; sin servidor o sin MCP, lo reporta |
+| `opencode.json` | Verificado: MCP local `chrome-devtools` con el formato de la documentación de OpenCode; `chrome-devtools-mcp` 1.10.1 es compatible con Node 24. Agregado `"permission": {"chrome-devtools_*": "deny"}` |
+| `reviewer.md` | `"chrome-devtools_*": allow`: único agente con el MCP. Verificado con `opencode debug agent` (reviewer → allow; orchestrator, subagentes y `build` → deny) y `opencode debug config` (8 comandos con su agente) |
+| `docs/agents.md` | Nueva sección "Comandos `/sdd-*`" (tabla comando → agente, MCP, `/constitution`) |
+| `AGENTS.md`, `README.md` | Estructura con `skills/`, `commands/` y `opencode.json` |
+| `docs/README.md`, `docs/memory.md` | Decisión #71; pendientes actualizados |
+
+`commands/constitution.md` queda sin cambios (decisión del usuario).
+
+**Siguen pendientes:** `npm run validate:content` en reviewer/integrator,
+`edit` por ruta en foundation, fricción de puertas, `## No hacer` en 9 specs y
+QA visual.
+
