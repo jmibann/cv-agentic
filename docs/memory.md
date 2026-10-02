@@ -1,6 +1,7 @@
-# MEMORY.md — cv-agentic
+# Memoria del proyecto — cv-agentic (`docs/memory.md`)
 
 Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
+La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes tienen `edit` denegado).
 
 ## Estado actual
 
@@ -27,10 +28,14 @@ Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo qu
 - zsh no separa `$var` por espacios: usar `git ls-files -z '*.md' | xargs -0 perl -pi -e '...'`.
 - Links entre specs de carpetas distintas necesitan `../../` (un `../` queda roto; verificar con un checker).
 - Plantilla: "10 secciones + Estado + EARS" y `Requisitos` **justo después** de `Propósito` (no siempre antes de Anatomía).
-- La memoria vive en `docs/memory.md` (en la raíz no hay `memory.md`).
+- La memoria vive en `docs/memory.md` (no hay `MEMORY.md` ni `memory.md` en la raíz); skill, orchestrator,
+  comandos y `AGENTS.md` ya apuntan acá (decisión #70).
 
 ## Próximos pasos
 
 - F1 (foundation): scaffold de la app, tooling, tokens, providers.
-- Pendientes: `## No hacer` en 9 specs; hallazgos 2–4 de la auditoría (`agent: plan|build`,
-  `/constitution` en inglés, permisos de reviewer/integrator, `docs/agents.md:30`).
+- **Unidad de trabajo por tarea** (decisión #69): `test(<Name>): Tn` → `feat(<Name>): Tn`; `feat`/`fix` no tocan
+  tests y `test` solo agrega; el orchestrator escribe `plan.md`/`tasks.md` y marca cada Tn tras el OK del reviewer.
+- Pendientes: `## No hacer` en 9 specs; comandos `/sdd-*` (agentes `plan`/`build`, `/constitution` en inglés,
+  MCP de Chrome DevTools); `npm run validate:content` en reviewer/integrator; `edit` por ruta en foundation;
+  `opencode.json`.

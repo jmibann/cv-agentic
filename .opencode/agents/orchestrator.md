@@ -11,7 +11,7 @@ permission:
     "*": deny
     # Documentos de estado que la skill pide actualizar al cerrar cada fase SDD.
     "README.md": allow
-    "MEMORY.md": allow
+    "docs/memory.md": allow
     "docs/diagnostics.md": allow
     # Specs: solo con aprobación explícita del usuario (redactar una spec nueva,
     # Clarificación, cambio de `Estado` a aprobada/implementada y Cambio).
@@ -68,7 +68,7 @@ Orden de prioridad: `docs/constitution.md` > skill `sdd` > spec > este archivo
 
 1. Cargá la skill `sdd`.
 2. Leé `docs/constitution.md`, `AGENTS.md`, `docs/README.md`,
-   `docs/DESIGN.md`, `specs/README.md` y `MEMORY.md`.
+   `docs/DESIGN.md`, `specs/README.md` y `docs/memory.md`.
 3. Revisá el estado real del repo (`git status`, `git log --oneline -20`,
    estructura de `src/components/`, estado de cada `tasks.md`) para saber en
    qué fase F y en qué fase SDD de qué pieza estás. No asumas: verificá.
@@ -106,7 +106,7 @@ Cada pieza tiene su carpeta `specs/<categoria>/<Name>/` (`spec.md`, `plan.md`,
 | Validación | `reviewer`, después de cada tarea y revisión completa al final de la pieza. | Tras la revisión completa: **usuario aprueba** → `Estado: implementada` |
 | Cambio | Spec → plan → tareas → código, en ese orden. | **Usuario aprueba** cada paso |
 
-Al cerrar cada fase SDD, actualizás `MEMORY.md`, el `README.md` de la raíz y
+Al cerrar cada fase SDD, actualizás `docs/memory.md`, el `README.md` de la raíz y
 `docs/diagnostics.md`, como pide la skill.
 
 ## Cómo delegar una tarea
@@ -117,7 +117,9 @@ Cada encargo es autocontenido y cubre **exactamente una tarea** de
 - La tarea (Tn) con su "Hecho cuando".
 - La ruta de la spec, del `plan.md` y del `tasks.md` de la pieza.
 - La carpeta donde puede escribir (`src/components/<Name>/`, o la que fije el
-  plan) y el `tasks.md` para marcar la tarea. Nada más.
+  plan). Nada más: **el subagente no escribe en `specs/`** (ni `tasks.md`).
+- Los mensajes de commit exactos: `test(<Name>): Tn` (tests en rojo) y
+  `feat(<Name>): Tn` (implementación); `fix(<Name>): Tn` si hay correcciones.
 - Las dependencias ya construidas que puede importar.
 - Una indicación: "Seguí la sección Implementación y los commits de la skill
   `sdd`".
@@ -135,6 +137,9 @@ los agentes comparten la carpeta de trabajo. Vos no commiteás.
 3. Si rechaza, devolvé los hallazgos al mismo subagente. **Máximo 3 rondas.**
    Después de la tercera, frená y reportá al usuario con la salida exacta de
    los comandos.
+3b. **Si aprueba, marcás vos la tarea** como hecha en `tasks.md` (`- [x]`),
+   con el hash del commit `feat(<Name>): Tn`. Sos el único que escribe en
+   `tasks.md`.
 4. Si fue la última tarea de la pieza, pedí al reviewer la revisión completa
    contra la spec. Con el OK, llegás a la puerta de Implementación +
    Validación: con la aprobación del usuario, marcá la spec como `implementada`

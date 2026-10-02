@@ -14,7 +14,8 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | Diagnóstico A, B, C, F, reestructuras H/I, auditoría J y constitución (K) | ✅ Cerrados |
 | Repositorio git (baseline) | ✅ Inicializado; primeros commits del modelo de spec |
 | Sticky del Sidebar en pantallas bajas | ✅ Resuelto: sticky solo con alto ≥ 900px |
-| Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68) |
+| Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68); P2/P4/T2 por tarea (decisión #69) |
+| Unidad de trabajo y memoria | ✅ Por tarea (Tn) en todo el sistema; memoria única en `docs/memory.md` (decisiones #69 y #70) |
 | Contenido del CV en JSON (esquema + validación) | ✅ Especificado: `data/cv.schema.json` + ejemplos JSON; se genera en F1 |
 | `plan.md` / `tasks.md` de las 27 specs, `src/`, `package.json` | ⏳ Próxima fase (orchestrator en las puertas; foundation en F1) |
 
@@ -44,3 +45,4 @@ cv-agentic/
 3. [docs/DESIGN.md](docs/DESIGN.md): lenguaje visual y reglas duras.
 4. [specs/README.md](specs/README.md): índice de specs y orden de construcción.
 5. [AGENTS.md](AGENTS.md) y [docs/agents.md](docs/agents.md): cómo trabajan los agentes.
+6. [docs/memory.md](docs/memory.md): memoria del proyecto (estado y decisiones recientes).

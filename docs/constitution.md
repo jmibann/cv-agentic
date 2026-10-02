@@ -14,9 +14,9 @@ Cada regla indica cómo verificarla.
 
 ## 2. Spec antes que código
 - **P1** No hay código sin spec en `specs/` o `foundations/`. *Verificar:* cada `src/components/<Name>/` tiene su `specs/**/<Name>/spec.md`.
-- **P2** Gana la spec. Código que la contradice es un error; si la spec parece equivocada, se frena y se consulta. Los agentes nunca editan specs.
+- **P2** Gana la spec. Código que la contradice es un error; si la spec parece equivocada, se frena y se consulta. Ningún agente edita `spec.md`; solo el orchestrator escribe `plan.md`/`tasks.md` (aprobados por el usuario) y marca cada tarea tras el OK del reviewer.
 - **P3** Los tests salen de la lista de tests de la spec; nada se agrega en silencio (los extras llevan `// extra: <motivo>`).
-- **P4** Por pieza: commit `test(<Name>)` (en rojo) → commit `feat(<Name>)` (en verde). *Verificar:* `git log`.
+- **P4** Por tarea (Tn de `tasks.md`): commit `test(<Name>): Tn` (en rojo) → `feat(<Name>): Tn` (en verde); `fix(<Name>): Tn` si hay correcciones. *Verificar:* `git log`.
 - **P5** Un cambio de spec va primero, en su propio commit, aprobado por el usuario.
 
 ## 3. Separación de responsabilidades
@@ -27,7 +27,7 @@ Cada regla indica cómo verificarla.
 
 ## 4. Tests
 - **T1** Cada componente, hook y función pura tiene su `*.test.ts(x)` al lado. *Verificar:* pares de archivos.
-- **T2** Los tests se escriben antes que el código y nunca se debilitan: sin borrar ni relajar aserciones, sin `.skip`/`.only`. *Verificar:* `git diff <commit de test> HEAD -- <archivo de test>` vacío.
+- **T2** Los tests se escriben antes que el código y nunca se debilitan: sin borrar ni relajar aserciones, sin `.skip`/`.only`. *Verificar:* los commits `feat`/`fix` no tocan archivos de test y los `test(<Name>): Tn` no borran líneas de tests (`git log -p`).
 - **T3** Búsquedas por rol y nombre accesible; `data-testid` solo con un comentario que lo justifique.
 - **T4** Cada archivo de test de componente termina con `expectNoA11yViolations`.
 - **T5** Terminado = `lint` (0 warnings), `typecheck`, `test` y `build` en verde. *Verificar:* salida de los comandos.

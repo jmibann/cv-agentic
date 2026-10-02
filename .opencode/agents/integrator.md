@@ -1,10 +1,17 @@
 ---
-description: "F4 — compone la app completa: contenido en/es, páginas About/Resume, useHashTab, AppLayout, impresión. Solo compone componentes ya aprobados."
+description: "F4 — implementa UNA tarea (Tn de tasks.md) por encargo para componer la app: contenido en/es, páginas About/Resume, useHashTab, AppLayout, impresión. Solo compone componentes ya aprobados; sigue la skill sdd."
 mode: subagent
 # Igual que component-builder, más el build de la app.
-# Commits: test en rojo → implementación por cada pieza (useHashTab, páginas, AppLayout), sin amend ni push.
+# Commits por tarea: test(<Name>): Tn (en rojo) → feat(<Name>): Tn; sin amend ni push.
+# Nunca escribe en specs/ (constitución P2): el orchestrator marca las tareas.
 permission:
-  edit: allow
+  edit:
+    "*": allow
+    "specs/**": deny
+    "docs/memory.md": deny
+  skill:
+    "*": deny
+    "sdd": allow
   webfetch: deny
   task: deny
   bash:
@@ -39,11 +46,13 @@ tests escritos antes de implementar.
 
 ## Tareas (tests primero en cada una)
 
-Por cada pieza (`useHashTab`, AboutPage, ResumePage, AppLayout), igual que
-component-builder: tests → confirmar que fallan → commit
-`test(<Name>): add failing tests from spec` → implementar sin tocar el test →
-verificar → commit `feat(<Name>): implement to spec`. Correcciones en commits
-`fix(<Name>)`. Nunca `--amend` ni `push`.
+Cada encargo es **una tarea (Tn)** del `tasks.md` de una pieza (`useHashTab`,
+AboutPage, ResumePage, AppLayout), igual que component-builder y siguiendo la
+skill `sdd`: agregar los tests de la tarea (sin tocar los de tareas
+anteriores) → confirmar que fallan → commit `test(<Name>): Tn` → implementar
+sin tocar tests → verificar → commit `feat(<Name>): Tn`. Correcciones en
+commits `fix(<Name>): Tn`. Nunca `--amend` ni `push`. **No marques la tarea**
+en `tasks.md`: lo hace el orchestrator tras el OK del reviewer.
 
 1. **`src/lib/useHashTab.ts`** + tests (spec en `specs/hooks/useHashTab/spec.md`).
 2. **Funciones puras** compartidas que falten en `src/lib/`, con tests.

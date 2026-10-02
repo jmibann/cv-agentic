@@ -7,6 +7,10 @@ en la QA visual de F5 del proyecto). El kit está listo para arrancar la fase
 F1 (foundation) del proyecto. Ese mismo día se sumó una **verificación
 independiente de la factibilidad de F1 y el plan de kickoff** (sección nueva
 abajo, tras "Estado actual"); es lo que hay que leer para arrancar mañana.
+**2026-10-02 — Unidad de trabajo y memoria (sección M):** trabajo por tarea
+(Tn) propagado a constitución, `AGENTS.md`, subagentes y reviewer; memoria
+unificada en `docs/memory.md`.
+
 **2026-10-02 — Constitución (sección K):** nuevo `docs/constitution.md` con
 reglas no negociables; enlazada desde `AGENTS.md` y los 5 agentes.
 
@@ -857,3 +861,36 @@ material de otro proyecto).
    siguiendo la sección "Verificación independiente y plan de kickoff"
    (etapas 0→3). `.git` y el `package.json` raíz todavía no existen: los
    crea foundation (tiene `git init` permitido).
+
+---
+
+## M. Unidad de trabajo por tarea y memoria única (2026-10-02)
+
+**Origen:** auditoría de salud del sistema agéntico (2026-10-02). La migración
+al modelo "por tarea" (skill `sdd`, orchestrator, specs con `plan.md`/`tasks.md`)
+no se había propagado: la constitución (P2, P4), `AGENTS.md`, component-builder,
+integrator y el control del reviewer seguían en "dos commits por pieza", y la
+memoria tenía tres nombres (`MEMORY.md`, `memory.md`, `docs/memory.md`) con el
+orchestrator sin permiso sobre la real.
+
+**Decisiones del usuario:** (1) unidad de trabajo **por tarea**; el
+**orchestrator marca** las tareas en `tasks.md`; (2) memoria en
+**`docs/memory.md`**.
+
+| Archivo | Cambio |
+|---|---|
+| `docs/constitution.md` | P2: ningún agente edita `spec.md`; solo el orchestrator escribe `plan.md`/`tasks.md` y marca tareas. P4: commits por tarea. T2: control nuevo (`feat`/`fix` no tocan tests; `test` solo agrega). Sigue en 46 líneas |
+| `.opencode/skills/sdd/SKILL.md` | Memoria en `docs/memory.md`; quien implementa no marca la tarea; regla de tests que no se debilitan por tarea |
+| `orchestrator.md` | Permiso y referencias a `docs/memory.md`; el encargo no incluye `tasks.md`; da los mensajes de commit exactos; paso 3b: marca la tarea tras el OK del reviewer |
+| `component-builder.md`, `integrator.md` | Una tarea Tn por encargo; commits `test(<Name>): Tn` → `feat(<Name>): Tn`; no tocan tests de tareas anteriores; no marcan tareas; `edit` denegado en `specs/**` y `docs/memory.md`; skill `sdd` permitida |
+| `reviewer.md` | Dos tipos de revisión (tarea / pieza completa); control de tests por `git log -p`; informe con Tn y "Hecho cuando" |
+| `AGENTS.md` | Memoria en `docs/memory.md`, solo la actualiza el orchestrator; unidad por tarea; `specs/` es del usuario y del orchestrator; control de tests |
+| `specs/README.md`, `docs/agents.md` | Unidad por tarea, commits por tarea, tabla de permisos actualizada |
+| Comandos | `sdd-spec`/`sdd-status` leen `docs/memory.md`; `sdd-implement` ya no marca la tarea |
+| `docs/memory.md` | Título y dueño únicos; decisión #69 y pendientes actualizados |
+| `docs/README.md` | Decisiones #69 y #70; #33 marcada como reemplazada |
+
+**Siguen pendientes** (decisiones 3–6 de la auditoría): comandos `/sdd-*`
+(agentes `plan`/`build`, `/constitution`, MCP), `npm run validate:content` en
+reviewer/integrator, `edit` por ruta en foundation, fricción de puertas,
+`## No hacer` en 9 specs, `opencode.json` y QA visual.

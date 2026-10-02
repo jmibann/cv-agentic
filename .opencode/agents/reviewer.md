@@ -31,7 +31,15 @@ salida es un informe.
 
 ## Qué recibís
 
-La ruta de la spec (o fase) y la ruta del código a revisar.
+Dos tipos de encargo (definidos por la skill `sdd`):
+
+- **Revisión de tarea:** la spec, la tarea (Tn) con su "Hecho cuando" y la
+  ruta del código. Verificás esa tarea: su "Hecho cuando", los commits de la
+  tarea y el checklist de abajo sobre lo que cambió.
+- **Revisión completa de la pieza** (tras la última tarea): la spec y la ruta
+  del código. Verificás cada RF y cada caso de "Tests esperados".
+
+No marcás tareas ni editás nada: el orchestrator marca la tarea si aprobás.
 
 ## Checklist por entrega
 
@@ -40,7 +48,7 @@ bloqueante. Cada regla tiene su verificación en el propio archivo; como
 mínimo, en cada entrega:
 - **S1/S3/S4** `package.json` contra la lista de `docs/README.md`; sin
   `styled-components|@emotion|tailwind`, router ni librería de estado.
-- **P1/P4** la pieza tiene spec; commits `test(<Name>)` → `feat(<Name>)`.
+- **P1/P4** la pieza tiene spec; por cada tarea, commits `test(<Name>): Tn` → `feat(<Name>): Tn` (y `fix(<Name>): Tn` si hubo).
 - **C1** archivos `*.ts` de lógica (no `use*.ts`) sin imports de React ni del
   DOM: `grep -rEln "from \"react|document\.|window\." src --include=*.ts`
   y revisar que solo aparezcan hooks y tests.
@@ -57,13 +65,18 @@ mínimo, en cada entrega:
 - `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`: todos en verde, sin warnings.
 
 **2. Integridad de tests**
-- Cada caso de "Tests esperados" de la spec está cubierto.
-- **El test no cambió desde que se commiteó en rojo.** Identificá el commit
-  `test(<Name>)` con `git log --oneline -- <ruta del test>` y verificá que
-  `git diff <ese commit> HEAD -- <ruta del test>` esté **vacío**. Cualquier
-  diferencia es bloqueante, salvo un cambio de spec aprobado por el usuario y
-  registrado en el mensaje del commit.
-- En el commit `test(<Name>)`: ningún `.skip`/`.only` ni `expect` que no
+- Revisión de tarea: los casos que cubre la tarea Tn están testeados y su
+  "Hecho cuando" se cumple. Revisión completa: cada caso de "Tests esperados"
+  de la spec está cubierto.
+- **Tests sin debilitar (por tarea).** Con
+  `git log -p --format="%h %s" -- <archivos de test de la pieza>`:
+  - los commits `feat(<Name>): Tn` y `fix(<Name>): Tn` **no tocan** archivos
+    de test;
+  - los commits `test(<Name>): Tn` **solo agregan** líneas (ninguna línea
+    borrada o cambiada de tests de tareas anteriores).
+  Cualquier otra cosa es bloqueante, salvo un cambio de spec aprobado por el
+  usuario y registrado en el mensaje del commit.
+- En cada commit `test(<Name>): Tn`: ningún `.skip`/`.only` ni `expect` que no
   verifique nada.
 - Queries por rol/nombre; `data-testid` solo justificado.
 - Caso `expectNoA11yViolations` presente.
@@ -142,9 +155,10 @@ quedó sin verificar visualmente.
 
 ```
 VEREDICTO: APROBADO | RECHAZADO
-Entrega: <componente o fase>
+Entrega: <Name> · Tn (o "revisión completa" / fase)
 Comandos: lint ✓/✗ · typecheck ✓/✗ · test ✓/✗ (N tests) · build ✓/✗
-Commits: test <hash> · feat <hash> · test sin cambios desde su commit ✓/✗
+Commits: test(<Name>): Tn <hash> · feat(<Name>): Tn <hash> · feat/fix sin tocar tests ✓/✗ · test solo agrega ✓/✗
+Hecho cuando: ✓/✗ (solo en revisión de tarea)
 Constitución: S ✓/✗ · P ✓/✗ · C ✓/✗ · T ✓/✗ · D ✓/✗ · L ✓/✗
 Hallazgos (ordenados por severidad):
   - [bloqueante|menor] <archivo:línea> — <qué está mal> — <qué dice la spec>

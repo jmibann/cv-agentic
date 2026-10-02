@@ -3,7 +3,7 @@ description: SDD · Dónde estamos - fase actual y siguiente paso de una spec
 agent: plan
 ---
 
-Lee `specs/$1/` (`spec.md`, `plan.md` y `tasks.md`, los que existan) y `MEMORY.md`.
+Lee `specs/$1/` (`spec.md`, `plan.md` y `tasks.md`, los que existan) y `docs/memory.md`.
 
 Dime en pocas líneas:
 

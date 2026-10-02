@@ -27,16 +27,18 @@ agente, se edita acá.
 
 | Agente | edit | bash | task | steps |
 |---|---|---|---|---|
-| orchestrator | solo `README.md` y `docs/diagnostics.md` (documentos de estado) | solo verificaciones y lectura de git | solo los 4 subagentes | — |
+| orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask`; skill `sdd` | solo verificaciones y lectura de git | solo los 4 subagentes | — |
 | foundation | allow | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | 150 |
-| component-builder | allow | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | 80 |
-| integrator | allow | verificaciones, build, dev, `git add` y `git commit -m` (sin `--amend`) | deny | 120 |
+| component-builder | allow, salvo `specs/**` y `docs/memory.md` (deny); skill `sdd` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | 80 |
+| integrator | allow, salvo `specs/**` y `docs/memory.md` (deny); skill `sdd` | verificaciones, build, dev, `git add` y `git commit -m` (sin `--amend`) | deny | 120 |
 | reviewer | deny | solo verificaciones, build, lectura de git y `grep` | deny | 60 |
 
-**Commits (decisión F3):** los hacen foundation, component-builder e
-integrator, con `git commit -m`. Por cada pieza: `test(<Name>)` con los tests
-en rojo → `feat(<Name>)` con la implementación → `fix(<Name>)` si hay
-correcciones. `--amend`, `reset --hard` y `push` están denegados. El reviewer
+**Commits (decisiones F3 y #69):** los hacen foundation, component-builder e
+integrator, con `git commit -m`. **Por cada tarea (Tn de `tasks.md`):**
+`test(<Name>): Tn` con los tests en rojo → `feat(<Name>): Tn` con la
+implementación → `fix(<Name>): Tn` si hay correcciones. `feat`/`fix` no tocan
+tests; `test` solo agrega. El orchestrator marca la tarea en `tasks.md` cuando el
+reviewer la aprueba. `--amend`, `reset --hard` y `push` están denegados. El reviewer
 y el orchestrator no commitean.
 
 ## Agentes

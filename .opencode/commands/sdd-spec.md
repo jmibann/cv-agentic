@@ -3,7 +3,7 @@ description: SDD · Entrevista y genera la spec (uso - /sdd-spec 002-nombre idea
 agent: plan
 ---
 
-NO escribas código en ningún momento. Lee `docs/constitution.md` y `MEMORY.md`, y usa la skill `sdd`.
+NO escribas código en ningún momento. Lee `docs/constitution.md` y `docs/memory.md`, y usa la skill `sdd`.
 
 Carpeta de la spec: `specs/$1/`  
 Idea inicial (el texto que va después del nombre de la carpeta): `$ARGUMENTS`

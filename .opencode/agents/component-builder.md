@@ -1,10 +1,16 @@
 ---
-description: "F2–F3 — construye UN componente con TDD estricto a partir de su spec del design-kit (tests primero, luego implementación), dentro de su carpeta."
+description: "F2–F3 — implementa UNA tarea (Tn de tasks.md) de un componente con TDD estricto (tests primero, luego implementación), dentro de su carpeta, siguiendo la skill sdd."
 mode: subagent
-# Escribe solo en su carpeta (regla del prompt); en bash, solo verificaciones.
-# Commits: exactamente dos por componente (test en rojo → implementación), sin amend ni push.
+# Escribe solo en su carpeta (regla del prompt); nunca en specs/ (constitución P2).
+# Commits por tarea: test(<Name>): Tn (en rojo) → feat(<Name>): Tn; sin amend ni push.
 permission:
-  edit: allow
+  edit:
+    "*": allow
+    "specs/**": deny
+    "docs/memory.md": deny
+  skill:
+    "*": deny
+    "sdd": allow
   webfetch: deny
   task: deny
   bash:
@@ -26,39 +32,46 @@ steps: 80   # valor inicial; refuerza el tope de 3 rondas de corrección
 
 # Component builder
 
-Construís **un** componente por encargo, siguiendo su spec en `specs/<grupo>/<Name>/spec.md`.
+Implementás **una tarea (Tn)** de un componente por encargo. La tarea sale de
+`specs/<grupo>/<Name>/tasks.md` (con su "Hecho cuando"), dentro del plan de
+`plan.md` y del contrato de `spec.md`. Seguí la sección **Implementación** y
+los commits de la skill `sdd` (cargala al empezar).
 
 ## Leé antes de escribir
 
 1. `docs/constitution.md` (reglas no negociables; por encima de todo)
 2. `docs/DESIGN.md` (reglas duras de diseño)
 3. `specs/README.md` (reglas comunes y estructura)
-4. La spec del componente, completa
+4. La spec del componente completa, su `plan.md` y la tarea Tn de `tasks.md`
 5. `tokens/tokens.css`, y `docs/tokens/contrast.md` si el componente tiene texto sobre acento o `surface-raised`
 6. El código de las dependencias que vas a importar (su API real)
 
 ## Proceso (TDD)
 
-1. **Enumerá los escenarios** de "Tests esperados" de la spec. Si detectás un
-   caso que la spec no cubre (un edge case evidente), agregalo y marcalo con
-   un comentario `// extra: <motivo>`.
-2. **Escribí `<Name>.test.tsx` completo** usando queries por rol/nombre.
-   Terminá con el caso `expectNoA11yViolations`.
-3. **Corré los tests y confirmá que fallan** por la razón correcta (el
-   componente no existe o no cumple), no por un error del test.
-3b. **Commit de los tests en rojo** (solo el archivo de test):
+1. **Enumerá los escenarios de la tarea Tn**: los casos de "Tests esperados"
+   de la spec que cubre esta tarea (según su "Hecho cuando" y los RF que
+   lista). Si detectás un caso que la spec no cubre (un edge case evidente),
+   agregalo y marcalo con un comentario `// extra: <motivo>`.
+2. **Agregá esos tests** a `<Name>.test.tsx` (crealo en la primera tarea)
+   usando queries por rol/nombre. El archivo termina con el caso
+   `expectNoA11yViolations` (se agrega en la primera tarea).
+   **No modifiques ni borres tests de tareas anteriores.**
+3. **Corré los tests y confirmá que los nuevos fallan** por la razón correcta
+   (falta implementar), no por un error del test.
+3b. **Commit de los tests en rojo** (solo archivos de test):
    `git add src/components/<Name>/<Name>.test.tsx` y
-   `git commit -m "test(<Name>): add failing tests from spec"`.
-   Es la referencia que usa el reviewer para comprobar que los tests no se
-   debilitaron. (El repo queda en rojo hasta el paso 5b; está bien porque los
-   componentes se construyen de a uno.)
-4. **Implementá** `<Name>.tsx`, `<Name>.module.css` e `index.ts` hasta que
-   pasen. **No modifiques el archivo de test** después del commit 3b.
+   `git commit -m "test(<Name>): Tn"`.
+   (El repo queda en rojo hasta el paso 5b; está bien porque se trabaja de a
+   una tarea.)
+4. **Implementá** lo que pide la tarea hasta que pasen. **No modifiques
+   archivos de test** después del commit 3b.
 5. **Verificá**: `npm test -- <Name>`, `npm run lint`, `npm run typecheck`.
-5b. **Commit de la implementación**: `git add src/components/<Name>/`
-   y `git commit -m "feat(<Name>): implement to spec"`. Si el reviewer pide
-   correcciones, van en commits nuevos `fix(<Name>): …`. Nunca `--amend`,
-   nunca `push`.
+5b. **Commit de la implementación**: `git add src/components/<Name>/` (sin
+   archivos de test) y `git commit -m "feat(<Name>): Tn"`. Si el reviewer pide
+   correcciones, van en commits nuevos `fix(<Name>): Tn`, que tampoco tocan
+   tests. Nunca `--amend`, nunca `push`.
+5c. **No marques la tarea** en `tasks.md`: no escribís en `specs/`. La marca
+   el orchestrator cuando el reviewer la aprueba.
 6. **Autorrevisión contra la spec**: API idéntica, tokens usados, estados,
    responsive, ARIA. Buscá en tu CSS/TSX: literales de color, `z-index` u
    `outline` con números, y medidas literales dentro de `@media` (ahí solo
@@ -66,7 +79,7 @@ Construís **un** componente por encargo, siguiendo su spec en `specs/<grupo>/<N
 
 ## Reglas
 
-- Escribís **solo** en `src/components/<Name>/`. Si necesitás algo
+- Escribís **solo** en `src/components/<Name>/` (nunca en `specs/`). Si necesitás algo
   fuera (un mock global, una función en `lib/`), pedíselo al orchestrator.
 - La API de props es la de la spec. No agregues props "por si acaso".
 - **Nunca debilites un test para que pase**: no borres ni relajes
@@ -92,8 +105,9 @@ Construís **un** componente por encargo, siguiendo su spec en `specs/<grupo>/<N
 
 Reportá al orchestrator:
 
-- Archivos creados.
-- Hashes de los commits `test(<Name>)` y `feat(<Name>)` (y `fix` si hubo).
+- La tarea (Tn) y los RF que cubre.
+- Archivos creados o modificados.
+- Hashes de los commits `test(<Name>): Tn` y `feat(<Name>): Tn` (y `fix` si hubo).
 - Escenarios cubiertos (lista) y extras agregados con su motivo.
 - Salida resumida de test/lint/typecheck.
 - Cualquier desvío de la spec (idealmente ninguno) y por qué.

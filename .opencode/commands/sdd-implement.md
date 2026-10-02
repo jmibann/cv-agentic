@@ -8,6 +8,6 @@ Implementa SOLO la tarea `$2` de `specs/$1/tasks.md`, siguiendo `specs/$1/plan.m
 1. Escribe primero los tests y comprueba que fallan.
 2. Escribe el código hasta que pasen.
 3. Ejecuta `npm test` y muéstrame el resultado.
-4. Marca `$2` como hecha en `tasks.md` e indica qué RF cubre.
+4. Indica qué RF cubre. **No marques `$2` en `tasks.md`**: la marca el orchestrator cuando el reviewer la aprueba (constitución P2).
 
 Después PÁRATE. No empieces la siguiente tarea.

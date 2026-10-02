@@ -36,13 +36,17 @@ no puede cambiar la API ni debilitar tests sin pasar por el usuario.
 | F4 | ResumePage | [pages/ResumePage/spec.md](pages/ResumePage/spec.md) | SectionTitle, ResumeSection, SkillList, LocaleProvider (`useCv`, `useLocale`) |
 | F4 | AppLayout | [layout/AppLayout/spec.md](layout/AppLayout/spec.md) | todo lo anterior, incluidos useHashTab, AboutPage y ResumePage |
 
-**Quién construye cada fase:** F2 y F3 → `component-builder` (un componente por
-encargo). F4 → `integrator`, en el orden de la tabla: `useHashTab` → páginas →
-AppLayout, cada uno con sus tests escritos **antes** de la implementación.
-**Siempre de a una pieza**, en el orden de la tabla (sin paralelismo), con dos
-commits por pieza: `test(<Name>)` en rojo y `feat(<Name>)`.
-Criterio de terminado de cada fila: los "Tests esperados" de su spec en verde +
-`lint` + `typecheck`, después del commit `feat(<Name>)`.
+**Quién construye cada fase:** F2 y F3 → `component-builder`. F4 →
+`integrator`, en el orden de la tabla: `useHashTab` → páginas → AppLayout.
+**Unidad de trabajo: una tarea (Tn) del `tasks.md` de la pieza por encargo**
+(skill `sdd`), con sus tests escritos **antes** de la implementación.
+**Siempre de a una pieza y de a una tarea**, en el orden de la tabla (sin
+paralelismo), con dos commits por tarea: `test(<Name>): Tn` en rojo y
+`feat(<Name>): Tn`. El orchestrator marca la tarea en `tasks.md` cuando el
+reviewer la aprueba.
+Criterio de terminado de cada fila: todas sus tareas marcadas, los "Tests
+esperados" de su spec en verde + `lint` + `typecheck`, la revisión completa del
+reviewer y la aprobación del usuario (`Estado: implementada`).
 
 `ThemeProvider` y `LocaleProvider` no son componentes visuales: sus specs están
 en [foundations/theming.md](../foundations/theming.md) y

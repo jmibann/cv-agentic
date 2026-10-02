@@ -55,8 +55,10 @@ equivocada o incompleta, **se frena y se consulta al usuario**; no se
 "corrige" la spec por cuenta propia.
 
 ## Memoria
-- Al empezar, lee `memory.md` para conocer el estado del proyecto y las decisiones tomadas.
-- Al terminar una tarea, actualízalo: estado actual, decisiones importantes (con su porqué) y errores a evitar.
+- La memoria del proyecto vive en **`docs/memory.md`** (no hay `MEMORY.md` en la raíz).
+- Al empezar, leela para conocer el estado del proyecto y las decisiones tomadas.
+- **Solo el orchestrator la actualiza**, al cerrar cada fase SDD (skill `sdd`): estado actual,
+  decisiones importantes (con su porqué) y errores a evitar. Los subagentes la leen; no la editan.
 - Mantenlo breve (máximo ~50 líneas): resume o elimina lo que ya no aporte.
 - Si algo se convierte en una regla permanente, propón moverlo a `AGENTS.md` en lugar de dejarlo en la memoria.
 - No guardes nunca datos sensibles (claves, tokens, datos personales).
@@ -95,12 +97,16 @@ rojo a propósito).
 - `z-index` siempre con un token `--z-*`.
 - Textos: contenido desde `useCv()` (solo en páginas/AppLayout), interfaz
   desde `useLocale().t`. Nada hardcodeado en componentes.
-- Commits: Conventional Commits. Por cada componente/pieza, en este orden:
-  `test(<Name>): add failing tests from spec` (solo el test, en rojo) →
-  `feat(<Name>): implement to spec` → `fix(<Name>): …` si hay correcciones.
+- **Unidad de trabajo: una tarea (Tn) de `specs/<cat>/<Name>/tasks.md`** (skill `sdd`).
+  Commits (Conventional Commits) por tarea, en este orden:
+  `test(<Name>): Tn` (solo tests, en rojo) → `feat(<Name>): Tn` →
+  `fix(<Name>): Tn` si hay correcciones.
   Sin `--amend`, sin reescribir historia, sin push (salvo pedido del usuario).
-- **Construcción de a una pieza por vez** (sin paralelismo): los tests en rojo
-  rompen el `typecheck` global y todos comparten la carpeta de trabajo.
+- **Una tarea por vez** (sin paralelismo): los tests en rojo rompen el
+  `typecheck` global y todos comparten la carpeta de trabajo.
+- **`specs/` es del usuario y del orchestrator:** nadie edita `spec.md` sin el
+  usuario; `plan.md`/`tasks.md` los escribe el orchestrator, que además marca
+  cada tarea cuando el reviewer la aprueba. Los subagentes no escriben en `specs/`.
 
 ## Tests
 
@@ -112,10 +118,11 @@ rojo a propósito).
 - **Nunca debilitar un test para que pase.** Borrar o relajar una aserción,
   agregar `.skip`/`.only`, o cambiar lo que un test espera **es un cambio de
   spec** y lo decide el usuario.
-- Los tests de un componente se escriben **antes** que su implementación y
-  se commitean en rojo (`test(<Name>)`) antes de implementar. Después de ese
-  commit el archivo de test **no cambia**: el reviewer lo verifica con
-  `git diff <commit de test> HEAD -- <archivo de test>`.
+- Los tests de cada tarea se escriben **antes** que su implementación y se
+  commitean en rojo (`test(<Name>): Tn`). Los commits `feat`/`fix` **no tocan**
+  archivos de test, y los `test(<Name>): Tn` **solo agregan** tests (no borran
+  ni cambian los de tareas anteriores): el reviewer lo verifica con `git log -p`
+  sobre los archivos de test de la pieza.
 
 ## Dependencias
 

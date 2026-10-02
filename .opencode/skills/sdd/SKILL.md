@@ -20,7 +20,7 @@ Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spe
   (obligatorio desde el inicio) y `plan.md` / `tasks.md` (se redactan en sus
   puertas). Categorías del kit: `primitives`, `controls`, `layout`, `content`,
   `pages`, `hooks`, más `qa` cuando exista la QA de F5.
-- Al terminar cada fase, actualiza `MEMORY.md`, el `README.md` de la raíz y
+- Al terminar cada fase, actualiza `docs/memory.md`, el `README.md` de la raíz y
   `docs/diagnostics.md`.
 
 ## Constitución
@@ -106,7 +106,9 @@ la spec.
 ## Implementación
 
 Una sola tarea cada vez: tests primero (en rojo), después el código, `npm run lint`,
-`npm run typecheck` y `npm test` en verde, marcar la tarea y parar.
+`npm run typecheck` y `npm test` en verde, reportar y parar. **Quien implementa
+no marca la tarea**: la marca el orchestrator en `tasks.md` después del OK del
+reviewer (los subagentes no escriben en `specs/`).
 
 ## Validación
 
@@ -135,12 +137,18 @@ trabaja con el orquestador.
   "Hecho cuando") y la ruta del código, nada más.
 - **Unidad de trabajo: una tarea de `tasks.md`.** Cada encargo a un subagente es
   exactamente una tarea (Tn). El subagente sigue la sección Implementación:
-  tests en rojo, implementa, deja lint + typecheck + tests en verde, marca la
-  tarea y para.
+  tests en rojo, implementa, deja lint + typecheck + tests en verde, reporta y
+  para. El orchestrator marca la tarea en `tasks.md` cuando el reviewer la
+  aprueba.
 - **Commits por tarea.** `test(<Name>): Tn` con los tests en rojo, después
   `feat(<Name>): Tn` con la implementación, y `fix(<Name>): Tn` si hubo
   correcciones. Si un hook de pre-commit bloquea el commit en rojo, no se usa
   `--no-verify`: se frena y se consulta al usuario.
+- **Tests que no se debilitan (por tarea).** Los commits `feat(<Name>): Tn` y
+  `fix(<Name>): Tn` **no tocan** archivos de test; los commits
+  `test(<Name>): Tn` solo **agregan** tests (no borran ni cambian líneas de
+  tests de tareas anteriores). El reviewer lo verifica con `git log -p` sobre
+  los archivos de test de la pieza.
 - **Una tarea por vez.** No se paraleliza. Nunca se invoca al reviewer con el repo
   en rojo (entre el commit de test y el de implementación).
 - **Validación.** El reviewer verifica cada tarea contra su "Hecho cuando". Al
