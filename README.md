@@ -30,7 +30,7 @@ Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
 cv-agentic/
 ├─ README.md          este índice
 ├─ AGENTS.md          convenciones para los agentes (OpenCode lo lee desde la raíz)
-├─ docs/              documentación (constitution, README completo, DESIGN, BACKLOG, diagnostics, agents, tokens/)
+├─ docs/              documentación (constitution, README completo, DESIGN, BACKLOG, diagnostics, agent-system.md, tokens/)
 ├─ tokens/            tokens.css (lo importa la app)
 ├─ foundations/       tipografía · layout · movimiento · theming · i18n
 ├─ specs/             una carpeta por pieza (<categoria>/<Name>/spec.md)

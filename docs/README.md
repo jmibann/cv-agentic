@@ -84,8 +84,11 @@ import type { CvData, Locale } from "@data/cv.types.generated";
 
 ## Entorno y dependencias aprobadas
 
-**Node 24 LTS** (`.nvmrc`: `24`; `engines.node`: `"^22.12.0 || >=24"`, el
-mínimo que exigen Vitest 5, jsdom 30 y ESLint 10). **Política de versiones:**
+**Node 24 LTS** (`.nvmrc`: `24`; `engines.node`: `"^22.12.0 || >=24"`).
+Piso real de las herramientas (npm, 2026-10-02): Vitest 5 `^22.12.0 || ^24.0.0
+|| >=26`, ESLint 10 `^20.19.0 || ^22.13.0 || >=24`, jsdom 30 `^22.22.2 ||
+^24.15.0 || >=26.0.0` — el piso efectivo lo fija jsdom y lo cubre `.nvmrc: 24`.
+**Política de versiones:**
 rango `^` dentro de la versión mayor de esta tabla (TypeScript con `~`, ver
 abajo) y `package-lock.json` commiteado. Subir una versión mayor es una
 decisión del usuario. Verificado contra el registro de npm el 2026-10-01.
