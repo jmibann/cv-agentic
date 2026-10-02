@@ -10,14 +10,14 @@ workspaces): el kit de diseño y la app conviven en la raíz. **Node 24 LTS**
 cv-agentic/
 ├─ AGENTS.md                  (este archivo)
 ├─ README.md                  índice corto
-├─ docs/                      constitution, README completo, DESIGN, BACKLOG, diagnostics, memory, agents.md, qa-report (F5), tokens/ (breakpoints, contraste)
+├─ docs/                      constitution, README completo, DESIGN, BACKLOG, diagnostics, memory, agent-system.md, qa-report (F5), tokens/ (breakpoints, contraste)
 ├─ tokens/                    tokens.css (lo importa la app)
 ├─ foundations/               tipografía, layout, movimiento, theming, i18n
 ├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (foundation, primitives, controls, layout, content, pages, hooks)
 ├─ data/                      cv.schema.json (fuente de verdad), constants.ts, ejemplos JSON y *.generated.* (alias @data)
 ├─ .opencode/agents/          los 5 agentes (orchestrator, foundation, component-builder, integrator, reviewer)
 ├─ .opencode/skills/sdd/      skill del flujo SDD (SKILL.md)
-├─ .opencode/commands/        comandos /sdd-* (atajos del flujo; ver docs/agents.md)
+├─ .opencode/commands/        comandos /sdd-* (atajos del flujo; ver docs/agent-system.md)
 ├─ opencode.json              config de OpenCode: MCP de Chrome DevTools (denegado salvo para el reviewer)
 ├─ package.json               scripts: dev, lint, typecheck, test, build (los crea la Fase 1)
 ├─ index.html                 incluye el script anti-flash (tema, idioma y theme-color)
@@ -71,7 +71,7 @@ equivocada o incompleta, **se frena y se consulta al usuario**; no se
 | Comando | Qué hace |
 |---|---|
 | `npm install` | Instala las dependencias |
-| `npm run dev` | Vite dev server |
+| `npm run dev` | Vite dev server (lo corre el usuario; ningún agente, decisión #91) |
 | `npm run lint` | ESLint con `--max-warnings 0` |
 | `npm run typecheck` | `tsc --noEmit` (un solo `tsconfig.json`: `src/`, `data/`, `vite.config.ts`) |
 | `npm test` | Vitest en modo run |

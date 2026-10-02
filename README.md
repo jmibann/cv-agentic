@@ -17,7 +17,7 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68); P2/P4/T2 por tarea (decisión #69); P2 aclarado (decisión #75) |
 | Comandos `/sdd-*` | ✅ Integrados: corren con el orchestrator o el reviewer, con argumento `<categoria>/<Name>` (decisión #71) |
 | Puertas | ✅ Plan + Tareas por fase F1–F4 (#74, #84, #85); Clarificación solo con hallazgos (#90): entre ~37 y ~65 puertas en lugar de ~113 |
-| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82); tercera auditoría: 2 altos (#83 identidad de git en permisos, #84 F1 como pieza `foundation/Foundation` con Tn) y 7 medios corregidos (#85–#91) |
+| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82); tercera auditoría: 2 altos (#83 identidad de git en permisos, #84 F1 como pieza `foundation/Foundation` con Tn) 7 medios (#85–#91) y bajos (#92–#94) corregidos; sin pendientes |
 | Unidad de trabajo y memoria | ✅ Por tarea (Tn) en todo el sistema; memoria única en `docs/memory.md` (decisiones #69 y #70) |
 | Contenido del CV en JSON (esquema + validación) | ✅ Especificado: `data/cv.schema.json` + ejemplos JSON; se genera en F1 |
 | `spec.md` de `foundation/Foundation`, `plan.md` / `tasks.md` de las 28 piezas, `src/`, `package.json` | ⏳ Próxima fase (kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn) |
@@ -48,5 +48,5 @@ cv-agentic/
    dependencias aprobadas y registro de decisiones.
 3. [docs/DESIGN.md](docs/DESIGN.md): lenguaje visual y reglas duras.
 4. [specs/README.md](specs/README.md): índice de specs y orden de construcción.
-5. [AGENTS.md](AGENTS.md) y [docs/agents.md](docs/agents.md): cómo trabajan los agentes.
+5. [AGENTS.md](AGENTS.md) y [docs/agent-system.md](docs/agent-system.md): cómo trabajan los agentes.
 6. [docs/memory.md](docs/memory.md): memoria del proyecto (estado y decisiones recientes).

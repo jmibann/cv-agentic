@@ -104,7 +104,8 @@ src/lib/useHashTab.ts    hook + useHashTab.test.ts
 
 Cada pieza vive en su propia carpeta con un `spec.md` (el contrato, con su
 `Estado`). `plan.md` y `tasks.md` los redacta el orchestrator y se aprueban
-**por fase**: todos los de F2 juntos, luego F3, etc. (ver skill `sdd`).
+**por fase**: todos los de F1 juntos, luego F2, F3 y F4 (F5 no tiene plan ni
+tareas, decisión #85; ver skill `sdd`).
 
 ```
 specs/<categoria>/<Name>/

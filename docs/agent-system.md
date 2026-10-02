@@ -1,16 +1,20 @@
 # Agentes (OpenCode)
 
 Los 5 agentes se escribieron **desde cero** para este proyecto y el proyecto
-arranca **sin base de aprendizajes**.
+arranca **sin base de aprendizajes**; la memoria entre sesiones vive en
+`docs/memory.md` (solo la edita el orchestrator).
 
 Ya están en su **ubicación final**: OpenCode lee `AGENTS.md` (raíz) y los
 agentes de **`.opencode/agents/`** (carpeta en plural, según la documentación
 vigente de OpenCode). No hay plantillas ni paso de instalación: si se edita un
 agente, se edita acá.
 
-> Esta documentación vive en `docs/agents.md` y **no** dentro de
+> Esta documentación vive en `docs/agent-system.md` y **no** dentro de
 > `.opencode/agents/` a propósito: OpenCode trataría cualquier `.md` de esa
-> carpeta como un agente.
+> carpeta como un agente. Se llamaba `docs/agents.md`: se renombró
+> (decisión #92) porque en sistemas de archivos que no distinguen mayúsculas
+> (macOS) chocaba con `AGENTS.md` y algunas herramientas lo tomaban como
+> instrucciones del directorio `docs/`.
 
 ## Formato de los agentes
 
@@ -35,10 +39,10 @@ agente, se edita acá.
 
 | Agente | edit | bash | task | skill | steps |
 |---|---|---|---|---|---|
-| orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `docs/qa-report.md` (informe de F5, #85); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
-| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git [-c user.name=…] commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | `sdd` | 150 |
-| component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git [-c user.name=…] commit -m` (sin `--amend`) | deny | `sdd` | 80 |
-| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, dev, `git add` y `git [-c user.name=…] commit -m` (sin `--amend`) | deny | `sdd` | 120 |
+| orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `docs/qa-report.md` (informe de F5, #85); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend` ni `--no-verify`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
+| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git [-c user.name=…] commit -m` permitidos; `push`, `--amend`, `--no-verify`, `reset --hard` y `rm -rf` denegados | deny | `sdd` | 150 |
+| component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`) | deny | `sdd` | 80 |
+| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, dev, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`) | deny | `sdd` | 120 |
 | reviewer | deny | solo verificaciones, build, `validate:content`, lectura de git y `grep`; único con el MCP `chrome-devtools_*` | deny | `sdd`, `browser-testing-with-devtools` | 60 |
 
 **Edición por grupo** (decisiones #72 y #73): foundation, component-builder e
@@ -60,7 +64,7 @@ tocan tests; `test` solo agrega. El orchestrator marca la tarea en
 `tasks.md` cuando el reviewer la aprueba y **commitea él mismo los
 documentos** (`git add` acotado a `README.md`, `docs/*` y `specs/*` +
 `git commit -m`, solo con el repo en verde, con mensaje en inglés y sin
-`git add .`/`-A`). `--amend`, `reset --hard` y `push` están denegados. El
+`git add .`/`-A`). `--amend`, `--no-verify` (#93), `reset --hard` y `push` están denegados. El
 reviewer no commitea.
 
 **Límite conocido de los patrones bash (decisión #88):** en OpenCode `*`
@@ -91,7 +95,7 @@ Usuario ──► orchestrator
               │    plan.md + tasks.md de Foundation ──► PUERTA Plan + Tareas
               │    foundation × Tn (test → feat) ──► reviewer por tarea y pieza
               │                                   ──► PUERTA F1
-   F2 ────────┼──► Clarificación de cada pieza (si hay dudas)
+   F2 ────────┼──► Clarificación de cada pieza (reviewer detecta; puerta solo con hallazgos, #90)
               │    plan.md + tasks.md de las 11 primitivas ──► PUERTA Plan + Tareas
               │    component-builder × N (de a una pieza, de a una Tn)
               │        └─► reviewer por tarea y por pieza ──► PUERTA por pieza
@@ -118,12 +122,12 @@ spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
 |---|---|---|
 | `/sdd-status <cat>/<Name>` | orchestrator | Fase, tareas hechas y siguiente comando (no modifica nada) |
 | `/sdd-spec <cat>/<Name> <idea>` | orchestrator | Entrevista y redacta una spec nueva (`spec.md` con `ask`) |
-| `/sdd-clarify <cat>/<Name>` | reviewer | QA de la spec: ambigüedades, contradicciones, RF sin test; no resuelve |
+| `/sdd-clarify <cat>/<Name>` | reviewer | QA de la spec: ambigüedades, contradicciones, RF sin test; no resuelve (lo resuelve el orchestrator con el usuario). "Sin hallazgos" en una spec aprobada → sin puerta (#90) |
 | `/sdd-change <cat>/<Name> <cambio>` | orchestrator | Propone el cambio en la spec (con `ask`); después siguen plan y tareas |
 | `/sdd-plan F1…F4` · `/sdd-plan <cat>/<Name>` | orchestrator | Con una fase: `plan.md` + `tasks.md` de todas sus piezas, una sola puerta. Con una pieza suelta o un Cambio: solo `plan.md` (puerta de Plan) |
 | `/sdd-task <cat>/<Name>` | orchestrator | `tasks.md` de una pieza suelta o de un Cambio (puerta de Tareas) |
 | `/sdd-implement <cat>/<Name> Tn` | orchestrator | Delega UNA tarea (test → feat), pide revisión, marca la tarea y para |
-| `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + `npm run build` + MCP de Chrome DevTools |
+| `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + `npm run build` + MCP de Chrome DevTools (app servida por el usuario, #91) |
 
 - **`/sdd-validate` y el MCP:** `opencode.json` (raíz) declara el servidor
   local `chrome-devtools` con versión fija (`npx -y chrome-devtools-mcp@1.10.1`,

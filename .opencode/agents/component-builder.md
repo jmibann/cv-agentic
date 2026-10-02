@@ -29,6 +29,8 @@ permission:
     # Identidad por flag (AGENTS.md; decisión #83): git -c user.name=… commit -m …
     "git -c user.name=* commit -m *": allow
     "*--amend*": deny
+    # Sin saltear hooks de pre-commit (skill sdd; decisión #93).
+    "*--no-verify*": deny
 steps: 80   # valor inicial; refuerza el tope de 3 rondas de corrección
 ---
 

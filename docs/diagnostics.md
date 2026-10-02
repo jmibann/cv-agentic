@@ -36,7 +36,7 @@ como `specs/` y `agents/agent/` como `.opencode/agents/`.
 
 ---
 
-## Estado actual (2026-09-30)
+## Estado actual (actualizado 2026-10-02)
 
 | Bloque | Estado | Qué falta |
 |---|---|---|
@@ -46,19 +46,26 @@ como `specs/` y `agents/agent/` como `.opencode/agents/`.
 | Contenido en JSON (sección G) | ✅ Aplicado en el kit | La generación de tipos y validador ocurre en F1 |
 | Auditoría de arquitectura (sección J) | ✅ Críticos, altos y medios (1–24) corregidos, más la observación del sticky | — |
 | A1–A6 Contradicciones | ✅ Decididas y aplicadas | — |
-| B1–B9 Puntos débiles | ✅ Decididas y aplicadas | Revisar los 4 desvíos anotados al final de la tabla de B |
+| B1–B9 Puntos débiles | ✅ Decididas y aplicadas | Los 4 desvíos del final de la tabla de B ya están en las 27 specs aprobadas (modelo L); revisarlos ahora sería un Cambio |
 | C1–C9 Notas menores | ✅ Resueltas y aplicadas (C8 y C9 detectadas en la evaluación de C) | — |
 | F1, F4, F5, F11 | ✅ Aplicadas (mecánicas) | — |
 | F2, F3, F6, F7, F8, F10 | ✅ Decididas y aplicadas (recomendaciones aceptadas) | F8: el valor final del avatar se fija en la QA visual de F5 |
 | F9 | ✅ Verificado, sin acción | Plan B de la spec (LinkedIn) |
 | F12–F13 | ✅ Resueltas con B | — |
 | Documentación | ✅ Actualizada (ver "Registro de documentación") | — |
-| **F1 del proyecto (fase foundation)** | ✅ Desbloqueada | Arrancar cuando el usuario lo indique |
+| Modelo de spec, unidad por tarea, comandos, permisos y puertas (L–Q) | ✅ Aplicados (decisiones #67–#74) | — |
+| Auditorías de agentes, skills y comandos (R, S, T, U, V) | ✅ Altos, medios y bajos corregidos (#75–#94) | Sin pendientes de auditoría |
+| **F1 del proyecto (fase foundation)** | ✅ Desbloqueada | Kickoff (#84): `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn |
 
 ## Verificación independiente y plan de kickoff (2026-09-30)
 
 Segunda pasada de auditoría (read-only) sobre el estado cerrado de A/B/C/F,
 enfocada en factibilidad de arrancar F1.
+
+> *Actualización 2026-10-02:* `.git` ya existe; F1 es la pieza
+> `specs/foundation/Foundation/` con tareas Tn (decisión #84) y la etapa 0 queda
+> cerrada (desvíos de B incluidos en las specs aprobadas). El texto de abajo es
+> el registro histórico del 2026-09-30.
 
 ### Lo que se verificó por separado
 
@@ -1108,3 +1115,29 @@ fases 5 = entre ~37 y ~65.
 archivo; `--no-verify` sin denegar en bash; doble conteo en `docs/README.md:38`;
 #57 sin marcar como reemplazada por #70; `docs/agents.md` vs `AGENTS.md` en
 sistemas que no distinguen mayúsculas; opción 1 de la decisión 5 (`ask` doble).
+
+
+## V. Tercera auditoría: hallazgos bajos (2026-10-02)
+
+**Origen:** los bajos que seguían abiertos en la sección U, aplicados a pedido
+del usuario. Opción 1 de la decisión 5 y el renombre, con su elección.
+
+| Hallazgo | Corrección |
+|---|---|
+| Estado de 2026-09-30 al inicio de este archivo; plan de kickoff con texto viejo; etapa 0 sin cierre | "Estado actual" actualizado (filas L–Q y R–V, F1 con el kickoff de #84); nota de actualización en el plan de kickoff; desvíos de B incluidos en las specs aprobadas |
+| `--no-verify` sin denegar en bash | `"*--no-verify*": deny` en los 4 agentes que commitean; `docs/agent-system.md` actualizado (#93) |
+| Doble conteo de secciones ("10 secciones más `Estado` y Requisitos") | `docs/README.md`, `sdd-spec` y `docs/memory.md`: 10 secciones (EARS incluida) + `Estado` |
+| #57 sin marcar como reemplazada | Tachada y apuntada a #70, #85 y #86 |
+| `docs/agents.md` chocaba con `AGENTS.md` en macOS | Renombrado a `docs/agent-system.md` con `git mv` (#92); referencias vivas actualizadas; las históricas (incluida esta sección y las anteriores) conservan el nombre viejo |
+| Opción 1 de la decisión 5 (`ask` doble en `spec.md`) | Se mantiene el `ask` (barrera técnica de P2); decisión 5 cerrada (#94) |
+| Árbol de `docs/README.md` incompleto | Agregados `constitution`, `memory`, `agent-system.md`, `qa-report.md`, `.opencode/{skills,commands}` y `opencode.json` |
+| `## No hacer` en 9 specs; excepciones de `AGENTS.md` → Límites | Ya resueltos en U (#89 y #86) |
+
+**Barrido final de documentación:** comentario de permisos del orchestrator y
+encabezado de `docs/memory.md` con la cadencia de #86; `AGENTS.md` → `npm run dev`
+lo corre el usuario (#91); `docs/agent-system.md` (comandos `/sdd-clarify` y
+`/sdd-validate`, flujo F2, memoria); `docs/README.md` (filas de la skill `sdd`,
+`docs/memory.md` y `docs/qa-report.md`); `specs/README.md` (Plan + Tareas F1–F4);
+`docs/BACKLOG.md` (aprendizajes: hoy en `docs/memory.md`; el reviewer no escribe).
+
+**Sin pendientes de auditoría.** Próximo hito: kickoff de F1.

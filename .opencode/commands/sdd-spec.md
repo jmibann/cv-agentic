@@ -13,7 +13,7 @@ Cargá la skill `sdd` y leé `docs/constitution.md`, `specs/README.md` y `docs/m
 2. Hacé preguntas de UNA en UNA para eliminar ambigüedades (casos límite, errores, qué queda
    fuera de esta versión). Máximo 5 preguntas.
 3. Con mis respuestas, redactá `specs/$1/spec.md` con la plantilla de `specs/README.md`
-   (10 secciones + `Estado: borrador` + `## Requisitos (EARS)`). Si es una pieza del kit,
+   (las 10 secciones, incluida `## Requisitos (EARS)`, más `Estado: borrador`). Si es una pieza del kit,
    incluye API, tokens y estructura HTML; si es una spec de dominio nueva, solo el QUÉ y
    el POR QUÉ (ver la skill).
 4. Mostrame el contenido y esperá mi aprobación antes de guardar (tu permiso sobre

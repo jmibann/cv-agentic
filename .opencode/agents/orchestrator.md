@@ -9,7 +9,7 @@ permission:
     "sdd": allow
   edit:
     "*": deny
-    # Documentos de estado que la skill pide actualizar al cerrar cada fase SDD.
+    # Documentos de estado: se actualizan al cerrar cada puerta F (skill sdd, decisión #86).
     "README.md": allow
     "docs/memory.md": allow
     "docs/diagnostics.md": allow
@@ -46,6 +46,8 @@ permission:
     # Identidad por flag (AGENTS.md; decisión #83): git -c user.name=… commit -m …
     "git -c user.name=* commit -m *": allow
     "*--amend*": deny
+    # Sin saltear hooks de pre-commit (skill sdd; decisión #93).
+    "*--no-verify*": deny
   task:
     "*": deny
     foundation: allow

@@ -36,9 +36,12 @@ fases F1–F5. Cada ítem necesita decisión del usuario antes de implementarse.
 - **Carga de idiomas.** Hoy ambos JSON de contenido van en el bundle (import
   estático). Si se suman idiomas o el contenido crece: `import()` dinámico por
   idioma en `content/index.ts`.
-- **Aprendizajes entre tareas.** El proyecto arranca sin base de
-  aprendizajes para los agentes. Si se ve que se repiten errores, diseñar un
-  mecanismo propio (por ejemplo, un `LEARNINGS.md` curado por el reviewer).
+- **Aprendizajes entre tareas.** Hoy los aprendizajes viven en
+  `docs/memory.md` ("Aprendizajes y errores a evitar", máximo ~50 líneas, solo
+  lo edita el orchestrator al cerrar cada puerta F). Si se ve que se repiten
+  errores y no alcanza, diseñar un mecanismo propio (por ejemplo, un
+  `LEARNINGS.md` que el orchestrator cure con los hallazgos del reviewer, que
+  no tiene permiso de escritura).
 
 ## Fuera de alcance (no reabrir sin decisión explícita)
 

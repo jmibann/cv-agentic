@@ -1,14 +1,14 @@
 # Memoria del proyecto — cv-agentic (`docs/memory.md`)
 
 Memoria del proyecto entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
-La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes tienen `edit` denegado).
+La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisión de reglas (#86; subagentes sin `edit`).
 
 ## Estado actual
 
 - Kit completo y auditado: reglas, tokens, fundamentos, 27 specs, esquema de datos.
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
 - Git baseline + commits solo docs/chore; **no existen `src/`, `package.json` ni la app** (las crea F1/foundation).
-- **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84) y 7 medios (#85–#91).
+- **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84), 7 medios (#85–#91) y bajos (#92–#94): sin pendientes de auditoría.
 - Próximo hito: kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn (#84).
 
 ## Decisiones (y por qué)
@@ -34,8 +34,8 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - No pasadas globales de rename sobre `docs/diagnostics.md`: son referencias históricas (`components/...`).
 - zsh no separa `$var` por espacios: usar `git ls-files -z '*.md' | xargs -0 perl -pi -e '...'`.
 - Links entre specs de carpetas distintas necesitan `../../` (un `../` queda roto; verificar con un checker).
-- Plantilla: "10 secciones + Estado + EARS" y `Requisitos` **justo después** de `Propósito` (no siempre antes de Anatomía).
-- La memoria vive en `docs/memory.md`, no en la raíz (decisión #70); skill, orchestrator y `AGENTS.md` apuntan acá.
+- Plantilla: "10 secciones (EARS incluida) + Estado" y `Requisitos` **justo después** de `Propósito` (no siempre antes de Anatomía).
+- La memoria vive en `docs/memory.md`, no en la raíz (decisión #70). La doc de agentes es `docs/agent-system.md` (#92): un `agents.md` choca con `AGENTS.md` en macOS.
 
 ## Próximos pasos
 
@@ -46,4 +46,4 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - Permisos (#72, #73): edición por grupo con `"*": deny` (foundation → app; component-builder → `src/components/**`; integrator → F4); reviewer e integrator corren `validate:content`.
 - Después de F1 nadie edita `src/test/**` ni configs: si un plan lo pide, decidir quién (consultar).
 - Plan + Tareas **por fase F1–F4** (#74, #84); Clarificación: reviewer detecta, orchestrator resuelve, puerta
-  solo con hallazgos (#90). Pendientes: opción 1 (`ask` doble en `spec.md`), bajas de la tercera auditoría, QA visual.
+  solo con hallazgos (#90); `ask` en `spec.md` se mantiene (#94). Pendiente: QA visual (F5).

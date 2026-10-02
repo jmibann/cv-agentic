@@ -47,6 +47,8 @@ permission:
     "git reset --hard*": deny
     "rm -rf*": deny
     "*--amend*": deny
+    # Sin saltear hooks de pre-commit (skill sdd; decisión #93).
+    "*--no-verify*": deny
 steps: 150  # valor inicial; ajustable
 ---
 
