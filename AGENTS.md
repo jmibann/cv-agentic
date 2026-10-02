@@ -106,6 +106,7 @@ reviewer **al cerrar la pieza** y en cada puerta (decisión #80).
   `test(<Name>): Tn` (solo tests, en rojo) → `feat(<Name>): Tn` →
   `fix(<Name>): Tn` si hay correcciones.
   Sin `--amend`, sin reescribir historia, sin push (salvo pedido del usuario).
+  **No modificar `git config`**: la identidad se pasa por flag (`git -c user.name=…`).
   Los de código los hacen foundation, component-builder e integrator; el
   orchestrator commitea **solo documentos** (`README.md`, `docs/*`, `specs/*`),
   con el repo en verde y con rutas explícitas (nunca `git add .`/`-A`);

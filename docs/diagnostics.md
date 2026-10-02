@@ -1045,3 +1045,23 @@ no aplican todavía (F1 pendiente).
 `## No hacer` (B2), fila F1 del `orchestrator.md` con texto de monorepo
 superado, `docs/AGENTS.md` resuelto case-insensitively como instrucciones de
 directorio, y la fricción abierta de la decisión 5 (opciones 1 y 2).
+
+
+## S. Re-auditoría y corrección de hallazgos medios (2026-10-02)
+
+Segunda pasada read-only (misma fecha que R): sin bloqueantes; 4 hallazgos
+medios elegidos por el usuario, corregidos con decisiones #81 y #82.
+
+| # | Hallazgo | Corrección |
+|---|---|---|
+| 1 | Fila F1 de `orchestrator.md` decía "Monorepo" y "agentes instalados" (contradice S2/#39 y #41; conocido desde R) | F1 = app en la raíz, proyecto único; agentes ya en `.opencode/agents/` |
+| 2 | T5 de la constitución exigía `build` en "Terminado", lectura literal en conflicto con #80 (DoD por tarea) | T5 reescrita: `lint`/`typecheck`/`test` por tarea; `build` por pieza/puerta (#81) |
+| 3 | `docs/memory.md` y la sección L citaban una prohibición de modificar `git config` "por `AGENTS.md`" que ya no estaba en `AGENTS.md` | Regla restablecida en `AGENTS.md` → "Convenciones" (los textos históricos quedan intactos) (#82c) |
+| 4 | Fila F4 de `orchestrator.md` listaba 6 "piezas" pero `specs/README.md` tiene 4 specs; "contenido" e "impresión" no tienen carpeta ni `tasks.md` | F4 aclarado: 4 piezas con spec; contenido en/es e impresión son trabajos del integrator con contrato en `foundations/` (P1), verificados dentro de las tareas de las piezas (#82b) |
+
+**Pendientes menores sin decisión (de esta pasada):** typo "tuncan" en
+`docs/agents.md:57`; doble conteo de secciones en `docs/README.md:38`;
+decisión #57 no anotada como reemplazada por #70; categorías de specs sin `qa`
+en `AGENTS.md`/`docs/README.md`; `/sdd-implement` no define ruta para tareas de
+F5; F1 no usa el modelo Tn/`tasks.md` (excepción implícita); y los pendientes
+heredados de R (B2, case-insensitive de `docs/agents.md`, decisión 5).

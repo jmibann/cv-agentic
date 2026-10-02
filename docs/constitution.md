@@ -30,7 +30,7 @@ Cada regla indica cómo verificarla.
 - **T2** Los tests se escriben antes que el código y nunca se debilitan: sin borrar ni relajar aserciones, sin `.skip`/`.only`. *Verificar:* los commits `feat`/`fix` no tocan archivos de test y los `test(<Name>): Tn` no borran líneas de tests (`git log -p`).
 - **T3** Búsquedas por rol y nombre accesible; `data-testid` solo con un comentario que lo justifique.
 - **T4** Cada archivo de test de componente termina con `expectNoA11yViolations`.
-- **T5** Terminado = `lint` (0 warnings), `typecheck`, `test` y `build` en verde. *Verificar:* salida de los comandos.
+- **T5** Terminado **por tarea** = `lint` (0 warnings), `typecheck` y `test` en verde tras el commit de implementación; `build` en verde se exige al cerrar la **pieza** y en cada puerta (decisión #80). *Verificar:* salida de los comandos.
 
 ## 5. Protección de datos
 - **D1** Sin analytics, trackers, cookies ni pedidos a terceros en runtime (fuentes e íconos van en el bundle). *Verificar:* la pestaña de red solo muestra el origen del sitio.
