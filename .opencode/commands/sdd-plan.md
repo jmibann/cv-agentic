@@ -14,7 +14,7 @@ Genera `specs/$1/plan.md` con:
 - Algoritmo en pseudocódigo.
 - Cómo se pinta en la interfaz.
 - Decisiones técnicas justificadas (con su alternativa descartada).
-- Estrategia de tests con `node --test`.
+- Estrategia de tests con `npm test`.
 
 Todo debe respetar la constitución y cubrir todos los RF. Marca qué RF cubre cada parte.
 
