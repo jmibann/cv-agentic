@@ -6,8 +6,16 @@ mode: subagent
 permission:
   edit:
     "*": allow
+    # El kit no se modifica (constitución P2 y AGENTS.md → Límites).
+    "README.md": deny
+    "AGENTS.md": deny
+    "opencode.json": deny
+    "docs/**": deny
+    "tokens/**": deny
+    "foundations/**": deny
     "specs/**": deny
-    "docs/memory.md": deny
+    "data/**": deny
+    ".opencode/**": deny
   skill:
     "*": deny
     "sdd": allow

@@ -38,5 +38,6 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
   tests y `test` solo agrega; el orchestrator escribe `plan.md`/`tasks.md` y marca cada Tn tras el OK del reviewer.
 - Comandos `/sdd-*` integrados (decisión #71): orchestrator o reviewer, argumento `<categoria>/<Name>`;
   MCP `chrome-devtools` solo para el reviewer (`/sdd-validate`); `/constitution` sin cambios.
-- Pendientes: `## No hacer` en 9 specs; `npm run validate:content` en reviewer/integrator; `edit` por ruta
-  en foundation; fricción de puertas; QA visual.
+- Permisos (decisión #72): foundation, component-builder e integrator no editan el kit (deny por ruta);
+  reviewer e integrator corren `npm run validate:content`.
+- Pendientes: `## No hacer` en 9 specs; fricción de puertas; QA visual.

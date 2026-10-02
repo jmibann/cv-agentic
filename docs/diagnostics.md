@@ -919,3 +919,31 @@ proyecto), argumentos `NNN-nombre` y textos de otro dominio.
 `edit` por ruta en foundation, fricción de puertas, `## No hacer` en 9 specs y
 QA visual.
 
+---
+
+## O. Permisos: `validate:content` y kit protegido (2026-10-02)
+
+**Origen:** decisión 4 de la auditoría de salud. El reviewer y el integrator
+tenían que correr `npm run validate:content` pero su bash lo denegaba; la
+regla "no tocar el kit" dependía solo del prompt (foundation tenía `edit: allow`).
+
+| Archivo | Cambio |
+|---|---|
+| `reviewer.md`, `integrator.md` | `"npm run validate:content*": allow` |
+| `foundation.md`, `component-builder.md`, `integrator.md` | `edit`: `"*": allow` y `deny` en `README.md`, `AGENTS.md`, `opencode.json`, `docs/**`, `tokens/**`, `foundations/**`, `specs/**`, `data/**`, `.opencode/**` |
+| `docs/agents.md` | Tabla de permisos y párrafo "El kit" |
+| `docs/README.md`, `docs/memory.md` | Decisión #72; pendientes actualizados |
+
+**Verificación:** `opencode debug agent` (última regla que coincide): `src/**`,
+`package.json` y `.gitignore` → allow; kit, `docs/memory.md`,
+`data/*.generated.*` y `specs/**/tasks.md` → deny en los tres agentes;
+`validate:content` → allow en reviewer e integrator, deny en component-builder.
+
+**Límite conocido:** `edit` no cubre bash (`cp *`, `npm run *` en foundation);
+lo cubren la regla del prompt y la revisión. El `npm run build` del reviewer
+regenera `data/*.generated.*` y `dist/` (deberían quedar idénticos; `git status`
+lo muestra).
+
+**Siguen pendientes:** fricción de puertas (decisión 5), `## No hacer` en 9
+specs y QA visual (decisión 6).
+

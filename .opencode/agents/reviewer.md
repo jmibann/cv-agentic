@@ -20,6 +20,7 @@ permission:
     "git diff*": allow
     "git log*": allow
     "npm run build*": allow
+    "npm run validate:content*": allow
     "git show*": allow
     "grep *": allow
     "ls *": allow
