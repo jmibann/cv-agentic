@@ -15,6 +15,10 @@ permission:
     "docs/diagnostics.md": allow
     # Informe de QA de F5 (decisión #85): lo escribe el orchestrator con lo que devuelve el reviewer.
     "docs/qa-report.md": allow
+    # Registro de decisiones y documentación de agentes (decisión #95): los
+    # mantiene el orchestrator junto con los documentos de estado.
+    "docs/README.md": allow
+    "docs/agent-system.md": allow
     # Specs: solo con aprobación explícita del usuario (redactar una spec nueva,
     # Clarificación, cambio de `Estado` a aprobada/implementada y Cambio).
     "specs/**": ask

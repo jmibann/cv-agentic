@@ -149,7 +149,8 @@ aprobadas". Cualquier otra: consultar al usuario.
   Excepciones: `data/*.generated.*` se regeneran con los scripts, nunca a mano;
   el orchestrator actualiza `README.md` ("Estado actual"), `docs/memory.md` y
   `docs/diagnostics.md` al cerrar cada puerta F (decisión #86), escribe
-  `docs/qa-report.md` en F5 (decisión #85), redacta
+  `docs/qa-report.md` en F5 (decisión #85), mantiene el registro de
+  `docs/README.md` y `docs/agent-system.md` (decisión #95), redacta
   `specs/**/plan.md`/`tasks.md` y edita `spec.md` solo con aprobación (`ask`).
 - **El contenido del CV se edita solo en `src/content/cv.{en,es}.json`**; su
   formato lo define `data/cv.schema.json`.

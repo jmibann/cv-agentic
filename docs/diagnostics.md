@@ -1141,3 +1141,23 @@ lo corre el usuario (#91); `docs/agent-system.md` (comandos `/sdd-clarify` y
 `docs/BACKLOG.md` (aprendizajes: hoy en `docs/memory.md`; el reviewer no escribe).
 
 **Sin pendientes de auditoría.** Próximo hito: kickoff de F1.
+
+## VI. Post-auditoría: hallazgos 1–3 y decisión #95 (2026-10-02)
+
+**Origen:** al ejecutar la corrección de los tres hallazgos no bloqueantes de la
+auditoría de arquitectura (commit `98ef9b4`).
+
+- **Hallazgo 1** (`docs/agent-system.md`): la fila F4/bash de integrator aún
+  listaba `dev`; quitado y fijado "`npm run dev` denegado (#91)".
+- **Hallazgo 2** (`README.md`): el árbol decía `agents`; corregido a
+  `agent-system.md` (post #92).
+- **Hallazgo 3** (`docs/README.md`): la justificación de `engines` atribuía el
+  piso `^22.12.0` también a jsdom; verificado contra npm: jsdom 30 exige
+  `^22.22.2 || ^24.15.0 || >=26.0.0` (piso efectivo, cubierto por `.nvmrc: 24`).
+  El rango `engines` **no cambia** (opción A aprobada por el usuario).
+- **Hallazgo nuevo durante la ejecución → decisión #95:** el `edit` del
+  orchestrator no cubría `docs/README.md` (registro de decisiones) ni
+  `docs/agent-system.md`; los parches 1 y 3 hubo que derivarlos al usuario. Se
+  agregan ambas rutas al `edit` de `orchestrator.md` (rige desde la sesión
+  siguiente), con su fila en la tabla de `docs/agent-system.md`, la fila 95 del
+  registro y "Límites" de `AGENTS.md` actualizados.

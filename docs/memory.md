@@ -28,6 +28,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - Commits con `git -c user.name="jmiban" commit -m` (permitido en bash por #83); no tocar git config; sin `--amend`.
 - **#85 F5 sin Tn**: QA del reviewer, informe en `docs/qa-report.md`; defectos → tarea nueva o Cambio de su pieza.
 - **#86** Estado/memoria/diagnostics solo por puerta F o decisión de reglas. **#91** `npm run dev` lo corre el usuario.
+  **#95** El orchestrator edita el registro (`docs/README.md`) y la doc de agentes (`docs/agent-system.md`).
 
 ## Aprendizajes y errores a evitar
 

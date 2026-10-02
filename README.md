@@ -10,7 +10,7 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 |---|---|
 | Kit de diseño (reglas, tokens, fundamentos, 27 specs, contrato de datos) | ✅ Completo y auditado; `## No hacer` en las 27 (#89) |
 | Modelo único de spec (`specs/<categoria>/<Name>/{spec,plan,tasks}.md`, plantilla de la skill `sdd`, `Estado` + `Requisitos (EARS)` en las 27) | ✅ Migrado y aprobado (2026-10-02); `plan.md`/`tasks.md` los redacta el orchestrator en sus puertas |
-| Agentes OpenCode (5) | ✅ En `.opencode/agents/` |
+| Agentes OpenCode (5) | ✅ En `.opencode/agents/`; el orchestrator también edita el registro de decisiones y `docs/agent-system.md` (#95) |
 | Diagnóstico A, B, C, F, reestructuras H/I, auditoría J y constitución (K) | ✅ Cerrados |
 | Repositorio git (baseline) | ✅ Inicializado; primeros commits del modelo de spec |
 | Sticky del Sidebar en pantallas bajas | ✅ Resuelto: sticky solo con alto ≥ 900px |
