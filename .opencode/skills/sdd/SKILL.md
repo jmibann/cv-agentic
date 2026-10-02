@@ -16,9 +16,10 @@ Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spe
   puerta (cada una validada al terminar); la puerta de Implementación +
   Validación se abre tras la revisión completa de la pieza contra la spec.
 - La spec manda: si algo no está en la spec, no se implementa. Si falta una decisión, para y pregunta.
-- Cada spec vive en su carpeta: `specs/<categoria>/<Name>/` con `spec.md`,
-  `plan.md` y `tasks.md` (categorías: `foundation`, `components`, `hooks`,
-  `pages`, `layout`, `qa`).
+- Cada spec vive en su carpeta: `specs/<categoria>/<Name>/` con `spec.md`
+  (obligatorio desde el inicio) y `plan.md` / `tasks.md` (se redactan en sus
+  puertas). Categorías del kit: `primitives`, `controls`, `layout`, `content`,
+  `pages`, `hooks`, más `qa` cuando exista la QA de F5.
 - Al terminar cada fase, actualiza `MEMORY.md`, el `README.md` de la raíz y
   `docs/diagnostics.md`.
 
@@ -29,24 +30,37 @@ la cambia el usuario. Si una spec o un plan la contradice, para y pregunta.
 
 ## Plantilla de spec (spec.md)
 
+Para las piezas de este kit la plantilla canónica es la de
+[`specs/README.md`](../../specs/README.md) → "Plantilla de spec", con dos
+adiciones obligatorias:
+
 ```text
-# Spec <categoria>/<Name> — <Nombre>
+# <Name>
 Estado: borrador | aprobada | implementada
-## Contexto y objetivo
-## Usuarios
-## Historias de usuario
-- HU-1. Como <rol>, quiero <acción> para <beneficio>.
-## Definiciones (solo si hay términos que puedan interpretarse de varias formas)
-## Requisitos funcionales
-## Requisitos no funcionales
-## Casos límite
-## Fuera de alcance
-## Criterios de finalización
-## Dudas abiertas
-- [NECESITA ACLARACIÓN] <duda>
+
+## Propósito
+## Requisitos (EARS)
+## Anatomía
+## API
+## Estilos y tokens
+## Estados
+## Responsive
+## Accesibilidad
+## Tests esperados
+## No hacer
 ```
 
-La spec describe el QUÉ y el POR QUÉ. Nada de stack, arquitectura ni nombres de archivos.
+- `Estado:` va justo debajo del título y **solo cambia con aprobación del usuario**.
+- `## Requisitos (EARS)` va entre `## Propósito` y `## Anatomía` (formato más abajo).
+- Las 10 secciones son obligatorias y explícitas, aunque su contenido sea
+  "No es interactivo" o "No aplica" (los hooks marcan "No aplica" donde corresponde).
+- Si queda alguna duda, se agrega además `## Dudas abiertas` con
+  `- [NECESITA ACLARACIÓN] <duda>`.
+
+La spec de una pieza **sí** incluye stack y nombres de archivos (API, tokens,
+estructura HTML): es el contrato que verifican el implementador y el reviewer.
+La regla "solo el QUÉ y el POR QUÉ" aplica a specs de dominio nuevas que no
+sean piezas del kit.
 
 ## Requisitos en EARS (en español)
 
@@ -57,6 +71,15 @@ La spec describe el QUÉ y el POR QUÉ. Nada de stack, arquitectura ni nombres d
 
 Cada RF debe ser verificable: nada de "rápido", "intenso" o "bonito" sin un criterio
 medible.
+
+Reglas de redacción:
+
+- Numeración `RF-1 … RF-n` **por spec** (se reinicia en cada pieza).
+- Un solo verbo observable por RF; comprobable con un test.
+- **Nunca se inventa alcance**: un RF de una pieza del kit solo se deriva de las
+  secciones ya existentes (`Propósito`, `Estados`, `Responsive`,
+  `Accesibilidad`, `Tests esperados`). Si un RF no tiene contraparte en
+  `Tests esperados`, **no se agrega el test**: se reporta al usuario.
 
 ## Clarificación
 

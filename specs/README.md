@@ -1,6 +1,6 @@
 # Specs de componentes
 
-Cada archivo es el **contrato** de un componente: el agente que escribe los
+Cada `spec.md` es el **contrato** de un componente: el agente que escribe los
 tests los deriva de la sección *Tests esperados*, y el agente que implementa
 no puede cambiar la API ni debilitar tests sin pasar por el usuario.
 
@@ -92,22 +92,46 @@ src/lib/useHashTab.ts    hook + useHashTab.test.ts
   });
   ```
 
-## Plantilla de spec
+## Estructura de la carpeta de spec
+
+Cada pieza vive en su propia carpeta con un `spec.md` (el contrato, con su
+`Estado`). `plan.md` y `tasks.md` los redacta el orchestrator en sus puertas
+del flujo SDD (ver skill `sdd`).
 
 ```
-# <Name>
-Propósito        — qué resuelve, en una o dos frases
-Anatomía         — estructura HTML/partes
-API              — interface de props (TS), valores por defecto
-Estilos y tokens — medidas y tokens por parte
-Estados          — hover, foco, activo, deshabilitado, vacío ("No es interactivo" si no hay)
-Responsive       — cambios por breakpoint ("Sin @media propios" si todo escala por tokens)
-Accesibilidad    — roles, nombres, teclado
-Tests esperados  — lista de casos (fuente de verdad para el test author)
-No hacer         — errores conocidos o tentaciones a evitar
+specs/<categoria>/<Name>/
+├─ spec.md      contrato de la pieza: Estado + 10 secciones
+├─ plan.md      archivos, decisiones y estrategia de tests  (puerta de Plan)
+└─ tasks.md     Tn con "Hecho cuando"                       (puerta de Tareas)
 ```
+
+No hay archivos `.md` sueltos dentro de `specs/<categoria>/`: la única excepción
+es `specs/README.md` (este índice).
+
+## Plantilla de spec
+
+```text
+# <Name>
+Estado: borrador | aprobada | implementada
+
+## Propósito          — qué resuelve, en una o dos frases
+## Requisitos (EARS)  — RF-1 … RF-n, derivados de las secciones de abajo
+## Anatomía           — estructura HTML/partes
+## API                — interface de props (TS), valores por defecto
+## Estilos y tokens   — medidas y tokens por parte
+## Estados            — hover, foco, activo, deshabilitado, vacío ("No es interactivo" si no hay)
+## Responsive         — cambios por breakpoint ("Sin @media propios" si todo escala por tokens)
+## Accesibilidad      — roles, nombres, teclado
+## Tests esperados    — lista de casos (fuente de verdad para el test author)
+## No hacer           — errores conocidos o tentaciones a evitar
+```
+
+`Estado:` va justo debajo del título y solo cambia con aprobación del usuario.
+`## Requisitos (EARS)` va entre `## Propósito` y `## Anatomía`; el formato EARS
+está en la skill `sdd`.
 
 Todas las secciones son **obligatorias** y explícitas, aunque su contenido
 sea "No es interactivo" o "Sin `@media` propios": el reviewer verifica contra
 ellas. Única excepción: los hooks (sin UI) marcan Anatomía, Estilos y tokens,
 Responsive y Accesibilidad como "No aplica".
+
