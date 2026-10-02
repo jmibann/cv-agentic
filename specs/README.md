@@ -99,14 +99,14 @@ src/lib/useHashTab.ts    hook + useHashTab.test.ts
 ## Estructura de la carpeta de spec
 
 Cada pieza vive en su propia carpeta con un `spec.md` (el contrato, con su
-`Estado`). `plan.md` y `tasks.md` los redacta el orchestrator en sus puertas
-del flujo SDD (ver skill `sdd`).
+`Estado`). `plan.md` y `tasks.md` los redacta el orchestrator y se aprueban
+**por fase**: todos los de F2 juntos, luego F3, etc. (ver skill `sdd`).
 
 ```
 specs/<categoria>/<Name>/
 ├─ spec.md      contrato de la pieza: Estado + 10 secciones
-├─ plan.md      archivos, decisiones y estrategia de tests  (puerta de Plan)
-└─ tasks.md     Tn con "Hecho cuando"                       (puerta de Tareas)
+├─ plan.md      archivos, decisiones y estrategia de tests  (puerta de Plan + Tareas de la fase)
+└─ tasks.md     Tn con "Hecho cuando"                       (ídem)
 ```
 
 No hay archivos `.md` sueltos dentro de `specs/<categoria>/`: la única excepción

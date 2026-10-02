@@ -1,7 +1,10 @@
 ---
-description: "SDD · Divide el plan en tareas pequeñas y verificables (uso: /sdd-task <categoria>/<Name>)"
+description: "SDD · Tareas de una pieza suelta o de un Cambio, con su plan ya aprobado (uso: /sdd-task <categoria>/<Name>)"
 agent: orchestrator
 ---
+
+Para piezas de una fase F, las tareas se redactan con `/sdd-plan <fase>` (puerta
+por fase). Este comando es para una pieza suelta o un Cambio.
 
 Cargá la skill `sdd` (sección Tareas). A partir de `specs/$1/spec.md` y `specs/$1/plan.md`
 (aprobado), redactá `specs/$1/tasks.md`:

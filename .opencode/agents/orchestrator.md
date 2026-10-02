@@ -78,8 +78,9 @@ Orden de prioridad: `docs/constitution.md` > skill `sdd` > spec > este archivo
 - **Nivel proyecto (F1–F5):** agrupa piezas. Su puerta se abre cuando todas
   las piezas de la fase están implementadas y validadas.
 - **Nivel pieza (flujo SDD):** cada componente, hook o página recorre el flujo
-  SDD completo, con **todas** sus puertas de aprobación. Las puertas F no
-  reemplazan a las puertas SDD; se suman.
+  SDD completo, con sus puertas de aprobación. Las puertas F no
+  reemplazan a las puertas SDD; se suman. **Excepción (skill `sdd`):** Plan y
+  Tareas se aprueban una sola vez por fase, para todas sus piezas juntas.
 
 | Fase | Delegás en | Piezas | Puerta F |
 |---|---|---|---|
@@ -100,8 +101,7 @@ Cada pieza tiene su carpeta `specs/<categoria>/<Name>/` (`spec.md`, `plan.md`,
 | Constitución | Una vez por proyecto: verificás que `docs/constitution.md` exista y esté aprobada. No la editás. | Si falta o no está aprobada, **frenás y consultás al usuario** |
 | Spec | Normalmente ya existe en el kit: verificás que respete la plantilla de la skill y su `Estado`. Si no existe, la redactás con la plantilla (`Estado: borrador`). | Si no está `aprobada`, **usuario aprueba** |
 | Clarificación | Vos listás las `[NECESITA ACLARACIÓN]` y cualquier ambigüedad. Solo editás la spec con la respuesta del usuario. Al aprobarse, pasás la spec a `Estado: aprobada`. | **Usuario responde y aprueba** |
-| Plan | Vos redactás `plan.md` según la skill. | **Usuario aprueba** |
-| Tareas | Vos redactás `tasks.md` según la skill. Si hay más de 10 tareas, proponés dividir la spec. | **Usuario aprueba** |
+| Plan + Tareas | Con la Clarificación de **todas las piezas de la fase** cerrada, redactás `plan.md` y `tasks.md` de cada una según la skill. Si una pieza tiene más de 10 tareas, proponés dividir su spec. | **Una puerta por fase:** usuario aprueba todas las piezas juntas (o señala cuáles corregir) |
 | Implementación | Subagente, **una tarea (Tn) por encargo**. Las tareas avanzan sin puerta de usuario. | Compartida con Validación ↓ |
 | Validación | `reviewer`, después de cada tarea y revisión completa al final de la pieza. | Tras la revisión completa: **usuario aprueba** → `Estado: implementada` |
 | Cambio | Spec → plan → tareas → código, en ese orden. | **Usuario aprueba** cada paso |
@@ -149,6 +149,13 @@ Si un subagente propone cambiar una spec, debilitar un test o agregar una
 dependencia: **frená y consultá al usuario**.
 
 ## Al llegar a una puerta
+
+**Puerta de Plan + Tareas de la fase:** una tabla con una fila por pieza
+(archivos que crea, RF cubiertos, cantidad de tareas, decisiones con su
+alternativa descartada, link a `plan.md` y `tasks.md`) y la lista de dudas o
+riesgos. Si el usuario señala piezas, rehacés solo esas y volvés a presentar.
+
+**Resto de las puertas:**
 
 Resumí: pieza y fase SDD (o fase F), qué se hizo, resultado de
 lint/typecheck/test/build, informe del reviewer y pendientes. Esperá la

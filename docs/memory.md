@@ -41,5 +41,7 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - Permisos (#72, #73): edición por grupo con `"*": deny` (foundation → app; component-builder →
   `src/components/**`; integrator → rutas de F4); reviewer e integrator corren `validate:content`.
 - Después de F1 nadie edita `src/test/**` ni configs: si un plan lo pide, decidir quién (consultar).
-- Pendientes: fricción de puertas (opciones 1–4: `ask` doble en `spec.md`, Clarificación sin hallazgos,
-  Plan+Tareas juntos, aprobación por fase); `## No hacer` en 9 specs; QA visual.
+- Plan + Tareas se aprueban **por fase** (decisión #74): `/sdd-plan F2` redacta los de todas las piezas, una
+  puerta; Clarificación de la fase antes. Pieza suelta y Cambio: puertas propias.
+- Pendientes: fricción restante (opciones 1 `ask` doble en `spec.md` y 2 Clarificación sin hallazgos);
+  `## No hacer` en 9 specs; QA visual.

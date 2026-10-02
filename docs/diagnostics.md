@@ -976,3 +976,42 @@ quién lo escribe. Opción futura: plugin `tool.execute.before` (disponible en
 **Sigue abierta la decisión 5** (reducir puertas): opciones 1–4 en
 `docs/memory.md`.
 
+---
+
+## Q. Puerta de Plan + Tareas por fase (2026-10-02)
+
+**Origen:** decisión 5 (fricción de puertas). El usuario descartó juntar Plan
+y Tareas por pieza y eligió aprobarlos **por fase** (decisión #74).
+
+**Flujo por fase (F2–F5):** Clarificación de cada pieza → `plan.md` +
+`tasks.md` de todas las piezas → **una puerta** → implementación pieza por
+pieza (puerta de Implementación + Validación por pieza) → puerta F.
+
+| Puertas | Antes | Ahora |
+|---|---|---|
+| Clarificación | 27 | 27 |
+| Plan | 27 | — |
+| Tareas | 27 | — |
+| Plan + Tareas por fase | — | 4 (F2, F3, F4, F5) |
+| Implementación + Validación | 27 | 27 |
+| Fases F1–F5 | 5 | 5 |
+| **Total** | **~113** | **~63** |
+
+| Archivo | Cambio |
+|---|---|
+| `.opencode/skills/sdd/SKILL.md` | Segunda excepción en Flujo; bullet "Puerta de Plan + Tareas por fase" en "Ejecución con agentes" |
+| `orchestrator.md` | "Dos niveles" con la excepción; fila única "Plan + Tareas" (una puerta por fase); formato de esa puerta en "Al llegar a una puerta" |
+| `sdd-plan.md` | Acepta una fase (`F2`) → plan + tareas de todas sus piezas; o una pieza suelta → solo plan |
+| `sdd-task.md` | Solo para pieza suelta o Cambio |
+| `specs/README.md`, `docs/agents.md` | Estructura de carpeta, tabla de comandos y diagrama de flujo |
+| `docs/README.md`, `docs/memory.md`, `README.md` | Decisión #74, pendientes y estado |
+
+**Riesgos:** revisar 11–12 planes juntos es más material por puerta (se
+mitiga con la tabla por pieza y devolviendo solo las piezas a corregir); un
+plan redactado antes de implementar sus dependencias puede quedar desfasado:
+se corrige como Cambio de esa pieza. La constitución no cambia (P2:
+`plan.md`/`tasks.md` aprobados por el usuario).
+
+**Siguen abiertas** (decisión 5): opción 1 (`ask` doble al editar `spec.md`)
+y opción 2 (Clarificación sin puerta si no hay hallazgos).
+

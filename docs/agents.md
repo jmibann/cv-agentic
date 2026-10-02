@@ -68,14 +68,15 @@ y el orchestrator no commitean.
 Usuario ──► orchestrator
               │
    F1 ────────┼──► foundation ──► reviewer ──► PUERTA (usuario aprueba)
-   F2 ────────┼──► component-builder × N (primitivas, de a una)
-              │        └─► reviewer por componente
-              │                                   ──► PUERTA
-   F3 ────────┼──► component-builder × N (compuestos, de a uno, en orden de dependencias)
-              │        └─► reviewer por componente
-              │                                   ──► PUERTA
-   F4 ────────┼──► integrator ──► reviewer        ──► PUERTA
-   F5 ────────┴──► reviewer (QA completo: 4 viewports × 2 temas × 2 idiomas)
+   F2 ────────┼──► Clarificación de cada pieza (si hay dudas)
+              │    plan.md + tasks.md de las 11 primitivas ──► PUERTA Plan + Tareas
+              │    component-builder × N (de a una pieza, de a una Tn)
+              │        └─► reviewer por tarea y por pieza ──► PUERTA por pieza
+              │                                   ──► PUERTA F2
+   F3 ────────┼──► ídem F2 con los 12 compuestos (en orden de dependencias)
+              │                                   ──► PUERTA F3
+   F4 ────────┼──► ídem con integrator            ──► PUERTA F4
+   F5 ────────┴──► plan + tareas de QA ──► reviewer (QA completo: 4 viewports × 2 temas × 2 idiomas)
                                                   ──► PUERTA FINAL
 ```
 
@@ -95,8 +96,8 @@ spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
 | `/sdd-spec <cat>/<Name> <idea>` | orchestrator | Entrevista y redacta una spec nueva (`spec.md` con `ask`) |
 | `/sdd-clarify <cat>/<Name>` | reviewer | QA de la spec: ambigüedades, contradicciones, RF sin test; no resuelve |
 | `/sdd-change <cat>/<Name> <cambio>` | orchestrator | Propone el cambio en la spec (con `ask`); después siguen plan y tareas |
-| `/sdd-plan <cat>/<Name>` | orchestrator | Redacta `plan.md` (puerta de Plan) |
-| `/sdd-task <cat>/<Name>` | orchestrator | Redacta `tasks.md` (puerta de Tareas) |
+| `/sdd-plan F2` · `/sdd-plan <cat>/<Name>` | orchestrator | Con una fase: `plan.md` + `tasks.md` de todas sus piezas, una sola puerta. Con una pieza suelta o un Cambio: solo `plan.md` (puerta de Plan) |
+| `/sdd-task <cat>/<Name>` | orchestrator | `tasks.md` de una pieza suelta o de un Cambio (puerta de Tareas) |
 | `/sdd-implement <cat>/<Name> Tn` | orchestrator | Delega UNA tarea (test → feat), pide revisión, marca la tarea y para |
 | `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + MCP de Chrome DevTools |
 

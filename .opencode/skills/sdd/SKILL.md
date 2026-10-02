@@ -12,9 +12,14 @@ Constitución → Spec → Clarificación → Plan → Tareas → Implementació
 Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spec.
 
 - Nunca pases a la siguiente fase sin la aprobación explícita del usuario.
-  Excepción única: dentro de Implementación las tareas avanzan una a una sin
-  puerta (cada una validada al terminar); la puerta de Implementación +
-  Validación se abre tras la revisión completa de la pieza contra la spec.
+  Dos excepciones:
+  - Dentro de Implementación las tareas avanzan una a una sin puerta (cada una
+    validada al terminar); la puerta de Implementación + Validación se abre tras
+    la revisión completa de la pieza contra la spec.
+  - **Plan y Tareas se aprueban por fase F** (F2–F5): se redactan `plan.md` y
+    `tasks.md` de todas las piezas de la fase y se aprueban juntos en una sola
+    puerta (ver "Ejecución con agentes"). Una pieza fuera de una fase (spec
+    nueva suelta) y todo Cambio mantienen las puertas de Plan y de Tareas propias.
 - La spec manda: si algo no está en la spec, no se implementa. Si falta una decisión, para y pregunta.
 - Cada spec vive en su carpeta: `specs/<categoria>/<Name>/` con `spec.md`
   (obligatorio desde el inicio) y `plan.md` / `tasks.md` (se redactan en sus
@@ -131,6 +136,14 @@ trabaja con el orquestador.
 - **Dos niveles.** Las fases F1–F5 del orquestador organizan el proyecto. Dentro
   de cada fase, cada pieza (componente, hook, página) recorre el flujo SDD
   completo y respeta sus puertas de aprobación.
+- **Puerta de Plan + Tareas por fase.** Al empezar F2, F3, F4 o F5, y con la
+  Clarificación de todas sus piezas cerrada, el orquestador redacta `plan.md` y
+  `tasks.md` de cada pieza de la fase (en el orden de `specs/README.md`) y los
+  presenta juntos: una tabla por pieza (archivos, RF cubiertos, cantidad de
+  tareas, decisiones con alternativa descartada) con links a los archivos. El
+  usuario aprueba la fase completa o señala piezas a corregir; solo esas se
+  rehacen y se vuelven a presentar. Si al implementar una pieza cambia algo que
+  afecta el plan de otra ya aprobada, eso es un Cambio de esa otra pieza.
 - **Roles.** El orquestador planifica, delega y frena en cada puerta; no escribe
   código ni tests. `foundation`, `component-builder` e `integrator` implementan.
   `reviewer` valida con contexto limpio: recibe la spec, la tarea (Tn con su
