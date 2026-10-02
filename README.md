@@ -4,18 +4,19 @@ Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-10-01)
+## Estado actual (2026-10-02)
 
 | Qué | Estado |
 |---|---|
 | Kit de diseño (reglas, tokens, fundamentos, 27 specs, contrato de datos) | ✅ Completo y auditado |
+| Modelo único de spec (`specs/<categoria>/<Name>/{spec,plan,tasks}.md`, plantilla de la skill `sdd`, `Estado` + `Requisitos (EARS)` en las 27) | ✅ Migrado y aprobado (2026-10-02); `plan.md`/`tasks.md` los redacta el orchestrator en sus puertas |
 | Agentes OpenCode (5) | ✅ En `.opencode/agents/` |
-| Diagnóstico A, B, C, F, reestructuras H/I y auditoría de arquitectura completa (J, 1–24) | ✅ Cerrados |
+| Diagnóstico A, B, C, F, reestructuras H/I, auditoría J y constitución (K) | ✅ Cerrados |
+| Repositorio git (baseline) | ✅ Inicializado; primeros commits del modelo de spec |
 | Sticky del Sidebar en pantallas bajas | ✅ Resuelto: sticky solo con alto ≥ 900px |
-| Constitución (`docs/constitution.md`) | ✅ Vigente; enlazada desde `AGENTS.md` y los agentes |
+| Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68) |
 | Contenido del CV en JSON (esquema + validación) | ✅ Especificado: `data/cv.schema.json` + ejemplos JSON; se genera en F1 |
-| Skills, piezas de SDD (PRD, IDs, DoR) y QA visual | ⏳ Próxima fase |
-| App (`src/`, `package.json`, `.git`) | ⏳ No creada: la arma la Fase 1 (foundation) |
+| `plan.md` / `tasks.md` de las 27 specs, `src/`, `package.json` | ⏳ Próxima fase (orchestrator en las puertas; foundation en F1) |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
 

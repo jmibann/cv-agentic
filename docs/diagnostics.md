@@ -793,7 +793,50 @@ informe; `docs/README.md` (contenido, orden de lectura, decisión #67);
 
 ---
 
-## E. Checklist para mañana (orden sugerido)
+## L. Modelo único de spec (2026-10-02)
+
+**Pedido del usuario:** cerrar el hallazgo **B1** de la auditoría (plantilla
+de la skill `sdd` desalineada con el kit) pasando a un modelo único de spec:
+`specs/<categoria>/<Name>/{spec,plan,tasks}.md`.
+
+**Decisiones del usuario** (todas opcion "Recomendada"):
+
+| Tema | Decisión |
+|---|---|
+| Plantilla | Híbrida: las 10 secciones del kit + `Estado:` + `## Requisitos (EARS)` entre `Propósito` y la sección siguiente |
+| `Estado` | `aprobada` en las 27 specs |
+| Alcance | Solo `spec.md` ahora; `plan.md`/`tasks.md` los redacta el orchestrator en su puerta |
+| Comandos `/sdd-*` | Solo ruta y `node --test` → `npm test`; `agent: plan\|build`, Chrome DevTools y `constitution.md` quedan para un pase aparte |
+| Sin `## No hacer` | 9 specs (ResumeSection, ServiceCard, TestimonialDialog, ControlsBar, LanguageSwitcher, ThemeToggle, AppLayout, Overhead, Separator): **fuera de este pase** (decisión B2) |
+| P1 (gate) | Aprobación explícita: verificación de `specs/**/<Name>.md` → `specs/**/<Name>/spec.md` + decisión #68 |
+
+**Proceso:** baseline git (`475534a`) → plantilla de la skill y de
+`specs/README.md` (`3820e93`) → migración de las 27 specs con `git mv`,
+`Estado`, headings y los `RF-n` (`8f81d9d`) → checkpoint de aprobación de los
+27 listados → gate de la constitución (`d247c5a`) → referencias rotas en todo
+el kit (`d5fab8d`) → comandos (`9dad7f4`). Commits con `-c user.name="jmiban"`
+(porque git config está prohibido por `AGENTS.md`); el primero quedó con el
+email de autor vacío y no se corrigió por la regla de no usar `--amend`.
+
+**Reglas de redacción EARS:** 3–8 `RF-n` por pieza, derivados solo de
+`Propósito`, `Estados`, `Responsive`, `Accesibilidad` y `Tests esperados`;
+nunca se inventó alcance y **no se agregó ningún test** (los RF de
+Responsive/Impresión no tienen contrapartida en "Tests esperados": ~12 casos
+listados en el checkpoint, aprobados tal cual).
+
+**Verificación (9 checks, todos OK):** 27 specs en carpeta · 0 archivos
+planos · `Estado: aprobada` ×27 · `Requisitos (EARS)` justo tras `Propósito`
+con 5–8 RF · sin `node --test` · sin referencias viejas `<cat>/<Name>.md` · 0
+links relativos rotos · P1 + decisión #68 · plantilla (`specs/README.md`,
+`SKILL.md`, `docs/README.md`, reviewer, component-builder) con "10 secciones"
+y la ruta nueva.
+
+**Pendientes tras este pase:** sección `## No hacer` en 9 specs (B2); hallazgos
+2–4 de la auditoría (`agent: plan\|build` y `/constitution` en inglés,
+`npm run`/permisos en reviewer e integrator, `docs/agents.md:30`); memoria del
+proyecto rota (en la raíz no existe `memory.md` y `docs/memory.md` contiene
+material de otro proyecto).
+
 
 1. ~~Decidir y aplicar **A1–A6**~~ ✅ decididas y aplicadas el 2026-09-30.
 1b. ~~Sección F~~ ✅ 2026-09-30: todas decididas y aplicadas (F8 se cierra
