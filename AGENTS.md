@@ -112,9 +112,10 @@ reviewer **al cerrar la pieza** y en cada puerta (decisión #80).
   el reviewer no commitea (decisión #76).
 - **Una tarea por vez** (sin paralelismo): los tests en rojo rompen el
   `typecheck` global y todos comparten la carpeta de trabajo.
-- **`specs/` es del usuario y del orchestrator:** nadie edita `spec.md` sin el
-  usuario; `plan.md`/`tasks.md` los escribe el orchestrator, que además marca
-  cada tarea cuando el reviewer la aprueba. Los subagentes no escriben en `specs/`.
+- **`specs/` es del usuario y del orchestrator:** nadie edita `spec.md` sin la
+  aprobación explícita del usuario (el orchestrator lo hace con `ask`);
+  `plan.md`/`tasks.md` los escribe el orchestrator, que además marca y
+  commitea cada tarea cuando el reviewer la aprueba. Los subagentes no escriben en `specs/`.
 
 ## Tests
 

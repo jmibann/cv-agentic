@@ -13,7 +13,8 @@ sección Validación), con contexto limpio. **No arregles nada.**
    ambos temas. Necesitás la app servida: si no hay un servidor corriendo, pedime que
    levante `npm run dev` (vos no podés iniciarlo). Si el MCP no responde, listá esos RF como
    "sin verificar (QA visual)".
-3. Comprobá los criterios de finalización de la pieza y que todas las tareas de `tasks.md`
+3. Comprobá los criterios de finalización de la pieza (incluye `npm run build` en
+   verde, que solo corre al cerrar la pieza) y que todas las tareas de `tasks.md`
    estén marcadas.
 
 Veredicto con tu formato de informe: **¿la spec está cumplida?**

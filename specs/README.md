@@ -43,9 +43,10 @@ no puede cambiar la API ni debilitar tests sin pasar por el usuario.
 **Siempre de a una pieza y de a una tarea**, en el orden de la tabla (sin
 paralelismo), con dos commits por tarea: `test(<Name>): Tn` en rojo y
 `feat(<Name>): Tn`. El orchestrator marca la tarea en `tasks.md` cuando el
-reviewer la aprueba.
+reviewer la aprueba y commitea ese cambio.
 Criterio de terminado de cada fila: todas sus tareas marcadas, los "Tests
-esperados" de su spec en verde + `lint` + `typecheck`, la revisión completa del
+esperados" de su spec en verde + `lint` + `typecheck` (el `npm run build`
+corre al cerrar la pieza), la revisión completa del
 reviewer y la aprobación del usuario (`Estado: implementada`).
 
 `ThemeProvider` y `LocaleProvider` no son componentes visuales: sus specs están

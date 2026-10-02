@@ -1022,13 +1022,13 @@ y opción 2 (Clarificación sin puerta si no hay hallazgos).
 del flujo SDD, y cerrar los 6 hallazgos medios que eligiera el usuario.
 
 **Verificado (todo OK):** `opencode debug agent` × 5 (permisos resueltos =
-tabla de `docs/agents.md`), `opencode debug config` (9 comandos con su agente,
-5 agentes, `chrome-devtools_*` denegado en global), skill `sdd` registrada, 0
-links rotos en los 59 `.md` trackeados (58 tras eliminar `/constitution`),
-27 specs con `Estado: aprobada` y EARS
-tras `Propósito`, RF 5–8 correlativos, decisiones #1–#74 correlativas y 13
-commits `docs`/`chore`. `lint/typecheck/test/build` no aplican todavía (F1
-pendiente).
+tabla de `docs/agents.md`), `opencode debug config` (9 comandos con su agente
+durante la auditoría y **8** tras eliminar `/constitution`, 5 agentes,
+`chrome-devtools_*` denegado en global), skill `sdd` registrada, 0 links rotos
+en los 59 `.md` trackeados (58 tras eliminar `/constitution`), 27 specs con
+`Estado: aprobada` y EARS tras `Propósito`, RF 5–8 correlativos, decisiones
+#1–#74 correlativas y 14 commits `docs`/`chore` (13 al auditar). `lint/typecheck/test/build`
+no aplican todavía (F1 pendiente).
 
 **Corregido en la sesión (decisiones #75–#80, detalle en `docs/README.md`):**
 

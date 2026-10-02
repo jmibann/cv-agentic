@@ -108,7 +108,7 @@ spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
 | `/sdd-plan F2` · `/sdd-plan <cat>/<Name>` | orchestrator | Con una fase: `plan.md` + `tasks.md` de todas sus piezas, una sola puerta. Con una pieza suelta o un Cambio: solo `plan.md` (puerta de Plan) |
 | `/sdd-task <cat>/<Name>` | orchestrator | `tasks.md` de una pieza suelta o de un Cambio (puerta de Tareas) |
 | `/sdd-implement <cat>/<Name> Tn` | orchestrator | Delega UNA tarea (test → feat), pide revisión, marca la tarea y para |
-| `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + MCP de Chrome DevTools |
+| `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + `npm run build` + MCP de Chrome DevTools |
 
 - **`/sdd-validate` y el MCP:** `opencode.json` (raíz) declara el servidor
   local `chrome-devtools` (`npx -y chrome-devtools-mcp`, requiere Node ≥ 20.19;

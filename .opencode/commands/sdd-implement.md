@@ -11,8 +11,9 @@ y tus secciones "Cómo delegar una tarea" y "Después de cada tarea":
    tests primero (commit `test(<Name>): $2`), implementación (commit `feat(<Name>): $2`).
 3. Confirmá que el repo quede en verde y pedí al `reviewer` la revisión de la tarea contra su
    "Hecho cuando".
-4. Si el reviewer aprueba, marcá `$2` en `tasks.md` con el hash del commit `feat`. Si rechaza,
-   aplicá la regla de rondas (máximo 3).
+4. Si el reviewer aprueba, marcá `$2` en `tasks.md` con el hash del commit `feat` y
+   commiteá ese cambio (`git add specs/$1/tasks.md` → `docs(sdd): <Name> Tn`).
+   Si rechaza, aplicá la regla de rondas (máximo 3).
 5. Mostrame el resultado: qué RF cubre, commits e informe del reviewer.
 
 Después PARÁ. No empieces la siguiente tarea.

@@ -7,7 +7,7 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 
 - Kit completo y auditado: reglas, tokens, fundamentos, 27 specs, esquema de datos.
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
-- Git baseline + 13 commits (solo docs/chore); **no existen `src/`, `package.json` ni la app** (las crea F1/foundation).
+- Git baseline + 14 commits (solo docs/chore); **no existen `src/`, `package.json` ni la app** (las crea F1/foundation).
 - **Auditoría de arquitectura 2026-10-02**: sin bloqueantes; 6 puntos corregidos en el momento (#75–#80).
 - Próximo hito: kickoff de F1 con el orchestrator (sección "Verificación independiente y plan de kickoff" de `docs/diagnostics.md`).
 

@@ -117,7 +117,9 @@ reviewer (los subagentes no escriben en `specs/`).
 
 ## Validación
 
-- Cada tarea se verifica contra su "Hecho cuando".
+- Cada tarea se verifica contra su "Hecho cuando": por tarea alcanza `lint` +
+  `typecheck` + `test` en verde; el `build` corre **al cerrar la pieza** y en
+  cada puerta (decisión #80).
 - Al terminar la última tarea, revisión completa contra la spec (cada RF, casos
   límite y criterios de finalización).
 - Con la revisión OK y la aprobación del usuario, la spec pasa a
@@ -155,7 +157,10 @@ trabaja con el orquestador.
   aprueba.
 - **Commits por tarea.** `test(<Name>): Tn` con los tests en rojo, después
   `feat(<Name>): Tn` con la implementación, y `fix(<Name>): Tn` si hubo
-  correcciones. Si un hook de pre-commit bloquea el commit en rojo, no se usa
+  correcciones. Los de código los hace quien implementa; el orchestrator
+  commitea **solo documentos** (`README.md`, `docs/*`, `specs/*`), en verde y
+  con rutas explícitas, nunca `git add .`/`-A` (decisión #76). Si un hook de
+  pre-commit bloquea el commit en rojo, no se usa
   `--no-verify`: se frena y se consulta al usuario.
 - **Tests que no se debilitan (por tarea).** Los commits `feat(<Name>): Tn` y
   `fix(<Name>): Tn` **no tocan** archivos de test; los commits
