@@ -35,7 +35,7 @@ cv-agentic/
 | [docs/tokens/breakpoints.md](tokens/breakpoints.md) | 580 / 768 / 992 / 1200, mobile-first |
 | [docs/tokens/contrast.md](tokens/contrast.md) | Contrastes WCAG calculados y reglas derivadas |
 | [foundations/](../foundations/) | Tipografía, layout, movimiento, theming, i18n |
-| [specs/](../specs/README.md) | Una spec por pieza, todas con las mismas 8 secciones (API, tokens, estados, responsive, a11y, **tests esperados**…). Carpetas: `primitives/`, `controls/`, `layout/`, `content/`, `pages/` (AboutPage, ResumePage) y `hooks/` (useHashTab) |
+| [specs/](../specs/README.md) | Una carpeta por pieza (`specs/<categoria>/<Name>/spec.md`), todas con las mismas 10 secciones más `Estado` y **Requisitos (EARS)** (Propósito, Anatomía, API, tokens, estados, responsive, a11y, **tests esperados**, No hacer…). Carpetas: `primitives/`, `controls/`, `layout/`, `content/`, `pages/` (AboutPage, ResumePage) y `hooks/` (useHashTab) |
 | [data/cv.schema.json](../data/cv.schema.json) | **Fuente de verdad** del formato del contenido (JSON Schema). De ahí se generan los tipos (`data/cv.types.generated.ts`) y el validador (`data/validate-cv.generated.js`) en la Fase 1 |
 | [data/constants.ts](../data/constants.ts) | Listas cerradas para recorrer en código (`LOCALES`, `SOCIAL_NETWORKS`…), iguales a los `enum` del esquema |
 | [data/cv.example.en.json](../data/cv.example.en.json), [.es.json](../data/cv.example.es.json) | Contenido ficticio de ejemplo (base de `src/content/cv.{en,es}.json`) |
@@ -148,11 +148,11 @@ lint declaran compatibilidad con ESLint 10.
 | 24 | Avatar de testimonios | Primitiva `HexAvatar` única (hexágono con `clipPath` compartido); el espacio para el avatar lo reserva solo el carrusel |
 | 25 | Carrusel | Un bullet por posición de scroll alcanzable (`getScrollStops` / `getActiveStop`); sin autoplay ni librerías |
 | 26 | Impresión | Ambos paneles; testimonios apilados con el texto completo; sin controles, tabs ni bullets |
-| 27 | Specs | Las 8 secciones de la plantilla son obligatorias en toda spec; los hooks marcan "No aplica" donde corresponde |
+| 27 | Specs | Las secciones de la plantilla son obligatorias en toda spec; los hooks marcan "No aplica" donde corresponde (hoy 10 secciones, ver #68) |
 | 28 | Páginas y hook | AboutPage, ResumePage y `useHashTab` tienen spec propia y se construyen en F4 (integrator) |
 | 29 | Seguimiento | Estado de las decisiones y pendientes en `~/code/cv-agentic/docs/diagnostics.md` |
 | 30 | Fechas | `YYYY` (1900–2099) o `YYYY-MM` (mes `01`–`12`). Desde #44 se valida con el `pattern` del esquema (ajv), no con el tipo TS; `content.test.ts` verifica `start` ≤ `end` |
-| 31 | Nombre de Badge | Un solo nombre, `Badge` (spec `primitives/Badge.md`, carpeta `src/components/Badge/`), con dos usos: badge del rol y chip de skill |
+| 31 | Nombre de Badge | Un solo nombre, `Badge` (spec `primitives/Badge/spec.md`, carpeta `src/components/Badge/`), con dos usos: badge del rol y chip de skill |
 | 32 | Construcción serial | Una pieza por vez, en el orden de `specs/README.md`; sin paralelismo (los tests en rojo rompen el `typecheck` global y los agentes comparten la carpeta de trabajo) |
 | 33 | Commits | Por pieza: `test(<Name>)` con los tests en rojo → `feat(<Name>)` → `fix(<Name>)` si hay correcciones. Los hacen foundation, component-builder e integrator; sin `--amend`, `reset --hard` ni `push`. El reviewer verifica que el test no cambió desde su commit |
 | 34 | Accesibilidad en tests | `axe-core` directo con el helper `expectNoA11yViolations` (`src/test/a11y.ts`); reemplaza a `vitest-axe`, sin mantenimiento |

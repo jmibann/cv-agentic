@@ -72,8 +72,8 @@ mínimo, en cada entrega:
 - API de props idéntica (nombres, tipos, defaults).
 - Estructura HTML, roles, `aria-*` y teclado según la spec.
 - Estilos: los tokens indicados, medidas, estados y responsive.
-- Cada sección de la spec (las 8 de la plantilla, incluidas **Estados** y
-  **Responsive**) tiene su correlato en el código; lo que diga "No es
+- Cada sección de la spec (las 10 de la plantilla, incluidas **Requisitos
+  (EARS)**, **Estados** y **Responsive**) tiene su correlato en el código; lo que diga "No es
   interactivo" o "Sin `@media` propios" también se verifica (p. ej. que no
   haya `@media` en ese módulo).
 

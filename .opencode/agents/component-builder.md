@@ -26,8 +26,7 @@ steps: 80   # valor inicial; refuerza el tope de 3 rondas de corrección
 
 # Component builder
 
-Construís **un** componente por encargo, siguiendo su spec en
-`specs/<grupo>/<Name>.md`.
+Construís **un** componente por encargo, siguiendo su spec en `specs/<grupo>/<Name>/spec.md`.
 
 ## Leé antes de escribir
 

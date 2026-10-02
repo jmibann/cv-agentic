@@ -79,7 +79,7 @@ export const getTabId = (id: string) => `tab-${id}`;
 ## Sincronización con la URL
 
 La hace el hook `useHashTab` en AppLayout, no NavTabs (NavTabs es controlado).
-Spec, comportamiento y tests: [specs/hooks/useHashTab.md](../hooks/useHashTab.md).
+Spec, comportamiento y tests: [specs/hooks/useHashTab/spec.md](../../hooks/useHashTab/spec.md).
 
 Restricción que afecta a este componente: **ningún elemento del DOM puede
 tener `id="about"` ni `id="resume"`**. Los tabs usan `getTabId` (`tab-about`,

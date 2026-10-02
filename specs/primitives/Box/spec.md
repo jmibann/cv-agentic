@@ -41,7 +41,7 @@ genérico de `role`, `tabIndex` ni `...rest`). `aria-label` y
 (`as="article" aria-labelledby`).
 
 El tabpanel de NavTabs **no** es un Box: es un `<div role="tabpanel">` dentro
-del Box de contenido (ver `specs/layout/AppLayout.md`).
+del Box de contenido (ver `specs/layout/AppLayout/spec.md`).
 
 ## Estilos y tokens
 

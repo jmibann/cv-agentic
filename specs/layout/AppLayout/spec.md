@@ -95,11 +95,11 @@ Requiere `ThemeProvider` y `LocaleProvider` por encima (los monta `main.tsx`).
 
 `AboutPage` y `ResumePage` (en `src/pages/`) tienen spec propia:
 
-- [specs/pages/AboutPage.md](../pages/AboutPage.md)
-- [specs/pages/ResumePage.md](../pages/ResumePage.md)
+- [specs/pages/AboutPage/spec.md](../../pages/AboutPage/spec.md)
+- [specs/pages/ResumePage/spec.md](../../pages/ResumePage/spec.md)
 
 AppLayout solo decide cuál renderizar en el tabpanel según el tab activo
-(`useHashTab`, spec en [specs/hooks/useHashTab.md](../hooks/useHashTab.md)).
+(`useHashTab`, spec en [specs/hooks/useHashTab/spec.md](../../hooks/useHashTab/spec.md)).
 
 ## Estilos y tokens
 

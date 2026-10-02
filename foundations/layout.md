@@ -59,7 +59,7 @@
 ```
 
 - **< lg**: el `h1` del panel va **debajo** de la CornerTab para no
-  superponerse. Fórmula única (definida en `specs/layout/AppLayout.md`),
+  superponerse. Fórmula única (definida en `specs/layout/AppLayout/spec.md`),
   aplicada en el tabpanel (`.panel`):
   `padding-top: calc(var(--size-nav-tab-height) - var(--box-padding) + var(--space-4))`.
   Descuenta el `--box-padding` del Box porque la tab está posicionada desde el
@@ -67,7 +67,7 @@
 - **≥ lg**: la tab **flota** a la derecha (`CornerTab placement="float"`) y
   el `h1` fluye a su izquierda en la misma franja, usando el ancho real de la
   tab (sin reservas fijas). `.panel` vuelve a `padding-top: 0`. Detalle en
-  `specs/layout/AppLayout.md` y `specs/primitives/CornerTab.md`.
+  `specs/layout/AppLayout/spec.md` y `specs/primitives/CornerTab/spec.md`.
 
 ### xl (≥ 1200px): sidebar + contenido
 
@@ -126,8 +126,8 @@
 ## Contenido de los paneles
 
 Resumen visual. **La spec normativa de cada panel está en
-[specs/pages/AboutPage.md](../specs/pages/AboutPage.md) y
-[specs/pages/ResumePage.md](../specs/pages/ResumePage.md)**; si este
+[specs/pages/AboutPage/spec.md](../specs/pages/AboutPage/spec.md) y
+[specs/pages/ResumePage/spec.md](../specs/pages/ResumePage/spec.md)**; si este
 resumen y esas specs difieren, ganan las specs.
 
 ### AboutPage
@@ -162,7 +162,7 @@ El CV debe imprimirse limpio en A4/Letter:
 - Ocultar: ControlsBar, CornerTab/NavTabs, botón "Show Contacts", Download CV,
   skip link, bullets del carrusel y el dialog.
 - Testimonios: **todos apilados, con el texto completo** (detalle en
-  `specs/content/TestimonialCarousel.md` → "Impresión").
+  `specs/content/TestimonialCarousel/spec.md` → "Impresión").
 - **Imprimir ambos paneles** (About y Resume) uno detrás del otro, sin importar
   el tab activo: los tabpanels ocultos se muestran en print.
 - Sidebar arriba en una columna, contactos siempre expandidos.

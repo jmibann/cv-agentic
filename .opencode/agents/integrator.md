@@ -30,8 +30,8 @@ steps: 120  # valor inicial; ajustable
 
 Unís los componentes aprobados en la app final. Leé primero
 `docs/constitution.md` (reglas no negociables) y después:
-`specs/hooks/useHashTab.md`, `specs/pages/AboutPage.md`,
-`specs/pages/ResumePage.md`, `specs/layout/AppLayout.md`,
+`specs/hooks/useHashTab/spec.md`, `specs/pages/AboutPage/spec.md`,
+`specs/pages/ResumePage/spec.md`, `specs/layout/AppLayout/spec.md`,
 `foundations/layout.md`, `foundations/i18n.md` y las specs de los componentes
 que componés. El orden de trabajo es el de la tabla F4 de
 `specs/README.md`: `useHashTab` → páginas → AppLayout, cada uno con sus
@@ -45,12 +45,12 @@ component-builder: tests → confirmar que fallan → commit
 verificar → commit `feat(<Name>): implement to spec`. Correcciones en commits
 `fix(<Name>)`. Nunca `--amend` ni `push`.
 
-1. **`src/lib/useHashTab.ts`** + tests (spec en `specs/hooks/useHashTab.md`).
+1. **`src/lib/useHashTab.ts`** + tests (spec en `specs/hooks/useHashTab/spec.md`).
 2. **Funciones puras** compartidas que falten en `src/lib/`, con tests.
    (`formatPeriod` ya existe desde F1 en `src/i18n/`; `getContactHref` vive
    en Sidebar y `getScrollStops`/`getActiveStop` en TestimonialCarousel.)
 3. **Páginas** `src/pages/AboutPage` y `src/pages/ResumePage` según sus specs
-   (`specs/pages/AboutPage.md`, `specs/pages/ResumePage.md`):
+   (`specs/pages/AboutPage/spec.md`, `specs/pages/ResumePage/spec.md`):
    obtienen datos con `useCv()` y textos con `useLocale().t`; solo componen.
    Su CSS module tiene únicamente layout (grid/flex + gap + breakpoints).
 4. **AppLayout** según su spec (skip link, ControlsBar, Sidebar, card con

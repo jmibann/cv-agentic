@@ -8,33 +8,33 @@ no puede cambiar la API ni debilitar tests sin pasar por el usuario.
 
 | Fase | Componente | Spec | Depende de |
 |---|---|---|---|
-| F2 | Icon | [primitives/Icon.md](primitives/Icon.md) | lucide-react |
-| F2 | BrandIcon | [primitives/BrandIcon.md](primitives/BrandIcon.md) | — |
-| F2 | Box | [primitives/Box.md](primitives/Box.md) | — |
-| F2 | Button | [primitives/Button.md](primitives/Button.md) | Icon |
-| F2 | Badge | [primitives/Badge.md](primitives/Badge.md) | — |
-| F2 | Overhead | [primitives/Overhead.md](primitives/Overhead.md) | — |
-| F2 | IconBox | [primitives/IconBox.md](primitives/IconBox.md) | Icon |
-| F2 | SectionTitle | [primitives/SectionTitle.md](primitives/SectionTitle.md) | IconBox |
-| F2 | Separator | [primitives/Separator.md](primitives/Separator.md) | — |
-| F2 | CornerTab | [primitives/CornerTab.md](primitives/CornerTab.md) | — |
-| F2 | HexAvatar | [primitives/HexAvatar.md](primitives/HexAvatar.md) | — |
-| F3 | ThemeToggle | [controls/ThemeToggle.md](controls/ThemeToggle.md) | Icon, ThemeProvider |
-| F3 | LanguageSwitcher | [controls/LanguageSwitcher.md](controls/LanguageSwitcher.md) | LocaleProvider |
-| F3 | ControlsBar | [controls/ControlsBar.md](controls/ControlsBar.md) | ThemeToggle, LanguageSwitcher, LocaleProvider |
-| F3 | NavTabs | [layout/NavTabs.md](layout/NavTabs.md) | CornerTab |
-| F3 | Sidebar | [layout/Sidebar.md](layout/Sidebar.md) | Box, Badge, IconBox, Overhead, Separator, Button, CornerTab, BrandIcon, Icon |
-| F3 | Timeline | [content/Timeline.md](content/Timeline.md) | — |
-| F3 | ResumeSection | [content/ResumeSection.md](content/ResumeSection.md) | SectionTitle, Timeline |
-| F3 | SkillList | [content/SkillList.md](content/SkillList.md) | Badge |
-| F3 | ServiceCard | [content/ServiceCard.md](content/ServiceCard.md) | Box, Icon |
-| F3 | TestimonialCard | [content/TestimonialCard.md](content/TestimonialCard.md) | Icon, HexAvatar |
-| F3 | TestimonialDialog | [content/TestimonialDialog.md](content/TestimonialDialog.md) | Icon, HexAvatar |
-| F3 | TestimonialCarousel | [content/TestimonialCarousel.md](content/TestimonialCarousel.md) | TestimonialCard, TestimonialDialog |
-| F4 | useHashTab (hook) | [hooks/useHashTab.md](hooks/useHashTab.md) | — |
-| F4 | AboutPage | [pages/AboutPage.md](pages/AboutPage.md) | SectionTitle, ServiceCard, TestimonialCarousel, LocaleProvider (`useCv`, `useLocale`) |
-| F4 | ResumePage | [pages/ResumePage.md](pages/ResumePage.md) | SectionTitle, ResumeSection, SkillList, LocaleProvider (`useCv`, `useLocale`) |
-| F4 | AppLayout | [layout/AppLayout.md](layout/AppLayout.md) | todo lo anterior, incluidos useHashTab, AboutPage y ResumePage |
+| F2 | Icon | [primitives/Icon/spec.md](primitives/Icon/spec.md) | lucide-react |
+| F2 | BrandIcon | [primitives/BrandIcon/spec.md](primitives/BrandIcon/spec.md) | — |
+| F2 | Box | [primitives/Box/spec.md](primitives/Box/spec.md) | — |
+| F2 | Button | [primitives/Button/spec.md](primitives/Button/spec.md) | Icon |
+| F2 | Badge | [primitives/Badge/spec.md](primitives/Badge/spec.md) | — |
+| F2 | Overhead | [primitives/Overhead/spec.md](primitives/Overhead/spec.md) | — |
+| F2 | IconBox | [primitives/IconBox/spec.md](primitives/IconBox/spec.md) | Icon |
+| F2 | SectionTitle | [primitives/SectionTitle/spec.md](primitives/SectionTitle/spec.md) | IconBox |
+| F2 | Separator | [primitives/Separator/spec.md](primitives/Separator/spec.md) | — |
+| F2 | CornerTab | [primitives/CornerTab/spec.md](primitives/CornerTab/spec.md) | — |
+| F2 | HexAvatar | [primitives/HexAvatar/spec.md](primitives/HexAvatar/spec.md) | — |
+| F3 | ThemeToggle | [controls/ThemeToggle/spec.md](controls/ThemeToggle/spec.md) | Icon, ThemeProvider |
+| F3 | LanguageSwitcher | [controls/LanguageSwitcher/spec.md](controls/LanguageSwitcher/spec.md) | LocaleProvider |
+| F3 | ControlsBar | [controls/ControlsBar/spec.md](controls/ControlsBar/spec.md) | ThemeToggle, LanguageSwitcher, LocaleProvider |
+| F3 | NavTabs | [layout/NavTabs/spec.md](layout/NavTabs/spec.md) | CornerTab |
+| F3 | Sidebar | [layout/Sidebar/spec.md](layout/Sidebar/spec.md) | Box, Badge, IconBox, Overhead, Separator, Button, CornerTab, BrandIcon, Icon |
+| F3 | Timeline | [content/Timeline/spec.md](content/Timeline/spec.md) | — |
+| F3 | ResumeSection | [content/ResumeSection/spec.md](content/ResumeSection/spec.md) | SectionTitle, Timeline |
+| F3 | SkillList | [content/SkillList/spec.md](content/SkillList/spec.md) | Badge |
+| F3 | ServiceCard | [content/ServiceCard/spec.md](content/ServiceCard/spec.md) | Box, Icon |
+| F3 | TestimonialCard | [content/TestimonialCard/spec.md](content/TestimonialCard/spec.md) | Icon, HexAvatar |
+| F3 | TestimonialDialog | [content/TestimonialDialog/spec.md](content/TestimonialDialog/spec.md) | Icon, HexAvatar |
+| F3 | TestimonialCarousel | [content/TestimonialCarousel/spec.md](content/TestimonialCarousel/spec.md) | TestimonialCard, TestimonialDialog |
+| F4 | useHashTab (hook) | [hooks/useHashTab/spec.md](hooks/useHashTab/spec.md) | — |
+| F4 | AboutPage | [pages/AboutPage/spec.md](pages/AboutPage/spec.md) | SectionTitle, ServiceCard, TestimonialCarousel, LocaleProvider (`useCv`, `useLocale`) |
+| F4 | ResumePage | [pages/ResumePage/spec.md](pages/ResumePage/spec.md) | SectionTitle, ResumeSection, SkillList, LocaleProvider (`useCv`, `useLocale`) |
+| F4 | AppLayout | [layout/AppLayout/spec.md](layout/AppLayout/spec.md) | todo lo anterior, incluidos useHashTab, AboutPage y ResumePage |
 
 **Quién construye cada fase:** F2 y F3 → `component-builder` (un componente por
 encargo). F4 → `integrator`, en el orden de la tabla: `useHashTab` → páginas →
@@ -127,8 +127,8 @@ Estado: borrador | aprobada | implementada
 ```
 
 `Estado:` va justo debajo del título y solo cambia con aprobación del usuario.
-`## Requisitos (EARS)` va entre `## Propósito` y `## Anatomía`; el formato EARS
-está en la skill `sdd`.
+`## Requisitos (EARS)` va justo después de `## Propósito` (antes de la sección
+que le sigue: Anatomía, API…); el formato EARS está en la skill `sdd`.
 
 Todas las secciones son **obligatorias** y explícitas, aunque su contenido
 sea "No es interactivo" o "Sin `@media` propios": el reviewer verifica contra

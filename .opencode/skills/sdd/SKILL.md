@@ -31,8 +31,7 @@ la cambia el usuario. Si una spec o un plan la contradice, para y pregunta.
 ## Plantilla de spec (spec.md)
 
 Para las piezas de este kit la plantilla canónica es la de
-[`specs/README.md`](../../specs/README.md) → "Plantilla de spec", con dos
-adiciones obligatorias:
+[`specs/README.md`](../../../specs/README.md) → "Plantilla de spec":
 
 ```text
 # <Name>
@@ -51,7 +50,7 @@ Estado: borrador | aprobada | implementada
 ```
 
 - `Estado:` va justo debajo del título y **solo cambia con aprobación del usuario**.
-- `## Requisitos (EARS)` va entre `## Propósito` y `## Anatomía` (formato más abajo).
+- `## Requisitos (EARS)` va justo después de `## Propósito`, antes de la sección que le sigue (formato más abajo).
 - Las 10 secciones son obligatorias y explícitas, aunque su contenido sea
   "No es interactivo" o "No aplica" (los hooks marcan "No aplica" donde corresponde).
 - Si queda alguna duda, se agrega además `## Dudas abiertas` con

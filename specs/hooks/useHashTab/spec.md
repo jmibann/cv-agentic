@@ -54,7 +54,7 @@ Decisiones:
 **Ningún elemento puede tener `id="about"` ni `id="resume"`** (ni ningún id
 que coincida con un valor de `ids`): el navegador saltaría a él al cargar con
 ese hash. El panel es `main-panel`; los tabs, `tab-about` / `tab-resume`
-(ver `specs/layout/NavTabs.md`). AppLayout lo verifica en su test 9.
+(ver `specs/layout/NavTabs/spec.md`). AppLayout lo verifica en su test 9.
 
 ## Anatomía
 

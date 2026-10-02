@@ -28,7 +28,7 @@ cv-agentic/
 ├─ docs/              documentación (constitution, README completo, DESIGN, BACKLOG, diagnostics, agents, tokens/)
 ├─ tokens/            tokens.css (lo importa la app)
 ├─ foundations/       tipografía · layout · movimiento · theming · i18n
-├─ specs/             una spec por pieza
+├─ specs/             una carpeta por pieza (<categoria>/<Name>/spec.md)
 ├─ data/              esquema JSON del CV (fuente de verdad) + ejemplos
 ├─ .opencode/agents/  los 5 agentes
 └─ src/ · public/ · index.html · package.json   ← los crea la Fase 1

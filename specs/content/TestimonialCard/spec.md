@@ -83,7 +83,7 @@ para la sombra). En el carrusel es el `padding-top` del track (ver
 debe aplicar ese mismo token.
 
 La forma hexagonal la resuelve la primitiva `HexAvatar`
-(`specs/primitives/HexAvatar.md`): no se reimplementa acá.
+(`specs/primitives/HexAvatar/spec.md`): no se reimplementa acá.
 
 ## Estados
 

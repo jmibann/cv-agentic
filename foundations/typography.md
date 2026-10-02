@@ -75,7 +75,7 @@ h1  título de página (uno por tabpanel)
 El título de un TimelineItem es `<h3>` con estilo de h4 (clase del módulo,
 no el tag). El tema original usaba `<h5>`; eso rompe la jerarquía y **no** se
 replica. El nombre del sidebar no es heading: es un `<p>` con estilo propio
-(decisión fijada en `specs/layout/Sidebar.md`; el único `h1` es el del
+(decisión fijada en `specs/layout/Sidebar/spec.md`; el único `h1` es el del
 panel activo).
 
 ## Márgenes de títulos

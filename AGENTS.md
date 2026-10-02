@@ -13,7 +13,7 @@ cv-agentic/
 ├─ docs/                      README completo, DESIGN, BACKLOG, diagnostics, agents.md, tokens/ (breakpoints, contraste)
 ├─ tokens/                    tokens.css (lo importa la app)
 ├─ foundations/               tipografía, layout, movimiento, theming, i18n
-├─ specs/                     una spec por pieza (primitives, controls, layout, content, pages, hooks)
+├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (primitives, controls, layout, content, pages, hooks)
 ├─ data/                      cv.schema.json (fuente de verdad), constants.ts, ejemplos JSON y *.generated.* (alias @data)
 ├─ .opencode/agents/          los 5 agentes (orchestrator, foundation, component-builder, integrator, reviewer)
 ├─ package.json               scripts: dev, lint, typecheck, test, build (los crea la Fase 1)
@@ -48,7 +48,7 @@ Debajo de la constitución, **el kit de diseño manda** (`docs/`, `tokens/`,
 1. `docs/constitution.md` (reglas no negociables)
 2. `docs/DESIGN.md` (reglas duras de diseño)
 3. `tokens/tokens.css` + `docs/tokens/` (contraste, breakpoints)
-4. La spec del componente en `specs/…`
+4. La spec del componente en `specs/<categoria>/<Name>/spec.md`
 
 Si la spec y el código no coinciden, **gana la spec**. Si la spec parece
 equivocada o incompleta, **se frena y se consulta al usuario**; no se
