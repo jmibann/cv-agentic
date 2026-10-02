@@ -1,0 +1,384 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cv-agentic.local/data/cv.schema.json",
+  "title": "CvData",
+  "description": "Contenido del CV para un idioma (cv.en.json / cv.es.json). Fuente de verdad del formato: los tipos TS se generan desde este archivo (data/cv.types.generated.ts). Los campos 'No traducible' deben ser idénticos entre idiomas (lo verifica content.test.ts).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "locale",
+    "profile",
+    "contact",
+    "social",
+    "services",
+    "education",
+    "experience",
+    "skills",
+    "testimonials"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Ruta a este esquema, para autocompletado y validación en el editor. No se usa en la app."
+    },
+    "locale": {
+      "$ref": "#/definitions/Locale"
+    },
+    "profile": {
+      "$ref": "#/definitions/Profile"
+    },
+    "contact": {
+      "type": "array",
+      "description": "Datos de contacto del Sidebar, en el orden en que se muestran.",
+      "items": {
+        "$ref": "#/definitions/ContactItem"
+      }
+    },
+    "social": {
+      "type": "array",
+      "description": "Redes sociales del Sidebar, en el orden en que se muestran.",
+      "items": {
+        "$ref": "#/definitions/SocialLink"
+      }
+    },
+    "services": {
+      "type": "array",
+      "description": "Tarjetas de 'What I'm Doing' en el panel About.",
+      "items": {
+        "$ref": "#/definitions/Service"
+      }
+    },
+    "education": {
+      "type": "array",
+      "description": "Timeline de Education (orden de los datos = orden en pantalla).",
+      "items": {
+        "$ref": "#/definitions/TimelineEntry"
+      }
+    },
+    "experience": {
+      "type": "array",
+      "description": "Timeline de Experience (orden de los datos = orden en pantalla).",
+      "items": {
+        "$ref": "#/definitions/TimelineEntry"
+      }
+    },
+    "skills": {
+      "type": "array",
+      "description": "Lista plana de chips, en el orden en que se muestran. Sin porcentajes ni categorías.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "testimonials": {
+      "type": "array",
+      "description": "Testimonios del carrusel (sin fecha).",
+      "items": {
+        "$ref": "#/definitions/Testimonial"
+      }
+    }
+  },
+  "definitions": {
+    "Locale": {
+      "title": "Locale",
+      "description": "Idioma del archivo. Debe coincidir con el nombre (cv.<locale>.json). Difiere entre archivos por definición (no entra en la comparación de paridad).",
+      "type": "string",
+      "enum": [
+        "en",
+        "es"
+      ]
+    },
+    "Id": {
+      "title": "Id",
+      "description": "Identificador estable, en minúsculas con guiones. No traducible.",
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "PublicPath": {
+      "title": "PublicPath",
+      "description": "Ruta pública del sitio (empieza con /) o URL https. No traducible.",
+      "type": "string",
+      "pattern": "^(/|https://)\\S+$"
+    },
+    "YearMonth": {
+      "title": "YearMonth",
+      "description": "Fecha \"YYYY\" o \"YYYY-MM\" (año 1900–2099, mes 01–12). No traducible.",
+      "type": "string",
+      "pattern": "^(19|20)\\d{2}(-(0[1-9]|1[0-2]))?$"
+    },
+    "Image": {
+      "title": "Image",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "src",
+        "alt"
+      ],
+      "properties": {
+        "src": {
+          "$ref": "#/definitions/PublicPath"
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Texto alternativo (traducible)."
+        }
+      }
+    },
+    "TestimonialAvatar": {
+      "title": "TestimonialAvatar",
+      "description": "Avatar de testimonio: solo src. Es decorativo (alt=\"\") porque el nombre está al lado.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "src"
+      ],
+      "properties": {
+        "src": {
+          "$ref": "#/definitions/PublicPath"
+        }
+      }
+    },
+    "Profile": {
+      "title": "Profile",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "headline",
+        "avatar",
+        "about"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nombre completo."
+        },
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Rol que se muestra en el Badge del Sidebar. Ej: \"Frontend Developer\"."
+        },
+        "avatar": {
+          "$ref": "#/definitions/Image"
+        },
+        "about": {
+          "type": "array",
+          "description": "Párrafos del panel About.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "downloadCvUrl": {
+          "$ref": "#/definitions/PublicPath",
+          "description": "URL del PDF del CV (no traducible por ahora; ver docs/BACKLOG.md). Si falta, el botón Download CV no se muestra."
+        }
+      }
+    },
+    "ContactType": {
+      "title": "ContactType",
+      "description": "Lista cerrada: agregar un tipo exige código (ícono y label de interfaz). No traducible.",
+      "type": "string",
+      "enum": [
+        "email",
+        "phone",
+        "whatsapp",
+        "location"
+      ]
+    },
+    "ContactItem": {
+      "title": "ContactItem",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "value"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "type": {
+          "$ref": "#/definitions/ContactType"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Valor visible. Ej: \"hello@example.com\", \"Buenos Aires, Argentina\"."
+        },
+        "href": {
+          "type": "string",
+          "pattern": "^(https?://|mailto:|tel:|/)\\S+$",
+          "description": "Destino del link (no traducible). Si falta se deriva del tipo: email → mailto:, phone → tel:, whatsapp → https://wa.me/<dígitos>, location → sin link."
+        }
+      }
+    },
+    "SocialNetwork": {
+      "title": "SocialNetwork",
+      "description": "Lista cerrada: agregar una red exige código (logo en BrandIcon). No traducible.",
+      "type": "string",
+      "enum": [
+        "github",
+        "linkedin",
+        "x",
+        "instagram",
+        "facebook",
+        "dribbble",
+        "behance"
+      ]
+    },
+    "SocialLink": {
+      "title": "SocialLink",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "network",
+        "url"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "network": {
+          "$ref": "#/definitions/SocialNetwork"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://\\S+$",
+          "description": "URL del perfil (https). No traducible."
+        }
+      }
+    },
+    "ServiceIcon": {
+      "title": "ServiceIcon",
+      "description": "Lista cerrada de íconos de lucide-react: agregar uno exige código (mapa de Icon). No traducible.",
+      "type": "string",
+      "enum": [
+        "code",
+        "layout",
+        "palette",
+        "smartphone",
+        "server",
+        "database",
+        "cloud",
+        "pen-tool",
+        "camera",
+        "megaphone",
+        "gauge",
+        "shield"
+      ]
+    },
+    "Service": {
+      "title": "Service",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "icon"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "icon": {
+          "$ref": "#/definitions/ServiceIcon"
+        }
+      }
+    },
+    "TimelineEntry": {
+      "title": "TimelineEntry",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "organization",
+        "start",
+        "end",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Carrera (Education) o puesto (Experience)."
+        },
+        "organization": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Institución o empresa."
+        },
+        "start": {
+          "$ref": "#/definitions/YearMonth"
+        },
+        "end": {
+          "description": "Fecha de fin (\"YYYY\" o \"YYYY-MM\") o null si es la actualidad (\"Present\" / \"Actualidad\"). No traducible.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/YearMonth"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "author",
+        "role",
+        "avatar",
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/Id"
+        },
+        "author": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nombre propio (normalmente igual en ambos idiomas)."
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Rol y empresa del autor."
+        },
+        "avatar": {
+          "$ref": "#/definitions/TestimonialAvatar"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Texto completo; la card muestra un extracto recortado por CSS."
+        }
+      }
+    }
+  }
+}

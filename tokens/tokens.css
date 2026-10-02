@@ -1,0 +1,465 @@
+/* =====================================================================
+   cv-agentic — tokens/tokens.css
+   ---------------------------------------------------------------------
+   Única fuente de verdad de color, tipografía, espaciado, radios,
+   sombras, movimiento y capas. Se importa UNA vez en src/main.tsx:
+
+     import "../tokens/tokens.css";
+
+   Capas:
+     1. Primitivas (--palette-*): valores crudos. Los componentes NUNCA
+        las consumen directamente.
+     2. Semánticas (--color-*, --gradient-*, --shadow-*, …): lo único que
+        usan los CSS Modules.
+     3. Tema oscuro: redefine SOLO semánticas bajo [data-theme="dark"].
+   4. Impresión: al final, @media print reasigna las semánticas a la paleta
+      clara (también en oscuro) y quita sombras.
+        El atributo lo fija siempre el script anti-flash de index.html
+        (ver foundations/theming.md), que ya resuelve prefers-color-scheme;
+        por eso no hay bloque duplicado en @media (prefers-color-scheme).
+
+   Regla dura: ningún color literal (#hex, rgb(), hsl(), nombre) fuera de
+   este archivo. Breakpoints: ver docs/tokens/breakpoints.md (los @media no
+   aceptan custom properties, se escriben con los 4 valores permitidos).
+   ===================================================================== */
+
+/* --icon-size: tamaño de Icon/BrandIcon. Registrada SIN herencia: solo
+   tiene efecto en la clase que el padre pasa al propio ícono (className), y
+   nunca se filtra a íconos anidados. syntax "*" permite rem y deja la
+   propiedad sin valor inicial, así el fallback de var() funciona. */
+@property --icon-size {
+  syntax: "*";
+  inherits: false;
+}
+
+:root {
+  /* ------------------------------------------------------------------
+     1. PRIMITIVAS
+     ------------------------------------------------------------------ */
+
+  /* Acentos */
+  --palette-blue-500: #304cfd;
+  --palette-blue-600: #2640eb;
+  --palette-gold-300: #fadd7f;
+  --palette-gold-400: #f6c16f;
+
+  /* Neutros — claro */
+  --palette-light-bg: #eceef4;
+  --palette-light-surface: #ffffff;
+  --palette-light-grey-100: #f5f7fa;
+  --palette-light-grey-200: #e3e5e8;
+  --palette-light-edge: #f0f0f0;
+  --palette-light-ink: #3b4b5e;
+  --palette-light-ink-muted: #637085;
+
+  /* Neutros — oscuro */
+  --palette-dark-bg: #151517;
+  --palette-dark-surface: #202123;
+  --palette-dark-grey-100: #1a1a1c;
+  --palette-dark-grey-200: #151617;
+  --palette-dark-raised: #2a2b2d;
+  --palette-dark-border: #2f2f30;
+  --palette-dark-edge: #191a1b;
+  --palette-dark-ink: #ffffff;
+  --palette-dark-ink-body: #e8e8e8;
+  --palette-dark-ink-muted: #9e9e9e;
+
+  /* Canales RGB para sombras teñidas (rgb(var(--x) / alpha)) */
+  --palette-blue-500-rgb: 48 76 253;
+  --palette-gold-400-rgb: 246 193 111;
+  --palette-ink-shadow-rgb: 4 15 21;
+  --palette-slate-shadow-rgb: 134 151 168;
+  --palette-black-rgb: 0 0 0;
+  --palette-overlay-light-rgb: 20 25 31;
+
+  /* ------------------------------------------------------------------
+     2. SEMÁNTICAS — TEMA CLARO (default)
+     ------------------------------------------------------------------ */
+  color-scheme: light;
+
+  /* Superficies */
+  --color-bg: var(--palette-light-bg);                 /* fondo de página */
+  --color-surface: var(--palette-light-surface);       /* Box outer, dialog */
+  --color-surface-muted: var(--palette-light-grey-100);/* Box inner, chips, IconBox, TestimonialCard */
+  --color-surface-raised: var(--palette-light-grey-100);/* CornerTab, ThemeToggle, LanguageSwitcher */
+  --color-box-edge: var(--palette-light-edge);         /* borde inferior 5px de Box outer */
+
+  /* Líneas (decorativas: nunca únicas portadoras de información) */
+  --color-border: var(--palette-light-grey-200);       /* bordes 1px (CornerTab, controles) */
+  --color-track: var(--palette-light-grey-200);        /* línea/halo Timeline, Separator, bullets inactivos */
+
+  /* Texto */
+  --color-heading: var(--palette-light-ink);
+  --color-text: var(--palette-light-ink);
+  --color-text-muted: var(--palette-light-ink-muted);  /* NO sobre --color-bg (4.32:1) */
+
+  /* Acento */
+  --color-accent: var(--palette-blue-500);             /* sólido: punto Timeline, foco, íconos */
+  --color-accent-text: var(--palette-blue-500);        /* texto/links/tab activo (5.87:1 sobre surface) */
+  --color-on-accent: var(--palette-light-surface);     /* texto SOBRE acento/gradiente */
+  --gradient-accent: linear-gradient(
+    137.84deg,
+    var(--palette-blue-500) 26.31%,
+    var(--palette-blue-600) 93.75%
+  );
+  --gradient-accent-start: var(--palette-blue-500);    /* stops para <linearGradient> SVG */
+  --gradient-accent-end: var(--palette-blue-600);
+
+  /* Overlay (::backdrop del dialog) */
+  --color-overlay: rgb(var(--palette-overlay-light-rgb) / 0.8);
+
+  /* Foco */
+  --color-focus-ring: var(--color-accent);
+
+  /* Sombras */
+  --shadow-box: 0 2.5rem 3.125rem rgb(var(--palette-ink-shadow-rgb) / 0.09);
+  --shadow-avatar: 0 0.5rem 1.5rem rgb(var(--palette-ink-shadow-rgb) / 0.05);
+  --shadow-control: 0 0.5rem 1.5rem rgb(var(--palette-ink-shadow-rgb) / 0.06);
+  --shadow-accent:
+    0 0.5rem 1rem rgb(var(--palette-blue-500-rgb) / 0.15),
+    0 0.125rem 0.25rem rgb(var(--palette-blue-500-rgb) / 0.15);
+  --shadow-accent-focus:
+    0 1.5rem 2.5rem rgb(var(--palette-blue-500-rgb) / 0.1),
+    0 0.5rem 1rem rgb(var(--palette-blue-500-rgb) / 0.1);
+  --shadow-accent-glow:
+    0 0.25rem 2rem rgb(var(--palette-blue-500-rgb) / 0.25),
+    0 0.25rem 1rem rgb(var(--palette-blue-500-rgb) / 0.25);
+  --shadow-dialog: 0 1.5rem 5rem rgb(var(--palette-black-rgb) / 0.25);
+  --filter-avatar-drop:
+    drop-shadow(0 0.25rem 0.25rem rgb(var(--palette-slate-shadow-rgb) / 0.25))
+    drop-shadow(0 0.5rem 0.5rem rgb(var(--palette-slate-shadow-rgb) / 0.4));
+
+  /* ------------------------------------------------------------------
+     TIPOGRAFÍA
+     ------------------------------------------------------------------ */
+  --font-family: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --font-weight-light: 300;     /* cuerpo */
+  --font-weight-regular: 400;   /* badges, overhead, botones */
+  --font-weight-medium: 500;    /* h4, nombre sidebar, tabs */
+  --font-weight-semibold: 600;  /* h1–h3, h5, h6, strong */
+
+  --line-height-body: 1.6;      /* ≥580px: 1.65 */
+  --line-height-heading: 1.3;
+  --line-height-tight: 1.3;     /* badges/chips */
+
+  /* Mobile-first: estos son los valores <580px. Suben en los @media de abajo. */
+  --font-size-body: 0.875rem;   /* 14px → 15px */
+  --font-size-h1: 1.5rem;       /* 24px → 32px */
+  --font-size-h2: 1.125rem;     /* 18px → 24px */
+  --font-size-h3: 1rem;         /* 16px → 18px */
+  --font-size-h4: 0.875rem;     /* 14px → 16px */
+  --font-size-h5: 0.75rem;      /* 12px → 14px */
+  --font-size-h6: 0.625rem;     /* 10px → 12px */
+  --font-size-name: 1.0625rem;  /* nombre sidebar: 17px → 27px (≥768) */
+  --font-size-small: 0.75rem;   /* 12px: Button size="small" */
+  --font-size-overhead: 0.6875rem; /* 11px → 12px */
+  --font-size-badge: 0.6875rem; /* 11px → 13px (≥768) */
+  --font-size-button: 0.875rem; /* 14px → 16px */
+  --font-size-nav: 0.875rem;    /* 14px → 16px (≥992) */
+  --font-size-contact-value: 0.8125rem; /* 13px → 14px (≥580): valores de contacto del Sidebar */
+
+  /* ------------------------------------------------------------------
+     ESPACIADO
+     ------------------------------------------------------------------ */
+  --space-1: 0.25rem;   /*  4px */
+  --space-2: 0.5rem;    /*  8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-7: 1.875rem;  /* 30px — unidad base del tema */
+  --space-8: 2.5rem;    /* 40px */
+  --space-9: 3.75rem;   /* 60px */
+  --space-10: 5rem;     /* 80px */
+  --space-11: 10rem;    /* 160px */
+
+  /* Semánticos responsive (mobile-first) */
+  --box-padding: 0.9375rem;        /* → 1.5rem (≥580) → 1.875rem (≥768) */
+  --box-inner-padding: var(--space-5);  /* 20px → space-7 30px (≥580) */
+  --stack-gap: 1rem;               /* separación vertical entre bloques; → 1.875rem (≥580) */
+  --gutter-top: var(--space-10);        /* 80px → space-11 160px (≥1200) */
+  --gutter-bottom: var(--space-8);      /* 40px → space-9 60px (≥580) */
+  --container-max: 1290px;
+  --container-padding-inline: 1rem;
+  --layout-gap: 1.875rem;          /* gap sidebar/contenido */
+
+  /* ------------------------------------------------------------------
+     RADIOS
+     ------------------------------------------------------------------ */
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-14: 14px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-32: 32px;
+  --radius-round: 999px;
+
+  /* ------------------------------------------------------------------
+     TAMAÑOS DE COMPONENTE
+     ------------------------------------------------------------------ */
+  --size-avatar-sidebar: 7.5rem;     /* → 9rem (≥768) → 11.25rem (≥1200) */
+  --size-avatar-border: 5px;         /* → 6px (≥768) */
+  --size-icon-box: 3rem;
+  --size-icon: 1.125rem;
+  --size-service-icon: 2.5rem;
+  --size-control: 2.5rem;            /* ThemeToggle / LanguageSwitcher */
+  --size-nav-tab-height: 3rem;       /* → 3.75rem (≥992) */
+  --size-testimonial-avatar-w: 5rem;
+  --size-testimonial-avatar-h: 5.5rem;
+  --size-timeline-dot: 0.5625rem;    /* 9px */
+  --size-title-bar-w: 1.875rem;      /* → 2.5rem (≥580) */
+  --size-title-bar-h: 0.1875rem;     /* → 0.3125rem (≥580) */
+  --size-bullet: 0.625rem;
+  --size-bullet-active: 1.25rem;
+  --size-box-edge: 5px;
+
+  /* ------------------------------------------------------------------
+     MOVIMIENTO
+     ------------------------------------------------------------------ */
+  --duration-fast: 0.15s;
+  --duration-base: 0.3s;
+  --duration-slow: 0.6s;
+  --ease-standard: ease-in-out;
+  --ease-emphasized: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+
+  /* ------------------------------------------------------------------
+     CAPAS
+     ------------------------------------------------------------------ */
+  --z-base: 0;
+  --z-raised: 1;     /* CornerTab sobre el contenido del Box */
+  --z-sticky: 10;    /* sidebar sticky */
+  --z-controls: 20;  /* ControlsBar */
+  --z-below: -1;     /* decoración detrás de su propio elemento (brillo del Button) */
+  /* <dialog> usa top layer: no necesita z-index */
+
+  /* ------------------------------------------------------------------
+     FOCO
+     ------------------------------------------------------------------ */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* ------------------------------------------------------------------
+     MEDIDAS INTERNAS DE COMPONENTES (responsive)
+     Regla (docs/tokens/breakpoints.md): un componente NUNCA redefine una medida
+     en su propio @media. Si una medida cambia por breakpoint, vive acá.
+     Valores base = < 580px; los @media de abajo los escalan.
+     ------------------------------------------------------------------ */
+  /* Box */
+  --radius-box-inner: var(--radius-14);            /* → 16 (≥580) */
+  /* Button */
+  --button-padding-block: 0.75rem;                 /* → 0.9375rem (≥580) */
+  --button-padding-inline: 1.125rem;               /* → 2rem (≥580) */
+  /* SectionTitle decorated */
+  --title-decorated-gap: 1.5rem;                   /* margin-bottom del h1 → 2.3125rem (≥580) */
+  --title-bar-offset: 0.625rem;                    /* distancia texto→barra → 1.0625rem (≥580) */
+  /* Separator */
+  --separator-gap: var(--space-4);                 /* → space-6 (≥580) */
+  /* CornerTab */
+  --corner-tab-padding-inline: var(--space-5);     /* 20px → 2rem (≥992) */
+  /* NavTabs */
+  --nav-tab-gap: 1.5rem;                           /* → 2.5rem (≥992) */
+  /* ControlsBar */
+  --controls-gap: var(--space-2);                  /* → space-3 (≥580) */
+  /* Sidebar */
+  --size-social-icon: 1rem;                        /* → 1.125rem (≥580) */
+  --radius-avatar-sidebar: var(--radius-20);       /* → 32 (≥768) */
+  --sidebar-name-gap: 0.625rem;                    /* → 0.875rem (≥768) */
+  --sidebar-cta-gap: 1rem;                         /* margin-top de Download CV → 1.25rem (≥580) → 2rem (≥768) → 1.875rem (≥1200) */
+  /* Timeline */
+  --timeline-indent: var(--space-7);               /* 30px → space-8 40px (≥580) */
+  --timeline-line-width: 1px;
+  --timeline-dot-ring: 0.25rem;
+  --timeline-dot-top: 0.0625rem;                   /* alinea el punto con la primera línea del título (que sube 0.3125rem) */
+  /* Testimonios */
+  --testimonial-padding: 1rem;                     /* → 1.875rem 1.875rem 1.5rem (≥580) */
+  --testimonial-padding-top: 1rem;                 /* → 1.875rem (≥580); parte superior de --testimonial-padding */
+  --testimonial-avatar-offset: 2.5rem;             /* cuánto sube el avatar → 3.75rem (≥580) */
+  --testimonial-quote-inset-block: 0.7rem;         /* → 1.5rem (≥580) */
+  --testimonial-quote-inset-inline: 1.2rem;        /* → 1.875rem (≥580) */
+  /* Protrusión real del avatar sobre el borde de la card, + 0.5rem para la drop-shadow */
+  --testimonial-headroom: calc(var(--testimonial-avatar-offset) - var(--testimonial-padding-top) + 0.5rem);
+}
+
+/* ------------------------------------------------------------------
+   ESCALADO RESPONSIVE (mobile-first; valores de docs/tokens/breakpoints.md)
+   ------------------------------------------------------------------ */
+@media (min-width: 580px) {
+  :root {
+    --line-height-body: 1.65;
+    --font-size-body: 0.9375rem;   /* 15px */
+    --font-size-h1: 2rem;          /* 32px */
+    --font-size-h2: 1.5rem;        /* 24px */
+    --font-size-h3: 1.125rem;      /* 18px */
+    --font-size-h4: 1rem;          /* 16px */
+    --font-size-h5: 0.875rem;      /* 14px */
+    --font-size-h6: 0.75rem;       /* 12px */
+    --font-size-overhead: 0.75rem; /* 12px */
+    --font-size-button: 1rem;      /* 16px */
+
+    --box-padding: 1.5rem;
+    --box-inner-padding: var(--space-7);
+    --stack-gap: 1.875rem;
+    --gutter-bottom: var(--space-9);
+
+    --size-title-bar-w: 2.5rem;
+    --size-title-bar-h: 0.3125rem;
+
+    --font-size-contact-value: 0.875rem;
+    --radius-box-inner: var(--radius-16);
+    --button-padding-block: 0.9375rem;
+    --button-padding-inline: 2rem;
+    --title-decorated-gap: 2.3125rem;
+    --title-bar-offset: 1.0625rem;
+    --separator-gap: var(--space-6);
+    --controls-gap: var(--space-3);
+    --size-social-icon: 1.125rem;
+    --sidebar-cta-gap: 1.25rem;
+    --timeline-indent: var(--space-8);
+    --testimonial-padding: 1.875rem 1.875rem 1.5rem;
+    --testimonial-padding-top: 1.875rem;
+    --testimonial-avatar-offset: 3.75rem;
+    --testimonial-quote-inset-block: 1.5rem;
+    --testimonial-quote-inset-inline: 1.875rem;
+  }
+}
+
+@media (min-width: 768px) {
+  :root {
+    --box-padding: 1.875rem;
+    --font-size-name: 1.6875rem;   /* 27px */
+    --font-size-badge: 0.8125rem;  /* 13px */
+    --size-avatar-sidebar: 9rem;   /* PROVISIONAL: se fija en la QA visual de F5 comparando con la captura de referencia */
+    --size-avatar-border: 6px;
+    --radius-avatar-sidebar: var(--radius-32);
+    --sidebar-name-gap: 0.875rem;
+    --sidebar-cta-gap: 2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  :root {
+    --font-size-nav: 1rem;         /* 16px */
+    --size-nav-tab-height: 3.75rem;
+    --corner-tab-padding-inline: 2rem;
+    --nav-tab-gap: 2.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --gutter-top: var(--space-11);
+    --size-avatar-sidebar: 11.25rem;
+    --sidebar-cta-gap: var(--space-7);
+  }
+}
+
+/* ------------------------------------------------------------------
+   3. TEMA OSCURO — solo semánticas
+   ------------------------------------------------------------------ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: var(--palette-dark-bg);
+  --color-surface: var(--palette-dark-surface);
+  --color-surface-muted: var(--palette-dark-grey-100);
+  --color-surface-raised: var(--palette-dark-raised);
+  --color-box-edge: var(--palette-dark-edge);
+
+  --color-border: var(--palette-dark-border);
+  /* grey-200 oscuro (#151617) es MÁS oscuro que surface: se reemplaza por
+     border para que línea/halo del Timeline y separadores sigan visibles. */
+  --color-track: var(--palette-dark-border);
+
+  --color-heading: var(--palette-dark-ink);
+  --color-text: var(--palette-dark-ink-body);
+  --color-text-muted: var(--palette-dark-ink-muted);
+
+  --color-accent: var(--palette-gold-300);
+  --color-accent-text: var(--palette-gold-300);        /* 12.06:1 sobre surface */
+  --color-on-accent: var(--palette-dark-bg);           /* blanco sobre dorado = 1.34:1 ✗ */
+  --gradient-accent: linear-gradient(
+    137.84deg,
+    var(--palette-gold-300) 26.31%,
+    var(--palette-gold-400) 93.75%
+  );
+  --gradient-accent-start: var(--palette-gold-300);
+  --gradient-accent-end: var(--palette-gold-400);
+
+  --color-overlay: rgb(var(--palette-black-rgb) / 0.8);
+
+  --shadow-box: 0 2.5rem 3.125rem rgb(var(--palette-black-rgb) / 0.1);
+  --shadow-avatar: 0 0.5rem 1.5rem rgb(var(--palette-black-rgb) / 0.2);
+  --shadow-control: 0 0.5rem 1.5rem rgb(var(--palette-black-rgb) / 0.3);
+  --shadow-accent:
+    0 0.5rem 1rem rgb(var(--palette-gold-400-rgb) / 0.15),
+    0 0.125rem 0.25rem rgb(var(--palette-gold-400-rgb) / 0.15);
+  --shadow-accent-focus:
+    0 1.5rem 2.5rem rgb(var(--palette-gold-400-rgb) / 0.1),
+    0 0.5rem 1rem rgb(var(--palette-gold-400-rgb) / 0.1);
+  --shadow-accent-glow:
+    0 0.25rem 2rem rgb(var(--palette-gold-400-rgb) / 0.2),
+    0 0.25rem 1rem rgb(var(--palette-gold-400-rgb) / 0.2);
+  --shadow-dialog: 0 1.5rem 5rem rgb(var(--palette-black-rgb) / 0.7);
+  --filter-avatar-drop:
+    drop-shadow(0 0.25rem 0.25rem rgb(var(--palette-black-rgb) / 0.25))
+    drop-shadow(0 0.5rem 0.5rem rgb(var(--palette-black-rgb) / 0.4));
+}
+
+/* ------------------------------------------------------------------
+   MOVIMIENTO REDUCIDO
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-base: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
+}
+
+/* ------------------------------------------------------------------
+   IMPRESIÓN — paleta clara siempre, también con data-theme="dark"
+   Es el ÚNICO lugar donde se reasignan semánticas para print: los
+   componentes no usan --palette-* ni en @media print. Va al final del
+   archivo para ganar por orden a :root[data-theme="dark"] (misma
+   especificidad).
+   ------------------------------------------------------------------ */
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+    color-scheme: light;
+
+    --color-bg: var(--palette-light-surface);          /* papel blanco */
+    --color-surface: var(--palette-light-surface);
+    --color-surface-muted: var(--palette-light-grey-100);
+    --color-surface-raised: var(--palette-light-grey-100);
+    --color-box-edge: transparent;
+
+    --color-border: var(--palette-light-grey-200);
+    --color-track: var(--palette-light-grey-200);
+
+    --color-heading: var(--palette-light-ink);
+    --color-text: var(--palette-light-ink);
+    --color-text-muted: var(--palette-light-ink-muted);
+
+    --color-accent: var(--palette-blue-500);
+    --color-accent-text: var(--palette-blue-500);
+    --color-on-accent: var(--palette-light-surface);
+    --gradient-accent: linear-gradient(
+      137.84deg,
+      var(--palette-blue-500) 26.31%,
+      var(--palette-blue-600) 93.75%
+    );
+    --gradient-accent-start: var(--palette-blue-500);
+    --gradient-accent-end: var(--palette-blue-600);
+
+    --shadow-box: none;
+    --shadow-avatar: none;
+    --shadow-control: none;
+    --shadow-accent: none;
+    --shadow-accent-focus: none;
+    --shadow-accent-glow: none;
+    --shadow-dialog: none;
+    --filter-avatar-drop: none;
+  }
+}
