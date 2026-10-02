@@ -947,3 +947,32 @@ lo muestra).
 **Siguen pendientes:** fricción de puertas (decisión 5), `## No hacer` en 9
 specs y QA visual (decisión 6).
 
+---
+
+## P. Edición por grupo en los subagentes (2026-10-02)
+
+**Origen:** análisis de la decisión 5 (fricción de puertas). Limitar `edit`
+por ruta **no reduce** las ~110 puertas SDD (4 por pieza × 27 + 5 de fase),
+que son reglas de la skill y del orchestrator; sí convierte en permiso la
+regla de cada agente sobre dónde escribe. El usuario eligió aplicarlo por
+grupo (decisión #73).
+
+| Agente | `edit` permitido (resto: deny) |
+|---|---|
+| foundation | `src/**`, `public/**`, `index.html`, `package.json`, `package-lock.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` |
+| component-builder | `src/components/**` |
+| integrator | `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` |
+
+**Verificación:** `opencode debug agent` sobre 22 rutas: cada agente permite
+solo las de su grupo; kit, `data/*.generated.*`, `specs/**`, `opencode.json` y
+`.vscode/` → deny en los tres; `src/test/**` → solo foundation.
+
+**Límites:** por grupo, no por pieza (component-builder puede escribir en
+cualquier componente, incluido `AppLayout`); `edit` no cubre bash. Si un plan
+pide un archivo fuera del grupo (mock en `src/test/`, config), hay que decidir
+quién lo escribe. Opción futura: plugin `tool.execute.before` (disponible en
+`@opencode-ai/plugin`) para limitar a la carpeta de la tarea activa.
+
+**Sigue abierta la decisión 5** (reducir puertas): opciones 1–4 en
+`docs/memory.md`.
+

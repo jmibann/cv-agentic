@@ -1,21 +1,13 @@
 ---
 description: "F2–F3 — implementa UNA tarea (Tn de tasks.md) de un componente con TDD estricto (tests primero, luego implementación), dentro de su carpeta, siguiendo la skill sdd."
 mode: subagent
-# Escribe solo en su carpeta (regla del prompt); nunca en specs/ (constitución P2).
+# Escribe solo en src/components/** (permiso) y, dentro, solo en su carpeta (regla del prompt).
 # Commits por tarea: test(<Name>): Tn (en rojo) → feat(<Name>): Tn; sin amend ni push.
 permission:
+  # Solo componentes (decisión #73); el kit y el resto de src/ quedan denegados.
   edit:
-    "*": allow
-    # El kit no se modifica (constitución P2 y AGENTS.md → Límites).
-    "README.md": deny
-    "AGENTS.md": deny
-    "opencode.json": deny
-    "docs/**": deny
-    "tokens/**": deny
-    "foundations/**": deny
-    "specs/**": deny
-    "data/**": deny
-    ".opencode/**": deny
+    "*": deny
+    "src/components/**": allow
   skill:
     "*": deny
     "sdd": allow

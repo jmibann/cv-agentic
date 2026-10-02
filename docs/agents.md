@@ -28,15 +28,19 @@ agente, se edita acá.
 | Agente | edit | bash | task | steps |
 |---|---|---|---|---|
 | orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask`; skill `sdd` | solo verificaciones y lectura de git | solo los 4 subagentes | — |
-| foundation | allow, salvo el kit (deny) | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | 150 |
-| component-builder | allow, salvo el kit (deny); skill `sdd` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | 80 |
-| integrator | allow, salvo el kit (deny); skill `sdd` | verificaciones, build, `validate:content`, dev, `git add` y `git commit -m` (sin `--amend`) | deny | 120 |
+| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | 150 |
+| component-builder | solo `src/components/**`; skill `sdd` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | 80 |
+| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx`; skill `sdd` | verificaciones, build, `validate:content`, dev, `git add` y `git commit -m` (sin `--amend`) | deny | 120 |
 | reviewer | deny | solo verificaciones, build, `validate:content`, lectura de git y `grep`; único con el MCP `chrome-devtools_*` | deny | 60 |
 
-**El kit** (decisión #72): `README.md`, `AGENTS.md`, `opencode.json`, `docs/**`,
-`tokens/**`, `foundations/**`, `specs/**`, `data/**` y `.opencode/**` tienen
-`edit: deny` en foundation, component-builder e integrator (incluye
-`docs/memory.md`). Los `data/*.generated.*` no son excepción de `edit`: se
+**Edición por grupo** (decisiones #72 y #73): foundation, component-builder e
+integrator tienen `edit` con `"*": deny` y solo permiten las rutas de su grupo
+(tabla de arriba). El kit (`README.md`, `AGENTS.md`, `opencode.json`, `docs/**`,
+`tokens/**`, `foundations/**`, `specs/**`, `data/**`, `.opencode/**`) queda
+denegado para los tres. El límite es por grupo, no por pieza: component-builder
+puede escribir en cualquier `src/components/<Name>/`; que use solo el de su
+tarea lo fija su prompt y lo controla el reviewer. Fuera de esas rutas (por
+ejemplo `src/test/`) ningún subagente escribe después de F1. Los `data/*.generated.*` no son excepción de `edit`: se
 regeneran solo con scripts (`gen:types`, `build:validator`). El permiso `edit`
 no cubre bash (`cp`, `npm run`): eso lo cubren la regla del prompt y el reviewer.
 

@@ -1,22 +1,21 @@
 ---
 description: "F4 — implementa UNA tarea (Tn de tasks.md) por encargo para componer la app: contenido en/es, páginas About/Resume, useHashTab, AppLayout, impresión. Solo compone componentes ya aprobados; sigue la skill sdd."
 mode: subagent
-# Igual que component-builder, más el build de la app.
+# Como component-builder, pero en las rutas de integración; más build, validate:content y dev.
 # Commits por tarea: test(<Name>): Tn (en rojo) → feat(<Name>): Tn; sin amend ni push.
 # Nunca escribe en specs/ (constitución P2): el orchestrator marca las tareas.
 permission:
+  # Solo integración (decisión #73); los demás componentes (ya aprobados) y el kit quedan denegados.
   edit:
-    "*": allow
-    # El kit no se modifica (constitución P2 y AGENTS.md → Límites).
-    "README.md": deny
-    "AGENTS.md": deny
-    "opencode.json": deny
-    "docs/**": deny
-    "tokens/**": deny
-    "foundations/**": deny
-    "specs/**": deny
-    "data/**": deny
-    ".opencode/**": deny
+    "*": deny
+    "src/content/**": allow
+    "src/pages/**": allow
+    "src/lib/**": allow
+    "src/components/AppLayout/**": allow
+    "src/styles/**": allow
+    "src/i18n/**": allow
+    "src/App.tsx": allow
+    "src/main.tsx": allow
   skill:
     "*": deny
     "sdd": allow

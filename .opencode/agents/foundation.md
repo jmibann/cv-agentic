@@ -3,18 +3,19 @@ description: "F1 — arma la app Vite/React/TS en la raíz del proyecto, el tool
 mode: subagent
 # Arma la app en la raíz: instala dependencias, crea carpetas e inicializa git.
 permission:
-  # El kit no se modifica (regla 2 del prompt); data/*.generated.* solo por scripts (bash).
+  # Solo la app (decisión #73); el kit y todo lo demás quedan denegados. data/*.generated.* solo por scripts (bash).
   edit:
-    "*": allow
-    "README.md": deny
-    "AGENTS.md": deny
-    "opencode.json": deny
-    "docs/**": deny
-    "tokens/**": deny
-    "foundations/**": deny
-    "specs/**": deny
-    "data/**": deny
-    ".opencode/**": deny
+    "*": deny
+    "src/**": allow
+    "public/**": allow
+    "index.html": allow
+    "package.json": allow
+    "package-lock.json": allow
+    "vite.config.ts": allow
+    "tsconfig.json": allow
+    "eslint.config.js": allow
+    ".nvmrc": allow
+    ".gitignore": allow
   webfetch: deny
   task: deny
   bash:
