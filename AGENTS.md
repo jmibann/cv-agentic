@@ -10,7 +10,7 @@ workspaces): el kit de diseño y la app conviven en la raíz. **Node 24 LTS**
 cv-agentic/
 ├─ AGENTS.md                  (este archivo)
 ├─ README.md                  índice corto
-├─ docs/                      README completo, DESIGN, BACKLOG, diagnostics, agents.md, tokens/ (breakpoints, contraste)
+├─ docs/                      constitution, README completo, DESIGN, BACKLOG, diagnostics, memory, agents.md, qa-report (F5), tokens/ (breakpoints, contraste)
 ├─ tokens/                    tokens.css (lo importa la app)
 ├─ foundations/               tipografía, layout, movimiento, theming, i18n
 ├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (foundation, primitives, controls, layout, content, pages, hooks)
@@ -60,7 +60,7 @@ equivocada o incompleta, **se frena y se consulta al usuario**; no se
 ## Memoria
 - La memoria del proyecto vive en **`docs/memory.md`** (no hay `MEMORY.md` en la raíz).
 - Al empezar, leela para conocer el estado del proyecto y las decisiones tomadas.
-- **Solo el orchestrator la actualiza**, al cerrar cada fase SDD (skill `sdd`): estado actual,
+- **Solo el orchestrator la actualiza**, al cerrar cada puerta F y ante una decisión del usuario que cambia reglas (skill `sdd`, decisión #86): estado actual,
   decisiones importantes (con su porqué) y errores a evitar. Los subagentes la leen; no la editan.
 - Mantenlo breve (máximo ~50 líneas): resume o elimina lo que ya no aporte.
 - Si algo se convierte en una regla permanente, propón moverlo a `AGENTS.md` en lugar de dejarlo en la memoria.
@@ -147,8 +147,10 @@ aprobadas". Cualquier otra: consultar al usuario.
 - No modificar el kit de diseño (`README.md`, `AGENTS.md`, `docs/`, `tokens/`,
   `foundations/`, `specs/`, `data/`, `.opencode/`) salvo pedido explícito del usuario.
   Excepciones: `data/*.generated.*` se regeneran con los scripts, nunca a mano;
-  el orchestrator actualiza `README.md` ("Estado actual") y `docs/diagnostics.md`
-  al cerrar cada puerta.
+  el orchestrator actualiza `README.md` ("Estado actual"), `docs/memory.md` y
+  `docs/diagnostics.md` al cerrar cada puerta F (decisión #86), escribe
+  `docs/qa-report.md` en F5 (decisión #85), redacta
+  `specs/**/plan.md`/`tasks.md` y edita `spec.md` solo con aprobación (`ask`).
 - **El contenido del CV se edita solo en `src/content/cv.{en,es}.json`**; su
   formato lo define `data/cv.schema.json`.
 - No crear archivos fuera de la carpeta asignada en la tarea.

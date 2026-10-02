@@ -15,3 +15,6 @@ Listá:
 5. Conflictos con `docs/constitution.md` o con la plantilla de `specs/README.md`.
 
 No propongas soluciones ni modifiques archivos: solo detectá. Formato: lista numerada.
+Si no encontrás nada, respondé exactamente **"Sin hallazgos"**: con la spec ya `aprobada`,
+la pieza sigue sin puerta de Clarificación (decisión #90). Las respuestas a los hallazgos
+las aplica el orchestrator en `spec.md` (con tu aprobación).

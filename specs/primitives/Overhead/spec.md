@@ -63,3 +63,10 @@ Nunca sobre `--color-bg` en claro (4.32:1). Sí sobre `surface`,
 - `as="dt"` renderiza `<dt>` (dentro de `<dl>` en el test).
 - Concatena `className`.
 - `expectNoA11yViolations` sin violaciones.
+
+## No hacer
+
+- No escribir el texto en mayúsculas en el DOM: la capitalización la pone `text-transform` (Accesibilidad).
+- No usarlo sobre `--color-bg` en tema claro (4.32:1): solo sobre `surface`, `surface-muted` o `surface-raised`.
+- No agregar `@media` propios: el tamaño escala por `--font-size-overhead`.
+- No hacerlo interactivo ni agregarle roles.

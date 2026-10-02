@@ -18,12 +18,17 @@ permission:
     ".gitignore": allow
   webfetch: deny
   task: deny
-  # Todas las skills disponibles (decisión #78); TDD/incremental van en el prompt.
-  skill: allow
+  # Solo `sdd` (decisión #87): las skills globales (spec-driven-development,
+  # git-workflow…) compiten con el flujo del proyecto; TDD va en el prompt.
+  skill:
+    "*": deny
+    "sdd": allow
   bash:
     "*": ask
     "npm install*": allow
     "npm run *": allow
+    # Sin servidor de desarrollo (decisión #91): no termina y bloquea al agente.
+    "npm run dev*": deny
     "npm test*": allow
     "npx vitest *": allow
     "npx tsc*": allow
@@ -195,10 +200,12 @@ test); queda en rojo porque el runner o el código todavía no existen, y el
 
 **Por tarea:** `npm run lint && npm run typecheck && npm test` en verde tras el
 commit `feat(Foundation): Tn` (desde la tarea que crea esos scripts).
-**Al cerrar la pieza:** además `npm run build` en verde (decisión #80) y
-`npm run dev` levanta y la página muestra el texto provisorio con
+**Al cerrar la pieza:** además `npm run build` en verde (decisión #80). La
+comprobación visual (con la app servida por el usuario, decisión #91) la hace
+el reviewer en la revisión completa: la página muestra el texto provisorio con
 Poppins, fondo `--color-bg`, y cambia a oscuro si se fija
-`localStorage["cv:theme"]="dark"` y se recarga, **sin parpadeo**.
+`localStorage["cv:theme"]="dark"` y se recarga, **sin parpadeo**. Vos no
+corrés `npm run dev`.
 
 ## Límites
 

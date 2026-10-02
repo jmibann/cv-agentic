@@ -8,7 +8,7 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - Kit completo y auditado: reglas, tokens, fundamentos, 27 specs, esquema de datos.
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
 - Git baseline + commits solo docs/chore; **no existen `src/`, `package.json` ni la app** (las crea F1/foundation).
-- **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83 `git -c` en permisos, #84 F1 con Tn).
+- **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84) y 7 medios (#85–#91).
 - Próximo hito: kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn (#84).
 
 ## Decisiones (y por qué)
@@ -18,15 +18,16 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - **#75 P2 aclarado**: nadie edita `spec.md` sin aprobación explícita (orchestrator con `ask`).
 - **#76 Commits de documentos**: el orchestrator commitea solo `README.md`, `docs/*`, `specs/*` en
   verde y con rutas explícitas (nunca `git add .`/`-A`); reviewer no commitea.
-- **#77/#78 Skills**: kickoff ya no cita skills TDD/frontend (van en los prompts, skill `sdd`);
-  `skill` declarada en los 5 agentes (foundation y reviewer = todas, el resto = solo `sdd`).
+- **#87 Skills**: lista explícita en los 5 agentes (`sdd`; el reviewer además `browser-testing-with-devtools`);
+  las globales (`spec-driven-development`, `git-workflow…`) quedan denegadas.
 - **#79 `/constitution` eliminado** (referencias limpiadas). **#80 DoD**: `build` por pieza,
   `lint`/`typecheck`/`test` por tarea.
 - **EARS**: 3–8 `RF-n`, derivados solo de `Propósito`, `Estados`, `Responsive`, `Accesibilidad` y
   `Tests esperados`; si un RF no tiene contrapartida en "Tests esperados" **no se agrega el test** (se reporta).
 - **P1 actualizado** con aprobación explícita + decisión #68 (la constitución exige ambas).
 - Commits con `git -c user.name="jmiban" commit -m` (permitido en bash por #83); no tocar git config; sin `--amend`.
-- `## No hacer` sigue faltando en 9 specs (decisión B2, pendiente).
+- **#85 F5 sin Tn**: QA del reviewer, informe en `docs/qa-report.md`; defectos → tarea nueva o Cambio de su pieza.
+- **#86** Estado/memoria/diagnostics solo por puerta F o decisión de reglas. **#91** `npm run dev` lo corre el usuario.
 
 ## Aprendizajes y errores a evitar
 
@@ -44,7 +45,5 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - Comandos `/sdd-*` (decisión #71): orchestrator o reviewer, argumento `<categoria>/<Name>`; MCP `chrome-devtools` solo para el reviewer.
 - Permisos (#72, #73): edición por grupo con `"*": deny` (foundation → app; component-builder → `src/components/**`; integrator → F4); reviewer e integrator corren `validate:content`.
 - Después de F1 nadie edita `src/test/**` ni configs: si un plan lo pide, decidir quién (consultar).
-- Plan + Tareas se aprueban **por fase** (decisión #74): `/sdd-plan F2` redacta los de todas las piezas, una
-  puerta; Clarificación de la fase antes. Pieza suelta y Cambio: puertas propias.
-- Pendientes: fricción restante (opciones 1 `ask` doble en `spec.md` y 2 Clarificación sin hallazgos);
-  `## No hacer` en 9 specs; QA visual.
+- Plan + Tareas **por fase F1–F4** (#74, #84); Clarificación: reviewer detecta, orchestrator resuelve, puerta
+  solo con hallazgos (#90). Pendientes: opción 1 (`ask` doble en `spec.md`), bajas de la tercera auditoría, QA visual.

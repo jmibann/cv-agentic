@@ -1084,3 +1084,27 @@ M4 `git add docs/*`/`specs/*` admite rutas extra, M5 `## No hacer` en 9 specs
 (B2), M6 doble dueño de Clarificación, M7 MCP sin versión fija; bajas: estado de
 2026-09-30 al inicio de este archivo, árbol de `docs/README.md`, excepciones de
 `AGENTS.md` → Límites, `--no-verify` sin denegar.
+
+
+## U. Tercera auditoría: hallazgos medios M1–M7 (2026-10-02)
+
+**Origen:** los 7 medios de la sección T, aplicados a pedido del usuario. M1, M5
+y M6 con su elección (opción recomendada en las tres); el resto según el informe.
+
+| # | Hallazgo | Corrección |
+|---|---|---|
+| M1 → #85 | F5 sin modelo ejecutable (`specs/qa/` inexistente, reviewer sin edición ni commits, informe sin archivo) | F5 sin Tn: pasada del reviewer con "QA de F5" como contrato; informe en `docs/qa-report.md` (orchestrator, permiso `edit` nuevo); defectos → tarea nueva o Cambio de la pieza. Skill, `orchestrator.md`, `reviewer.md`, `sdd-plan`, `docs/agents.md`, `AGENTS.md` |
+| M2 → #86 | Cuatro granularidades distintas para actualizar memoria/README/diagnostics | Solo por puerta F o decisión de reglas, igual en skill, `orchestrator.md` y `AGENTS.md` (incluida la lista de excepciones de "Límites") |
+| M3 → #87 | `skill: allow` en foundation y reviewer exponía 26 skills globales | Lista explícita en los 5 agentes; reviewer + `browser-testing-with-devtools` |
+| M4 → #88 | `git add docs/*`/`specs/*` admitía rutas extra | Límite documentado; `git diff --cached --name-only` antes de cada commit del orchestrator; check `git show --stat` en el reviewer |
+| M5 → #89 | 9 specs sin `## No hacer` (B2) | Sección agregada con viñetas derivadas de cada spec; 27/27 |
+| M6 → #90 | Clarificación con dos dueños y sin salida | Reviewer detecta, orchestrator resuelve; "Sin hallazgos" en spec aprobada → sin puerta. `sdd-clarify`, `sdd-plan`, skill, `orchestrator.md` |
+| M7 → #91 | MCP sin versión fija; `npm run dev` sin dueño | `chrome-devtools-mcp@1.10.1`; `npm run dev` denegado en foundation y quitado del integrator; lo sirve el usuario (orchestrator lo pide; `sdd-validate` no frena) |
+
+**Puertas:** Clarificación 0–28 + Implementación 28 + Plan/Tareas 4 (F1–F4) +
+fases 5 = entre ~37 y ~65.
+
+**Siguen abiertos (bajos, sin decisión):** estado de 2026-09-30 al inicio de este
+archivo; `--no-verify` sin denegar en bash; doble conteo en `docs/README.md:38`;
+#57 sin marcar como reemplazada por #70; `docs/agents.md` vs `AGENTS.md` en
+sistemas que no distinguen mayúsculas; opción 1 de la decisión 5 (`ask` doble).

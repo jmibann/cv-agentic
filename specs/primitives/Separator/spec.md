@@ -58,3 +58,10 @@ contenido).
 - Renderiza un elemento con `aria-hidden="true"`.
 - No expone rol `separator`.
 - `expectNoA11yViolations` sin violaciones.
+
+## No hacer
+
+- No usar `<hr>` ni `role="separator"`: es decorativo (`aria-hidden="true"`).
+- No usarlo fuera de un `Box variant="outer"`: el full-bleed depende de `--box-padding`.
+- No tomar su `margin-block` como precedente: es una de las dos únicas excepciones a "sin margen externo" (junto con `SectionTitle`).
+- No agregar `@media` propios: la separación escala por `--separator-gap`.

@@ -8,7 +8,7 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 
 | Qué | Estado |
 |---|---|
-| Kit de diseño (reglas, tokens, fundamentos, 27 specs, contrato de datos) | ✅ Completo y auditado |
+| Kit de diseño (reglas, tokens, fundamentos, 27 specs, contrato de datos) | ✅ Completo y auditado; `## No hacer` en las 27 (#89) |
 | Modelo único de spec (`specs/<categoria>/<Name>/{spec,plan,tasks}.md`, plantilla de la skill `sdd`, `Estado` + `Requisitos (EARS)` en las 27) | ✅ Migrado y aprobado (2026-10-02); `plan.md`/`tasks.md` los redacta el orchestrator en sus puertas |
 | Agentes OpenCode (5) | ✅ En `.opencode/agents/` |
 | Diagnóstico A, B, C, F, reestructuras H/I, auditoría J y constitución (K) | ✅ Cerrados |
@@ -16,8 +16,8 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | Sticky del Sidebar en pantallas bajas | ✅ Resuelto: sticky solo con alto ≥ 900px |
 | Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68); P2/P4/T2 por tarea (decisión #69); P2 aclarado (decisión #75) |
 | Comandos `/sdd-*` | ✅ Integrados: corren con el orchestrator o el reviewer, con argumento `<categoria>/<Name>` (decisión #71) |
-| Puertas | ✅ Plan + Tareas aprobados por fase (decisión #74); F1 también por tareas (#84): ~66 puertas en lugar de ~113 |
-| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82); tercera auditoría: 2 altos corregidos (#83 identidad de git en permisos, #84 F1 como pieza `foundation/Foundation` con Tn) |
+| Puertas | ✅ Plan + Tareas por fase F1–F4 (#74, #84, #85); Clarificación solo con hallazgos (#90): entre ~37 y ~65 puertas en lugar de ~113 |
+| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82); tercera auditoría: 2 altos (#83 identidad de git en permisos, #84 F1 como pieza `foundation/Foundation` con Tn) y 7 medios corregidos (#85–#91) |
 | Unidad de trabajo y memoria | ✅ Por tarea (Tn) en todo el sistema; memoria única en `docs/memory.md` (decisiones #69 y #70) |
 | Contenido del CV en JSON (esquema + validación) | ✅ Especificado: `data/cv.schema.json` + ejemplos JSON; se genera en F1 |
 | `spec.md` de `foundation/Foundation`, `plan.md` / `tasks.md` de las 28 piezas, `src/`, `package.json` | ⏳ Próxima fase (kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn) |

@@ -165,3 +165,12 @@ AppLayout solo decide cuál renderizar en el tabpanel según el tab activo
 8. El primer elemento enfocable es el skip link con `href="#main-panel"`; al activarlo, el foco pasa al tabpanel y `location.hash` **no** cambia.
 9. No hay ningún elemento con `id="about"` ni `id="resume"`.
 10. `expectNoA11yViolations` sin violaciones en About y en Resume, en ambos idiomas.
+
+## No hacer
+
+- No dejar la lista de tabs vacía ni cambiar su orden: siempre los dos de `TAB_IDS`.
+- No cambiar el hash al activar el skip link: `preventDefault` y foco al tabpanel.
+- No montar `AccentGradientDefs` ni `HexAvatarDefs` más de una vez.
+- No dar `id="about"` ni `id="resume"` a ningún elemento.
+- No hacer `.panel` (ni el raíz de las páginas) flex/grid ni con `overflow` distinto de `visible`: rompe el flujo del `h1` junto a la tab flotante.
+- No reservar el espacio de la tab con números mágicos: fórmula única con tokens (< lg) y ancho real de la tab (≥ lg).

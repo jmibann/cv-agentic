@@ -10,9 +10,10 @@ sección Validación), con contexto limpio. **No arregles nada.**
    resultado de `npm test`.
 2. Los RF de interfaz que no se puedan verificar con `npm test`, verificalos con el MCP de
    Chrome DevTools (configurado en `opencode.json`), incluida la vista móvil de 375 px y
-   ambos temas. Necesitás la app servida: si no hay un servidor corriendo, pedime que
-   levante `npm run dev` (vos no podés iniciarlo). Si el MCP no responde, listá esos RF como
-   "sin verificar (QA visual)".
+   ambos temas. Precondición: la app la sirve el usuario (`npm run dev`,
+   `http://localhost:5173`; vos no podés iniciarla, decisión #91). Si no responde o el MCP
+   falla, no frenes a mitad: listá esos RF como "sin verificar (QA visual)" e indicá que
+   hay que servir la app y repetir `/sdd-validate`.
 3. Comprobá los criterios de finalización de la pieza (incluye `npm run build` en
    verde, que solo corre al cerrar la pieza) y que todas las tareas de `tasks.md`
    estén marcadas.

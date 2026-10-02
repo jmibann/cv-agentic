@@ -76,3 +76,10 @@ Igual en todos los tamaños; solo el `gap` escala, por token (`--controls-gap`).
 - Contiene el ThemeToggle y el LanguageSwitcher (por rol y nombre).
 - Al cambiar el idioma a `es`, los labels de los controles cambian al español.
 - `expectNoA11yViolations` sin violaciones.
+
+## No hacer
+
+- No ubicarla dentro de las cards: va arriba, a la derecha y fuera de ellas.
+- No usar `--color-text-muted` para texto: está sobre `--color-bg` (`docs/tokens/contrast.md`).
+- No agregar otro landmark `<header>`: el banner es único en la página.
+- No agregar `@media` propios: solo el `gap` escala, por `--controls-gap`.

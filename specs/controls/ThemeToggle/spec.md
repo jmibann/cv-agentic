@@ -79,3 +79,10 @@ Patrón **toggle button**:
 
 (Los tests envuelven con `ThemeProvider` y resetean `data-theme` y
 `localStorage` en `afterEach`.)
+
+## No hacer
+
+- No cambiar el `aria-label` según el tema: es fijo y describe el modo; el estado lo da `aria-pressed`.
+- No hardcodear el label: llega traducido por la prop `label`.
+- No leer ni escribir `localStorage` fuera de `try/catch`, ni con otra clave que `cv:theme`.
+- No cambiar el tamaño por breakpoint ni agregar `@media` propios (`--size-control`).

@@ -16,7 +16,9 @@ Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spe
   - Dentro de Implementación las tareas avanzan una a una sin puerta (cada una
     validada al terminar); la puerta de Implementación + Validación se abre tras
     la revisión completa de la pieza contra la spec.
-  - **Plan y Tareas se aprueban por fase F** (F1–F5): se redactan `plan.md` y
+  - **Clarificación sin hallazgos** sobre una spec ya `aprobada` no abre
+    puerta (decisión #90; ver Clarificación).
+  - **Plan y Tareas se aprueban por fase F** (F1–F4): se redactan `plan.md` y
     `tasks.md` de todas las piezas de la fase y se aprueban juntos en una sola
     puerta (ver "Ejecución con agentes"). Una pieza fuera de una fase (spec
     nueva suelta) y todo Cambio mantienen las puertas de Plan y de Tareas propias.
@@ -25,9 +27,13 @@ Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spe
   (obligatorio desde el inicio) y `plan.md` / `tasks.md` (se redactan en sus
   puertas). Categorías del kit: `foundation` (la pieza `Foundation` de F1,
   decisión #84), `primitives`, `controls`, `layout`, `content`, `pages`,
-  `hooks`, más `qa` cuando exista la QA de F5.
-- Al terminar cada fase, actualiza `docs/memory.md`, el `README.md` de la raíz y
-  `docs/diagnostics.md`.
+  `hooks`. F5 (QA) no tiene carpeta en `specs/` (decisión #85).
+- **Documentos de estado (decisión #86):** al cerrar cada **puerta F** (F1–F5)
+  y cuando el usuario aprueba una decisión que cambia reglas (nueva entrada en el
+  registro de `docs/README.md`), actualiza `docs/memory.md`, el `README.md` de la
+  raíz ("Estado actual") y agrega una entrada en `docs/diagnostics.md`. Las
+  puertas de pieza (spec, Clarificación, Plan + Tareas, Implementación) solo
+  actualizan `spec.md` (`Estado`) y `tasks.md`.
 
 ## Constitución
 
@@ -92,6 +98,13 @@ Lista todas las `[NECESITA ACLARACIÓN]` y cualquier ambigüedad, y pregunta al
 usuario. La spec solo se edita con sus respuestas. Cuando no quedan dudas y el
 usuario la aprueba, pasa a `Estado: aprobada`.
 
+Con agentes (decisión #90) hay **un solo camino**: el reviewer **detecta**
+(`/sdd-clarify`, contexto limpio, sin proponer soluciones) y el orchestrator
+**resuelve** (presenta los hallazgos al usuario y aplica sus respuestas en
+`spec.md` con permiso `ask`). **Puerta solo si hay hallazgos:** si el reviewer
+informa "Sin hallazgos" sobre una spec ya `aprobada`, la pieza sigue sin
+puerta de Clarificación.
+
 ## Plan (plan.md)
 
 Archivos y responsabilidades · Funciones puras (si hay lógica que depende de la
@@ -139,8 +152,18 @@ trabaja con el orquestador.
 - **Dos niveles.** Las fases F1–F5 del orquestador organizan el proyecto. Dentro
   de cada fase, cada pieza (componente, hook, página, y en F1 la pieza
   `foundation/Foundation`) recorre el flujo SDD completo y respeta sus puertas
-  de aprobación. Ninguna fase queda fuera del modelo Tn (decisión #84).
-- **Puerta de Plan + Tareas por fase.** Al empezar F1, F2, F3, F4 o F5, y con la
+  de aprobación. F1–F4 siguen el modelo Tn (decisión #84).
+- **F5 (QA) no produce código ni tiene Tn (decisión #85).** Es una pasada del
+  `reviewer` sobre la app completa, con la sección "QA de F5" de
+  `reviewer.md` como contrato: sin `specs/qa/`, sin `plan.md`/`tasks.md` y sin
+  commits `test`→`feat` (P4 no aplica porque no hay tareas ni código). El
+  orchestrator guarda el informe en `docs/qa-report.md` y lo commitea
+  (`docs(qa): F5 report`). Cada defecto vuelve a su pieza: si el código no
+  cumple la spec, como **tarea nueva** en su `tasks.md` (puerta de Tareas de
+  pieza suelta, después `/sdd-implement`); si la spec está mal, como
+  **Cambio**. Con los defectos corregidos, el reviewer repite la pasada y el
+  usuario cierra la puerta F5.
+- **Puerta de Plan + Tareas por fase.** Al empezar F1, F2, F3 o F4, y con la
   Clarificación de todas sus piezas cerrada, el orquestador redacta `plan.md` y
   `tasks.md` de cada pieza de la fase (en el orden de `specs/README.md`) y los
   presenta juntos: una tabla por pieza (archivos, RF cubiertos, cantidad de

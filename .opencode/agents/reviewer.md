@@ -9,9 +9,12 @@ permission:
   # lo usa (QA visual en /sdd-validate y F5).
   "chrome-devtools_*": allow
   task: deny
-  # Todas las skills (decisión #78): TDD/incremental y
-  # browser-testing-with-devtools (QA visual de F5).
-  skill: allow
+  # Lista explícita (decisión #87): `sdd` y la global
+  # browser-testing-with-devtools (QA visual de /sdd-validate y F5).
+  skill:
+    "*": deny
+    "sdd": allow
+    "browser-testing-with-devtools": allow
   bash:
     "*": deny
     "npm run lint*": allow
@@ -66,6 +69,10 @@ mínimo, en cada entrega:
   sin `.env` ni claves en el repo.
 - **L1/L2** comentarios y documentación en español; identificadores, nombres
   de archivos, nombres de tests y commits en inglés.
+- **Commits de documentos** (solo en revisión completa de pieza o de fase,
+  decisión #88): con `git log --format="%h %s"` y `git show --stat <hash>`, los
+  commits `docs(...)` desde la puerta anterior solo tocan `README.md`,
+  `docs/**` o `specs/**`. Otra ruta es bloqueante.
 
 
 **1. Comandos** (pegá la salida resumida)
@@ -158,6 +165,12 @@ claro / oscuro × en / es** y verificá:
 
 Si no tenés navegador, decilo explícitamente en el informe y listá qué
 quedó sin verificar visualmente.
+
+F5 no tiene `tasks.md` ni Tn (decisión #85): tu informe es el entregable. Usá
+el formato de abajo con `Entrega: F5 QA` y, en "Hallazgos", indicá para cada
+defecto la **pieza** afectada (`<categoria>/<Name>`) y si el código no cumple
+la spec o la spec parece equivocada. No lo guardás vos: el orchestrator lo
+vuelca en `docs/qa-report.md`.
 
 ## Formato del informe
 

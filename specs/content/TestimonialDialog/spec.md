@@ -120,3 +120,11 @@ versión de jsdom que lo soporte. Documentarlo en el setup.
 6. El padre pasa `testimonial` a `null` con el dialog abierto → se cierra y `onClose` **no** se llama.
 7. `closeLabel` es el nombre del botón de cerrar.
 8. `expectNoA11yViolations` sin violaciones con el dialog abierto.
+
+## No hacer
+
+- No llamar `onClose` desde el botón Close ni desde el backdrop: solo lo llama el evento `close` del `<dialog>`.
+- No reemplazar el `<dialog>` nativo por un modal hecho con `div` ni por una librería: foco atrapado, Esc y top layer son nativos.
+- No reimplementar el avatar: se usa `HexAvatar`.
+- No imprimir el diálogo (`display: none` en `@media print`).
+- No agregar medidas por breakpoint: ancho y alto máximos van por `min()`/`calc()` sobre el viewport.

@@ -13,6 +13,8 @@ permission:
     "README.md": allow
     "docs/memory.md": allow
     "docs/diagnostics.md": allow
+    # Informe de QA de F5 (decisión #85): lo escribe el orchestrator con lo que devuelve el reviewer.
+    "docs/qa-report.md": allow
     # Specs: solo con aprobación explícita del usuario (redactar una spec nueva,
     # Clarificación, cambio de `Estado` a aprobada/implementada y Cambio).
     "specs/**": ask
@@ -98,7 +100,7 @@ Orden de prioridad: `docs/constitution.md` > skill `sdd` > spec > este archivo
 | F2 Primitivas | `component-builder` | Icon, BrandIcon, Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar | Ídem |
 | F3 Compuestos | `component-builder` | ThemeToggle, LanguageSwitcher, ControlsBar, NavTabs, Sidebar, Timeline, ResumeSection, SkillList, ServiceCard, TestimonialCard, TestimonialDialog, TestimonialCarousel | Ídem |
 | F4 Integración | `integrator` | 4 piezas con spec propia (`specs/hooks/useHashTab/`, `specs/pages/AboutPage/`, `specs/pages/ResumePage/`, `specs/layout/AppLayout/`). El contenido en/es y la impresión **no son piezas**: son trabajos del integrator sin `plan.md`/`tasks.md` propios, con contrato en `foundations/i18n.md` y `foundations/layout.md`, ejecutados y verificados dentro de las tareas de esas 4 piezas | Ídem |
-| F5 QA | `reviewer` | Informe completo: 375/768/1024/1440 × claro/oscuro × en/es (spec en `specs/qa/<Name>/`). Como el `reviewer` ejecuta el QA, su informe no se autovalida: lo valida el usuario en esta puerta. | **Usuario aprueba** el cierre |
+| F5 QA | `reviewer` | Sin piezas ni Tn (decisión #85): una pasada de QA sobre la app completa (375/768/1024/1440 × claro/oscuro × en/es) con la sección "QA de F5" de `reviewer.md` como contrato. Antes, pedile al usuario que sirva la app (#91). Guardás el informe en `docs/qa-report.md` y lo commiteás; cada defecto vuelve a su pieza como tarea nueva (o Cambio si la spec está mal) y el reviewer repite la pasada. Como el `reviewer` ejecuta el QA, su informe no se autovalida: lo valida el usuario en esta puerta. | **Usuario aprueba** el cierre |
 
 Piezas en el orden de la tabla de `specs/README.md`. **Una pieza por vez.**
 Cada pieza tiene su carpeta `specs/<categoria>/<Name>/` (`spec.md`, `plan.md`,
@@ -110,14 +112,16 @@ Cada pieza tiene su carpeta `specs/<categoria>/<Name>/` (`spec.md`, `plan.md`,
 |---|---|---|
 | Constitución | Una vez por proyecto: verificás que `docs/constitution.md` exista y esté aprobada. No la editás. | Si falta o no está aprobada, **frenás y consultás al usuario** |
 | Spec | Normalmente ya existe en el kit: verificás que respete la plantilla de la skill y su `Estado`. Si no existe, la redactás con la plantilla (`Estado: borrador`). | Si no está `aprobada`, **usuario aprueba** |
-| Clarificación | Vos listás las `[NECESITA ACLARACIÓN]` y cualquier ambigüedad. Solo editás la spec con la respuesta del usuario. Al aprobarse, pasás la spec a `Estado: aprobada`. | **Usuario responde y aprueba** |
-| Plan + Tareas | Con la Clarificación de **todas las piezas de la fase** cerrada, redactás `plan.md` y `tasks.md` de cada una según la skill. Si una pieza tiene más de 10 tareas, proponés dividir su spec. | **Una puerta por fase:** usuario aprueba todas las piezas juntas (o señala cuáles corregir) |
+| Clarificación | El `reviewer` detecta (lo mismo que `/sdd-clarify`: `[NECESITA ACLARACIÓN]`, ambigüedades, RF sin test). Vos presentás los hallazgos y solo editás la spec con la respuesta del usuario (`ask`). Al aprobarse, pasás la spec a `Estado: aprobada` (decisión #90) | **Solo si hay hallazgos:** usuario responde y aprueba. "Sin hallazgos" en una spec `aprobada` → sin puerta |
+| Plan + Tareas | Con la Clarificación de **todas las piezas de la fase** cerrada (pedila al reviewer pieza por pieza si no se hizo), redactás `plan.md` y `tasks.md` de cada una según la skill. Si una pieza tiene más de 10 tareas, proponés dividir su spec. | **Una puerta por fase:** usuario aprueba todas las piezas juntas (o señala cuáles corregir) |
 | Implementación | Subagente, **una tarea (Tn) por encargo**. Las tareas avanzan sin puerta de usuario. | Compartida con Validación ↓ |
 | Validación | `reviewer`, después de cada tarea y revisión completa al final de la pieza. | Tras la revisión completa: **usuario aprueba** → `Estado: implementada` |
 | Cambio | Spec → plan → tareas → código, en ese orden. | **Usuario aprueba** cada paso |
 
-Al cerrar cada fase SDD, actualizás `docs/memory.md`, el `README.md` de la raíz y
-`docs/diagnostics.md`, como pide la skill.
+Los documentos de estado (`docs/memory.md`, `README.md`, `docs/diagnostics.md`)
+se actualizan **solo** al cerrar cada puerta F y ante una decisión del usuario
+que cambia reglas, como pide la skill (decisión #86). Las puertas de pieza solo
+tocan `spec.md` (`Estado`) y `tasks.md`.
 
 ## Cómo delegar una tarea
 
@@ -154,7 +158,9 @@ tests.
    `tasks.md`, y commiteás ese cambio solo (`git add specs/<cat>/<Name>/tasks.md`
    → `docs(sdd): <Name> Tn`).
 4. Si fue la última tarea de la pieza, pedí al reviewer la revisión completa
-   contra la spec. Con el OK, llegás a la puerta de Implementación +
+   contra la spec. Si incluye QA visual, antes pedile al usuario que sirva la
+   app (`npm run dev` en su terminal) y pasale la URL al reviewer: ningún agente
+   corre el servidor (decisión #91). Con el OK, llegás a la puerta de Implementación +
    Validación: con la aprobación del usuario, marcá la spec como `implementada`
    y pasá a la pieza siguiente.
 
@@ -172,8 +178,9 @@ riesgos. Si el usuario señala piezas, rehacés solo esas y volvés a presentar.
 
 Resumí: pieza y fase SDD (o fase F), qué se hizo, resultado de
 lint/typecheck/test/build, informe del reviewer y pendientes. Esperá la
-aprobación explícita. Al cerrar una puerta F, agregá además una entrada en
-`docs/diagnostics.md` con los hashes de commits relevantes.
+aprobación explícita. Al cerrar una puerta F, actualizá además los documentos
+de estado (decisión #86); la entrada de `docs/diagnostics.md` lleva los hashes
+de commits relevantes.
 
 ## Commits de documentos
 
@@ -184,6 +191,10 @@ actualizás en las puertas y al marcar tareas (`README.md`,
 - Siempre rutas explícitas (`git add README.md`, `git add docs/memory.md`,
   `git add specs/<cat>/<Name>/tasks.md`): **nunca** `git add .` ni `git add -A`,
   y nunca agregues código o tests que no te pertenezcan.
+- Antes de cada commit, `git diff --cached --name-only`: solo puede listar
+  `README.md`, `docs/…` o `specs/…`. Si aparece otra ruta (por ejemplo algo que
+  dejó un subagente en staging), no commitees: frená y avisá. El permiso bash
+  no lo garantiza (`*` acepta rutas extra; decisión #88).
 - Solo con el repo en verde y con mensajes Conventional Commits en inglés
   (p. ej. `docs(state): update status after F2 gate`,
   `docs(sdd): Badge T1 approved`).

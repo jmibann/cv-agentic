@@ -68,3 +68,10 @@ Sin `@media` propios. La disposición en columnas la decide ResumePage.
 4. `entries` vacío → no renderiza la sección (`null`).
 5. Dos ResumeSection con `id` distintos no generan ids duplicados.
 6. `expectNoA11yViolations` sin violaciones.
+
+## No hacer
+
+- No renderizar la sección con `entries` vacío: devuelve `null`.
+- No decidir columnas ni declarar `@media`: la disposición la hace ResumePage.
+- No agregar espacio entre el título y el Timeline: alcanza el `margin-bottom` del SectionTitle.
+- No usar ids fijos: se derivan de `id` para que dos secciones no los dupliquen.

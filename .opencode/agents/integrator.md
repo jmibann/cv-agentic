@@ -1,7 +1,8 @@
 ---
 description: "F4 — implementa UNA tarea (Tn de tasks.md) por encargo para componer la app: contenido en/es, páginas About/Resume, useHashTab, AppLayout, impresión. Solo compone componentes ya aprobados; sigue la skill sdd."
 mode: subagent
-# Como component-builder, pero en las rutas de integración; más build, validate:content y dev.
+# Como component-builder, pero en las rutas de integración; más build y validate:content.
+# Sin `npm run dev` (decisión #91): el servidor lo levanta el usuario.
 # Commits por tarea: test(<Name>): Tn (en rojo) → feat(<Name>): Tn; sin amend ni push.
 # Nunca escribe en specs/ (constitución P2): el orchestrator marca las tareas.
 permission:
@@ -33,7 +34,6 @@ permission:
     "git log*": allow
     "npm run build*": allow
     "npm run validate:content*": allow
-    "npm run dev*": allow
     "ls *": allow
     "git add *": allow
     "git commit -m *": allow
@@ -96,6 +96,7 @@ en `tasks.md`: lo hace el orchestrator tras el OK del reviewer.
 ## Verificación
 
 **Por tarea:** `npm run lint && npm run typecheck && npm test` en verde.
-**Al cerrar la pieza:** además `npm run build` (decisión #80) y `npm run dev`
-muestra ambos paneles, cambia tema e idioma, y `#resume` en la URL abre
-directamente Resume.
+**Al cerrar la pieza:** además `npm run build` (decisión #80). La comprobación
+visual (con la app servida por el usuario, decisión #91) la hace el reviewer:
+ambos paneles, cambio de tema e idioma, y `#resume` en la URL abre
+directamente Resume. Vos no corrés `npm run dev`.

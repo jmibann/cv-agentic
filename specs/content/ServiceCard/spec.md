@@ -82,3 +82,10 @@ No es interactivo: sin hover ni foco.
 3. Renderiza un svg decorativo con `stroke="url(#accent-gradient)"`.
 4. Ids únicos por `service.id`.
 5. `expectNoA11yViolations` sin violaciones.
+
+## No hacer
+
+- No agregar hover ni foco: no es interactiva.
+- No pasar `size` al `Icon` ni fijar `--icon-size` en un contenedor: va en la clase del propio ícono (`.glyph`).
+- No decidir la cantidad de columnas: la grilla la arma AboutPage.
+- No cambiar medidas en el `@media` de < 580px: solo dirección, alineación y centrado.

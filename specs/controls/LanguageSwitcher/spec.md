@@ -84,3 +84,11 @@ Tamaño fijo en todos los breakpoints (`--size-control`); sin `@media` propios.
 - Click en el activo no llama a `setLocale` de nuevo (o no cambia nada observable).
 - Cada botón tiene su atributo `lang`.
 - `expectNoA11yViolations` sin violaciones.
+
+## No hacer
+
+- No implementar el patrón radiogroup (flechas, un solo tab stop): son dos botones que se recorren con Tab.
+- No traducir los nombres de los idiomas (`EN`/`ES`, "English"/"Español"): son fijos.
+- No hardcodear la lista de idiomas: sale de `LOCALES` de `@data/constants`, en ese orden.
+- No producir cambios observables al activar el idioma que ya está activo.
+- No leer ni escribir `localStorage` fuera de `try/catch`, ni con otra clave que `cv:locale`.

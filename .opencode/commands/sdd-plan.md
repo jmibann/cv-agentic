@@ -1,17 +1,19 @@
 ---
-description: "SDD · Plan + tareas de una fase completa o el plan de una pieza suelta (uso: /sdd-plan F1…F5 | /sdd-plan <categoria>/<Name>)"
+description: "SDD · Plan + tareas de una fase completa o el plan de una pieza suelta (uso: /sdd-plan F1…F4 | /sdd-plan <categoria>/<Name>)"
 agent: orchestrator
 ---
 
 Cargá la skill `sdd` (secciones Plan, Tareas y "Ejecución con agentes") y leé
 `docs/constitution.md`, `AGENTS.md` y `specs/README.md`. **No escribas código.**
 
-**Si `$1` es una fase (`F1`, `F2`, `F3`, `F4` o `F5`):** puerta de Plan + Tareas por
+**Si `$1` es una fase (`F1`, `F2`, `F3` o `F4`; F5 no tiene plan ni tareas, decisión #85):** puerta de Plan + Tareas por
 fase. Para cada pieza de esa fase (tabla de `specs/README.md`, en orden; en
 F1 la única pieza es `foundation/Foundation`),
 redactá `plan.md` y `tasks.md` (formato de la skill). Si alguna spec no tiene
 `Estado: aprobada` o tiene `[NECESITA ACLARACIÓN]` abiertas, frená y avisame
-antes de redactar nada. Presentá todo junto con el formato de tu sección "Al
+antes de redactar nada. Si la Clarificación de alguna pieza no se hizo, pedísela
+al `reviewer` (como `/sdd-clarify`) y presentame solo las que tengan hallazgos
+(decisión #90). Presentá todo junto con el formato de tu sección "Al
 llegar a una puerta" y esperá mi aprobación de la fase.
 
 **Si `$1` es `<categoria>/<Name>`** (pieza fuera de una fase, o un Cambio):
