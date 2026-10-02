@@ -14,7 +14,7 @@ Cada regla indica cómo verificarla.
 
 ## 2. Spec antes que código
 - **P1** No hay código sin spec en `specs/` o `foundations/`. *Verificar:* cada `src/components/<Name>/` tiene su `specs/**/<Name>/spec.md`.
-- **P2** Gana la spec. Código que la contradice es un error; si la spec parece equivocada, se frena y se consulta. Ningún agente edita `spec.md`; solo el orchestrator escribe `plan.md`/`tasks.md` (aprobados por el usuario) y marca cada tarea tras el OK del reviewer.
+- **P2** Gana la spec. Código que la contradice es un error; si la spec parece equivocada, se frena y se consulta. Ningún agente edita `spec.md` sin la aprobación explícita del usuario (el orchestrator lo hace con permiso `ask`); solo el orchestrator escribe `plan.md`/`tasks.md` (aprobados por el usuario) y marca cada tarea tras el OK del reviewer.
 - **P3** Los tests salen de la lista de tests de la spec; nada se agrega en silencio (los extras llevan `// extra: <motivo>`).
 - **P4** Por tarea (Tn de `tasks.md`): commit `test(<Name>): Tn` (en rojo) → `feat(<Name>): Tn` (en verde); `fix(<Name>): Tn` si hay correcciones. *Verificar:* `git log`.
 - **P5** Un cambio de spec va primero, en su propio commit, aprobado por el usuario.

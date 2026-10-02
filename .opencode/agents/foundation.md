@@ -18,6 +18,8 @@ permission:
     ".gitignore": allow
   webfetch: deny
   task: deny
+  # Todas las skills disponibles (decisión #78); TDD/incremental van en el prompt.
+  skill: allow
   bash:
     "*": ask
     "npm install*": allow

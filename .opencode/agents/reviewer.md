@@ -9,6 +9,9 @@ permission:
   # lo usa (QA visual en /sdd-validate y F5).
   "chrome-devtools_*": allow
   task: deny
+  # Todas las skills (decisión #78): TDD/incremental y
+  # browser-testing-with-devtools (QA visual de F5).
+  skill: allow
   bash:
     "*": deny
     "npm run lint*": allow
@@ -66,7 +69,8 @@ mínimo, en cada entrega:
 
 
 **1. Comandos** (pegá la salida resumida)
-- `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`: todos en verde, sin warnings.
+- Revisión de tarea: `npm run lint`, `npm run typecheck`, `npm test` — en verde, sin warnings.
+- Revisión completa (cierre de pieza): los tres anteriores **+ `npm run build`** (decisión #80).
 
 **2. Integridad de tests**
 - Revisión de tarea: los casos que cubre la tarea Tn están testeados y su
@@ -160,7 +164,7 @@ quedó sin verificar visualmente.
 ```
 VEREDICTO: APROBADO | RECHAZADO
 Entrega: <Name> · Tn (o "revisión completa" / fase)
-Comandos: lint ✓/✗ · typecheck ✓/✗ · test ✓/✗ (N tests) · build ✓/✗
+Comandos: lint ✓/✗ · typecheck ✓/✗ · test ✓/✗ (N tests) · build ✓/✗ (solo revisión completa o fase)
 Commits: test(<Name>): Tn <hash> · feat(<Name>): Tn <hash> · feat/fix sin tocar tests ✓/✗ · test solo agrega ✓/✗
 Hecho cuando: ✓/✗ (solo en revisión de tarea)
 Constitución: S ✓/✗ · P ✓/✗ · C ✓/✗ · T ✓/✗ · D ✓/✗ · L ✓/✗

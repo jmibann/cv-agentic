@@ -93,7 +93,7 @@ kit ya ES la spec; `AGENTS.md` vigente dice "gana la spec".
 |---|---|---|
 | 0. Pre-kickoff | Decidir desvíos de B (revisar o aceptar); confirmar `git init` de F1 | usuario |
 | 1. F1 foundation | App en la **raíz** (Vite+React+TS creada a mano, sin generadores), alias `@data`, ESLint 10, Vitest+axe-core + helper a11y, providers, anti-flash, contenido en/es. *(Actualizado 2026-10-01: sin workspaces ni `apps/web`; los agentes ya están instalados)* | `foundation` → reviewer → PUERTA |
-| 2. F2–F4 serial | 27 piezas, una por vez, `test(<Name>)` en rojo → `feat(<Name>)` | `component-builder` / `integrator`; skills TDD, incremental-implementation, frontend-ui-engineering |
+| 2. F2–F4 serial | 27 piezas, una por vez, `test(<Name>)` en rojo → `feat(<Name>)` | `component-builder` / `integrator`; skill `sdd` (TDD e incremental van en su prompt; decisión #77) |
 | 3. F5 QA | 4 viewports × 2 temas × 2 idiomas; cerrar avatar F8 | `reviewer`; skill browser-testing-with-devtools |
 
 Opcional post-F1: skill constraint-driven-development — las reglas duras de
@@ -1015,3 +1015,33 @@ se corrige como Cambio de esa pieza. La constitución no cambia (P2:
 **Siguen abiertas** (decisión 5): opción 1 (`ask` doble al editar `spec.md`)
 y opción 2 (Clarificación sin puerta si no hay hallazgos).
 
+
+## R. Auditoría de arquitectura de agentes, skills y comandos (2026-10-02)
+
+**Pedido:** revisar (solo lectura) agentes, skills, comandos y documentación
+del flujo SDD, y cerrar los 6 hallazgos medios que eligiera el usuario.
+
+**Verificado (todo OK):** `opencode debug agent` × 5 (permisos resueltos =
+tabla de `docs/agents.md`), `opencode debug config` (9 comandos con su agente,
+5 agentes, `chrome-devtools_*` denegado en global), skill `sdd` registrada, 0
+links rotos en los 59 `.md` trackeados (58 tras eliminar `/constitution`),
+27 specs con `Estado: aprobada` y EARS
+tras `Propósito`, RF 5–8 correlativos, decisiones #1–#74 correlativas y 13
+commits `docs`/`chore`. `lint/typecheck/test/build` no aplican todavía (F1
+pendiente).
+
+**Corregido en la sesión (decisiones #75–#80, detalle en `docs/README.md`):**
+
+| # | Punto | Dónde quedó |
+|---|---|---|
+| 75 | P2: `spec.md` solo con aprobación explícita (`ask` del orchestrator) | `docs/constitution.md` P2 |
+| 76 | Dueño del commit de documentos: el orchestrator, con `git add` acotado y en verde | `.opencode/agents/orchestrator.md`, `docs/agents.md`, `AGENTS.md` |
+| 77 | Plan de kickoff sin skills TDD/incremental/frontend citadas (van en los prompts) | `docs/diagnostics.md` etapa 2 |
+| 78 | Clave `skill` en los 5 agentes y documentada | `foundation.md`, `reviewer.md`, `docs/agents.md` |
+| 79 | `/constitution` eliminado con sus referencias | `.opencode/commands/`, `AGENTS.md`, `docs/agents.md`, `docs/memory.md` |
+| 80 | DoD: `build` por pieza, no por tarea | `AGENTS.md`, `reviewer.md`, `integrator.md` |
+
+**Quedaron sin decisión** (menores, para más adelante): 9 specs sin
+`## No hacer` (B2), fila F1 del `orchestrator.md` con texto de monorepo
+superado, `docs/AGENTS.md` resuelto case-insensitively como instrucciones de
+directorio, y la fricción abierta de la decisión 5 (opciones 1 y 2).

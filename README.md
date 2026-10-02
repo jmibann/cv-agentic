@@ -14,9 +14,10 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | Diagnóstico A, B, C, F, reestructuras H/I, auditoría J y constitución (K) | ✅ Cerrados |
 | Repositorio git (baseline) | ✅ Inicializado; primeros commits del modelo de spec |
 | Sticky del Sidebar en pantallas bajas | ✅ Resuelto: sticky solo con alto ≥ 900px |
-| Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68); P2/P4/T2 por tarea (decisión #69) |
+| Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68); P2/P4/T2 por tarea (decisión #69); P2 aclarado (decisión #75) |
 | Comandos `/sdd-*` | ✅ Integrados: corren con el orchestrator o el reviewer, con argumento `<categoria>/<Name>` (decisión #71) |
 | Puertas | ✅ Plan + Tareas aprobados por fase (decisión #74): ~63 puertas en lugar de ~113 |
+| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (decisiones #75–#80) |
 | Unidad de trabajo y memoria | ✅ Por tarea (Tn) en todo el sistema; memoria única en `docs/memory.md` (decisiones #69 y #70) |
 | Contenido del CV en JSON (esquema + validación) | ✅ Especificado: `data/cv.schema.json` + ejemplos JSON; se genera en F1 |
 | `plan.md` / `tasks.md` de las 27 specs, `src/`, `package.json` | ⏳ Próxima fase (orchestrator en las puertas; foundation en F1) |

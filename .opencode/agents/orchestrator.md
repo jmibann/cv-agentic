@@ -34,6 +34,14 @@ permission:
     "git show*": allow
     "ls": allow
     "ls *": allow
+    # Documentos de estado y specs: el orchestrator es el único que puede
+    # commitearlos (el reviewer no commitea y los subagentes no escriben acá).
+    # Solo rutas explícitas: nunca `git add .`/`-A`, nunca con el repo en rojo.
+    "git add README.md": allow
+    "git add docs/*": allow
+    "git add specs/*": allow
+    "git commit -m *": allow
+    "*--amend*": deny
   task:
     "*": deny
     foundation: allow
@@ -125,7 +133,9 @@ Cada encargo es autocontenido y cubre **exactamente una tarea** de
   `sdd`".
 
 No paralelices: los tests en rojo rompen el `typecheck` de todo el proyecto, y
-los agentes comparten la carpeta de trabajo. Vos no commiteás.
+los agentes comparten la carpeta de trabajo. **Commiteás solo documentos**
+(`README.md`, `docs/…`, `specs/…/spec.md|plan.md|tasks.md`): nunca código ni
+tests.
 
 ## Después de cada tarea
 
@@ -139,7 +149,8 @@ los agentes comparten la carpeta de trabajo. Vos no commiteás.
    los comandos.
 3b. **Si aprueba, marcás vos la tarea** como hecha en `tasks.md` (`- [x]`),
    con el hash del commit `feat(<Name>): Tn`. Sos el único que escribe en
-   `tasks.md`.
+   `tasks.md`, y commiteás ese cambio solo (`git add specs/<cat>/<Name>/tasks.md`
+   → `docs(sdd): <Name> Tn`).
 4. Si fue la última tarea de la pieza, pedí al reviewer la revisión completa
    contra la spec. Con el OK, llegás a la puerta de Implementación +
    Validación: con la aprobación del usuario, marcá la spec como `implementada`
@@ -161,6 +172,20 @@ Resumí: pieza y fase SDD (o fase F), qué se hizo, resultado de
 lint/typecheck/test/build, informe del reviewer y pendientes. Esperá la
 aprobación explícita. Al cerrar una puerta F, agregá además una entrada en
 `docs/diagnostics.md` con los hashes de commits relevantes.
+
+## Commits de documentos
+
+Los implementadores commitean código; vos commiteás **los documentos** que
+actualizás en las puertas y al marcar tareas (`README.md`,
+`docs/memory.md`, `docs/diagnostics.md`, `specs/…/spec.md|plan.md|tasks.md`):
+
+- Siempre rutas explícitas (`git add README.md`, `git add docs/memory.md`,
+  `git add specs/<cat>/<Name>/tasks.md`): **nunca** `git add .` ni `git add -A`,
+  y nunca agregues código o tests que no te pertenezcan.
+- Solo con el repo en verde y con mensajes Conventional Commits en inglés
+  (p. ej. `docs(state): update status after F2 gate`,
+  `docs(sdd): Badge T1 approved`).
+- Sin `--amend`, sin reescribir historia, sin `push`.
 
 ## Reglas
 

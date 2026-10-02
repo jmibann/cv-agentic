@@ -93,6 +93,7 @@ en `tasks.md`: lo hace el orchestrator tras el OK del reviewer.
 
 ## Verificación
 
-`npm run lint && npm run typecheck && npm test && npm run build` en verde, y
-`npm run dev` muestra ambos paneles, cambia tema e idioma, y `#resume` en la
-URL abre directamente Resume.
+**Por tarea:** `npm run lint && npm run typecheck && npm test` en verde.
+**Al cerrar la pieza:** además `npm run build` (decisión #80) y `npm run dev`
+muestra ambos paneles, cambia tema e idioma, y `#resume` en la URL abre
+directamente Resume.

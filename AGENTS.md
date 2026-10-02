@@ -17,7 +17,7 @@ cv-agentic/
 ├─ data/                      cv.schema.json (fuente de verdad), constants.ts, ejemplos JSON y *.generated.* (alias @data)
 ├─ .opencode/agents/          los 5 agentes (orchestrator, foundation, component-builder, integrator, reviewer)
 ├─ .opencode/skills/sdd/      skill del flujo SDD (SKILL.md)
-├─ .opencode/commands/        comandos /sdd-* (atajos del flujo; ver docs/agents.md) y /constitution
+├─ .opencode/commands/        comandos /sdd-* (atajos del flujo; ver docs/agents.md)
 ├─ opencode.json              config de OpenCode: MCP de Chrome DevTools (denegado salvo para el reviewer)
 ├─ package.json               scripts: dev, lint, typecheck, test, build (los crea la Fase 1)
 ├─ index.html                 incluye el script anti-flash (tema, idioma y theme-color)
@@ -79,10 +79,11 @@ equivocada o incompleta, **se frena y se consulta al usuario**; no se
 | `npm run gen:types` | Regenera `data/cv.types.generated.ts` desde `data/cv.schema.json` |
 | `npm run validate:content` | Valida `src/content/cv.*.json` contra el esquema |
 
-**Definition of done** de cualquier tarea: `lint`, `typecheck`, `test` y
-`build` en verde, sin warnings, **después del commit de implementación**
-(entre el commit de tests en rojo y el de implementación el repo está en
-rojo a propósito).
+**Definition of done** de cualquier tarea: `lint`, `typecheck` y `test` en
+verde, sin warnings, **después del commit de implementación** (entre el commit
+de tests en rojo y el de implementación el repo está en rojo a propósito).
+`build` **no corre por tarea**: lo corren el orchestrator, el integrator o el
+reviewer **al cerrar la pieza** y en cada puerta (decisión #80).
 
 ## Convenciones
 
@@ -105,6 +106,10 @@ rojo a propósito).
   `test(<Name>): Tn` (solo tests, en rojo) → `feat(<Name>): Tn` →
   `fix(<Name>): Tn` si hay correcciones.
   Sin `--amend`, sin reescribir historia, sin push (salvo pedido del usuario).
+  Los de código los hacen foundation, component-builder e integrator; el
+  orchestrator commitea **solo documentos** (`README.md`, `docs/*`, `specs/*`),
+  con el repo en verde y con rutas explícitas (nunca `git add .`/`-A`);
+  el reviewer no commitea (decisión #76).
 - **Una tarea por vez** (sin paralelismo): los tests en rojo rompen el
   `typecheck` global y todos comparten la carpeta de trabajo.
 - **`specs/` es del usuario y del orchestrator:** nadie edita `spec.md` sin el

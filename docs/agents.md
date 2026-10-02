@@ -19,19 +19,25 @@ agente, se edita acá.
 - **`permission` reemplaza a `tools`**, que OpenCode marca como obsoleto.
   Claves usadas: `edit` (cubre write y patch), `bash` (reglas por patrón;
   **gana la última que coincide**, por eso `"*"` va primero), `task` (qué
-  subagentes puede invocar) y `webfetch`.
+  subagentes puede invocar), `skill` (qué skills puede cargar: `"*": deny` +
+  lista de permitidas, o `allow` para todas) y `webfetch`.
+- **`skill` (decisión #78)** está declarada en los 5 agentes, incluso donde el
+  alcance es "todas": foundation y reviewer pueden cargar cualquier skill
+  disponible (incluida la global `browser-testing-with-devtools` de la QA de
+  F5); orchestrator, component-builder e integrator, **solo `sdd`** (el flujo
+  TDD que usan ya va embebido en sus prompts).
 - **Sin `model`**: el orchestrator usa el modelo global y los subagentes
   heredan el del agente que los invoca.
 - `steps`: tope de iteraciones por invocación (valores iniciales, ajustables);
   refuerza la regla de máximo 3 rondas de corrección.
 
-| Agente | edit | bash | task | steps |
-|---|---|---|---|---|
-| orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask`; skill `sdd` | solo verificaciones y lectura de git | solo los 4 subagentes | — |
-| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | 150 |
-| component-builder | solo `src/components/**`; skill `sdd` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | 80 |
-| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx`; skill `sdd` | verificaciones, build, `validate:content`, dev, `git add` y `git commit -m` (sin `--amend`) | deny | 120 |
-| reviewer | deny | solo verificaciones, build, `validate:content`, lectura de git y `grep`; único con el MCP `chrome-devtools_*` | deny | 60 |
+| Agente | edit | bash | task | skill | steps |
+|---|---|---|---|---|---|
+| orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
+| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | todas | 150 |
+| component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | `sdd` | 80 |
+| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, dev, `git add` y `git commit -m` (sin `--amend`) | deny | `sdd` | 120 |
+| reviewer | deny | solo verificaciones, build, `validate:content`, lectura de git y `grep`; único con el MCP `chrome-devtools_*` | deny | todas | 60 |
 
 **Edición por grupo** (decisiones #72 y #73): foundation, component-builder e
 integrator tienen `edit` con `"*": deny` y solo permiten las rutas de su grupo
@@ -44,13 +50,16 @@ ejemplo `src/test/`) ningún subagente escribe después de F1. Los `data/*.gener
 regeneran solo con scripts (`gen:types`, `build:validator`). El permiso `edit`
 no cubre bash (`cp`, `npm run`): eso lo cubren la regla del prompt y el reviewer.
 
-**Commits (decisiones F3 y #69):** los hacen foundation, component-builder e
-integrator, con `git commit -m`. **Por cada tarea (Tn de `tasks.md`):**
-`test(<Name>): Tn` con los tests en rojo → `feat(<Name>): Tn` con la
-implementación → `fix(<Name>): Tn` si hay correcciones. `feat`/`fix` no tocan
-tests; `test` solo agrega. El orchestrator marca la tarea en `tasks.md` cuando el
-reviewer la aprueba. `--amend`, `reset --hard` y `push` están denegados. El reviewer
-y el orchestrator no commitean.
+**Commits (decisiones F3, #69 y #76):** los de código los hacen foundation,
+component-builder e integrator, con `git commit -m`. **Por cada tarea (Tn de
+`tasks.md`):** `test(<Name>): Tn` con los tests en rojo → `feat(<Name>): Tn`
+con la implementación → `fix(<Name>): Tn` si hay correcciones. `feat`/`fix` no
+tuncan tests; `test` solo agrega. El orchestrator marca la tarea en
+`tasks.md` cuando el reviewer la aprueba y **commitea él mismo los
+documentos** (`git add` acotado a `README.md`, `docs/*` y `specs/*` +
+`git commit -m`, solo con el repo en verde, con mensaje en inglés y sin
+`git add .`/`-A`). `--amend`, `reset --hard` y `push` están denegados. El
+reviewer no commitea.
 
 ## Agentes
 
@@ -109,7 +118,7 @@ spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
   aplica después de la global; verificado con `opencode debug agent`). El reviewer no puede iniciar `npm run dev`: si la app no
   está servida, lo pide; si el MCP no responde, lista esos RF como "sin verificar
   (QA visual)".
-- **`/constitution`** es el prompt original con el que se redactó
-  `docs/constitution.md`; se conserva tal cual y no forma parte del flujo.
+- **`/constitution` fue eliminado** (decisión #79): el prompt original ya no
+  aplica y `docs/constitution.md` es la fuente viva.
 - Los comandos son opcionales: lo mismo se le puede pedir al orchestrator en
   lenguaje natural.
