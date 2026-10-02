@@ -16,11 +16,11 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | Sticky del Sidebar en pantallas bajas | ✅ Resuelto: sticky solo con alto ≥ 900px |
 | Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68); P2/P4/T2 por tarea (decisión #69); P2 aclarado (decisión #75) |
 | Comandos `/sdd-*` | ✅ Integrados: corren con el orchestrator o el reviewer, con argumento `<categoria>/<Name>` (decisión #71) |
-| Puertas | ✅ Plan + Tareas aprobados por fase (decisión #74): ~63 puertas en lugar de ~113 |
-| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82) |
+| Puertas | ✅ Plan + Tareas aprobados por fase (decisión #74); F1 también por tareas (#84): ~66 puertas en lugar de ~113 |
+| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82); tercera auditoría: 2 altos corregidos (#83 identidad de git en permisos, #84 F1 como pieza `foundation/Foundation` con Tn) |
 | Unidad de trabajo y memoria | ✅ Por tarea (Tn) en todo el sistema; memoria única en `docs/memory.md` (decisiones #69 y #70) |
 | Contenido del CV en JSON (esquema + validación) | ✅ Especificado: `data/cv.schema.json` + ejemplos JSON; se genera en F1 |
-| `plan.md` / `tasks.md` de las 27 specs, `src/`, `package.json` | ⏳ Próxima fase (orchestrator en las puertas; foundation en F1) |
+| `spec.md` de `foundation/Foundation`, `plan.md` / `tasks.md` de las 28 piezas, `src/`, `package.json` | ⏳ Próxima fase (kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn) |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
 

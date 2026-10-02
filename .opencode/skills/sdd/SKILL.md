@@ -16,15 +16,16 @@ Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spe
   - Dentro de Implementación las tareas avanzan una a una sin puerta (cada una
     validada al terminar); la puerta de Implementación + Validación se abre tras
     la revisión completa de la pieza contra la spec.
-  - **Plan y Tareas se aprueban por fase F** (F2–F5): se redactan `plan.md` y
+  - **Plan y Tareas se aprueban por fase F** (F1–F5): se redactan `plan.md` y
     `tasks.md` de todas las piezas de la fase y se aprueban juntos en una sola
     puerta (ver "Ejecución con agentes"). Una pieza fuera de una fase (spec
     nueva suelta) y todo Cambio mantienen las puertas de Plan y de Tareas propias.
 - La spec manda: si algo no está en la spec, no se implementa. Si falta una decisión, para y pregunta.
 - Cada spec vive en su carpeta: `specs/<categoria>/<Name>/` con `spec.md`
   (obligatorio desde el inicio) y `plan.md` / `tasks.md` (se redactan en sus
-  puertas). Categorías del kit: `primitives`, `controls`, `layout`, `content`,
-  `pages`, `hooks`, más `qa` cuando exista la QA de F5.
+  puertas). Categorías del kit: `foundation` (la pieza `Foundation` de F1,
+  decisión #84), `primitives`, `controls`, `layout`, `content`, `pages`,
+  `hooks`, más `qa` cuando exista la QA de F5.
 - Al terminar cada fase, actualiza `docs/memory.md`, el `README.md` de la raíz y
   `docs/diagnostics.md`.
 
@@ -136,9 +137,10 @@ Esta sección no cambia el flujo SDD: define quién ejecuta cada fase cuando se
 trabaja con el orquestador.
 
 - **Dos niveles.** Las fases F1–F5 del orquestador organizan el proyecto. Dentro
-  de cada fase, cada pieza (componente, hook, página) recorre el flujo SDD
-  completo y respeta sus puertas de aprobación.
-- **Puerta de Plan + Tareas por fase.** Al empezar F2, F3, F4 o F5, y con la
+  de cada fase, cada pieza (componente, hook, página, y en F1 la pieza
+  `foundation/Foundation`) recorre el flujo SDD completo y respeta sus puertas
+  de aprobación. Ninguna fase queda fuera del modelo Tn (decisión #84).
+- **Puerta de Plan + Tareas por fase.** Al empezar F1, F2, F3, F4 o F5, y con la
   Clarificación de todas sus piezas cerrada, el orquestador redacta `plan.md` y
   `tasks.md` de cada pieza de la fase (en el orden de `specs/README.md`) y los
   presenta juntos: una tabla por pieza (archivos, RF cubiertos, cantidad de

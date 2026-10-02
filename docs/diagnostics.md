@@ -1065,3 +1065,22 @@ decisión #57 no anotada como reemplazada por #70; categorías de specs sin `qa`
 en `AGENTS.md`/`docs/README.md`; `/sdd-implement` no define ruta para tareas de
 F5; F1 no usa el modelo Tn/`tasks.md` (excepción implícita); y los pendientes
 heredados de R (B2, case-insensitive de `docs/agents.md`, decisión 5).
+
+
+## T. Tercera auditoría: identidad de git y F1 con Tn (2026-10-02)
+
+**Origen:** auditoría read-only del sistema agéntico (2 altos, 7 medios, 8 bajos).
+El usuario eligió corregir los dos altos.
+
+| # | Hallazgo | Corrección |
+|---|---|---|
+| A1 → #83 | `AGENTS.md` exige `git -c user.name=…`, pero las allowlists `"git commit -m *"` no lo admiten: orchestrator, component-builder e integrator no podían commitear con la identidad (foundation: `ask`). `user.name` sin configurar; historial con autores mixtos | `"git -c user.name=* commit -m *": allow` en los 4 agentes que commitean; forma única `git -c user.name="jmiban" commit -m "<mensaje>"` en `AGENTS.md`, `orchestrator.md`, `component-builder.md`, `foundation.md` y `docs/agents.md` |
+| A2 → #84 | F1 fuera del modelo Tn (un solo `chore: scaffold app`), en conflicto con P4/T2 y con el checklist 0 del reviewer | F1 = pieza `specs/foundation/Foundation/` (spec en el kickoff con `/sdd-spec`, solo con alcance existente). `foundation.md` por Tn con tests primero (también tooling); skill (categoría `foundation`, Plan + Tareas F1–F5), `sdd-plan` (F1), `sdd-implement` (foundation en F1), `orchestrator.md` (fila F1), `specs/README.md`, `docs/agents.md`, `AGENTS.md`, `docs/README.md`. Constitución sin cambios |
+
+**Siguen abiertos (sin decisión):** M1 F5 sin modelo ejecutable (QA del reviewer
+sin edición ni commits; no existe `specs/qa/`), M2 granularidad dispar de
+actualización de memoria/diagnóstico, M3 `skill: allow` expone skills globales,
+M4 `git add docs/*`/`specs/*` admite rutas extra, M5 `## No hacer` en 9 specs
+(B2), M6 doble dueño de Clarificación, M7 MCP sin versión fija; bajas: estado de
+2026-09-30 al inicio de este archivo, árbol de `docs/README.md`, excepciones de
+`AGENTS.md` → Límites, `--no-verify` sin denegar.

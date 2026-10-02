@@ -7,9 +7,9 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 
 - Kit completo y auditado: reglas, tokens, fundamentos, 27 specs, esquema de datos.
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
-- Git baseline + 14 commits (solo docs/chore); **no existen `src/`, `package.json` ni la app** (las crea F1/foundation).
-- **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios corregidos (#81–#82; T5 ya redactada por tarea+pieza).
-- Próximo hito: kickoff de F1 con el orchestrator (sección "Verificación independiente y plan de kickoff" de `docs/diagnostics.md`).
+- Git baseline + commits solo docs/chore; **no existen `src/`, `package.json` ni la app** (las crea F1/foundation).
+- **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83 `git -c` en permisos, #84 F1 con Tn).
+- Próximo hito: kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn (#84).
 
 ## Decisiones (y por qué)
 
@@ -25,7 +25,7 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 - **EARS**: 3–8 `RF-n`, derivados solo de `Propósito`, `Estados`, `Responsive`, `Accesibilidad` y
   `Tests esperados`; si un RF no tiene contrapartida en "Tests esperados" **no se agrega el test** (se reporta).
 - **P1 actualizado** con aprobación explícita + decisión #68 (la constitución exige ambas).
-- Commits con `-c user.name="jmiban"`: modificar git config está prohibido por `AGENTS.md`; sin `--amend`.
+- Commits con `git -c user.name="jmiban" commit -m` (permitido en bash por #83); no tocar git config; sin `--amend`.
 - `## No hacer` sigue faltando en 9 specs (decisión B2, pendiente).
 
 ## Aprendizajes y errores a evitar
@@ -38,7 +38,7 @@ La actualiza **solo el orchestrator** al cerrar cada fase SDD (los subagentes ti
 
 ## Próximos pasos
 
-- F1 (foundation): scaffold de la app, tooling, tokens, providers.
+- F1 (foundation): pieza `foundation/Foundation`, Tn con test → feat también en tooling; sin `chore: scaffold app`.
 - **Unidad de trabajo por tarea** (decisión #69): `test(<Name>): Tn` → `feat(<Name>): Tn`; `feat`/`fix` no tocan
   tests y `test` solo agrega; el orchestrator escribe `plan.md`/`tasks.md` y marca cada Tn tras el OK del reviewer.
 - Comandos `/sdd-*` (decisión #71): orchestrator o reviewer, argumento `<categoria>/<Name>`; MCP `chrome-devtools` solo para el reviewer.

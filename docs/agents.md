@@ -33,10 +33,10 @@ agente, se edita acá.
 
 | Agente | edit | bash | task | skill | steps |
 |---|---|---|---|---|---|
-| orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
-| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | todas | 150 |
-| component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git commit -m` (sin `--amend`) | deny | `sdd` | 80 |
-| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, dev, `git add` y `git commit -m` (sin `--amend`) | deny | `sdd` | 120 |
+| orchestrator | `README.md`, `docs/diagnostics.md`, `docs/memory.md` (estado y memoria); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
+| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git [-c user.name=…] commit -m` permitidos; `push`, `--amend`, `reset --hard` y `rm -rf` denegados | deny | todas | 150 |
+| component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git [-c user.name=…] commit -m` (sin `--amend`) | deny | `sdd` | 80 |
+| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, dev, `git add` y `git [-c user.name=…] commit -m` (sin `--amend`) | deny | `sdd` | 120 |
 | reviewer | deny | solo verificaciones, build, `validate:content`, lectura de git y `grep`; único con el MCP `chrome-devtools_*` | deny | todas | 60 |
 
 **Edición por grupo** (decisiones #72 y #73): foundation, component-builder e
@@ -51,10 +51,10 @@ regeneran solo con scripts (`gen:types`, `build:validator`). El permiso `edit`
 no cubre bash (`cp`, `npm run`): eso lo cubren la regla del prompt y el reviewer.
 
 **Commits (decisiones F3, #69 y #76):** los de código los hacen foundation,
-component-builder e integrator, con `git commit -m`. **Por cada tarea (Tn de
+component-builder e integrator, con `git -c user.name="jmiban" commit -m` (identidad por flag, decisión #83). **Por cada tarea (Tn de
 `tasks.md`):** `test(<Name>): Tn` con los tests en rojo → `feat(<Name>): Tn`
 con la implementación → `fix(<Name>): Tn` si hay correcciones. `feat`/`fix` no
-tuncan tests; `test` solo agrega. El orchestrator marca la tarea en
+tocan tests; `test` solo agrega. El orchestrator marca la tarea en
 `tasks.md` cuando el reviewer la aprueba y **commitea él mismo los
 documentos** (`git add` acotado a `README.md`, `docs/*` y `specs/*` +
 `git commit -m`, solo con el repo en verde, con mensaje en inglés y sin
@@ -66,7 +66,7 @@ reviewer no commitea.
 | Agente | Modo | Escribe código | Responsabilidad |
 |---|---|---|---|
 | [orchestrator](../.opencode/agents/orchestrator.md) | primary | No | Recorre F1–F5, delega, frena en cada puerta para aprobación del usuario |
-| [foundation](../.opencode/agents/foundation.md) | subagent | Sí | F1: scaffold de la app en la raíz, tooling, alias `@data`, tokens, fuente, providers, script anti-flash |
+| [foundation](../.opencode/agents/foundation.md) | subagent | Sí | F1: una Tn por vez de `specs/foundation/Foundation/` (decisión #84): scaffold de la app en la raíz, tooling, alias `@data`, tokens, fuente, providers, script anti-flash |
 | [component-builder](../.opencode/agents/component-builder.md) | subagent | Sí | F2–F3: un componente por vez, TDD estricto desde su spec |
 | [integrator](../.opencode/agents/integrator.md) | subagent | Sí | F4: páginas, contenido en/es, `useHashTab`, AppLayout, print |
 | [reviewer](../.opencode/agents/reviewer.md) | subagent | No | F5 y al final de cada fase: verificación independiente con contexto limpio |
@@ -76,7 +76,10 @@ reviewer no commitea.
 ```
 Usuario ──► orchestrator
               │
-   F1 ────────┼──► foundation ──► reviewer ──► PUERTA (usuario aprueba)
+   F1 ────────┼──► spec de foundation/Foundation (/sdd-spec) ──► PUERTA spec
+              │    plan.md + tasks.md de Foundation ──► PUERTA Plan + Tareas
+              │    foundation × Tn (test → feat) ──► reviewer por tarea y pieza
+              │                                   ──► PUERTA F1
    F2 ────────┼──► Clarificación de cada pieza (si hay dudas)
               │    plan.md + tasks.md de las 11 primitivas ──► PUERTA Plan + Tareas
               │    component-builder × N (de a una pieza, de a una Tn)
@@ -105,7 +108,7 @@ spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
 | `/sdd-spec <cat>/<Name> <idea>` | orchestrator | Entrevista y redacta una spec nueva (`spec.md` con `ask`) |
 | `/sdd-clarify <cat>/<Name>` | reviewer | QA de la spec: ambigüedades, contradicciones, RF sin test; no resuelve |
 | `/sdd-change <cat>/<Name> <cambio>` | orchestrator | Propone el cambio en la spec (con `ask`); después siguen plan y tareas |
-| `/sdd-plan F2` · `/sdd-plan <cat>/<Name>` | orchestrator | Con una fase: `plan.md` + `tasks.md` de todas sus piezas, una sola puerta. Con una pieza suelta o un Cambio: solo `plan.md` (puerta de Plan) |
+| `/sdd-plan F1…F5` · `/sdd-plan <cat>/<Name>` | orchestrator | Con una fase: `plan.md` + `tasks.md` de todas sus piezas, una sola puerta. Con una pieza suelta o un Cambio: solo `plan.md` (puerta de Plan) |
 | `/sdd-task <cat>/<Name>` | orchestrator | `tasks.md` de una pieza suelta o de un Cambio (puerta de Tareas) |
 | `/sdd-implement <cat>/<Name> Tn` | orchestrator | Delega UNA tarea (test → feat), pide revisión, marca la tarea y para |
 | `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + `npm run build` + MCP de Chrome DevTools |

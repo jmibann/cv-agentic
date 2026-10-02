@@ -37,6 +37,8 @@ permission:
     "ls *": allow
     "git add *": allow
     "git commit -m *": allow
+    # Identidad por flag (AGENTS.md; decisión #83): git -c user.name=… commit -m …
+    "git -c user.name=* commit -m *": allow
     "*--amend*": deny
 steps: 120  # valor inicial; ajustable
 ---

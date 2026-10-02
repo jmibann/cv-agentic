@@ -7,7 +7,8 @@ Ejecutá SOLO la tarea `$2` de `specs/$1/tasks.md`, siguiendo la skill `sdd`, `d
 y tus secciones "Cómo delegar una tarea" y "Después de cada tarea":
 
 1. Verificá que `spec.md`, `plan.md` y `tasks.md` estén aprobados y que `$2` no esté marcada.
-2. Delegá `$2` al subagente que corresponde (`component-builder` en F2–F3, `integrator` en F4):
+2. Delegá `$2` al subagente que corresponde (`foundation` en F1, `component-builder` en F2–F3,
+   `integrator` en F4):
    tests primero (commit `test(<Name>): $2`), implementación (commit `feat(<Name>): $2`).
 3. Confirmá que el repo quede en verde y pedí al `reviewer` la revisión de la tarea contra su
    "Hecho cuando".

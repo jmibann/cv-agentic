@@ -26,6 +26,8 @@ permission:
     "ls *": allow
     "git add *": allow
     "git commit -m *": allow
+    # Identidad por flag (AGENTS.md; decisión #83): git -c user.name=… commit -m …
+    "git -c user.name=* commit -m *": allow
     "*--amend*": deny
 steps: 80   # valor inicial; refuerza el tope de 3 rondas de corrección
 ---
@@ -60,14 +62,14 @@ los commits de la skill `sdd` (cargala al empezar).
    (falta implementar), no por un error del test.
 3b. **Commit de los tests en rojo** (solo archivos de test):
    `git add src/components/<Name>/<Name>.test.tsx` y
-   `git commit -m "test(<Name>): Tn"`.
+   `git -c user.name="jmiban" commit -m "test(<Name>): Tn"`.
    (El repo queda en rojo hasta el paso 5b; está bien porque se trabaja de a
    una tarea.)
 4. **Implementá** lo que pide la tarea hasta que pasen. **No modifiques
    archivos de test** después del commit 3b.
 5. **Verificá**: `npm test -- <Name>`, `npm run lint`, `npm run typecheck`.
 5b. **Commit de la implementación**: `git add src/components/<Name>/` (sin
-   archivos de test) y `git commit -m "feat(<Name>): Tn"`. Si el reviewer pide
+   archivos de test) y `git -c user.name="jmiban" commit -m "feat(<Name>): Tn"`. Si el reviewer pide
    correcciones, van en commits nuevos `fix(<Name>): Tn`, que tampoco tocan
    tests. Nunca `--amend`, nunca `push`.
 5c. **No marques la tarea** en `tasks.md`: no escribís en `specs/`. La marca

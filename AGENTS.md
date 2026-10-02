@@ -13,7 +13,7 @@ cv-agentic/
 ├─ docs/                      README completo, DESIGN, BACKLOG, diagnostics, agents.md, tokens/ (breakpoints, contraste)
 ├─ tokens/                    tokens.css (lo importa la app)
 ├─ foundations/               tipografía, layout, movimiento, theming, i18n
-├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (primitives, controls, layout, content, pages, hooks)
+├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (foundation, primitives, controls, layout, content, pages, hooks)
 ├─ data/                      cv.schema.json (fuente de verdad), constants.ts, ejemplos JSON y *.generated.* (alias @data)
 ├─ .opencode/agents/          los 5 agentes (orchestrator, foundation, component-builder, integrator, reviewer)
 ├─ .opencode/skills/sdd/      skill del flujo SDD (SKILL.md)
@@ -106,7 +106,10 @@ reviewer **al cerrar la pieza** y en cada puerta (decisión #80).
   `test(<Name>): Tn` (solo tests, en rojo) → `feat(<Name>): Tn` →
   `fix(<Name>): Tn` si hay correcciones.
   Sin `--amend`, sin reescribir historia, sin push (salvo pedido del usuario).
-  **No modificar `git config`**: la identidad se pasa por flag (`git -c user.name=…`).
+  **No modificar `git config`**: la identidad se pasa por flag, siempre con la
+  misma forma: `git -c user.name="jmiban" commit -m "<mensaje>"` (el email sale
+  de la config global). Es la forma que admiten los permisos bash de los
+  agentes que commitean (decisión #83).
   Los de código los hacen foundation, component-builder e integrator; el
   orchestrator commitea **solo documentos** (`README.md`, `docs/*`, `specs/*`),
   con el repo en verde y con rutas explícitas (nunca `git add .`/`-A`);

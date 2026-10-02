@@ -41,6 +41,8 @@ permission:
     "git add docs/*": allow
     "git add specs/*": allow
     "git commit -m *": allow
+    # Identidad por flag (AGENTS.md; decisión #83): git -c user.name=… commit -m …
+    "git -c user.name=* commit -m *": allow
     "*--amend*": deny
   task:
     "*": deny
@@ -92,7 +94,7 @@ Orden de prioridad: `docs/constitution.md` > skill `sdd` > spec > este archivo
 
 | Fase | Delegás en | Piezas | Puerta F |
 |---|---|---|---|
-| F1 Foundation | `foundation` | App Vite/React/TS en la **raíz** (proyecto único, S2) + tooling + tokens + fuente + providers + anti-flash (los agentes ya viven en `.opencode/agents/`, #41) | Todas las piezas validadas → **usuario aprueba** |
+| F1 Foundation | `foundation` | 1 pieza: `specs/foundation/Foundation/` (decisión #84) = app Vite/React/TS en la **raíz** (proyecto único, S2) + tooling + tokens + fuente + providers + i18n + contenido inicial + anti-flash (los agentes ya viven en `.opencode/agents/`, #41). Su `spec.md` no existe todavía: en el kickoff la redactás con `/sdd-spec foundation/Foundation`, derivada **solo** del alcance de `foundation.md` y de `foundations/*.md` (sin alcance nuevo), y el usuario la aprueba; después `/sdd-plan F1` y una Tn por encargo, como en F2–F4 | Todas las piezas validadas → **usuario aprueba** |
 | F2 Primitivas | `component-builder` | Icon, BrandIcon, Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar | Ídem |
 | F3 Compuestos | `component-builder` | ThemeToggle, LanguageSwitcher, ControlsBar, NavTabs, Sidebar, Timeline, ResumeSection, SkillList, ServiceCard, TestimonialCard, TestimonialDialog, TestimonialCarousel | Ídem |
 | F4 Integración | `integrator` | 4 piezas con spec propia (`specs/hooks/useHashTab/`, `specs/pages/AboutPage/`, `specs/pages/ResumePage/`, `specs/layout/AppLayout/`). El contenido en/es y la impresión **no son piezas**: son trabajos del integrator sin `plan.md`/`tasks.md` propios, con contrato en `foundations/i18n.md` y `foundations/layout.md`, ejecutados y verificados dentro de las tareas de esas 4 piezas | Ídem |
@@ -185,6 +187,8 @@ actualizás en las puertas y al marcar tareas (`README.md`,
 - Solo con el repo en verde y con mensajes Conventional Commits en inglés
   (p. ej. `docs(state): update status after F2 gate`,
   `docs(sdd): Badge T1 approved`).
+- Identidad por flag (`AGENTS.md`, decisión #83):
+  `git -c user.name="jmiban" commit -m "<mensaje>"`. No modifiques `git config`.
 - Sin `--amend`, sin reescribir historia, sin `push`.
 
 ## Reglas

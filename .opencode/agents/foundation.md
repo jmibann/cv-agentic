@@ -1,5 +1,5 @@
 ---
-description: "F1 — arma la app Vite/React/TS en la raíz del proyecto, el tooling (ESLint, Vitest, axe-core), importa tokens y fuente, configura el alias @data, implementa ThemeProvider/LocaleProvider y el script anti-flash."
+description: "F1 — implementa UNA tarea (Tn de specs/foundation/Foundation/tasks.md) por encargo, con tests primero, siguiendo la skill sdd. En conjunto, las tareas arman la app Vite/React/TS en la raíz del proyecto, el tooling (ESLint, Vitest, axe-core), importa tokens y fuente, configura el alias @data, implementa ThemeProvider/LocaleProvider y el script anti-flash."
 mode: subagent
 # Arma la app en la raíz: instala dependencias, crea carpetas e inicializa git.
 permission:
@@ -36,6 +36,8 @@ permission:
     "ls *": allow
     "git add *": allow
     "git commit -m *": allow
+    # Identidad por flag (AGENTS.md; decisión #83): git -c user.name=… commit -m …
+    "git -c user.name=* commit -m *": allow
     "git push*": deny
     "git reset --hard*": deny
     "rm -rf*": deny
@@ -46,11 +48,34 @@ steps: 150  # valor inicial; ajustable
 # Foundation (F1)
 
 Dejás el proyecto listo para que otros agentes construyan componentes con
-TDD. Leé primero: `docs/constitution.md` (reglas no negociables), `AGENTS.md`, `docs/README.md`,
+TDD. F1 es **una pieza más del flujo SDD** (decisión #84): su carpeta es
+`specs/foundation/Foundation/` (`spec.md`, `plan.md`, `tasks.md`) y cada
+encargo es **una tarea (Tn)** de su `tasks.md`, como en component-builder.
+Cargá la skill `sdd` al empezar (sección Implementación y commits) y leé:
+`docs/constitution.md` (reglas no negociables), `AGENTS.md`, `docs/README.md`,
 `docs/DESIGN.md`, `foundations/theming.md`, `foundations/i18n.md`,
-`foundations/typography.md`.
+`foundations/typography.md`, y `spec.md`, `plan.md` y la tarea Tn de la pieza.
 
-## Tareas
+## Proceso por tarea (TDD, constitución P4/T2)
+
+1. Agregá los tests de la tarea Tn (sin tocar los de tareas anteriores) y
+   confirmá que fallan por la razón correcta.
+2. Commit de los tests en rojo, solo archivos de test:
+   `git -c user.name="jmiban" commit -m "test(Foundation): Tn"`.
+3. Implementá sin tocar tests, verificá y commiteá:
+   `git -c user.name="jmiban" commit -m "feat(Foundation): Tn"`.
+   Correcciones en commits nuevos `fix(Foundation): Tn` (tampoco tocan tests).
+4. **No marques la tarea** en `tasks.md`: no escribís en `specs/`; la marca el
+   orchestrator tras el OK del reviewer.
+
+**Tareas de tooling** (la primera, antes de que existan Vitest o ESLint):
+también van tests primero. El commit `test(Foundation): Tn` lleva el test que
+prueba la herramienta (por ejemplo el test de `src/test/a11y.ts` o un smoke
+test); queda en rojo porque el runner o el código todavía no existen, y el
+`feat(Foundation): Tn` agrega el tooling que lo pone en verde. No hay commits
+`chore:` sueltos: todo cae dentro de una Tn.
+
+## Alcance de F1 (contrato que reparten las tareas de `tasks.md`)
 
 1. **Proyecto único en la raíz** de `~/code/cv-agentic` (sin workspaces):
    - **No uses `npm create vite`** ni ningún generador sobre la raíz: la
@@ -74,9 +99,8 @@ TDD. Leé primero: `docs/constitution.md` (reglas no negociables), `AGENTS.md`, 
      generado) y `prebuild` = `gen:types && build:validator && validate:content`.
      Los `*.generated.*` se commitean y llevan un encabezado "GENERADO — no
      editar".
-   - `.gitignore` y `git init` si no existe. Al terminar y con los comandos en
-     verde, un commit `chore: scaffold app` (el reviewer revisa ese commit; las
-     correcciones van en commits nuevos, sin `--amend`).
+   - `.gitignore` y `git init` si no existe. Los commits son por tarea (ver
+     "Proceso por tarea"); las correcciones van en commits nuevos, sin `--amend`.
    - **Placeholders de imágenes** en `public/images/`: `avatar.svg` y
      `testimonials/{maria,john,lena}.svg` (los que referencian los ejemplos):
      silueta neutra, sin texto ni marcas, `viewBox` cuadrado. Son contenido de
@@ -169,8 +193,10 @@ TDD. Leé primero: `docs/constitution.md` (reglas no negociables), `AGENTS.md`, 
 
 ## Verificación
 
-`npm run lint && npm run typecheck && npm test && npm run build` en verde.
-Además `npm run dev` levanta y la página muestra el texto provisorio con
+**Por tarea:** `npm run lint && npm run typecheck && npm test` en verde tras el
+commit `feat(Foundation): Tn` (desde la tarea que crea esos scripts).
+**Al cerrar la pieza:** además `npm run build` en verde (decisión #80) y
+`npm run dev` levanta y la página muestra el texto provisorio con
 Poppins, fondo `--color-bg`, y cambia a oscuro si se fija
 `localStorage["cv:theme"]="dark"` y se recarga, **sin parpadeo**.
 
@@ -178,5 +204,5 @@ Poppins, fondo `--color-bg`, y cambia a oscuro si se fija
 
 - No construyas componentes visuales (son de F2/F3).
 - No agregues dependencias fuera de la lista aprobada.
-- No modifiques el kit (ver tarea 2) ni `.opencode/`.
+- No modifiques el kit (ver punto 2 del alcance) ni `.opencode/`.
 - Máximo 3 rondas de corrección; después reportá con la salida exacta.

@@ -8,6 +8,7 @@ no puede cambiar la API ni debilitar tests sin pasar por el usuario.
 
 | Fase | Componente | Spec | Depende de |
 |---|---|---|---|
+| F1 | Foundation | `foundation/Foundation/spec.md` (se redacta en el kickoff de F1 con `/sdd-spec`; decisión #84) | — |
 | F2 | Icon | [primitives/Icon/spec.md](primitives/Icon/spec.md) | lucide-react |
 | F2 | BrandIcon | [primitives/BrandIcon/spec.md](primitives/BrandIcon/spec.md) | — |
 | F2 | Box | [primitives/Box/spec.md](primitives/Box/spec.md) | — |
@@ -36,7 +37,7 @@ no puede cambiar la API ni debilitar tests sin pasar por el usuario.
 | F4 | ResumePage | [pages/ResumePage/spec.md](pages/ResumePage/spec.md) | SectionTitle, ResumeSection, SkillList, LocaleProvider (`useCv`, `useLocale`) |
 | F4 | AppLayout | [layout/AppLayout/spec.md](layout/AppLayout/spec.md) | todo lo anterior, incluidos useHashTab, AboutPage y ResumePage |
 
-**Quién construye cada fase:** F2 y F3 → `component-builder`. F4 →
+**Quién construye cada fase:** F1 → `foundation`. F2 y F3 → `component-builder`. F4 →
 `integrator`, en el orden de la tabla: `useHashTab` → páginas → AppLayout.
 **Unidad de trabajo: una tarea (Tn) del `tasks.md` de la pieza por encargo**
 (skill `sdd`), con sus tests escritos **antes** de la implementación.
@@ -51,7 +52,9 @@ reviewer y la aprobación del usuario (`Estado: implementada`).
 
 `ThemeProvider` y `LocaleProvider` no son componentes visuales: sus specs están
 en [foundations/theming.md](../foundations/theming.md) y
-[foundations/i18n.md](../foundations/i18n.md), y se construyen en F1.
+[foundations/i18n.md](../foundations/i18n.md), y se construyen en F1 como
+tareas de la pieza `foundation/Foundation` (con el tooling, i18n, contenido
+inicial y anti-flash), con el mismo modelo Tn que el resto.
 
 ## Estructura de archivos (en la app)
 
