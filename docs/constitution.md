@@ -13,7 +13,7 @@ Cada regla indica cómo verificarla.
 - **S5** Node 24 LTS (`.nvmrc`), TypeScript `~6.0`, `^` dentro de la versión mayor documentada, `package-lock.json` commiteado. *Verificar:* `package.json`.
 
 ## 2. Spec antes que código
-- **P1** No hay código sin spec en `specs/` o `foundations/`. *Verificar:* cada `src/components/<Name>/` tiene su `specs/**/<Name>.md`.
+- **P1** No hay código sin spec en `specs/` o `foundations/`. *Verificar:* cada `src/components/<Name>/` tiene su `specs/**/<Name>/spec.md`.
 - **P2** Gana la spec. Código que la contradice es un error; si la spec parece equivocada, se frena y se consulta. Los agentes nunca editan specs.
 - **P3** Los tests salen de la lista de tests de la spec; nada se agrega en silencio (los extras llevan `// extra: <motivo>`).
 - **P4** Por pieza: commit `test(<Name>)` (en rojo) → commit `feat(<Name>)` (en verde). *Verificar:* `git log`.
