@@ -7,8 +7,9 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 
 - Kit completo y auditado: reglas, tokens, fundamentos, 27 specs, esquema de datos.
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
-- **F1 en curso** (2026-10-03): spec/plan/tasks de `specs/foundation/Foundation/` aprobados; **T1–T5 aprobadas y marcadas** (+T2b, T3b, T5b de deuda/Cambio): andamiaje + configs, setup Vitest, helper axe (`src/test/a11y.ts`), `index.html` anti-flash con test verbatim, `ThemeProvider`+`useTheme`. Sigue **T6** (claves UI en/es + `format`), luego T7–T11. Puerta F1 al cerrar la pieza (`build` + revisión completa + aprobación del usuario).
+- **F1 CERRADA** (2026-10-03): pieza `foundation/Foundation` `Estado: implementada`; T1–T11 + reparos T2b/T3b/T5b/T8b aprobadas (última: revisión completa **APROBADA** tras reparo T8b `ae59762`; **QA visual en navegador APROBADO** con app servida: anti-flash oscuro, RF-3 vivo, `theme-color`, es/en, Poppins autohosteada, 375/1440 sin overflow). App Vite/React/TS en la raíz con providers, i18n, contenido validado y tooling; `build` ✅, 53 tests.
 - **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84), 7 medios (#85–#91) y bajos (#92–#94): sin pendientes de auditoría.
+- **Siguiente: F2 primitivas** — specs ya aprobadas; al arrancar F2: `/sdd-plan F2` (plan+tasks de Icon…Separator juntos, puerta única).
 
 ## Decisiones (y por qué)
 
@@ -36,7 +37,14 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
   nunca se mueve el hook a otro archivo ni se `eslint-disable`.
 - **Criterio L1 unificado** (T4/T3b): los comentarios de código van en español **también en `src/test/**`**
   (títulos de tests, identificadores, rutas y citas entre backticks siguen en inglés). Deudas detectadas en review
-  se tratan como tarea de reparo tipo T2b/T3b, no se dejan pasar.
+  se tratan como tarea de reparo tipo T2b/T3b, no se dejan pasar. Lo mismo **L2**: títulos de `describe`/`it` y
+  mensajes de commit en inglés (deudas reparadas: T2b, `c42e33d`, T8b; deuda de forma `07eead6` registrada).
+- **#97 `ucs2length` de ajv aceptado en el bundle** (F1, decisión del usuario al cerrar la puerta): "no ajv en
+  runtime" prohíbe el **compilador**; el helper standalone (~1 kB) necesario por los `pattern` UCS-2 queda aceptado.
+- **Deudas registradas al cerrar F1** (mayor detalle en `docs/diagnostics.md` §VIII): ① `StrictMode` omitido en
+  `main.tsx` por ausencia de mandato (si alguien lo quiere, es Cambio); ② `value` de contexto sin `useMemo` en
+  ambos providers (coherente con T5 aprobado); ③ typos "recalculera" en 2 comentarios de tests; ④ rastros de
+  reparo `07eead6` (etiqueta `fix`+español debió ser `test`+inglés) y shim CJS/ESM de `build-validator.ts` (`59efc8d`).
 
 ## Aprendizajes y errores a evitar
 
@@ -54,8 +62,9 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 
 ## Próximos pasos
 
-- **F1: seguir T6** (claves UI en/es + `format`), T7–T11; puerta F1 al cerrar la pieza (`build` + revisión completa + aprobación del usuario).
-- F1 (foundation): pieza `foundation/Foundation`, Tn con test → feat también en tooling; sin `chore: scaffold app`.
+- **F2 primitivas**: `/sdd-plan primitives/F2` con las 10 piezas (Icon, BrandIcon, Box, Button, Badge, Overhead,
+  IconBox, SectionTitle, Separator, CornerTab), Clarificación primero; specs ya aprobadas. Si algún componente spíado
+  exporta hook junto al componente, aplicar #96 (`allowExportNames`) como Cambio aprobado.
 - **Unidad de trabajo por tarea** (decisión #69): `test(<Name>): Tn` → `feat(<Name>): Tn`; `feat`/`fix` no tocan
   tests y `test` solo agrega; el orchestrator escribe `plan.md`/`tasks.md` y marca cada Tn tras el OK del reviewer.
 - Comandos `/sdd-*` (decisión #71): orchestrator o reviewer, argumento `<categoria>/<Name>`; MCP `chrome-devtools` solo para el reviewer.

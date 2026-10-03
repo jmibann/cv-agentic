@@ -1181,3 +1181,40 @@ auditoría de arquitectura (commit `98ef9b4`).
 - **Estado F1:** T1–T5 (+T2b, T3b, T5b) aprobadas por el reviewer y marcadas
   (últimas: `bcb4605` feat T5, `48bd323` fix T5b). Repo en verde (lint,
   typecheck, 24 tests). Sigue T6.
+
+## VIII. Cierre de F1: revisión completa, T8b, QA visual y decisión #97 (2026-10-03)
+
+- **T6–T11** aprobadas por tarea (feat: `15a9592`, `884bb2f`, `14aec22`,
+  `59efc8d`+`c42e33d`, `faae4c2`, `79b7133`). Rastros aceptados por el reviewer:
+  enmienda `gen:types` con banner (opción A, decisión 4 del plan; dentro del
+  `feat` de T8) y shim CJS/ESM de `build-validator.ts` en `59efc8d` (primer
+  consumidor runtime bajo Vitest; determinismo intacto).
+- **Revisión completa de pieza: primer veredicto RECHAZADO** por un título
+  `describe` en español en `src/content/schema.test.ts` (L2) → **T8b** (`ae59762`,
+  reparo tipo T2b) → **APROBADO** en re-check sin repetir el barrido. Integridad
+  histórica verificada: ningún `feat` tocó tests; los `test` extra solo repararon
+  ventanas propias (`bac24cb`, `c259db2`, `c42e33d`, T2b, T3b); deuda de forma en
+  `07eead6` (etiqueta `fix`+español debió ser `test`+inglés) registrada en
+  `tasks.md` y memoria.
+- **QA visual (puerta, app servida por el usuario, #91): APROBADO** con
+  chrome-devtools en `http://localhost:5173/`: anti-flash oscuro sin destello
+  observable (sonda pre-script), RF-3 en vivo (cambio de sistema sin recargar,
+  storage sin persistir), preferencia gana al sistema, `theme-color` espejado,
+  `cv:locale`→`lang`/textos es, Poppins autohosteada (cero requests a Google,
+  peso 300 activo), placeholders 200, consola limpia, 375/1440 sin overflow.
+  Sin verificar (limitaciones, no defectos): timing de píxel del parpadeo,
+  `toggleTheme`/`setLocale` por UI (no existen controles hasta F3), axe con
+  contraste real y storage bloqueado — cubiertos por tests unitarios y
+  pendientes para F5.
+- **Decisión #97 (usuario al cerrar la puerta):** `ajv/dist/runtime/ucs2length`
+  aceptado en el bundle (~1 kB, inherente al standalone spíado); la regla "no ajv
+  en runtime" prohíbe el **compilador**. *Descartado:* reingeniería de
+  `build:validator`.
+- **Deudas menores registradas** (ver `docs/memory.md`): StrictMode omitido por
+  ausencia de mandato; `value` de contexto sin `useMemo` en ambos providers
+  (coherente con T5); typos "recalculera" en 2 comentarios; nota pendiente:
+  paridad de nombres de placeholder en/es podría blindarse con un test futuro.
+- **F1 implementada** (spec `Estado: implementada` con aprobación del usuario en
+  esta puerta). Checks de cierre: lint ✓ · typecheck ✓ · test 53/53 ✓ ·
+  validate:content ✓ · build ✓ (prebuild completo, sin diff post-build).
+  Próxima fase: **F2 primitivas** (Plan + Tareas en puerta única).
