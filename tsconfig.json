@@ -1,0 +1,31 @@
+{
+  // Un solo tsconfig para todo el proyecto (decisión #63): src/, data/ y
+  // vite.config.ts. Sin baseUrl (deprecado en TS 6): los paths relativos
+  // resuelven contra este archivo.
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+
+    // Opciones declaradas explícitamente porque su default cambió (o cambia)
+    // en TS 6: no depender del default (foundation.md p.3).
+    "types": ["vite/client", "node"],
+    "skipLibCheck": false,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+
+    "noEmit": true,
+    "resolveJsonModule": true,
+
+    "paths": {
+      "@data/*": ["./data/*"]
+    }
+  },
+  "include": ["src", "data", "vite.config.ts"]
+}
