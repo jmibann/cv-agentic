@@ -74,6 +74,13 @@ La API completa (firmas de providers, hooks, `format`, `formatPeriod`,
    la regla anti-colores y `strict` no pueden aplicar a código generado que no
    controlamos. *Descartado:* retocar los generados (prohibido: "no editar a
    mano").
+   **Enmienda (Cambio aprobado por el usuario, 2026-10-03):**
+   `react-refresh/only-export-components` se configura con
+   `allowExportNames: ["useTheme", "useLocale", "useCv"]`: la API de la spec
+   fija provider + hook en el mismo `.tsx` y la regla, sin esta exención, hace
+   insatisfacible ese contrato. No cambia ningún contrato observable de las
+   piezas. *Descartado:* mover los hooks a `.ts` aparte (viola la Anatomía de
+   la spec). Ejecutado como T5b.
 3. **Helper de `build:validator` en `src/scripts/build-validator.ts`**
    ejecutado con `node` directo (Node 24 trae *type stripping* estable) —
    único lugar dentro del permiso `edit` del agente foundation (`src/**`).

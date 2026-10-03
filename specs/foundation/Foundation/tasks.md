@@ -1,11 +1,14 @@
 # Foundation — tasks
 
-Orden de dependencia (ver plan.md): T1 → T2 → T2b → T3 → T3b → T4 → T5 → T6 →
-T7 → T8 → T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn`
-→ `feat(Foundation): Tn` (T2b y T3b son excepción: un solo commit
-`test(Foundation): Tn` porque solo reparan texto —títulos o comentarios— de sus
-archivos, sin implementación nueva). T2b, T3b y T4 se reordenaron al ejecutarse:
-T4 se implementó antes de registrar T3b (deuda L1 detectada en su review).
+Orden de dependencia (ver plan.md): T1 → T2 → T2b → T3 → T3b → T4 → T5b → T5 →
+T6 → T7 → T8 → T9 → T10 → T11. Una tarea por encargo; commits
+`test(Foundation): Tn` → `feat(Foundation): Tn` (T2b y T3b son excepción: un solo
+commit `test(Foundation): Tn` porque solo reparan texto —títulos o comentarios—
+de sus archivos, sin implementación nueva; T5b es otra excepción: un solo commit
+`fix(Foundation): T5b` porque solo cambia `eslint.config.js` y desbloquea el
+`feat(Foundation): T5` —el `test(Foundation): T5` ya estaba commiteado en rojo—).
+T2b, T3b y T4 se reordenaron al ejecutarse: T4 se implementó antes de registrar
+T3b (deuda L1 detectada en su review).
 
 - [x] **T1. Andamiaje del proyecto único: configs, dependencias exactas, alias.** RF-1 (contrato API: scripts y deps), API/Anatomía (alias `@data` en Vitest) — 529199f
   - Hecho cuando: `package.json` tiene `"private": true`, `"type": "module"`,
@@ -66,6 +69,16 @@ T4 se implementó antes de registrar T3b (deuda L1 detectada en su review).
     `src/test/anti-flash.test.ts` pasa leyendo ambos archivos: los dos
     literales del script igualan a `--palette-light-bg` y `--palette-dark-bg`
     de `tokens/tokens.css`.
+
+- [ ] **T5b. Excepción `allowExportNames` en `react-refresh` (Cambio aprobado por el usuario).** T5 (bloqueante de lint), plan §decisión 2 enmendada
+  - Hecho cuando: `eslint.config.js` fija
+    `react-refresh/only-export-components` con `{ allowConstantExport: true,
+    allowExportNames: ["useTheme", "useLocale", "useCv"] }` (único cambio de
+    config; `useLocale`/`useCv` se incluyen ahora para que T10 no repita el
+    bloqueo); el error 110:17 de `ThemeProvider.tsx` desaparece; `npm run lint`
+    solo puede quedar rojo por el test en rojo de T5 aún sin implementación, no
+    por react-refresh; un solo commit `fix(Foundation): T5b ...` toca solo
+    `eslint.config.js`.
 
 - [ ] **T5. `ThemeProvider` + `useTheme`.** RF-2, RF-3, RF-4, RF-5
   - Hecho cuando: los 7 tests de `ThemeProvider.test.tsx` pasan: inicial desde
