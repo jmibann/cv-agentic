@@ -25,6 +25,21 @@ export default tseslint.config(
       reactHooks.configs.flat["recommended-latest"],
       reactRefresh.configs.vite,
     ],
+    // Excepción aprobada por el usuario (Cambio T5b, plan §decisión 2 enmendada):
+    // los providers spíados exportan su hook junto al componente (spec.md §API:
+    // ThemeProvider + useTheme; LocaleProvider + useLocale + useCv). La regla
+    // identifica componentes por mayúscula inicial y no tiene caso para hooks;
+    // allowExportNames evita dividir los providers (alternativa descartada:
+    // hooks en .ts aparte, viola la Anatomía).
+    rules: {
+      "react-refresh/only-export-components": [
+        "error",
+        {
+          allowConstantExport: true,
+          allowExportNames: ["useTheme", "useLocale", "useCv"],
+        },
+      ],
+    },
   },
 
   {
