@@ -39,7 +39,7 @@ porque solo renombra títulos de su propio archivo, sin implementación nueva).
     `describe`/`it` a inglés (aserciones e imports intactos); `npm run lint`,
     `npm run typecheck` y `npm test` en verde.
 
-- [ ] **T3. Helper de accesibilidad `expectNoA11yViolations` sobre axe-core.** Tests esperados (Helper de accesibilidad)
+- [x] **T3. Helper de accesibilidad `expectNoA11yViolations` sobre axe-core.** Tests esperados (Helper de accesibilidad) — 92e924e
   - Hecho cuando: `src/test/a11y.ts` expone
     `expectNoA11yViolations(container: Element): Promise<void>` con
     `axe.run` y las reglas `color-contrast` y `region` desactivadas, y el
