@@ -1,9 +1,11 @@
 # Foundation — tasks
 
-Orden de dependencia (ver plan.md): T1 → T2 → T2b → T3 → T4 → T5 → T6 → T7 →
-T8 → T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn` →
-`feat(Foundation): Tn` (T2b es excepción: un solo commit `test(Foundation): T2b`
-porque solo renombra títulos de su propio archivo, sin implementación nueva).
+Orden de dependencia (ver plan.md): T1 → T2 → T2b → T3 → T3b → T4 → T5 → T6 →
+T7 → T8 → T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn`
+→ `feat(Foundation): Tn` (T2b y T3b son excepción: un solo commit
+`test(Foundation): Tn` porque solo reparan texto —títulos o comentarios— de sus
+archivos, sin implementación nueva). T2b, T3b y T4 se reordenaron al ejecutarse:
+T4 se implementó antes de registrar T3b (deuda L1 detectada en su review).
 
 - [x] **T1. Andamiaje del proyecto único: configs, dependencias exactas, alias.** RF-1 (contrato API: scripts y deps), API/Anatomía (alias `@data` en Vitest) — 529199f
   - Hecho cuando: `package.json` tiene `"private": true`, `"type": "module"`,
@@ -46,6 +48,14 @@ porque solo renombra títulos de su propio archivo, sin implementación nueva).
     mensaje lista `id (impact): targets`; `src/test/a11y.test.ts` pasa: un
     `<img>` sin `alt` hace que rechace y un botón con texto no produce
     violaciones.
+
+- [ ] **T3b. Paso a español de los comentarios de `a11y.ts` y `a11y.test.ts` (deuda L1 de T3).** L1 (constitución), T3 (corrección de deuda)
+  - Hecho cuando: un solo commit `test(Foundation): T3b` toca **solo**
+    `src/test/a11y.ts` y `src/test/a11y.test.ts` y cambia **únicamente** el
+    texto de sus comentarios a español (aserciones, títulos de `describe`/`it`,
+    imports y lógica byte a byte intactos; como en T2b, el prefijo `test` es la
+    excepción documentada porque no hay implementación nueva); `npm run lint`,
+    `npm run typecheck` y `npm test` en verde (17 tests).
 
 - [x] **T4. `index.html`: anti-flash tal cual theming.md, lang, theme-color.** RF-1 — 3a3d25a (+ test L1 fix c259db2)
   - Hecho cuando: `index.html` tiene `<html lang="en">`,
