@@ -90,7 +90,7 @@ T3b (deuda L1 detectada en su review).
     sistema (RF-4, con `vi.spyOn(window, "getComputedStyle")`); `useTheme` fuera
     del provider lanza error descriptivo.
 
-- [ ] **T6. Claves de interfaz en/es + `format()`.** RF-6 (parcial: `t`), Tests esperados (`format`)
+- [x] **T6. Claves de interfaz en/es + `format()`.** RF-6 (parcial: `t`), Tests esperados (`format`) — 15a9592
   - Hecho cuando: `ui.en.ts` exporta `uiEn as const` con **todas** las claves de
     `foundations/i18n.md` y el tipo `UiStrings` (`DeepStringify`); `ui.es.ts`
     exporta `uiEs satisfies UiStrings` (una clave de más o de menos rompe
