@@ -1,8 +1,9 @@
 # Foundation — tasks
 
-Orden de dependencia (ver plan.md): T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 →
-T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn` →
-`feat(Foundation): Tn`.
+Orden de dependencia (ver plan.md): T1 → T2 → T2b → T3 → T4 → T5 → T6 → T7 →
+T8 → T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn` →
+`feat(Foundation): Tn` (T2b es excepción: un solo commit `test(Foundation): T2b`
+porque solo renombra títulos de su propio archivo, sin implementación nueva).
 
 - [x] **T1. Andamiaje del proyecto único: configs, dependencias exactas, alias.** RF-1 (contrato API: scripts y deps), API/Anatomía (alias `@data` en Vitest) — 529199f
   - Hecho cuando: `package.json` tiene `"private": true`, `"type": "module"`,
@@ -31,6 +32,12 @@ T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn` →
     `src/test/setup.test.ts` pasan (el DOM no acumula un botón repetido;
     `matchMedia` responde; `localStorage` llega vacío al test siguiente) y el
     smoke de T1 sigue en verde.
+
+- [ ] **T2b. Renombre L2 de los títulos de test del smoke de T1.** L2 (constitución), T1 (corrección de deuda)
+  - Hecho cuando: `git show -p` del commit `test(Foundation): T2b` toca **solo**
+    `src/tooling.smoke.test.ts` y cambia **únicamente** los títulos de
+    `describe`/`it` a inglés (aserciones e imports intactos); `npm run lint`,
+    `npm run typecheck` y `npm test` en verde.
 
 - [ ] **T3. Helper de accesibilidad `expectNoA11yViolations` sobre axe-core.** Tests esperados (Helper de accesibilidad)
   - Hecho cuando: `src/test/a11y.ts` expone
