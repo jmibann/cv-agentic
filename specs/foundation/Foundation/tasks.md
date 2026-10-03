@@ -21,7 +21,7 @@ T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn` →
     `@data/constants`) pasa con `npm test`, y `npm run lint` y
     `npm run typecheck` corren en verde.
 
-- [ ] **T2. Setup de Vitest: jest-dom, cleanup explícito, mocks y limpieza global.** Tests esperados (Tooling: cleanup entre tests)
+- [x] **T2. Setup de Vitest: jest-dom, cleanup explícito, mocks y limpieza global.** Tests esperados (Tooling: cleanup entre tests) — e8a51fa (+ fix 2fb4833)
   - Hecho cuando: `src/test/setup.ts` (referenciado por la config) importa
     `@testing-library/jest-dom/vitest`, registra `afterEach(cleanup)` de RTL y
     mocks de `matchMedia` (con `addEventListener`), `ResizeObserver`,
