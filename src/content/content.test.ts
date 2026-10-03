@@ -92,7 +92,7 @@ function withExtraField(cv: CvData): unknown {
   return { ...cv, uncampoquennadieniepide: true };
 }
 
-describe("cv.{en,es}.json (copias de los ejemplos de data/)", () => {
+describe("cv.{en,es}.json (copies of the data/ examples)", () => {
   it("declares the shared schema path in both locales", () => {
     expect(enContent.$schema).toBe(SCHEMA_REF);
     expect(esContent.$schema).toBe(SCHEMA_REF);
