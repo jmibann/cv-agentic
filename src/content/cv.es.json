@@ -1,0 +1,156 @@
+{
+  "$schema": "../../data/cv.schema.json",
+  "locale": "es",
+  "profile": {
+    "name": "Alex Rivera",
+    "headline": "Desarrollador Frontend",
+    "avatar": {
+      "src": "/images/avatar.svg",
+      "alt": "Retrato de Alex Rivera"
+    },
+    "about": [
+      "Soy desarrollador frontend en Buenos Aires y me especializo en construir interfaces accesibles, rápidas y mantenibles con React y TypeScript.",
+      "Me gusta convertir requisitos complejos en componentes simples y bien testeados, y trabajar junto a diseño para que el producto sea consistente en todos los dispositivos."
+    ]
+  },
+  "contact": [
+    {
+      "id": "email",
+      "type": "email",
+      "value": "alex@example.com"
+    },
+    {
+      "id": "phone",
+      "type": "phone",
+      "value": "+54 11 5555-0100"
+    },
+    {
+      "id": "whatsapp",
+      "type": "whatsapp",
+      "value": "+54 9 11 5555-0100"
+    },
+    {
+      "id": "location",
+      "type": "location",
+      "value": "Buenos Aires, Argentina"
+    }
+  ],
+  "social": [
+    {
+      "id": "github",
+      "network": "github",
+      "url": "https://github.com/example"
+    },
+    {
+      "id": "linkedin",
+      "network": "linkedin",
+      "url": "https://www.linkedin.com/in/example"
+    },
+    {
+      "id": "x",
+      "network": "x",
+      "url": "https://x.com/example"
+    }
+  ],
+  "services": [
+    {
+      "id": "web-apps",
+      "title": "Aplicaciones web",
+      "description": "Aplicaciones de una sola página con React y TypeScript, desde la arquitectura hasta el despliegue.",
+      "icon": "code"
+    },
+    {
+      "id": "ui-systems",
+      "title": "Sistemas de diseño",
+      "description": "Bibliotecas de componentes reutilizables y con temas, basadas en design tokens.",
+      "icon": "layout"
+    },
+    {
+      "id": "accessibility",
+      "title": "Accesibilidad",
+      "description": "Interfaces que cumplen WCAG y funcionan con teclado y lectores de pantalla.",
+      "icon": "shield"
+    },
+    {
+      "id": "performance",
+      "title": "Rendimiento",
+      "description": "Auditorías y mejoras de tiempo de carga, renderizado y Core Web Vitals.",
+      "icon": "gauge"
+    }
+  ],
+  "education": [
+    {
+      "id": "uba-cs",
+      "title": "Licenciatura en Ciencias de la Computación",
+      "organization": "Universidad de Buenos Aires",
+      "start": "2012",
+      "end": "2017",
+      "description": "Orientación en ingeniería de software, algoritmos e interacción humano-computadora."
+    },
+    {
+      "id": "a11y-cert",
+      "title": "Especialista en Accesibilidad Web",
+      "organization": "Certificación online",
+      "start": "2020-03",
+      "end": "2020-09",
+      "description": "Patrones de diseño accesible, ARIA y pruebas con tecnologías de asistencia."
+    }
+  ],
+  "experience": [
+    {
+      "id": "acme",
+      "title": "Desarrollador Frontend Senior",
+      "organization": "Acme Corp",
+      "start": "2021-02",
+      "end": null,
+      "description": "Lidero la biblioteca de componentes y la migración de vistas legacy a React y TypeScript."
+    },
+    {
+      "id": "globex",
+      "title": "Desarrollador Frontend",
+      "organization": "Globex",
+      "start": "2017-06",
+      "end": "2021-01",
+      "description": "Desarrollé dashboards para clientes e introduje testing automatizado en el equipo."
+    }
+  ],
+  "skills": [
+    "React",
+    "TypeScript",
+    "Vite",
+    "CSS Modules",
+    "Vitest",
+    "Testing Library",
+    "Accesibilidad",
+    "Git"
+  ],
+  "testimonials": [
+    {
+      "id": "t-maria",
+      "author": "María González",
+      "role": "Product Manager, Acme Corp",
+      "avatar": {
+        "src": "/images/testimonials/maria.svg"
+      },
+      "text": "Alex entregó siempre trabajo de alta calidad e hizo que funcionalidades complejas resultaran simples para nuestros usuarios."
+    },
+    {
+      "id": "t-john",
+      "author": "John Smith",
+      "role": "Design Lead, Globex",
+      "avatar": {
+        "src": "/images/testimonials/john.svg"
+      },
+      "text": "Un gran aliado para diseño: a Alex le importan los detalles, la accesibilidad y la consistencia en todo el producto."
+    },
+    {
+      "id": "t-lena",
+      "author": "Lena Fischer",
+      "role": "Engineering Manager, Acme Corp",
+      "avatar": {
+        "src": "/images/testimonials/lena.svg"
+      },
+      "text": "Alex elevó el estándar de testing del equipo y acompañó a otros con paciencia y claridad."
+    }
+  ]
+}

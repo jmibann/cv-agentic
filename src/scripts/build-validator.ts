@@ -50,8 +50,14 @@ function readSchema(): AnySchemaObject {
 
 /**
  * Reescribe los `require(...).default` del módulo generado a imports ESM con
- * interop: `import __ajvRuntimeN from "ajv/dist/runtime/<modulo>.js"` +
- * acceso a `.default` (los runtime de ajv son CJS con `exports.default`).
+ * interop: `import __ajvRuntimeN from "ajv/dist/runtime/<modulo>.js"` + un
+ * shim `const __ajvRuntimeNm = { default: __ajvRuntimeN.default ??
+ * __ajvRuntimeN }`. Por qué el shim (surface en T9, primer consumo bajo
+ * Vite/Vitest): los runtime de ajv son CJS con `__esModule` + `exports.default`.
+ * En Node ESM el default import es `module.exports` (objeto con `.default`);
+ * Vite (dev, tests y build de navegador) desenvuelve `__esModule` y entrega el
+ * default interno (`ucs2length`, una función) y `fn.default` es `undefined`.
+ * `raw.default ?? raw` tolera ambas formas (y también un namespace import).
  * Alias numerados por orden de aparición: determinista. Si quedara algún
  * `require(` sin cubrir, el script falla en vez de emitir código roto.
  */
@@ -63,7 +69,8 @@ function toEsmRuntimeImports(moduleCode: string): string {
       alias = `__ajvRuntime${aliases.size}`;
       aliases.set(modulePath, alias);
     }
-    return `${alias}.default`;
+    // Uso a través del shim (`__ajvRuntimeNm.default`), no del import crudo.
+    return `${alias}m.default`;
   });
   if (rewritten.includes("require(")) {
     throw new Error(
@@ -72,7 +79,11 @@ function toEsmRuntimeImports(moduleCode: string): string {
     );
   }
   const imports = [...aliases]
-    .map(([modulePath, alias]) => `import ${alias} from "${modulePath}.js";`)
+    .map(
+      ([modulePath, alias]) =>
+        `import ${alias} from "${modulePath}.js";\n` +
+        `const ${alias}m = { default: ${alias}.default ?? ${alias} };`,
+    )
     .join("\n");
   return `${imports}\n${rewritten}`;
 }
