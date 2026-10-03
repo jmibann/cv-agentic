@@ -104,7 +104,8 @@ T3b (deuda L1 detectada en su review).
     `"2019-03"`+`"2021-11"` → `"Mar 2019 — Nov 2021"`/`"mar 2019 — nov 2021"`;
     separador `" — "` en todos los casos; `Intl` con el `locale` recibido.
 
-- [ ] **T8. Scripts de datos operativos: tipos y validador generados + `schema.test.ts`.** RF-7 (parcial: generados al día), Tests esperados (Esquema al día)
+- [x] **T8. Scripts de datos operativos: tipos y validador generados + `schema.test.ts`.** RF-7 (parcial: generados al día), Tests esperados (Esquema al día) — 14aec22 (+ enmienda `gen:types` opción A, aprobada por el usuario)
+  - Nota para el cierre de pieza: `07eead6` corrigió el mecanismo del test propio en su ventana rojo con etiqueta `fix` y mensaje en español (debía ser `test(Foundation): T8 …` en inglés; precedententes `bac24cb`/`c259db2`). Contenido legítimo, aserciones intactas; registrar la regla en `docs/memory.md`/`docs/diagnostics.md` al cerrar F1. Además: `data/validate-cv.generated.js` importa `ajv/dist/runtime/ucs2length.js` (inherente al standalone; anotado por el reviewer).
   - Hecho cuando: `npm run gen:types` y `npm run build:validator` corren desde
     `package.json` y commitean `data/cv.types.generated.ts` y
     `data/validate-cv.generated.{js,d.ts}` (este último declara
