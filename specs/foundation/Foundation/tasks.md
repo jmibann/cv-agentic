@@ -4,7 +4,7 @@ Orden de dependencia (ver plan.md): T1 → T2 → T3 → T4 → T5 → T6 → T7
 T9 → T10 → T11. Una tarea por encargo; commits `test(Foundation): Tn` →
 `feat(Foundation): Tn`.
 
-- [ ] **T1. Andamiaje del proyecto único: configs, dependencias exactas, alias.** RF-1 (contrato API: scripts y deps), API/Anatomía (alias `@data` en Vitest)
+- [x] **T1. Andamiaje del proyecto único: configs, dependencias exactas, alias.** RF-1 (contrato API: scripts y deps), API/Anatomía (alias `@data` en Vitest) — 529199f
   - Hecho cuando: `package.json` tiene `"private": true`, `"type": "module"`,
     `"engines.node": "^22.12.0 || >=24"` y solo las deps/rangos de
     `docs/README.md` (TypeScript `~6.0`) con los 9 scripts; `.nvmrc` dice `24`;
