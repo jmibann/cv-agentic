@@ -47,7 +47,7 @@ porque solo renombra títulos de su propio archivo, sin implementación nueva).
     `<img>` sin `alt` hace que rechace y un botón con texto no produce
     violaciones.
 
-- [ ] **T4. `index.html`: anti-flash tal cual theming.md, lang, theme-color.** RF-1
+- [x] **T4. `index.html`: anti-flash tal cual theming.md, lang, theme-color.** RF-1 — 3a3d25a (+ test L1 fix c259db2)
   - Hecho cuando: `index.html` tiene `<html lang="en">`,
     `<meta name="theme-color" content="#eceef4">`, el script inline idéntico al
     de `foundations/theming.md` (tema → `theme-color` → idioma, todo en
