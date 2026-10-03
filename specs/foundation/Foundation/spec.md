@@ -1,5 +1,5 @@
 # Foundation
-Estado: aprobada
+Estado: implementada
 
 Pieza de F1 (decisión #84): deja la app lista para que F2–F4 construyan
 componentes con TDD. El alcance está derivado **solo** de
