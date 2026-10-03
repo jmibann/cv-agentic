@@ -5,8 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { LOCALES } from "@data/constants";
 
-describe("andamiaje del proyecto único", () => {
-  it("resuelve el alias @data/* y ejecuta bajo jsdom", () => {
+describe("single-project scaffolding", () => {
+  it("resolves the @data/* alias and runs under jsdom", () => {
     expect(LOCALES).toEqual(["en", "es"]);
     // entorno jsdom activo (config `test.environment` de vite.config.ts)
     expect(typeof window).toBe("object");
