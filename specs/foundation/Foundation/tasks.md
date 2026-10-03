@@ -1,7 +1,7 @@
 # Foundation — tasks
 
 Orden de dependencia (ver plan.md): T1 → T2 → T2b → T3 → T3b → T4 → T5b → T5 →
-T6 → T7 → T8 → T9 → T10 → T11. Una tarea por encargo; commits
+T6 → T8 → T8b → T9 → T10 → T11. Una tarea por encargo; commits
 `test(Foundation): Tn` → `feat(Foundation): Tn` (T2b y T3b son excepción: un solo
 commit `test(Foundation): Tn` porque solo reparan texto —títulos o comentarios—
 de sus archivos, sin implementación nueva; T5b es otra excepción: un solo commit
@@ -116,6 +116,13 @@ T3b (deuda L1 detectada en su review).
     los `enum` del esquema y los tipos generados están al día (regenerar en
     memoria y comparar).
 
+- [ ] **T8b. Renombre L2 del título de `describe` en `schema.test.ts` (deuda detectada en la revisión completa de pieza).** L2 (constitución), revisión completa F1
+  - Hecho cuando: un solo commit `test(Foundation): T8b` toca **solo**
+    `src/content/schema.test.ts` y cambia **únicamente** el título
+    `describe("Esquema al día (RF-7)")` (~línea 87) a inglés (aserciones,
+    `it` e imports intactos); `npm run lint`, `npm run typecheck` y `npm test`
+    en verde.
+
 - [x] **T9. Contenido inicial validado: `cv.{en,es}.json` + `index.ts` + `content.test.ts`.** RF-7 — 59efc8d (+ reparo L2 c42e33d)
   - Nota para el cierre de pieza: `59efc8d` incluyó la corrección del **productor** del generado (`build-validator.ts`: shim de interop CJS/ESM `{ default: raw.default ?? raw }` + regeneración por script de `validate-cv.generated.js`) porque T9 es el primer consumidor runtime bajo Vitest; dictamen del reviewer: corrección legítima, determinismo y `.d.ts` intactos. Rastro pedido por el reviewer: registrarla en memoria/diagnostics al cerrar F1 (junto con la deuda `07eead6` de T8).
   - Hecho cuando: `cv.en.json`/`cv.es.json` son copia de
@@ -145,3 +152,11 @@ T3b (deuda L1 detectada en su review).
     `t` y el nombre de `useCv()`; `App.test.tsx` pasa (muestra ambos y cierra
     con `expectNoA11yViolations`); `npm run lint && npm run typecheck &&
     npm test` en verde sobre toda la pieza.
+  - Deudas para el registro de cierre F1 (reviewer de T11 + revisión completa):
+    ① `StrictMode` omitido por ausencia de mandato (decisión a registrar; hoy
+    solo comentado en `src/main.tsx`); ② `value` de contexto sin `useMemo` en
+    ambos providers (coherente con T5 aprobado; registro); ③ typos
+    "recalculera" en `ThemeProvider.test.tsx:47` y `LocaleProvider.test.tsx:51`
+    (comentarios, no títulos); ④ `data/validate-cv.generated.js` importa
+    `ajv/dist/runtime/ucs2length.js` al bundle (runtime-helper de ajv
+    standalone; decide el usuario en la puerta F1).
