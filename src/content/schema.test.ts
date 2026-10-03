@@ -23,11 +23,22 @@ import type { Locale } from "@data/cv.types.generated";
  * `@data/*` (spec.md §API: "debe resolver también en Vitest") tanto en el
  * typecheck como en la resolución de módulos de Vitest.
  */
+/**
+ * ATENCIÓN: el `new URL(rel, import.meta.url)` vive dentro de esta función,
+ * con `rel` como VARIABLE. Si se escribe literal en el cuerpo de un test
+ * (`new URL("../../data/…", import.meta.url)`), el plugin de assets de Vite
+ * lo reescribe a una URL servida (http) y `fileURLToPath` lanza "The URL must
+ * be of scheme file". Con variable no lo toca (misma forma que el
+ * `readRepoFile` de `src/test/anti-flash.test.ts`).
+ */
+const repoUrl = (relativeFromThisFile: string): URL =>
+  new URL(relativeFromThisFile, import.meta.url);
+
+const repoPath = (relativeFromThisFile: string): string =>
+  fileURLToPath(repoUrl(relativeFromThisFile));
+
 const readRepoFile = (relativeFromThisFile: string): string =>
-  readFileSync(
-    fileURLToPath(new URL(relativeFromThisFile, import.meta.url)),
-    "utf8",
-  );
+  readFileSync(repoPath(relativeFromThisFile), "utf8");
 
 /** Definición del esquema que nos interesa: solo puede traer `enum`. */
 interface SchemaEnumDefinition {
@@ -106,11 +117,10 @@ describe("Esquema al día (RF-7)", () => {
     // como opción propia; el resto lo aporta DEFAULT_OPTIONS, idéntico en
     // CLI y API (index.js:30). Sin marcas de tiempo: es determinista.
     const schemaSource = readRepoFile("../../data/cv.schema.json");
-    const schemaPath = fileURLToPath(new URL("../../data/cv.schema.json", import.meta.url));
     const regenerated = await compile(
       JSON.parse(schemaSource) as unknown as CompileSchemaArg,
       "data/cv.schema.json",
-      { bannerComment: banner, cwd: dirname(schemaPath) },
+      { bannerComment: banner, cwd: dirname(repoPath("../../data/cv.schema.json")) },
     );
     expect(regenerated).toBe(committed);
   });
