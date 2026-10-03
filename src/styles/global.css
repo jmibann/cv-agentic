@@ -1,0 +1,43 @@
+/* Estilos base globales de la app (T11): reset mínimo + base tipográfica de
+ * foundations/typography.md §"Estilos base" + bloqueo de scroll con <dialog>
+ * abierto. Solo tokens (regla dura 1 de docs/DESIGN.md): los valores literales
+ * viven en tokens/tokens.css, importado una sola vez desde src/main.tsx.
+ * Sin @media propios (spec.md → Responsive): todo escala por tokens. */
+
+/* Reset mínimo: modelo de caja uniforme y cero márgenes del navegador en el
+ * body (los márgenes de títulos los fija la base tipográfica de abajo). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+/* Base tipográfica — replicada tal cual de foundations/typography.md
+ * §"Estilos base". El cuerpo en peso 300 es identidad visual: no subirlo. */
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-light);
+  line-height: var(--line-height-body);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-heading);
+  margin: 0;
+}
+h4 { font-weight: var(--font-weight-medium); }
+strong, b { font-weight: var(--font-weight-semibold); color: var(--color-heading); }
+
+/* Con un <dialog> abierto se bloquea el scroll del fondo (spec.md §Anatomía:
+ * el reset global agrega esta regla al lado de la base tipográfica). */
+html:has(dialog[open]) {
+  overflow: hidden;
+}

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- Placeholder de ejemplo (Foundation T11): silueta neutra, sin texto ni
+       marcas, viewBox cuadrado. Es contenido de ejemplo, no estilos
+       (specs/foundation/Foundation/spec.md §Estilos y tokens: "Placeholders
+       en public/images/: son contenido de ejemplo, no estilos"), fuera del
+       alcance de la regla dura 1 de docs/DESIGN.md. -->
+  <rect width="96" height="96" fill="#dfe2ea"/>
+  <circle cx="48" cy="37" r="15" fill="#a6abbb"/>
+  <path d="M18 96a30 30 0 0 1 60 0z" fill="#a6abbb"/>
+</svg>
