@@ -33,7 +33,7 @@ porque solo renombra títulos de su propio archivo, sin implementación nueva).
     `matchMedia` responde; `localStorage` llega vacío al test siguiente) y el
     smoke de T1 sigue en verde.
 
-- [ ] **T2b. Renombre L2 de los títulos de test del smoke de T1.** L2 (constitución), T1 (corrección de deuda)
+- [x] **T2b. Renombre L2 de los títulos de test del smoke de T1.** L2 (constitución), T1 (corrección de deuda) — 4a20573
   - Hecho cuando: `git show -p` del commit `test(Foundation): T2b` toca **solo**
     `src/tooling.smoke.test.ts` y cambia **únicamente** los títulos de
     `describe`/`it` a inglés (aserciones e imports intactos); `npm run lint`,
