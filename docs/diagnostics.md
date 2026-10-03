@@ -1161,3 +1161,23 @@ auditoría de arquitectura (commit `98ef9b4`).
   agregan ambas rutas al `edit` de `orchestrator.md` (rige desde la sesión
   siguiente), con su fila en la tabla de `docs/agent-system.md`, la fila 95 del
   registro y "Límites" de `AGENTS.md` actualizados.
+
+## VII. F1 hasta T5: decisión #96 y criterio L1 unificado (2026-10-03)
+
+- **Deuda L1 detectada en el review de T4** (comentarios en inglés en
+  `src/test/anti-flash.test.ts`, rechazada y reparada con `c259db2`) reveló el
+  mismo patrón en los archivos aprobados de T3 → **T3b** (`17b0409`) los pasó a
+  español. Criterio unificado y registrado en `docs/memory.md`: comentarios de
+  código en español **también en `src/test/**`**; títulos de tests,
+  identificadores, rutas y citas en backticks, en inglés.
+- **Bloqueante en T5 → Cambio aprobado por el usuario (decisión #96, `48bd323`):**
+  `react-refresh/only-export-components` hacía insatisfacible la API spíada
+  (provider + hook en el mismo `.tsx`). `eslint.config.js` fija ahora
+  `allowExportNames: ["useTheme", "useLocale", "useCv"]`; pérdida aceptada de
+  `allowCompoundComponents` (dictamen del reviewer: irrelevante). *Descartado:*
+  mover los hooks a `.ts` (viola la Anatomía). Registrada la regla permanente
+  para F2–F4 en `docs/memory.md`. Enmienda en `plan.md` (decisión 2) y tarea
+  **T5b** creada en `tasks.md` (precedente T2b/T3b de tareas de reparo).
+- **Estado F1:** T1–T5 (+T2b, T3b, T5b) aprobadas por el reviewer y marcadas
+  (últimas: `bcb4605` feat T5, `48bd323` fix T5b). Repo en verde (lint,
+  typecheck, 24 tests). Sigue T6.

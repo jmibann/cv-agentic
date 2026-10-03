@@ -4,7 +4,7 @@ Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-10-02)
+## Estado actual (2026-10-03)
 
 | Qué | Estado |
 |---|---|
@@ -20,7 +20,8 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82); tercera auditoría: 2 altos (#83 identidad de git en permisos, #84 F1 como pieza `foundation/Foundation` con Tn) 7 medios (#85–#91) y bajos (#92–#94) corregidos; sin pendientes |
 | Unidad de trabajo y memoria | ✅ Por tarea (Tn) en todo el sistema; memoria única en `docs/memory.md` (decisiones #69 y #70) |
 | Contenido del CV en JSON (esquema + validación) | ✅ Especificado: `data/cv.schema.json` + ejemplos JSON; se genera en F1 |
-| `spec.md` de `foundation/Foundation`, `plan.md` / `tasks.md` de las 28 piezas, `src/`, `package.json` | ⏳ Próxima fase (kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn) |
+| `spec.md` de `foundation/Foundation` + `plan.md` / `tasks.md` | ✅ Aprobados; Tareas de las demás piezas: al inicio de su fase F |
+| **F1 Foundation** (pieza `foundation/Foundation`, Tn por encargo) | ⏳ En curso: T1–T5 y T2b/T3b/T5b aprobadas y marcadas (`src/` con andamiaje, setup Vitest, helper axe, `index.html` anti-flash, `ThemeProvider`); sigue T6–T11. Cambios registrados: T5b/#96 (`react-refresh` `allowExportNames`) y `skipLibCheck` |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
 
