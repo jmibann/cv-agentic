@@ -7,9 +7,9 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 
 - Kit completo y auditado: reglas, tokens, fundamentos, 27 specs, esquema de datos.
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
-- Git baseline + commits solo docs/chore; **no existen `src/`, `package.json` ni la app** (las crea F1/foundation).
+- **F1 en curso** (2026-10-02): spec/plan/tasks de `specs/foundation/Foundation/` aprobadas; T1 (andamiaje + configs), T2 (setup Vitest) y T2b (deuda L2 del smoke de T1) aprobadas por el reviewer y marcadas. `src/`, `package.json` y configs **ya existen**; `index.html`, providers, i18n y contenido todavía no (T4+).
 - **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84), 7 medios (#85–#91) y bajos (#92–#94): sin pendientes de auditoría.
-- Próximo hito: kickoff de F1: `/sdd-spec foundation/Foundation` → `/sdd-plan F1` → foundation por Tn (#84).
+- Próximo hito: retomar F1 en **T3** (helper `expectNoA11yViolations`) y seguir T4–T11; puerta F1 recién al cerrar la pieza (`build` + revisión completa + aprobación del usuario).
 
 ## Decisiones (y por qué)
 
@@ -29,6 +29,8 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - **#85 F5 sin Tn**: QA del reviewer, informe en `docs/qa-report.md`; defectos → tarea nueva o Cambio de su pieza.
 - **#86** Estado/memoria/diagnostics solo por puerta F o decisión de reglas. **#91** `npm run dev` lo corre el usuario.
   **#95** El orchestrator edita el registro (`docs/README.md`) y la doc de agentes (`docs/agent-system.md`).
+- **`skipLibCheck: true`** (F1/T2, aprobado por el usuario): jest-dom 7 y Vitest 5 declaran `Assertion` incompatibles
+  en sus `.d.ts` (TS2428); el código propio sigue chequeando. Volver a `false` si jest-dom publica tipos compatibles.
 
 ## Aprendizajes y errores a evitar
 
@@ -37,6 +39,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - Links entre specs de carpetas distintas necesitan `../../` (un `../` queda roto; verificar con un checker).
 - Plantilla: "10 secciones (EARS incluida) + Estado" y `Requisitos` **justo después** de `Propósito` (no siempre antes de Anatomía).
 - La memoria vive en `docs/memory.md`, no en la raíz (decisión #70). La doc de agentes es `docs/agent-system.md` (#92): un `agents.md` choca con `AGENTS.md` en macOS.
+- El orchestrator **no puede `git push`** (no está en su allowlist de bash): los pushes los corre el usuario en su terminal.
 
 ## Próximos pasos
 
