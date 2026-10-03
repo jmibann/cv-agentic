@@ -57,6 +57,9 @@ class MockMediaQueryList {
   }
 }
 
+// Cacheadas por query para que `simulateMediaChange` encuentre la instancia
+// que el test obtuvo de `window.matchMedia`. Se vacía en el afterEach global:
+// el `matches` de un test no filtra al siguiente (ver más abajo).
 const mediaQueryLists = new Map<string, MockMediaQueryList>();
 
 function mockMatchMedia(query: string): MockMediaQueryList {
@@ -170,11 +173,15 @@ afterEach(() => {
   // Con `globals: false`, RTL no registra su autolimpieza: sin esto, el DOM
   // de un test queda visible para el siguiente (ver setup.test.ts).
   cleanup();
-});
 
-afterEach(() => {
   // Estado global que mutan los providers (T5/T10) y el hash de navegación:
-  // cada test arranca con el documento y el storage limpios.
+  // cada test arranca con el documento y el storage limpios. El Map de
+  // MediaQueryLists también se descarta: si no, un `emitChange` de un test
+  // heredaría su `matches` al siguiente dentro del mismo archivo (T5).
+  // Los listeners registrados por tests anteriores desaparecen con los
+  // objetos; cada test vuelve a llamar a `window.matchMedia`.
+  mediaQueryLists.clear();
+
   localStorage.clear();
   const html = document.documentElement;
   html.removeAttribute("data-theme");

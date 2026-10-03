@@ -12,12 +12,11 @@
     // Opciones declaradas explícitamente porque su default cambió (o cambia)
     // en TS 6: no depender del default (foundation.md p.3).
     "types": ["vite/client", "node"],
-    // true (decisión del usuario al destrabar T2): jest-dom 7.0.1 (última
-    // versión) y Vitest 5 declaran `Assertion` con type parameters
-    // incompatibles entre sus propios `.d.ts` de terceros (TS2428). El flag
-    // no es requisito del kit ni lo fija docs/README.md; nuestro código
-    // (src/, data/, vite.config.ts) sigue chequeando contra esos tipos y no
-    // se debilita ningún test.
+    // true: los tipos de @testing-library/jest-dom 7 y Vitest 5 declaran
+    // `Assertion` con type parameters incompatibles entre sus propios `.d.ts`
+    // de terceros (TS2428). El flag no es requisito del kit ni lo fija
+    // docs/README.md; el código propio (src/, data/, vite.config.ts) se sigue
+    // chequeando contra esos tipos.
     "skipLibCheck": true,
 
     "strict": true,
