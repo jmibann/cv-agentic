@@ -70,7 +70,7 @@ T3b (deuda L1 detectada en su review).
     literales del script igualan a `--palette-light-bg` y `--palette-dark-bg`
     de `tokens/tokens.css`.
 
-- [ ] **T5b. Excepción `allowExportNames` en `react-refresh` (Cambio aprobado por el usuario).** T5 (bloqueante de lint), plan §decisión 2 enmendada
+- [x] **T5b. Excepción `allowExportNames` en `react-refresh` (Cambio aprobado por el usuario).** T5 (bloqueante de lint), plan §decisión 2 enmendada — 48bd323
   - Hecho cuando: `eslint.config.js` fija
     `react-refresh/only-export-components` con `{ allowConstantExport: true,
     allowExportNames: ["useTheme", "useLocale", "useCv"] }` (único cambio de
@@ -80,7 +80,7 @@ T3b (deuda L1 detectada en su review).
     por react-refresh; un solo commit `fix(Foundation): T5b ...` toca solo
     `eslint.config.js`.
 
-- [ ] **T5. `ThemeProvider` + `useTheme`.** RF-2, RF-3, RF-4, RF-5
+- [x] **T5. `ThemeProvider` + `useTheme`.** RF-2, RF-3, RF-4, RF-5 — bcb4605
   - Hecho cuando: los 7 tests de `ThemeProvider.test.tsx` pasan: inicial desde
     `data-theme` (sin recalcular); `toggleTheme` alterna `data-theme` y
     persiste `cv:theme`; si `localStorage` lanza, el tema cambia igual en
