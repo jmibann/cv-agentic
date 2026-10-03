@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Valor de --palette-light-bg (tokens.css); el anti-flash lo ajusta
+         según el tema resuelto. Único exceptuado de la regla dura 1 de
+         docs/DESIGN.md, fijado por test (src/test/anti-flash.test.ts). -->
+    <meta name="theme-color" content="#eceef4" />
+    <title>cv-agentic</title>
+<script>
+  (function () {
+    var d = document.documentElement;
+    try {
+      var t = localStorage.getItem("cv:theme");
+      if (t !== "light" && t !== "dark") {
+        t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      d.dataset.theme = t;
+      // theme-color inicial: tokens.css todavía no cargó, así que van los
+      // valores de --palette-light-bg / --palette-dark-bg (un test verifica
+      // que coincidan con tokens.css; ver regla dura 1 de docs/DESIGN.md)
+      var m = document.querySelector('meta[name="theme-color"]');
+      if (m) m.setAttribute("content", t === "dark" ? "#151517" : "#eceef4");
+      var l = localStorage.getItem("cv:locale");
+      if (l !== "en" && l !== "es") {
+        var n = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+        l = /^es\b/i.test(n) ? "es" : "en";
+      }
+      d.lang = l;
+    } catch (e) {
+      d.dataset.theme = "light";
+      d.lang = "en";
+    }
+  })();
+</script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
