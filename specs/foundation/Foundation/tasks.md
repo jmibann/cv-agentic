@@ -134,7 +134,8 @@ T3b (deuda L1 detectada en su review).
     y `useCv()` al idioma activo; si `localStorage` lanza, no rompe (cambia en
     memoria); `useLocale`/`useCv` fuera del provider lanzan error descriptivo.
 
-- [ ] **T11. Estilos base, `main.tsx` y `App.tsx` provisorio ensamblados.** Estados (primer frame, Poppins), Accesibilidad (App pasa axe), Tests esperados (smoke App + axe)
+- [ ] **T11. Estilos base, `main.tsx`, `App.tsx` provisorio ensamblados + placeholders `public/images/`.** Estados (primer frame, Poppins), Accesibilidad (App pasa axe), Tests esperados (smoke App + axe), Anatomía ~69 y Estilos ~171 (placeholders)
+  - Registro: los placeholders `public/images/{avatar.svg,testimonials/{maria,john,lena}.svg}` los exige la spec (Anatomía/Estilos) y ningún plan/tarea previa los asignaba; se agregan acá sin alcance nuevo (silueta neutra, sin texto/marcas, `viewBox` cuadrado; `foundation.md` ítem 1).
   - Hecho cuando: `src/styles/global.css` trae el reset + la base tipográfica de
     `foundations/typography.md` §"Estilos base" (solo tokens) +
     `html:has(dialog[open]) { overflow: hidden }`; `src/main.tsx` importa
