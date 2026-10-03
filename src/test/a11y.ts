@@ -2,14 +2,15 @@ import axe from "axe-core";
 import { expect } from "vitest";
 
 /**
- * Runs axe-core against `container` and fails the test if there are any
- * a11y violations. The failure message lists each violation as
+ * Ejecuta axe-core sobre `container` y falla el test si hay violaciones de
+ * accesibilidad. El mensaje de fallo lista cada violación como
  * `id (impact): targets`.
  *
- * Disabled rules (jsdom limitations, see foundations spec):
- * - `color-contrast`: jsdom does not compute styles (contrast is covered by
- *   `docs/tokens/contrast.md` and the visual QA).
- * - `region`: components are tested isolated, outside page landmarks.
+ * Reglas deshabilitadas (limitaciones de jsdom, ver la spec de foundation):
+ * - `color-contrast`: jsdom no calcula estilos (el contraste lo cubren
+ *   `docs/tokens/contrast.md` y la QA visual).
+ * - `region`: los componentes se prueban aislados, fuera de los landmarks
+ *   de la página.
  */
 export async function expectNoA11yViolations(
   container: Element,
