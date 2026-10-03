@@ -49,7 +49,7 @@ T4 se implementó antes de registrar T3b (deuda L1 detectada en su review).
     `<img>` sin `alt` hace que rechace y un botón con texto no produce
     violaciones.
 
-- [ ] **T3b. Paso a español de los comentarios de `a11y.ts` y `a11y.test.ts` (deuda L1 de T3).** L1 (constitución), T3 (corrección de deuda)
+- [x] **T3b. Paso a español de los comentarios de `a11y.ts` y `a11y.test.ts` (deuda L1 de T3).** L1 (constitución), T3 (corrección de deuda) — 17b0409
   - Hecho cuando: un solo commit `test(Foundation): T3b` toca **solo**
     `src/test/a11y.ts` y `src/test/a11y.test.ts` y cambia **únicamente** el
     texto de sus comentarios a español (aserciones, títulos de `describe`/`it`,
