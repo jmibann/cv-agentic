@@ -116,7 +116,8 @@ T3b (deuda L1 detectada en su review).
     los `enum` del esquema y los tipos generados están al día (regenerar en
     memoria y comparar).
 
-- [ ] **T9. Contenido inicial validado: `cv.{en,es}.json` + `index.ts` + `content.test.ts`.** RF-7
+- [x] **T9. Contenido inicial validado: `cv.{en,es}.json` + `index.ts` + `content.test.ts`.** RF-7 — 59efc8d (+ reparo L2 c42e33d)
+  - Nota para el cierre de pieza: `59efc8d` incluyó la corrección del **productor** del generado (`build-validator.ts`: shim de interop CJS/ESM `{ default: raw.default ?? raw }` + regeneración por script de `validate-cv.generated.js`) porque T9 es el primer consumidor runtime bajo Vitest; dictamen del reviewer: corrección legítima, determinismo y `.d.ts` intactos. Rastro pedido por el reviewer: registrarla en memoria/diagnostics al cerrar F1 (junto con la deuda `07eead6` de T8).
   - Hecho cuando: `cv.en.json`/`cv.es.json` son copia de
     `data/cv.example.{en,es}.json` con `"$schema": "../../data/cv.schema.json"`;
     `src/content/index.ts` expone `cvByLocale: Record<Locale, CvData>` tras
