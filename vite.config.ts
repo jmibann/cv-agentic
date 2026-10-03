@@ -19,7 +19,9 @@ export default defineConfig({
     // `globals: false` (decisión #48): los tests importan describe/it/expect
     // desde "vitest".
     globals: false,
-    // `setupFiles` se agrega en T2: src/test/setup.ts todavía no existe y
-    // referenciarlo acá rompería el runner.
+    // Setup global de los tests (T2): jest-dom, afterEach(cleanup) explícito,
+    // mocks de matchMedia/ResizeObserver/scrollTo/dialog y limpieza de
+    // localStorage, data-theme, lang y hash entre tests.
+    setupFiles: ["./src/test/setup.ts"],
   },
 });
