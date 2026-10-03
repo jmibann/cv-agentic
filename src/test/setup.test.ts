@@ -8,22 +8,22 @@ import { describe, expect, it, vi } from "vitest";
 
 import { simulateMediaChange } from "./setup";
 
-describe("cleanup del DOM entre tests (afterEach(cleanup) de setup.ts)", () => {
+describe("DOM cleanup between tests (afterEach(cleanup) in setup.ts)", () => {
   // Sin el cleanup explícito (globals: false desactiva el automático de RTL),
   // el botón del test A quedaría en document.body y el test B vería dos.
-  it("test A: renderiza un botón y hay uno en el DOM (jest-dom extendido)", () => {
+  it("test A: renders a button and it is in the DOM (jest-dom extended)", () => {
     render(createElement("button", null, "x"));
     expect(screen.getByRole("button", { name: "x" })).toBeInTheDocument();
   });
 
-  it("test B: el DOM no acumula — sigue habiendo un solo botón 'x'", () => {
+  it("test B: the DOM does not accumulate — there is still only one 'x' button", () => {
     render(createElement("button", null, "x"));
     expect(screen.getAllByRole("button", { name: "x" })).toHaveLength(1);
   });
 });
 
-describe("mock de window.matchMedia", () => {
-  it("responde con matches booleano y listeners funcionales; change dispara", () => {
+describe("window.matchMedia mock", () => {
+  it("returns boolean matches and functional listeners; change fires", () => {
     const listener = vi.fn();
     const query = "(prefers-color-scheme: dark)";
     const mql = window.matchMedia(query);
@@ -46,19 +46,19 @@ describe("mock de window.matchMedia", () => {
   });
 });
 
-describe("limpieza de localStorage entre tests", () => {
-  it("test A: escribe una clave", () => {
+describe("localStorage cleanup between tests", () => {
+  it("test A: writes a key", () => {
     localStorage.setItem("k", "v");
     expect(localStorage.getItem("k")).toBe("v");
   });
 
-  it("test B: localStorage llega vacío (el afterEach global limpió 'k')", () => {
+  it("test B: localStorage arrives empty (the global afterEach cleared 'k')", () => {
     expect(localStorage.getItem("k")).toBeNull();
   });
 });
 
-describe("limpieza de data-theme, lang y location.hash entre tests", () => {
-  it("test A: muta el documento y la URL como harían los providers", () => {
+describe("data-theme, lang and location.hash cleanup between tests", () => {
+  it("test A: mutates the document and the URL as providers would", () => {
     document.documentElement.setAttribute("data-theme", "dark");
     document.documentElement.lang = "es";
     window.location.hash = "#resume";
@@ -68,7 +68,7 @@ describe("limpieza de data-theme, lang y location.hash entre tests", () => {
     expect(window.location.hash).toBe("#resume");
   });
 
-  it("test B: el documento arranca limpio de nuevo", () => {
+  it("test B: the document starts clean again", () => {
     expect(document.documentElement.hasAttribute("data-theme")).toBe(false);
     expect(document.documentElement.hasAttribute("lang")).toBe(false);
     expect(window.location.hash).toBe("");
