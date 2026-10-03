@@ -97,7 +97,7 @@ T3b (deuda L1 detectada en su review).
     `npm run typecheck`, que está en verde); `format.ts` exporta `format` pura y
     su test pasa: un placeholder, varios, y placeholder ausente queda literal.
 
-- [ ] **T7. `formatPeriod`.** RF-8
+- [x] **T7. `formatPeriod`.** RF-8 — 884bb2f
   - Hecho cuando: `formatPeriod({ start, end }, locale, presentLabel)` vive en
     `src/i18n/formatPeriod.ts` (pura, sin React/DOM) y pasan sus tests:
     `"2015"`+`null` → `"2015 — Present"`/`"2015 — Actualidad"`;
