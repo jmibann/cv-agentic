@@ -116,7 +116,7 @@ T3b (deuda L1 detectada en su review).
     los `enum` del esquema y los tipos generados están al día (regenerar en
     memoria y comparar).
 
-- [ ] **T8b. Renombre L2 del título de `describe` en `schema.test.ts` (deuda detectada en la revisión completa de pieza).** L2 (constitución), revisión completa F1
+- [x] **T8b. Renombre L2 del título de `describe` en `schema.test.ts` (deuda detectada en la revisión completa de pieza).** L2 (constitución), revisión completa F1 — ae59762
   - Hecho cuando: un solo commit `test(Foundation): T8b` toca **solo**
     `src/content/schema.test.ts` y cambia **únicamente** el título
     `describe("Esquema al día (RF-7)")` (~línea 87) a inglés (aserciones,
