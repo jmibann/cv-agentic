@@ -4,10 +4,10 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 /**
- * T4 (RF-1): contract test between raw repo files — `index.html` ↔
- * `tokens/tokens.css` ↔ `foundations/theming.md` — read with `node:fs`
- * (plan.md, decision 7: document contracts, not DOM). The bundle is never
- * loaded: `/src/main.tsx` only exists from T11 (plan.md, decision 6).
+ * T4 (RF-1): test de contrato entre archivos crudos del repo — `index.html` ↔
+ * `tokens/tokens.css` ↔ `foundations/theming.md` — leídos con `node:fs`
+ * (plan.md, decisión 7: documentar contratos, no el DOM). El bundle nunca se
+ * carga: `/src/main.tsx` solo existe a partir de T11 (plan.md, decisión 6).
  */
 const readRepoFile = (relativeFromThisFile: string): string =>
   readFileSync(
@@ -15,7 +15,7 @@ const readRepoFile = (relativeFromThisFile: string): string =>
     "utf8",
   );
 
-/** Group 1 of `pattern`; throws when missing (a red test, never `undefined`). */
+/** Grupo 1 de `pattern`; lanza si falta (test en rojo, nunca `undefined`). */
 function capture(source: string, pattern: RegExp, label: string): string {
   const value = pattern.exec(source)?.[1];
   if (value === undefined) {
@@ -24,7 +24,7 @@ function capture(source: string, pattern: RegExp, label: string): string {
   return value;
 }
 
-/** Groups 1 and 2 of `pattern`; throws when missing. */
+/** Grupos 1 y 2 de `pattern`; lanza si faltan. */
 function captures2(
   source: string,
   pattern: RegExp,
@@ -40,8 +40,8 @@ function captures2(
 }
 
 /**
- * The inline `<script>`: a plain `<script>` tag with no attributes (the
- * bundle module tag carries `type`/`src`, so it can never match here).
+ * El `<script>` inline: una etiqueta `<script>` plana, sin atributos (la
+ * etiqueta module del bundle lleva `type`/`src`, así que nunca matchea acá).
  */
 function extractInlineScript(source: string, label: string): string {
   const value = /<script>[\s\S]*?<\/script>/.exec(source)?.[0];
@@ -52,9 +52,9 @@ function extractInlineScript(source: string, label: string): string {
 }
 
 /**
- * Robust extraction of the canonical anti-flash block from
- * `foundations/theming.md`: the first fenced ```html code block, narrowed to
- * its `<script>` element (so both sides compare the same shape).
+ * Extracción robusta del bloque anti-flash canónico de
+ * `foundations/theming.md`: el primer bloque de código ```html cercado,
+ * reducido a su elemento `<script>` (así ambos lados comparan la misma forma).
  */
 function extractThemingScriptBlock(markdown: string): string {
   const block = /```html\n([\s\S]*?)```/.exec(markdown)?.[1];
@@ -96,7 +96,7 @@ describe("index.html anti-flash (RF-1)", () => {
   });
 
   it("uses the palette token values as the two theme-color literals in the script", () => {
-    // `m.setAttribute("content", t === "dark" ? "#151517" : "#eceef4");`
+    // Literales del script: `m.setAttribute("content", t === "dark" ? "#151517" : "#eceef4");`
     const [darkLiteral, lightLiteral] = captures2(
       inlineScript,
       /t === "dark" \? "(#[0-9a-fA-F]{3,8})" : "(#[0-9a-fA-F]{3,8})"/,
