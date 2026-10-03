@@ -84,7 +84,7 @@ function readGenTypesScript(): string {
 
 type CompileSchemaArg = Parameters<typeof compile>[0];
 
-describe("Esquema al día (RF-7)", () => {
+describe("schema up to date (RF-7)", () => {
   it("keeps @data/constants lists equal to the schema enums", () => {
     const schemaEnums = extractSchemaEnums(readRepoFile("../../data/cv.schema.json"));
     expect(schemaEnums).toEqual({
