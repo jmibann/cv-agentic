@@ -11,7 +11,7 @@
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "gen:types": "json2ts -i data/cv.schema.json -o data/cv.types.generated.ts",
+    "gen:types": "json2ts -i data/cv.schema.json -o data/cv.types.generated.ts --bannerComment=\"/* GENERADO — no editar. Regenerar con: npm run gen:types */\"",
     "build:validator": "node src/scripts/build-validator.ts",
     "validate:content": "node src/scripts/validate-content.ts",
     "prebuild": "npm run gen:types && npm run build:validator && npm run validate:content",
