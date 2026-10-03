@@ -128,7 +128,7 @@ T3b (deuda L1 detectada en su review).
     rechazos en memoria (mes `99`, red desconocida, campo extra);
     `npm run validate:content` en verde.
 
-- [ ] **T10. `LocaleProvider` + `useLocale` + `useCv`.** RF-5, RF-6
+- [x] **T10. `LocaleProvider` + `useLocale` + `useCv`.** RF-5, RF-6 — faae4c2
   - Hecho cuando: los 5 tests de `LocaleProvider.test.tsx` pasan: inicial desde
     `<html lang>`; `setLocale` cambia `lang`, persiste `cv:locale` y conmuta `t`
     y `useCv()` al idioma activo; si `localStorage` lanza, no rompe (cambia en
