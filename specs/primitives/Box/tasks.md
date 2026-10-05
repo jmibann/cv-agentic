@@ -5,7 +5,7 @@
     renderiza `children`; `as="section"` renderiza `<section>`; verde tras
     `feat(Box): T1`.
 
-- [ ] **T2. Variante `inner` y atributos ARIA/id.** RF-2
+- [x] **T2. Variante `inner` y atributos ARIA/id.** RF-2 — 7f2d3a2
   - Hecho cuando: `variant="inner"` aplica `inner` y **no** `outer` (P2);
     `id`, `aria-label` y `aria-labelledby` llegan al raíz
     (`as="aside" aria-label="Profile"` → `getByRole("complementary", { name: "Profile" })`);
