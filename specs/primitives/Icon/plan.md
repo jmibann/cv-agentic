@@ -42,4 +42,4 @@ tokens CSS: inspección del reviewer), P4 (los tests que usan `tone="gradient"`
 montan `AccentGradientDefs` como armazón; la unicidad es de AppLayout).
 El archivo termina con `expectNoA11yViolations` (con y sin `label`). `npm test`.
 
-Cobertura: T1→RF-1,RF-5 · T2→RF-2,RF-3,RF-7 · T3→RF-4,RF-6 · T4→RF-4 · T5→RF-6.
+Cobertura: T1→RF-1,RF-5 · T2→RF-2,RF-3,RF-7 · T3→RF-4 (defs) · T4→RF-4,RF-6 (tone) · T5→RF-6. (Swap T3/T4: el test de tone monta las defs, así que `AccentGradientDefs` va primero — orden de dependencia de la skill.)
