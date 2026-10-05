@@ -1,6 +1,6 @@
 # Tareas — Box
 
-- [ ] **T1. Render base: `outer` por defecto y `as`.** RF-1, RF-3
+- [x] **T1. Render base: `outer` por defecto y `as`.** RF-1, RF-3 — 459d436
   - Hecho cuando: sin `variant` el raíz `div` lleva la clase `outer` (P2) y
     renderiza `children`; `as="section"` renderiza `<section>`; verde tras
     `feat(Box): T1`.
