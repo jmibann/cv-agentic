@@ -28,7 +28,7 @@
     clase del módulo (P2) y ningún nodo lleva atributo `style`; `current` no
     agrega clase de color; verde tras `feat(Icon): T4`.
 
-- [ ] **T4b. Reparos del review de T4 (precedente T2b/T3b).** RF-3, L1/L2
+- [x] **T4b. Reparos del review de T4 (precedente T2b/T3b).** RF-3, L1/L2 — 23e0a34
   - Hecho cuando: (a) `test(Icon): T4b` pasa a inglés el nombre del test
     `"…(tone="current" heredado)"` (`Icon.test.tsx`, solo renombra ese título,
     sin tocar aserciones ni otros tests); (b) `fix(Icon): T4b` actualiza el
