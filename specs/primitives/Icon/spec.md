@@ -1,5 +1,5 @@
 # Icon
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
