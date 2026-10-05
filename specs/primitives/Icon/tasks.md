@@ -35,7 +35,7 @@
     comentario de `Icon.tsx` que dice que la spec no define `label` vacío — ya
     lo define (Accesibilidad, aprobado en `5dc0802`); verde tras ambos commits.
 
-- [ ] **T5. Tamaño por CSS, `className` y cierre a11y.** RF-6
+- [x] **T5. Tamaño por CSS, `className` y cierre a11y.** RF-6 — 9f1def5
   - Hecho cuando: `.icon` fija `width/height: var(--icon-size, var(--size-icon))`
     y `flex-shrink: 0` (inspección: sin literales ni `@media`); el `className`
     recibido queda unido a `.icon` sobre el `<svg>` (aserción P2); el archivo de
