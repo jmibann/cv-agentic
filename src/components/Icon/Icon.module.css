@@ -1,6 +1,19 @@
 /* Icon — specs/primitives/Icon/spec.md → Gradiente / Estilos y tokens.
-   T3: defs del gradiente de acento (RF-4). T4: `.toneAccent` (RF-4). `.icon`
-   (tamaño por --icon-size) se agrega en T5. */
+   T3: defs del gradiente de acento (RF-4). T4: `.toneAccent` (RF-4).
+   T5: `.icon`, tamaño solo por CSS (RF-6). */
+
+/* Tamaño solo por CSS (RF-6, spec → Estilos y tokens): cadena de fallback
+   exacta de la spec, sin prop `size` y sin `@media` propios (Responsive). El
+   CSS gana sobre los atributos width/height que lucide pone por defecto;
+   flex-shrink: 0 evita que el ícono se comprima en filas flex. El consumidor
+   fija --icon-size en su propia clase UNIDA al <svg> (registrada en
+   tokens.css con @property inherits:false: no se filtra a íconos anidados).
+   --size-icon (1.125rem) es el default del kit. */
+.icon {
+  width: var(--icon-size, var(--size-icon));
+  height: var(--icon-size, var(--size-icon));
+  flex-shrink: 0;
+}
 
 /* tone="accent" (RF-4/RF-6, spec → Estilos y tokens): el color de acento
    sólido se aplica por clase, sin style inline ni atributos de color; el trazo

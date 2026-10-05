@@ -1,8 +1,8 @@
 // Icon — único punto de entrada a lucide-react (specs/primitives/Icon/spec.md).
 // T1: mapa explícito nombre → componente y render de todos los IconName
 // (RF-1). T2: accesibilidad del conducto `label` (RF-2, RF-3, RF-7). T3:
-// AccentGradientDefs (RF-4). T4: conducto `tone` (RF-4). El tamaño por CSS con
-// `className` de consumidor (T5) se agrega en la tarea siguiente.
+// AccentGradientDefs (RF-4). T4: conducto `tone` (RF-4). T5: tamaño solo por
+// CSS (clase `.icon`) y unión de `className` del consumidor (RF-6).
 
 import {
   BookOpen,
@@ -106,7 +106,7 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
   shield: Shield,
 };
 
-export function Icon({ name, tone = "current", label }: IconProps) {
+export function Icon({ name, tone = "current", label, className }: IconProps) {
   const Glyph = ICON_MAP[name];
 
   const toneProps: ToneProps =
@@ -116,6 +116,22 @@ export function Icon({ name, tone = "current", label }: IconProps) {
         ? { className: styles.toneAccent }
         : {};
 
+  // RF-6 / T5 (spec → API y Estilos y tokens): el tamaño va solo por CSS, sin
+  // prop `size`. La clase base `.icon` (width/height con `var(--icon-size,
+  // var(--size-icon))` y `flex-shrink: 0`) se fija SIEMPRE sobre el propio
+  // <svg> raíz; a ella se UNE el `className` del consumidor (no la reemplaza:
+  // ahí el padre fija `--icon-size`, registrada en tokens.css con
+  // @property inherits:false, así que solo afecta a este <svg>) y, si tone
+  // es "accent", también la clase de color del módulo. Las tres conviven.
+  const svgClassName = [styles.icon, toneProps.className, className]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
+  // El className explícito va después del spread de toneProps: pisa el de
+  // tone="accent", que ya está incorporado en svgClassName (`gradient` y
+  // `current` no traen className en toneProps, y pasar `stroke={undefined}`
+  // pisaría el currentColor de lucide: ver el comentario de ToneProps).
+  //
   // RF-7: focusable="false" siempre, con y sin label.
   // Accesibilidad (RF-2/RF-3): el marcado se fija explícitamente en el
   // componente, sin depender del default interno de lucide (pasar cualquier
@@ -127,11 +143,19 @@ export function Icon({ name, tone = "current", label }: IconProps) {
   // `aria-label=""` no produce nombre accesible)".
   if (label) {
     return (
-      <Glyph {...toneProps} role="img" aria-label={label} focusable="false" />
+      <Glyph
+        {...toneProps}
+        className={svgClassName}
+        role="img"
+        aria-label={label}
+        focusable="false"
+      />
     );
   }
 
-  return <Glyph {...toneProps} aria-hidden focusable="false" />;
+  return (
+    <Glyph {...toneProps} className={svgClassName} aria-hidden focusable="false" />
+  );
 }
 
 // AccentGradientDefs — definiciones compartidas del gradiente de acento
