@@ -8,12 +8,15 @@ Acción principal con el gradiente de acento. En este alcance se usa para
 
 ## Requisitos (EARS)
 
-- RF-1: CUANDO el componente no recibe `href`, ENTONCES EL SISTEMA renderiza un `<button type="button">`.
+- RF-1: CUANDO el componente no recibe `href`, ENTONCES EL SISTEMA renderiza un `<button>` con el `type` recibido (default `"button"`).
 - RF-2: CUANDO recibe `href`, ENTONCES EL SISTEMA renderiza un `<a>` con ese destino; SI además recibe `target="_blank"` sin `rel`, ENTONCES agrega `rel="noopener noreferrer"`.
 - RF-3: CUANDO recibe `onClick` y no está `disabled`, ENTONCES EL SISTEMA invoca el handler al activarse; SI está `disabled`, ENTONCES no lo invoca.
 - RF-4: CUANDO recibe `icon`, ENTONCES EL SISTEMA renderiza el ícono decorativo (`aria-hidden`) sin alterar el nombre accesible, que sigue siendo el texto visible.
-- RF-5: EL SISTEMA aplica en `focus-visible` el anillo de foco estándar (`--focus-ring-width` / `--focus-ring-offset`) y en `disabled` `opacity: 0.5` con `cursor: not-allowed`.
-- RF-6: EL SISTEMA resuelve fondo, padding y tipografía con tokens y no declara `@media` propios.
+- RF-5: EL SISTEMA aplica en `focus-visible` el anillo de foco estándar (`--focus-ring-width` / `--focus-ring-offset`) y en `disabled` (solo `<button>`) `opacity: 0.5` con `cursor: not-allowed`, sin hover. Verificación: inspección del CSS + axe (los pseudo-estados no son testeables en jsdom).
+- RF-6: EL SISTEMA resuelve fondo, padding y tipografía con tokens y no declara `@media` propios (verificación: inspección del CSS).
+- RF-7: CUANDO recibe `iconPosition="end"`, ENTONCES EL SISTEMA renderiza el ícono **después** del label (default `start`).
+- RF-8: CUANDO recibe `download`, ENTONCES EL SISTEMA lo transmite al `<a>` con el valor recibido.
+- RF-9: SI recibe `rel` explícito, ENTONCES EL SISTEMA lo usa tal cual, sin fusionarlo con el default de RF-2.
 
 ## Anatomía
 
@@ -31,6 +34,7 @@ interface CommonProps {
   icon?: IconName;
   iconPosition?: "start" | "end";      // default "start"
   fullWidth?: boolean;                  // default false
+  /** Se une a la clase base del elemento raíz (<button> o <a>). */
   className?: string;
 }
 
@@ -48,11 +52,11 @@ export type ButtonProps =
 |---|---|---|
 | Fondo | `--gradient-accent` | igual |
 | Texto | `--color-on-accent`, `--font-weight-regular`, `--font-size-button` | `--font-size-small` |
-| Padding | `var(--button-padding-block) var(--button-padding-inline)` (12/18px < 580 → 15/32px) | `0.625rem 1rem` (fijo) |
+| Padding | `var(--button-padding-block) var(--button-padding-inline)` (12/18px < 580 → 15/32px) | `var(--button-small-padding-block) var(--button-small-padding-inline)` (10/16px, fijos) |
 | Radio | `--radius-20` | igual |
 | Sombra | `--shadow-accent` | igual |
-| Brillo `::before` | `box-shadow: var(--shadow-accent-glow)`, alto 1rem, ancho 64%, centrado abajo, `z-index: var(--z-below)` (el botón crea su propio contexto de apilamiento con `position: relative; z-index: var(--z-base)` para que el brillo no quede detrás de la card) | sin brillo |
-| Ícono | `gap: 0.375rem` entre ícono y texto | `gap: 0.5rem` |
+| Brillo `::before` | `box-shadow: var(--shadow-accent-glow)`, alto 1rem, ancho 64%, centrado abajo con `bottom: 0` (el halo lo da el blur del token), `z-index: var(--z-below)` (el botón crea su propio contexto de apilamiento con `position: relative; z-index: var(--z-base)` para que el brillo no quede detrás de la card) | sin brillo (`::before` con `content: none`) |
+| Ícono | `gap: 0.375rem` entre ícono y texto | `gap: 0.5rem` (intencional: botón compacto centrado en el ícono) |
 
 - `display: inline-flex; align-items: center; justify-content: center;`
 - `fullWidth` → `width: 100%`.
@@ -80,12 +84,13 @@ componente no tiene `@media` propios.
 
 ## Tests esperados
 
-- Sin `href`: `getByRole("button", { name })`, `type="button"` por defecto.
+- Sin `href`: `getByRole("button", { name })`, `type="button"` por defecto; `type="submit"` llega al `<button>`.
 - Con `href`: `getByRole("link", { name })` con ese `href`.
-- `target="_blank"` agrega `rel="noopener noreferrer"`.
+- `target="_blank"` agrega `rel="noopener noreferrer"`; un `rel` explícito se usa tal cual (RF-9).
+- `download` se transmite al `<a>` con su valor (RF-8).
 - `onClick` se llama al hacer click; no se llama si `disabled`.
-- `icon` renderiza un svg `aria-hidden` y el nombre accesible sigue siendo solo el texto.
-- `size="small"` y `fullWidth` aplican sus clases.
+- `icon` renderiza un svg `aria-hidden` y el nombre accesible sigue siendo solo el texto; con `iconPosition="end"` el svg aparece **después** del texto en el DOM (RF-7).
+- `size="small"` y `fullWidth` aplican sus clases (aserción con el criterio de CSS Modules de la fase).
 - `expectNoA11yViolations` sin violaciones (button y link).
 
 ## No hacer

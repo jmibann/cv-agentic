@@ -11,8 +11,8 @@ bloque interno tintado (`inner`).
 - RF-1: CUANDO el componente se renderiza sin `variant`, ENTONCES EL SISTEMA aplica la variante `outer` (superficie flotante con borde inferior y sombra).
 - RF-2: CUANDO recibe `variant="inner"`, ENTONCES EL SISTEMA aplica la variante `inner` (fondo tintado, sin borde ni sombra).
 - RF-3: CUANDO recibe `as`, ENTONCES EL SISTEMA renderiza ese elemento (`div` por defecto) y solo le transmite `children`, `id`, `aria-label`, `aria-labelledby` y `className`.
-- RF-4: SI se le pasa un atributo fuera de la API cerrada (p. ej. `role` o `tabIndex`), ENTONCES EL SISTEMA no lo transmite al elemento.
-- RF-5: EL SISTEMA resuelve fondo, radio, padding y cambios de breakpoint solo con tokens; Box no declara `@media` propios.
+- RF-4: SI se le pasa un atributo fuera de la API cerrada (p. ej. `role` o `tabIndex`), ENTONCES EL SISTEMA no lo transmite al elemento. Verificación: inspección (el tipo cerrado de props lo garantiza; no hay unit test posible para un consumo no tipado).
+- RF-5: EL SISTEMA resuelve fondo, radio, padding y cambios de breakpoint solo con tokens; Box no declara `@media` propios (verificación: inspección del CSS).
 - RF-6: EL SISTEMA mantiene `overflow: visible` en `outer` para que el avatar del Sidebar y la CornerTab no se recorten.
 
 ## Anatomía
@@ -43,6 +43,10 @@ genérico de `role`, `tabIndex` ni `...rest`). `aria-label` y
 El tabpanel de NavTabs **no** es un Box: es un `<div role="tabpanel">` dentro
 del Box de contenido (ver `specs/layout/AppLayout/spec.md`).
 
+`className` se **une** a la clase de la variante sobre el elemento raíz (no la
+reemplaza). El orden en el atributo `class` no resuelve conflictos de
+especificidad: rige el orden en la hoja de estilos.
+
 ## Estilos y tokens
 
 | | outer | inner |
@@ -56,6 +60,7 @@ del Box de contenido (ver `specs/layout/AppLayout/spec.md`).
 
 - `outer` usa `overflow: visible` (el avatar del sidebar y la CornerTab
   dependen de eso). La CornerTab resuelve su esquina con su propio radio.
+- `inner` **no declara** `overflow` (queda `visible` por defecto).
 
 ## Estados
 

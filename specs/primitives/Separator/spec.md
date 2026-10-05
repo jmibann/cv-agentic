@@ -12,7 +12,7 @@ entre la información básica y la lista de contactos.
 - RF-1: CUANDO el componente se renderiza, ENTONCES EL SISTEMA dibuja una línea decorativa de 1px con `aria-hidden="true"`.
 - RF-2: EL SISTEMA no expone rol `separator` ni usa `<hr>` (anunciaría un cambio de tema del contenido).
 - RF-3: EL SISTEMA extiende la línea hasta los bordes de la card (`full-bleed` calculado desde `--box-padding`).
-- RF-4: EL SISTEMA separa verticalmente con `--separator-gap`, que escala por breakpoint sin `@media` propios.
+- RF-4: EL SISTEMA separa verticalmente con `--separator-gap` **en cada lado de la línea** (`margin-block`); el contenedor que lo hospeda **no** suma su `gap` en ese tramo (el espacio bloques-línea-bloques no se acumula). `--separator-gap` escala por breakpoint sin `@media` propios.
 - RF-5: EL SISTEMA aplica `margin-block` como excepción documentada a "sin margen externo" (la única junto a `SectionTitle`).
 
 ## Anatomía
@@ -58,10 +58,12 @@ contenido).
 - Renderiza un elemento con `aria-hidden="true"`.
 - No expone rol `separator`.
 - `expectNoA11yViolations` sin violaciones.
+- RF-1 (grosor 1px), RF-3 (full-bleed), RF-4/RF-5 (margen): verificación por **inspección del CSS** (jsdom no lo computa).
 
 ## No hacer
 
 - No usar `<hr>` ni `role="separator"`: es decorativo (`aria-hidden="true"`).
 - No usarlo fuera de un `Box variant="outer"`: el full-bleed depende de `--box-padding`.
 - No tomar su `margin-block` como precedente: es una de las dos únicas excepciones a "sin margen externo" (junto con `SectionTitle`).
+- No convivir con `gap` del padre en su tramo: el separador aporta todo el espacio vertical (RF-4).
 - No agregar `@media` propios: la separación escala por `--separator-gap`.

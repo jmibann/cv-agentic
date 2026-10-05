@@ -20,8 +20,8 @@ h1 decorado `var(--title-decorated-gap)`; h2 `1.25rem`; h3 `0.5rem` (ver
 - RF-2: CUANDO recibe `decorated`, ENTONCES EL SISTEMA dibuja la barra de gradiente con un `::after` sin contenido textual.
 - RF-3: CUANDO recibe `icon`, ENTONCES EL SISTEMA renderiza un `IconBox` a la izquierda sin alterar el nombre accesible del heading.
 - RF-4: CUANDO recibe `id`, ENTONCES EL SISTEMA lo transmite al heading para que la sección pueda usar `aria-labelledby`.
-- RF-5: EL SISTEMA aplica como única excepción a "sin margen externo" el `margin-bottom` propio según el nivel (h1 `--title-decorated-gap`, h2 `1.25rem`, h3 `0.5rem`).
-- RF-6: EL SISTEMA resuelve tamaño, separación y barra con tokens y no declara `@media` propios.
+- RF-5: EL SISTEMA aplica como única excepción a "sin margen externo" el `margin-bottom` propio según el nivel: h1 **decorado** `--title-decorated-gap` (un h1 sin `decorated` toma el margen global de headings, `foundations/typography.md`), h2 `1.25rem`, h3 `0.5rem`. Verificación: inspección del CSS (jsdom no computa márgenes).
+- RF-6: EL SISTEMA resuelve color, radio, tamaño de fuente y barra con tokens; los márgenes título→contenido son los literales fijados en RF-5. No declara `@media` propios (inspección del CSS).
 
 ## Anatomía
 
@@ -44,6 +44,7 @@ export interface SectionTitleProps {
   /** IconBox a la izquierda. */
   icon?: IconName;
   id?: string;             // para aria-labelledby de la sección
+  /** Se une a la clase base del heading (el elemento raíz; sin wrapper). */
   className?: string;
 }
 ```
@@ -53,6 +54,8 @@ El **tamaño** sigue al nivel (`--font-size-h1/2/3`).
 
 ## Estilos y tokens
 
+**Nivel**: el módulo fija las clases `.h1/.h2/.h3 { font-size: var(--font-size-h1/2/3); }` (el tamaño **no** depende de la tipografía global por etiqueta).
+
 **decorated**
 - `position: relative; margin-bottom: var(--title-decorated-gap)` (24px < 580 → 37px).
 - `::after` (decorativo): `width: var(--size-title-bar-w); height: var(--size-title-bar-h);`
@@ -60,8 +63,14 @@ El **tamaño** sigue al nivel (`--font-size-h1/2/3`).
   `position: absolute; left: 0; bottom: calc(var(--title-bar-offset) * -1)` (10px < 580 → 17px).
 
 **with icon**
-- `display: flex; align-items: center; gap: var(--space-4);`
+- `display: flex; align-items: center; gap: var(--space-4);` **sobre el propio heading** (sin wrapper).
 - IconBox a la izquierda; texto a continuación.
+
+**decorated + icon (combinación válida)**: ambos tratamientos se aplican sobre el
+mismo heading; la barra `::after` se ancla al borde inferior-izquierdo del
+heading **completo** (`left: 0`: queda bajo el IconBox también), porque
+`position: absolute` excluye al pseudo-elemento del flujo flex. El margen sigue
+la regla RF-5 por nivel.
 
 ## Estados
 
@@ -81,8 +90,9 @@ escalan por tokens.
 ## Tests esperados
 
 - `as="h1"` → `getByRole("heading", { level: 1, name })`; ídem h2/h3.
-- `decorated` aplica su clase.
+- `decorated` aplica su clase (aserción con el criterio de CSS Modules de la fase); el `::after` sin contenido textual se verifica por inspección.
 - `icon` renderiza un IconBox y el nombre accesible del heading **no** cambia.
+- `decorated` + `icon` juntos: el heading conserva la clase decorated **y** el IconBox (no se anulan; ver "decorated + icon" en Estilos).
 - `id` llega al heading.
 - `expectNoA11yViolations` sin violaciones.
 

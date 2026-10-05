@@ -10,11 +10,11 @@ posición; el contenido y el comportamiento los pone quien la usa.
 
 ## Requisitos (EARS)
 
-- RF-1: CUANDO el componente se renderiza, ENTONCES EL SISTEMA lo posiciona en absoluto en la esquina superior derecha del Box contenedor, con `z-index: var(--z-raised)`.
+- RF-1: CUANDO `placement` es `"overlay"` (default), ENTONCES EL SISTEMA lo posiciona en absoluto en la esquina superior derecha del Box contenedor, con `z-index: var(--z-raised)`. Verificación: inspección + QA al usarla en F3/F4 (jsdom no computa posición).
 - RF-2: CUANDO recibe `size`, ENTONCES EL SISTEMA aplica la variante `sm` o `md` (default `md`).
-- RF-3: CUANDO recibe `placement="float"` y el viewport es ≥ 992px, ENTONCES EL SISTEMA la saca del posicionamiento absoluto y la flota a la derecha para que el contenido siguiente fluya a su lado; SI el viewport es < 992px, ENTONCES permanece absoluta.
-- RF-4: EL SISTEMA mantiene la tab visible en todos los breakpoints.
-- RF-5: SI en tema oscuro la tab careciera de borde, ENTONCES `surface-raised` contra `surface` quedaría en 1.14:1; por eso el borde es obligatorio.
+- RF-3: CUANDO recibe `placement="float"` y el viewport es ≥ 992px, ENTONCES EL SISTEMA la saca del posicionamiento absoluto (y del apilamiento: `z-index: auto`) y la flota a la derecha para que el contenido siguiente fluya a su lado; SI el viewport es < 992px, ENTONCES permanece absoluta.
+- RF-4: EL SISTEMA mantiene la tab visible en todos los breakpoints de **pantalla**; en impresión se oculta con los estilos compartidos (`foundations/layout.md`): CornerTab **no** declara `@media print` propio.
+- RF-5: EL SISTEMA pinta siempre el borde `1px solid var(--color-border)`: en oscuro separa `surface-raised` de `surface` (sin borde quedaría en 1.14:1; regla 4 de `docs/tokens/contrast.md`). Verificación: inspección del CSS (axe no mide contraste en jsdom).
 - RF-6: EL SISTEMA no agrega roles ni atributos `aria-*` a la tab; los estados de hover y foco pertenecen a su contenido.
 
 ## Anatomía
@@ -42,6 +42,7 @@ export interface CornerTabProps {
    * ancho real de la tab. Solo lo usa NavTabs.
    */
   placement?: "overlay" | "float";
+  /** Se une a la clase base del `<div>` raíz. */
   className?: string;
 }
 ```
@@ -50,7 +51,7 @@ export interface CornerTabProps {
 
 | Propiedad | Valor |
 |---|---|
-| Posición | `position: absolute; top: 0; right: 0; z-index: var(--z-raised);` |
+| Posición | `position: absolute; top: 0; right: 0; z-index: var(--z-raised);` (base; rige en `overlay`, RF-1) |
 | Fondo | `--color-surface-raised` |
 | Borde | `border-left: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);` |
 | Radio | `border-radius: 0 var(--radius-20) 0 var(--radius-32);` (arriba-der = radio del Box) |
@@ -70,12 +71,13 @@ Ninguno propio. Los estados de hover/foco son del contenido (tabs, botón).
 ## Responsive
 
 - El padding de `size="md"` escala por token (`--corner-tab-padding-inline`).
-- La tab **siempre está visible** en todos los breakpoints.
+- La tab **siempre está visible** en todos los breakpoints de pantalla; en impresión la oculta el estilo compartido de `foundations/layout.md` (RF-4).
 - `placement="float"`, en `@media (min-width: 992px)` (solo cambio de posicionamiento):
 
   ```css
   .float {
     position: relative;          /* sale del absoluto; sigue anclada a la esquina */
+    z-index: auto;               /* en el flujo no apila (RF-3) */
     float: right;
     margin-top: calc(var(--box-padding) * -1);
     margin-right: calc(var(--box-padding) * -1);
@@ -96,9 +98,9 @@ Sin rol propio (es un contenedor visual). No debe tener `aria-*`.
 ## Tests esperados
 
 - Renderiza `children`.
-- `size="sm"` / `"md"` aplican clases distintas; default `md`.
+- `size="sm"` / `"md"` aplican clases distintas; default `md` (aserción con el criterio de CSS Modules de la fase).
 - `placement="float"` aplica su clase; default `overlay` no la aplica.
-- No agrega roles (`container.firstChild` sin atributo `role`).
+- El raíz no tiene atributo `role` **ni ningún `aria-*`**.
 - `expectNoA11yViolations` sin violaciones.
 
 ## No hacer
