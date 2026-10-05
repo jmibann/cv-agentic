@@ -250,6 +250,8 @@
   /* Button */
   --button-padding-block: 0.75rem;                 /* → 0.9375rem (≥580) */
   --button-padding-inline: 1.125rem;               /* → 2rem (≥580) */
+  --button-small-padding-block: 0.625rem;          /* fijo, no escala */
+  --button-small-padding-inline: 1rem;             /* fijo, no escala */
   /* SectionTitle decorated */
   --title-decorated-gap: 1.5rem;                   /* margin-bottom del h1 → 2.3125rem (≥580) */
   --title-bar-offset: 0.625rem;                    /* distancia texto→barra → 1.0625rem (≥580) */
