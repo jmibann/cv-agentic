@@ -3,7 +3,7 @@
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
 los hashes de los commits relevantes. Última actualización: **2026-10-05**
-(saneado del archivo + regla de mantenimiento).
+(saneado del archivo + regla de mantenimiento + entrada #100 con poda #98).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
 `docs/memory.md` · decisiones #1–#98 → `docs/README.md` · QA de F5 →
@@ -46,6 +46,19 @@ de la entrada); el detalle queda en git.
 | Deudas menores de F1 | `StrictMode` sin mandato, `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md` | Sin fecha (se reevalúan en F2) |
 
 ## Entradas
+
+### 2026-10-05 · Decisión #100 — `allowExportNames` extendido a `BRAND_NAMES` (en curso F2; no es puerta F)
+
+- Qué: BrandIcon T3 frena en lint: `react-refresh/only-export-components` marca el objeto
+  `BRAND_NAMES` exportado junto al componente (la tabla del plan y B-3 lo mandatan en el `.tsx`;
+  `allowConstantExport` solo exceptúa literales/plantillas/binarios). El usuario aprueba la
+  extensión A del mecanismo #96: `"BRAND_NAMES"` en `allowExportNames`. Lo aplica `foundation`
+  (dueño de configs, post-F1) y el builder cierra el `feat`. T3 luego **APROBADA** por el reviewer.
+- Checks: lint ✓ · typecheck ✓ · test ✓ (139/139; BrandIcon 43).
+- Decisiones: **#100** → registro + `docs/memory.md` (extensión de #96; nombre nuevo = aprobación del usuario).
+- Commits: `1e41bb6` (test T3) · `6d107c6` (chore eslint) · `8de4610` (feat T3) · docs `c3d97ce`.
+- Abre: nada; cierra: el freno de lint de T3. Además: el archivo pasaba de 150 líneas → se aplica la
+  poda de #98 (entraciones §VI, R–V y K–Q reducidas a una línea; detalle en git, hash `dd7b35b`).
 
 ### 2026-10-05 · Decisión #99 — patrón canónico de aserción P2 (en curso F2; no es puerta F)
 
@@ -96,47 +109,11 @@ de la entrada); el detalle queda en git.
   (feat T5) `4adab35` (registro).
 - Pendientes: cierra la deuda L1 de T4/T3.
 
-### §VI · 2026-10-02 — Post-auditoría: hallazgos 1–3 y decisión #95
+### 2026-10-02 · Post-auditoría hallazgos 1–3 y decisión #95 · #95 · `git show dd7b35b:docs/diagnostics.md` (§VI)
 
-- Hallazgos no bloqueantes de la auditoría de arquitectura aplicados:
-  `docs/agent-system.md` (bash del integrator sin `dev`), árbol de
-  `README.md` (`agent-system.md` post-#92) y justificación de `engines` vs.
-  jsdom en `docs/README.md` (el rango **no cambia**).
-- Hallazgo nuevo: el `edit` del orchestrator no cubría `docs/README.md` ni
-  `docs/agent-system.md` → rutas agregadas a su permiso.
-- Decisiones: **#95**.
-- Commits: `98ef9b4` (hallazgos 1–3) `c8ff8a7` (#95).
+### 2026-10-02 · Auditorías del sistema agéntico (secciones R–V) · #75–#94 · `git show dd7b35b:docs/diagnostics.md`
 
-### 2026-10-02 — Auditorías del sistema agéntico (secciones R–V)
-
-- Tres pasadas read-only sobre agentes, skills, comandos y documentación del
-  flujo SDD: 6 puntos + re-auditoría (4 medios) + tercera (2 altos, 7 medios,
-  bajos). Verificado: permisos con `opencode debug agent`/`debug config`,
-  0 links rotos, 27 specs con `Estado: aprobada` + EARS y decisiones
-  correlativas en el registro (#1–#74 al auditar).
-- Decisiones: **#75–#80** (P2, commits de documentos, skills TDD en prompts,
-  clave `skill`, `/constitution` fuera, DoD `build` por pieza), **#81–#82**
-  (T5 por tarea, F4 = 4 piezas, `git config`), **#83–#84** (identidad de git
-  en permisos; F1 como pieza con Tn), **#85–#91** (F5 sin Tn, cadencia #86,
-  skills por lista, `git add` acotado, `## No hacer`, Clarificación #90, MCP
-  y `npm run dev`), **#92–#94** (`agent-system.md`, `--no-verify` denegado,
-  `ask` en `spec.md`).
-- Commits: `5ab6a42` `1503bb1` `70d863c` `3480951` `8502c27` `c37cc4b`.
-- Pendientes: cierra toda la deuda de auditoría ("sin pendientes de
-  auditoría"); quedan F8/F5.
-
-### 2026-10-02 — Decisiones de proceso #67–#74 (secciones K–Q)
-
-- **K** constitución `docs/constitution.md` (S/P/C/T/D/L, por encima de todo)
-  · **L** modelo único de spec `specs/<cat>/<Name>/{spec,plan,tasks}.md` con
-  `Estado` + EARS en las 27 · **M** unidad de trabajo por tarea (Tn) y memoria
-  única en `docs/memory.md` · **N** comandos `/sdd-*` con agentes del
-  proyecto · **O** kit protegido por permisos y `validate:content` · **P**
-  edición por grupo en los subagentes · **Q** puerta de Plan + Tareas por
-  fase (~113 → ~63 puertas).
-- Decisiones: **#67–#74**.
-- Commits: `475534a` (baseline, con la constitución) `3820e93` `8f81d9d`
-  `d5fab8d` `24cdad7` `953d620` `5d4b709` `e9d9218` `4931617`.
+### 2026-10-02 · Decisiones de proceso #67–#74 (secciones K–Q) · #67–#74 · `git show dd7b35b:docs/diagnostics.md`
 
 ## Índice histórico — auditoría inicial (2026-09-29 → 2026-10-01)
 

@@ -9,7 +9,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
 - **F1 CERRADA** (2026-10-03): pieza `foundation/Foundation` `Estado: implementada`; T1–T11 + reparos T2b/T3b/T5b/T8b aprobadas (última: revisión completa **APROBADA** tras reparo T8b `ae59762`; **QA visual en navegador APROBADO** con app servida: anti-flash oscuro, RF-3 vivo, `theme-color`, es/en, Poppins autohosteada, 375/1440 sin overflow). App Vite/React/TS en la raíz con providers, i18n, contenido validado y tooling; `build` ✅, 53 tests.
 - **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84), 7 medios (#85–#91) y bajos (#92–#94): sin pendientes de auditoría.
-- **Siguiente: F2 primitivas** — specs ya aprobadas; al arrancar F2: `/sdd-plan F2` (plan+tasks de Icon…Separator juntos, puerta única).
+- **F2 Primitivas EN CURSO**: Icon **CERRADA** (spec `implementada`; T1–T5+T4b; revisión completa APROBADA `ee9ee34`). BrandIcon: T1 `9f0cc0b`, T1b `f8ddc10`, T2 `eb0d21c`+`d654a26`, T3 `8de4610` aprobadas; **falta T4** (CSS, `className`, `index.ts`, cierre a11y). Remaining F2: Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar (specs y plans/tareas aprobados; `/sdd-plan F2` hecho).
 
 ## Decisiones (y por qué)
 
@@ -34,7 +34,10 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - **#96 `react-refresh` + hooks de provider** (F1/T5b, aprobado por el usuario, 2026-10-03): la API spíada fija
   provider + hook en el mismo `.tsx`; `eslint.config.js` usa `allowExportNames: ["useTheme", "useLocale", "useCv"]`.
   Regla permanente para F2–F4: un hook spíado junto a su componente se agrega a `allowExportNames` (Cambio),
-  nunca se mueve el hook a otro archivo ni se `eslint-disable`.
+  nunca se mueve el hook a otro archivo ni se `eslint-disable`. **Extendido #100 (F2/BrandIcon T3, 2026-10-05):**
+  mismo mecanismo aplica a **constantes-objeto exportadas junto al componente cuando el plan las manda ahí**
+  (`BRAND_NAMES` en `BrandIcon.tsx`; `allowExportNames` suma `"BRAND_NAMES"`, `6d107c6`). Frenar y consultar si un
+  builder propone mover el dato a `.ts` o `eslint-disable`.
 - **Criterio L1 unificado** (T4/T3b): los comentarios de código van en español **también en `src/test/**`**
   (títulos de tests, identificadores, rutas y citas entre backticks siguen en inglés). Deudas detectadas en review
   se tratan como tarea de reparo tipo T2b/T3b, no se dejan pasar. Lo mismo **L2**: títulos de `describe`/`it` y
