@@ -1,0 +1,22 @@
+/* Icon — specs/primitives/Icon/spec.md → Gradiente / Estilos y tokens.
+   T3: defs del gradiente de acento (RF-4). `.toneAccent` (T4) y `.icon` (T5)
+   se agregan en sus tareas. */
+
+/* <svg> de AccentGradientDefs: invisible por tamaño (width/height="0" como
+   atributos en el componente), sacado del flujo con posición absoluta.
+   Nunca display:none: algunos navegadores no resuelven referencias url(#…)
+   a definiciones dentro de un SVG no renderizado (spec → Gradiente). */
+.defs {
+  position: absolute;
+}
+
+/* Colors de los <stop> solo desde tokens semánticos (regla dura 2 de
+   DESIGN.md): al ser custom properties, el gradiente cambia solo con el
+   tema. */
+.stopStart {
+  stop-color: var(--gradient-accent-start);
+}
+
+.stopEnd {
+  stop-color: var(--gradient-accent-end);
+}

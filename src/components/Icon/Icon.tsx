@@ -1,8 +1,8 @@
 // Icon — único punto de entrada a lucide-react (specs/primitives/Icon/spec.md).
 // T1: mapa explícito nombre → componente y render de todos los IconName
-// (RF-1). T2: accesibilidad del conducto `label` (RF-2, RF-3, RF-7). `tone`
-// (T3), AccentGradientDefs (T4) y tamaño por CSS con `className` (T5) se
-// agregan en las tareas siguientes.
+// (RF-1). T2: accesibilidad del conducto `label` (RF-2, RF-3, RF-7). T3:
+// AccentGradientDefs (RF-4). `tone` (T4) y tamaño por CSS con `className` (T5)
+// se agregan en las tareas siguientes.
 
 import {
   BookOpen,
@@ -33,6 +33,8 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import type { ServiceIcon } from "@data/cv.types.generated";
+
+import styles from "./Icon.module.css";
 
 export type UiIconName =
   | "mail"
@@ -107,4 +109,46 @@ export function Icon({ name, label }: IconProps) {
   }
 
   return <Glyph aria-hidden focusable="false" />;
+}
+
+// AccentGradientDefs — definiciones compartidas del gradiente de acento
+// (RF-4). Se monta una sola vez en AppLayout (RF-6 de su spec); los tests de
+// componentes con tone="gradient" lo montan como armazón. Dueña única del id
+// "accent-gradient" (plan.md: mismo módulo de Icon; descartado módulo defs
+// aparte).
+export function AccentGradientDefs() {
+  return (
+    // Invisible por tamaño (0×0 + posicionamiento por clase .defs): nunca
+    // display:none, porque algunos navegadores no resuelven referencias
+    // url(#…) a definiciones dentro de un SVG no renderizado (spec →
+    // Gradiente).
+    <svg
+      width="0"
+      height="0"
+      aria-hidden="true"
+      focusable="false"
+      className={styles.defs}
+    >
+      {/* gradientUnits="userSpaceOnUse" es obligatorio: con el default
+          (objectBoundingBox) cada trazo toma su propia caja y las líneas
+          rectas (caja de ancho o alto 0) no se dibujan. Los extremos
+          reproducen el ángulo 137.84° de --gradient-accent mapeados al
+          espacio 0–24 del viewBox de lucide; los offsets, las posiciones
+          26.31 % / 93.75 % (spec → Gradiente). */}
+      <linearGradient
+        id="accent-gradient"
+        gradientUnits="userSpaceOnUse"
+        x1="0.62"
+        y1="-0.56"
+        x2="23.38"
+        y2="24.56"
+      >
+        {/* Sin style inline (regla dura 3 de DESIGN.md): el color de cada
+            stop sale de los tokens por clase del CSS Module, así que el
+            gradiente cambia solo con el tema. */}
+        <stop offset="0.2631" className={styles.stopStart} />
+        <stop offset="0.9375" className={styles.stopEnd} />
+      </linearGradient>
+    </svg>
+  );
 }
