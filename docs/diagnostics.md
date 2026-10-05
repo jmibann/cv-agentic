@@ -47,6 +47,16 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### 2026-10-05 · Decisión #99 — patrón canónico de aserción P2 (en curso F2; no es puerta F)
+
+- Qué: Icon T3/T4 detecta fricción entre el criterio P2 y `noUncheckedIndexedAccess`
+  (`styles.x` es `string | undefined`); el reviewer la dictamina no debilitante y el
+  usuario fija el patrón canónico: `const c = styles.name ?? "name"` + `toHaveClass(c)`.
+- Descartado: helper en `src/test/` (sin dueño de escritura desde F1) y criterio libre por builder.
+- Decisiones: **#99** → registro + `docs/memory.md`; se transmite en cada encargo F2–F4.
+- Abre: nada; cierra: la duda metodológica de Icon T3/T4. Además, el usuario agregó
+  `--button-small-padding-*` a `tokens/tokens.css` (T-2=A de la Clarificación F2), aún **sin commitear**.
+
 ### 2026-10-05 — Regla de mantenimiento del log (#98)
 
 - Qué: regla propia del archivo: entrada por puerta F o decisión de reglas con
