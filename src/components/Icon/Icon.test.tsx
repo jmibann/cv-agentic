@@ -184,3 +184,105 @@ describe("AccentGradientDefs", () => {
     expect(defsSvg).toHaveAttribute("focusable", "false");
   });
 });
+
+// Tests de T4 (specs/primitives/Icon/tasks.md) — RF-4 y RF-6: conducto `tone`
+// (current / accent / gradient).
+//
+// Justificación de las queries (constitución T3): un <svg> sin `label` es
+// decorativo (RF-2) y no expone rol ni nombre accesible, y la spec no define
+// `data-testid` en la API; lo observable son sus atributos y clases, así que se
+// consulta con `container.querySelector`, el mismo criterio justificado en T1.
+// Con `label` sí se usa getByRole("img", { name: label }). Las aserciones de
+// clases siguen el criterio P2 de la fase (`import styles` + `toHaveClass`) y
+// las de gradient montan `AccentGradientDefs` como armazón (criterio P4: la
+// unicidad del montaje en la app es de AppLayout, no de estos tests).
+//
+// Nota de tipos: el fallback `?? "..."` es solo de tipos (noUncheckedIndexedAccess,
+// ver el comentario de T3); el componente importa el mismo objeto `styles`.
+const toneAccentClass = styles.toneAccent ?? "toneAccent";
+
+describe("Icon tone", () => {
+  it("applies stroke=\"url(#accent-gradient)\" with tone=\"gradient\" (RF-4)", () => {
+    const { container } = render(
+      <>
+        <AccentGradientDefs />
+        <Icon name="code" tone="gradient" />
+      </>,
+    );
+
+    // Armazón: las definiciones compartidas que resuelve la url (spec →
+    // Gradiente; si no están montadas, el trazo no se ve).
+    expect(container.querySelector("linearGradient")).toHaveAttribute(
+      "id",
+      "accent-gradient",
+    );
+
+    // El raíz del Icon es el <svg> que no es el de las defs (clase .defs).
+    const glyph = container.querySelector(`svg:not(.${defsClass})`);
+    expect(glyph).not.toBeNull();
+    // gradient no es un color: va por el atributo stroke (spec → Estilos y
+    // tokens), nunca por style inline.
+    expect(glyph).toHaveAttribute("stroke", "url(#accent-gradient)");
+  });
+
+  it("adds no inline style attribute anywhere with tone=\"gradient\"", () => {
+    const { container } = render(
+      <>
+        <AccentGradientDefs />
+        <Icon name="cloud" tone="gradient" />
+      </>,
+    );
+
+    expect(container.querySelectorAll("[style]")).toHaveLength(0);
+  });
+
+  // extra: la spec (→ Accesibilidad) declara `tone="gradient"` + `label` una
+  // combinación válida: el gradiente decora el trazo y el nombre accesible lo
+  // da aria-label. No está en "Tests esperados", pero sostiene RF-3 y RF-4 a la
+  // vez sobre el mismo nodo.
+  it("keeps the accessible name when tone=\"gradient\" and label are combined", () => {
+    const label = "Cloud infrastructure";
+    const { container, getByRole } = render(
+      <>
+        <AccentGradientDefs />
+        <Icon name="cloud" tone="gradient" label={label} />
+      </>,
+    );
+
+    const glyph = getByRole("img", { name: label });
+    expect(glyph).toHaveAttribute("stroke", "url(#accent-gradient)");
+    expect(container.querySelectorAll("[style]")).toHaveLength(0);
+  });
+
+  it("applies the module accent class with tone=\"accent\" and no inline styles (RF-6)", () => {
+    const { container } = render(<Icon name="sun" tone="accent" />);
+    const glyph = container.querySelector("svg");
+
+    expect(glyph).not.toBeNull();
+    // tone se aplica por clases del CSS Module (.toneAccent { color:
+    // var(--color-accent); }); el trazo hereda el color por currentColor.
+    expect(glyph).toHaveClass(toneAccentClass);
+    expect(glyph).not.toHaveAttribute("stroke", "url(#accent-gradient)");
+    expect(container.querySelectorAll("[style]")).toHaveLength(0);
+  });
+
+  it("adds no color class by default (tone=\"current\" heredado)", () => {
+    const { container } = render(<Icon name="mail" />);
+    const glyph = container.querySelector("svg");
+
+    expect(glyph).not.toBeNull();
+    expect(glyph).not.toHaveClass(toneAccentClass);
+    expect(glyph).not.toHaveAttribute("stroke", "url(#accent-gradient)");
+    expect(container.querySelectorAll("[style]")).toHaveLength(0);
+  });
+
+  it("adds no color class with an explicit tone=\"current\"", () => {
+    const { container } = render(<Icon name="download" tone="current" />);
+    const glyph = container.querySelector("svg");
+
+    expect(glyph).not.toBeNull();
+    expect(glyph).not.toHaveClass(toneAccentClass);
+    expect(glyph).not.toHaveAttribute("stroke", "url(#accent-gradient)");
+    expect(container.querySelectorAll("[style]")).toHaveLength(0);
+  });
+});
