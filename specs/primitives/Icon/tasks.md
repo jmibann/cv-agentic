@@ -22,11 +22,18 @@
     tamaño (0×0 + `position: absolute`, nunca `display: none` — inspección del
     CSS); verde tras `feat(Icon): T3`.
 
-- [ ] **T4. `tone`: current / accent / gradient.** RF-4, RF-6
+- [x] **T4. `tone`: current / accent / gradient.** RF-4, RF-6 — 0e37294
   - Hecho cuando: `tone="gradient"` → `stroke="url(#accent-gradient)"` (el test
     monta las `AccentGradientDefs` de T3 como armazón); `tone="accent"` aplica la
     clase del módulo (P2) y ningún nodo lleva atributo `style`; `current` no
     agrega clase de color; verde tras `feat(Icon): T4`.
+
+- [ ] **T4b. Reparos del review de T4 (precedente T2b/T3b).** RF-3, L1/L2
+  - Hecho cuando: (a) `test(Icon): T4b` pasa a inglés el nombre del test
+    `"…(tone="current" heredado)"` (`Icon.test.tsx`, solo renombra ese título,
+    sin tocar aserciones ni otros tests); (b) `fix(Icon): T4b` actualiza el
+    comentario de `Icon.tsx` que dice que la spec no define `label` vacío — ya
+    lo define (Accesibilidad, aprobado en `5dc0802`); verde tras ambos commits.
 
 - [ ] **T5. Tamaño por CSS, `className` y cierre a11y.** RF-6
   - Hecho cuando: `.icon` fija `width/height: var(--icon-size, var(--size-icon))`
