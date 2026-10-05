@@ -70,7 +70,7 @@ const ACCENT_GRADIENT_STROKE = `url(#${ACCENT_GRADIENT_ID})`;
 // Props que aplica cada tone. `current` no agrega ninguna (hereda el color del
 // control); `accent` usa la clase del CSS Module; `gradient`, el atributo
 // stroke (no es un color: spec → Estilos y tokens). Se arma un objeto y se
-// espatea en vez de pasar `stroke={undefined}`: undefined pisaría el
+// propaga en el JSX en vez de pasar `stroke={undefined}`: undefined pisaría el
 // stroke="currentColor" que lucide trae por defecto y el trazo no se dibuja.
 type ToneProps = { className?: string; stroke?: string };
 
