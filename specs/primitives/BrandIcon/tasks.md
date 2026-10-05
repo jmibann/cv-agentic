@@ -1,12 +1,20 @@
 # Tareas — BrandIcon
 
-- [ ] **T1. `paths.ts` con `{ viewBox, d }` para toda `SOCIAL_NETWORKS`.** RF-1, RF-4
+- [x] **T1. `paths.ts` con `{ viewBox, d }` para toda `SOCIAL_NETWORKS`.** RF-1, RF-4 — 9f0cc0b
   - Hecho cuando: hay una entrada por red (`@data/constants`) con imports
     nombrados de `simple-icons`; LinkedIn usa SVG oficial con comentario de
     origen (y el reporte lo registra luego el orchestrator en BACKLOG); el
     módulo typechequea contra `SocialNetwork`; verde tras `feat(BrandIcon): T1`
     (con el test parametrizado de estructura: viewBox string no vacío, `d`
     string o array con al menos un `d` no vacío).
+
+- [ ] **T1b. Reparo del hallazgo menor del review de T1 (honestidad del comentario de origen).** RF-4, L1
+  - Hecho cuando: `fix(BrandIcon): T1b` reescribe el comentario de origen de
+    LinkedIn en `paths.ts` para afirmar solo lo verificado: el path es el que
+    distribuyó `simple-icons` hasta v14 (geométrica y tipológicamente válido en
+    24×24); la equivalencia exacta con el kit de prensa queda pendiente y
+    registrada en `docs/BACKLOG.md`. No toca tests ni otras líneas; verde tras
+    el fix.
 
 - [ ] **T2. Render del `<svg>` por red.** RF-1
   - Hecho cuando: test parametrizado: cada `network` renderiza `<svg>` con el

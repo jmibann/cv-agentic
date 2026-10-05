@@ -21,9 +21,13 @@ fases F1–F5. Cada ítem necesita decisión del usuario antes de implementarse.
 
 - **Ícono de LinkedIn.** Confirmado (2026-09-30): no está en
   `simple-icons` 16.33.0 (retirado en la v14 a pedido de la marca); las demás
-  redes de `SOCIAL_NETWORKS` sí están. Usar el SVG oficial del kit de marca de
-  LinkedIn en `BrandIcon/paths.ts`, con comentario de origen, y revisar sus
-  guías de uso del logo para enlazar a un perfil propio.
+  redes de `SOCIAL_NETWORKS` sí están. Resuelto en BrandIcon T1 (`9f0cc0b`):
+  `BrandIcon/paths.ts` usa el path canónico del logo "in" monocromo (el que
+  distribuyó `simple-icons` hasta v14; geometría 24×24 validada por el
+  reviewer), con comentario de origen. **Pendiente:** verificar la equivalencia
+  exacta contra el SVG actual del kit de prensa de LinkedIn
+  (`https://brand.linkedin.com/downloads` — el entorno de los agentes no tiene
+  red) y revisar sus guías de uso del logo para enlazar a un perfil propio.
 - **SEO por idioma.** Hoy el idioma no está en la URL (`/es/…`) y hay un solo
   `<title>`/meta description. Si importa el SEO en español: rutas por idioma,
   `hreflang`, metadatos por idioma y posiblemente prerender.
