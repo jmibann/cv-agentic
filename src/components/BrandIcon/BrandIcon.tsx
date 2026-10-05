@@ -1,9 +1,9 @@
 // BrandIcon — logos de redes sociales como SVG inline
 // (specs/primitives/BrandIcon/spec.md). T2: render del <svg> por red desde
 // paths.ts (RF-1): `viewBox` de la entrada y un <path> por cada `d` no vacío.
-// T3 agrega el marcado decorativo (aria-hidden/focusable) y BRAND_NAMES
-// (RF-2/RF-3); T4, el tamaño por CSS y la unión de `className` (RF-5/RF-6)
-// — ver specs/primitives/BrandIcon/tasks.md.
+// T3: <svg> siempre decorativo (RF-3: aria-hidden/focusable, y fill="currentColor"
+// de la Anatomía/RF-1) + BRAND_NAMES (RF-2). T4: el tamaño por CSS y la unión
+// de `className` (RF-5/RF-6) — ver specs/primitives/BrandIcon/tasks.md.
 
 import type { SocialNetwork } from "@data/cv.types.generated";
 
@@ -16,6 +16,24 @@ export interface BrandIconProps {
   className?: string;
 }
 
+// RF-2 (spec → API): nombre visible de cada red, para los aria-labels del
+// link contenedor. Literales definidos por el diseño, NO derivados del
+// `title` de simple-icons (plan.md → decisión B-3: el fallback oficial de
+// LinkedIn no trae `si.title` y el nombre lo elige el diseño). El tipo
+// `Record<SocialNetwork, string>` exige una clave por cada valor de la unión
+// (@data/constants → SOCIAL_NETWORKS): si el esquema crece sin nombre, `tsc`
+// falla (mismo anclaje en compilación que BRAND_PATHS en paths.ts; spec →
+// Tests esperados).
+export const BRAND_NAMES: Record<SocialNetwork, string> = {
+  github: "GitHub",
+  linkedin: "LinkedIn",
+  x: "X",
+  instagram: "Instagram",
+  facebook: "Facebook",
+  dribbble: "Dribbble",
+  behance: "Behance",
+};
+
 // Lookup directo network → paths.ts (plan.md: sin lógica ni funciones puras
 // aparte; C1 ya se cumple en paths.ts, dato puro sin React).
 export function BrandIcon({ network }: BrandIconProps) {
@@ -27,12 +45,23 @@ export function BrandIcon({ network }: BrandIconProps) {
   // datos actuales de paths.ts nunca ocurre; lo ancla el test de T1).
   const paths = (Array.isArray(d) ? d : [d]).filter((item) => item.trim() !== "");
 
-  // Sin `fill`/`aria-hidden`/`focusable` todavía: eso es T3 (RF-3/RF-1 en su
-  // parte de atributos). Sin clase base ni `className`: el módulo CSS y la
-  // unión son T4 (RF-5/RF-6; tasks.md). La clave es el índice: la lista es
-  // estática y sin reordenos, y un array oficial podría traer `d` repetidos.
+  // RF-3 (spec → Accesibilidad): el logo es SIEMPRE decorativo, igual que el
+  // caso sin `label` de Icon —el marcado se fija explícitamente en el
+  // componente, sin depender de defaults—. aria-hidden="true" lo saca del
+  // árbol de accesibilidad (focusable="false" cubre IE/Edge legacy) y el
+  // nombre accesible la aporta el link contenedor con
+  // `aria-label={BRAND_NAMES[network]}` (Sidebar, su spec). fill="currentColor"
+  // es el de la Anatomía: monocromo heredado del padre (RF-5), sin color ni
+  // gradiente propio. Sin clase base ni `className`: el módulo CSS y la unión
+  // son T4 (RF-5/RF-6; tasks.md). La clave de los paths es el índice: la lista
+  // es estática y sin reordenos, y un array oficial podría traer `d` repetidos.
   return (
-    <svg viewBox={viewBox}>
+    <svg
+      viewBox={viewBox}
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+    >
       {paths.map((pathD, index) => (
         <path key={index} d={pathD} />
       ))}
