@@ -1,0 +1,27 @@
+# Tareas — BrandIcon
+
+- [ ] **T1. `paths.ts` con `{ viewBox, d }` para toda `SOCIAL_NETWORKS`.** RF-1, RF-4
+  - Hecho cuando: hay una entrada por red (`@data/constants`) con imports
+    nombrados de `simple-icons`; LinkedIn usa SVG oficial con comentario de
+    origen (y el reporte lo registra luego el orchestrator en BACKLOG); el
+    módulo typechequea contra `SocialNetwork`; verde tras `feat(BrandIcon): T1`
+    (con el test parametrizado de estructura: viewBox string no vacío, `d`
+    string o array con al menos un `d` no vacío).
+
+- [ ] **T2. Render del `<svg>` por red.** RF-1
+  - Hecho cuando: test parametrizado: cada `network` renderiza `<svg>` con el
+    `viewBox` de su entrada (default `0 0 24 24`) y al menos un `<path>` con
+    `d` no vacío; verde tras `feat(BrandIcon): T2`.
+
+- [ ] **T3. `BRAND_NAMES` y decorativo a11y.** RF-2, RF-3
+  - Hecho cuando: `getByRole` no lo encuentra (`aria-hidden="true"`),
+    `focusable="false"` presente, `fill="currentColor"` en el svg;
+    `BRAND_NAMES` tiene valor no vacío para cada red (test rechaza `""`);
+    verde tras `feat(BrandIcon): T3`.
+
+- [ ] **T4. Tamaño/herencia por CSS, `className` y cierre a11y.** RF-5, RF-6
+  - Hecho cuando: el módulo fija `width/height: var(--icon-size,
+    var(--size-social-icon))` sin `@media` ni color/opacidad propios
+    (inspección); `className` se une en el `<svg>` (P2); archivo termina con
+    `expectNoA11yViolations`; lint + typecheck + test verdes tras
+    `feat(BrandIcon): T4`.
