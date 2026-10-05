@@ -27,6 +27,9 @@ import { render } from "@testing-library/react";
 
 import { BrandIcon } from "./BrandIcon";
 
+// Import de T3 (se agrega sin tocar los de T1/T2): BRAND_NAMES (RF-2).
+import { BRAND_NAMES } from "./BrandIcon";
+
 // Helper del test: normaliza `d` (string | string[]) a lista para recorrerla.
 function toPathList(d: string | string[]): string[] {
   return Array.isArray(d) ? d : [d];
@@ -116,6 +119,62 @@ describe("BrandIcon render", () => {
       // de más y confirma que ningún `d` renderizado es la string vacía.
       expect(rendered.length).toBeGreaterThanOrEqual(1);
       expect(rendered).toEqual(expected);
+    },
+  );
+});
+
+// Tests de T3 (specs/primitives/BrandIcon/tasks.md) — RF-2 y RF-3: BRAND_NAMES
+// con nombre visible no vacío por red, y el <svg> SIEMPRE decorativo
+// (aria-hidden="true" + focusable="false"; el "Hecho cuando" de T3 ancla
+// además fill="currentColor" sobre el raíz, la parte de RF-1 que T2 no marcó).
+//
+// Justificación de las queries (constitución T3): por spec (→ Accesibilidad)
+// el logo no expone rol ni nombre accesible —el nombre lo aporta el link
+// contenedor con `aria-label={BRAND_NAMES[network]}`—, así que la única query
+// por rol esperada es la que NO debe dar hits (queryByRole("img") → null: el
+// "getByRole no lo encuentra" del "Hecho cuando"). Lo demás es observable en
+// los atributos del raíz <svg>: se consulta con container.querySelector("svg"),
+// el mismo criterio justificado en T2 (la spec no define data-testid en la
+// API). El cierre `expectNoA11yViolations` sigue diferido a T4 (tasks.md).
+describe("BrandIcon decorative accessibility (RF-3)", () => {
+  it.each([...SOCIAL_NETWORKS])(
+    "\"%s\" renders a decorative svg: aria-hidden, focusable=\"false\", fill=\"currentColor\", absent from getByRole(\"img\")",
+    (network) => {
+      const { container, queryByRole } = render(
+        <BrandIcon network={network} />,
+      );
+
+      const svg = container.querySelector("svg");
+
+      expect(svg).toBeInTheDocument();
+      // RF-3 / spec → Accesibilidad: siempre decorativo, con y sin link.
+      expect(svg).toHaveAttribute("aria-hidden", "true");
+      expect(svg).toHaveAttribute("focusable", "false");
+      // Anatomía (spec): fill="currentColor" sobre el <svg> raíz (monocromo,
+      // RF-5 en su parte de atributo; el tamaño por CSS llega en T4).
+      expect(svg).toHaveAttribute("fill", "currentColor");
+      // Decorativo ⇒ fuera del árbol de accesibilidad: nada bajo el rol img.
+      expect(queryByRole("img")).toBeNull();
+    },
+  );
+});
+
+// Tests de T3 — RF-2: BRAND_NAMES mantiene un nombre visible no vacío para
+// cada red de SOCIAL_NETWORKS. La cobertura total la garantiza en compilación
+// el tipo `Record<SocialNetwork, string>` (spec → Tests esperados: "el tipo
+// Record lo garantiza"), igual que BRAND_PATHS en paths.ts; el test verifica
+// en runtime que ningún valor sea string vacío.
+describe("BRAND_NAMES (RF-2)", () => {
+  it.each([...SOCIAL_NETWORKS])(
+    "\"%s\" has a non-empty visible name",
+    (network) => {
+      const name = BRAND_NAMES[network];
+
+      expect(typeof name).toBe("string");
+      // El "Hecho cuando" rechaza explícitamente ""; el trim descarta además
+      // un "nombre" de solo espacios (no sería nombre visible).
+      expect(name).not.toBe("");
+      expect(name.trim()).not.toBe("");
     },
   );
 });
