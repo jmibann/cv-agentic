@@ -3,7 +3,9 @@
 // cambia el elemento. T2: la clase se elige por `variant` (`inner`/`outer`,
 // RF-1/RF-2) y `id`/`aria-label`/`aria-labelledby` llegan al raíz (RF-3). T3:
 // la `className` del consumidor se UNE a la clase de variante en el único
-// elemento (RF-3). Falta: los estilos por tokens con `overflow` (T4).
+// elemento (RF-3). T4 hecha: los estilos por tokens (RF-5/RF-6) viven en
+// Box.module.css — `outer` con `overflow: visible` explícito y `inner` sin
+// `overflow` (plan.md → resolución X-3: queda `visible` por defecto).
 
 import type { ReactNode } from "react";
 
