@@ -2,17 +2,19 @@
 // (specs/primitives/BrandIcon/spec.md). T2: render del <svg> por red desde
 // paths.ts (RF-1): `viewBox` de la entrada y un <path> por cada `d` no vacío.
 // T3: <svg> siempre decorativo (RF-3: aria-hidden/focusable, y fill="currentColor"
-// de la Anatomía/RF-1) + BRAND_NAMES (RF-2). T4: el tamaño por CSS y la unión
-// de `className` (RF-5/RF-6) — ver specs/primitives/BrandIcon/tasks.md.
+// de la Anatomía/RF-1) + BRAND_NAMES (RF-2). T4: el tamaño por CSS (clase
+// `.brandIcon`) y la unión de `className` del consumidor (RF-5/RF-6).
 
 import type { SocialNetwork } from "@data/cv.types.generated";
+
+import styles from "./BrandIcon.module.css";
 
 import { BRAND_PATHS } from "./paths";
 
 export interface BrandIconProps {
   network: SocialNetwork;
-  /** Se UNE a la clase base del `<svg>` raíz (no la reemplaza). La API la
-      declara la spec; su unión sobre el elemento llega con T4 (tasks.md). */
+  /** Se UNE a la clase base `.brandIcon` sobre el `<svg>` raíz (no la
+      reemplaza); ahí el padre fija `--icon-size` (spec → Estilos y tokens). */
   className?: string;
 }
 
@@ -36,7 +38,7 @@ export const BRAND_NAMES: Record<SocialNetwork, string> = {
 
 // Lookup directo network → paths.ts (plan.md: sin lógica ni funciones puras
 // aparte; C1 ya se cumple en paths.ts, dato puro sin React).
-export function BrandIcon({ network }: BrandIconProps) {
+export function BrandIcon({ network, className }: BrandIconProps) {
   const { viewBox, d } = BRAND_PATHS[network];
 
   // `d` es string (un path) o array (un path por elemento). Se descartan los
@@ -45,6 +47,18 @@ export function BrandIcon({ network }: BrandIconProps) {
   // datos actuales de paths.ts nunca ocurre; lo ancla el test de T1).
   const paths = (Array.isArray(d) ? d : [d]).filter((item) => item.trim() !== "");
 
+  // RF-5/RF-6 y T4 (spec → API y Estilos y tokens): el tamaño va solo por CSS,
+  // sin prop `size`. La clase base `.brandIcon` (width/height con `var(
+  // --icon-size, var(--size-social-icon))`) se fija SIEMPRE sobre el propio
+  // <svg> raíz; a ella se UNE el `className` del consumidor (no la reemplaza:
+  // ahí el padre fija `--icon-size`, registrada en tokens.css con
+  // @property inherits:false, así que solo afecta a este <svg>). Join manual
+  // con el mismo mecanismo que Icon: se descartan los undefined, sin clases
+  // vacías propias.
+  const svgClassName = [styles.brandIcon, className]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
   // RF-3 (spec → Accesibilidad): el logo es SIEMPRE decorativo, igual que el
   // caso sin `label` de Icon —el marcado se fija explícitamente en el
   // componente, sin depender de defaults—. aria-hidden="true" lo saca del
@@ -52,11 +66,11 @@ export function BrandIcon({ network }: BrandIconProps) {
   // nombre accesible la aporta el link contenedor con
   // `aria-label={BRAND_NAMES[network]}` (Sidebar, su spec). fill="currentColor"
   // es el de la Anatomía: monocromo heredado del padre (RF-5), sin color ni
-  // gradiente propio. Sin clase base ni `className`: el módulo CSS y la unión
-  // son T4 (RF-5/RF-6; tasks.md). La clave de los paths es el índice: la lista
-  // es estática y sin reordenos, y un array oficial podría traer `d` repetidos.
+  // gradiente propio. La clave de los paths es el índice: la lista es estática
+  // y sin reordenos, y un array oficial podría traer `d` repetidos.
   return (
     <svg
+      className={svgClassName}
       viewBox={viewBox}
       fill="currentColor"
       aria-hidden="true"

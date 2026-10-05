@@ -1,0 +1,18 @@
+/* BrandIcon — specs/primitives/BrandIcon/spec.md → Estilos y tokens.
+   T4: tamaño solo por CSS (RF-5/RF-6). Sin @media (spec → Responsive) y sin
+   color/opacidad propios (la herencia del link padre la da currentColor sobre
+   el <svg> en el componente; el color base y el hover los fija el Sidebar,
+   su spec). */
+
+/* Tamaño solo por CSS (RF-5/RF-6, spec → Estilos y tokens): cadena de
+   fallback exacta de la spec, sin prop `size` (los atributos SVG no aceptan
+   var()) y sin @media propios (Responsive): el default --size-social-icon ya
+   escala (1rem < 580 → 1.125rem ≥ 580, tokens.css). El CSS gana sobre
+   cualquier atributo width/height. Para otro tamaño, el padre fija
+   --icon-size en su propia clase UNIDA al <svg> (custom property registrada
+   en tokens.css con @property inherits:false: no se filtra a nodos anidados;
+   en un contenedor no tiene efecto — spec → Estilos y tokens). */
+.brandIcon {
+  width: var(--icon-size, var(--size-social-icon));
+  height: var(--icon-size, var(--size-social-icon));
+}
