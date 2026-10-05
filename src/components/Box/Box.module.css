@@ -1,19 +1,36 @@
 /* Box — specs/primitives/Box/spec.md → Estilos y tokens.
-   T1/T2: solo el contrato de nombres de clase que exige la API (`outer`,
-   RF-1; `inner`, RF-2); el componente ya las aplica y los tests las verifican
-   con el patrón P2 (#99). Los estilos completos (fondo, radio, padding, borde,
-   sombra, overflow y responsive solo por tokens; RF-5/RF-6) llegan en T4.
-   Sin colores literales ni @media propios (reglas duras de docs/DESIGN.md). */
+   T1/T2 trajeron el contrato de nombres de clase que exige la API (`outer`,
+   RF-1; `inner`, RF-2); T4 los completa con los estilos por tokens
+   (RF-5/RF-6). Cero colores literales y cero @media propios: el responsive
+   sale íntegramente de --box-padding, --box-inner-padding y
+   --radius-box-inner, que escalan en tokens/tokens.css (reglas duras de
+   docs/DESIGN.md). */
 
-/* Variante default (RF-1): superficie flotante. Estilos completos: T4. */
+/* Variante default (RF-1): superficie flotante (spec → Estilos y tokens:
+   fondo --color-surface, radio --radius-20, padding --box-padding, borde
+   inferior (--size-box-edge solid --color-box-edge), sombra --shadow-box).
+   `position: relative`: ancla de CornerTab (espec de la tabla).
+   RF-6: `overflow: visible` EXPLÍCITO (plan.md → decisión: la CornerTab y el
+   avatar del Sidebar dependen de no ser recortados; es una declaración
+   deliberada, no un resto). Sin margen externo (spec → No hacer; el padre
+   posiciona con gap). */
 .outer {
-  /* estilos por tokens: T4 */
+  background: var(--color-surface);
+  border-radius: var(--radius-20);
+  padding: var(--box-padding);
+  border-bottom: var(--size-box-edge) solid var(--color-box-edge);
+  box-shadow: var(--shadow-box);
+  position: relative;
+  overflow: visible;
 }
 
-/* Variante `inner` (RF-2): bloque interno tintado, sin borde ni sombra.
-   T2 trae solo el nombre de clase (la elección de variante en Box.tsx y el
-   test P2); estilos por tokens (--color-surface-muted, --radius-box-inner,
-   --box-inner-padding) y ausencia de overflow: T4. */
+/* Variante `inner` (RF-2): bloque interno tintado (spec → Estilos y tokens:
+   fondo --color-surface-muted, radio --radius-box-inner y padding
+   --box-inner-padding, ambos responsive solo por token), SIN borde ni
+   sombra. No declara `overflow` (plan.md → resolución X-3: queda `visible`
+   por defecto; `hidden` recortaría el radio tintado). */
 .inner {
-  /* estilos por tokens: T4 */
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-box-inner);
+  padding: var(--box-inner-padding);
 }
