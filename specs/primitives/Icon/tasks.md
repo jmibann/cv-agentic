@@ -1,6 +1,6 @@
 # Tareas — Icon
 
-- [ ] **T1. Mapa explícito y render de todos los `IconName`.** RF-1, RF-5
+- [x] **T1. Mapa explícito y render de todos los `IconName`.** RF-1, RF-5 — 12ffb92
   - Hecho cuando: `test(Icon): T1` deja en verde un test parametrizado que
     renderiza un `<svg>` por cada uno de los 24 valores de `IconName`;
     `ICON_MAP: Record<IconName, LucideIcon>` typecheckea contra el tipo
@@ -30,5 +30,7 @@
   - Hecho cuando: `.icon` fija `width/height: var(--icon-size, var(--size-icon))`
     y `flex-shrink: 0` (inspección: sin literales ni `@media`); el `className`
     recibido queda unido a `.icon` sobre el `<svg>` (aserción P2); el archivo de
-    tests termina con `expectNoA11yViolations` (con y sin label); lint +
-    typecheck + test verdes tras `feat(Icon): T5`.
+    tests termina con `expectNoA11yViolations` (con y sin label); `index.ts`
+    re-exporta `Icon`, `AccentGradientDefs` y los tipos (archivo del plan; gap
+    cubierto en el review de T1); lint + typecheck + test verdes tras
+    `feat(Icon): T5`.

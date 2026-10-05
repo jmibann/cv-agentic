@@ -18,3 +18,5 @@
     `:hover`/`:focus`/transiciones (inspección); archivo termina con
     `expectNoA11yViolations`; lint + typecheck + test verdes tras
     `feat(IconBox): T3`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `IconBox` y tipos (el
+    plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).

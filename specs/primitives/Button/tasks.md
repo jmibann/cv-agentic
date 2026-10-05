@@ -37,3 +37,5 @@
     termina con `expectNoA11yViolations` (button y link); lint + typecheck +
     test verdes tras `feat(Button): T6` (el `build` de cierre de pieza lo
     corren orchestrator/reviewer, decisión #80).
+  - Nota para el cierre de pieza: `index.ts` re-exporta `Button` y tipos (el plan
+    lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).

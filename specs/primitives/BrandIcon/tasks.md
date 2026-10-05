@@ -25,3 +25,6 @@
     (inspección); `className` se une en el `<svg>` (P2); archivo termina con
     `expectNoA11yViolations`; lint + typecheck + test verdes tras
     `feat(BrandIcon): T4`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `BrandIcon`, `BRAND_NAMES`
+    y tipos (el plan lo lista y las tareas no lo cubrían; gap detectado en el
+    review de Icon T1).

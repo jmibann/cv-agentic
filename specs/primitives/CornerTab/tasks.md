@@ -26,3 +26,5 @@
     `@media print` en el módulo (inspección); archivo termina con
     `expectNoA11yViolations`; lint + typecheck + test verdes tras
     `feat(CornerTab): T4`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `CornerTab` y tipos (el
+    plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).

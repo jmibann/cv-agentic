@@ -17,3 +17,5 @@
     `--font-size-overhead`, peso regular, cero `@media`, cero roles/interactividad
     (inspección); archivo termina con `expectNoA11yViolations`; lint +
     typecheck + test verdes tras `feat(Overhead): T3`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `Overhead` y tipos (el
+    plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).

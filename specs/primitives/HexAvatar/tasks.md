@@ -25,3 +25,6 @@
     `:hover`/`:focus`/transición; `className` unida al `wrap` (P2); archivo
     termina con `expectNoA11yViolations` (con `HexAvatarDefs` montado); lint +
     typecheck + test verdes tras `feat(HexAvatar): T4`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `HexAvatar`,
+    `HexAvatarDefs` y tipos (el plan lo lista y las tareas no lo cubrían; gap
+    detectado en el review de Icon T1).

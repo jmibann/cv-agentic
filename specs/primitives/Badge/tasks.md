@@ -16,3 +16,5 @@
     literales de color, cero `@media`, cero reglas `:hover`/`:focus`); archivo
     termina con `expectNoA11yViolations` (span y li-en-ul); lint + typecheck +
     test verdes tras `feat(Badge): T3`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `Badge` y tipos (el plan
+    lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).

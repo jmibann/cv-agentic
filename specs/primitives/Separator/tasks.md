@@ -17,3 +17,5 @@
   - Hecho cuando: el archivo termina con `expectNoA11yViolations` (dentro de un
     `Box outer` de armazón si hace falta para el escenario); lint + typecheck +
     test verdes tras `feat(Separator): T3`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `Separator` (el plan lo
+    lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).

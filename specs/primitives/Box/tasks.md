@@ -22,3 +22,5 @@
     `overflow` (inspección); props sin `role`/`tabIndex` (inspección de la API);
     archivo termina con `expectNoA11yViolations` (outer y inner); lint +
     typecheck + test verdes tras `feat(Box): T4`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `Box` y tipos (el plan lo
+    lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).

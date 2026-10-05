@@ -28,3 +28,5 @@
     h3 `0.5rem`, h1 sin decorar no declara margen propio (inspección); cero
     `@media` propios; archivo termina con `expectNoA11yViolations`; lint +
     typecheck + test verdes tras `feat(SectionTitle): T5`.
+  - Nota para el cierre de pieza: `index.ts` re-exporta `SectionTitle` y tipos
+    (el plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
