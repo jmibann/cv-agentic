@@ -5,7 +5,7 @@
 | Archivo | Responsabilidad | RF |
 |---|---|---|
 | `src/components/Icon/Icon.tsx` | `Icon` (render desde mapa explícito) + `AccentGradientDefs` + tipos `UiIconName`/`IconName` | RF-1…RF-4, RF-6, RF-7 |
-| `src/components/Icon/Icon.module.css` | `.icon` (tamaño por `var(--icon-size, var(--size-icon))` + `flex-shrink`), `.toneAccent`, `.stopStart`/`.stopEnd` | RF-4, RF-6 |
+| `src/components/Icon/Icon.module.css` | `.icon` (tamaño por `var(--icon-size, var(--size-icon))` + `flex-shrink`), `.toneAccent`, `.stopStart`/`.stopEnd`, `.defs` (0×0 + `position: absolute`) | RF-4, RF-6 |
 | `src/components/Icon/Icon.test.tsx` | tests de RF + cierre `expectNoA11yViolations` | todas |
 | `src/components/Icon/index.ts` | re-export `Icon`, `AccentGradientDefs`, tipos | — |
 

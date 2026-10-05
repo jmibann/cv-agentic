@@ -15,7 +15,7 @@
     `role="img"`; el `<svg>` tiene `focusable="false"` en ambos casos; verde
     tras `feat(Icon): T2`.
 
-- [ ] **T3. `AccentGradientDefs`.** RF-4
+- [x] **T3. `AccentGradientDefs`.** RF-4 — f3c1b54
   - Hecho cuando: el test encuentra `linearGradient` con id `accent-gradient`,
     `gradientUnits="userSpaceOnUse"` y los `x1/y1/x2/y2` de la spec; dos `stop`
     con `offset` 0.2631/0.9375 sin atributo `style`; el `<svg>` es invisible por
