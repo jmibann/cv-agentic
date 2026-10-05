@@ -17,6 +17,8 @@ import { describe, expect, it } from "vitest";
 
 import { SERVICE_ICONS } from "@data/constants";
 
+import { expectNoA11yViolations } from "../../test/a11y";
+
 import { Icon } from "./Icon";
 import type { IconName, UiIconName } from "./Icon";
 
@@ -284,5 +286,79 @@ describe("Icon tone", () => {
     expect(glyph).not.toHaveClass(toneAccentClass);
     expect(glyph).not.toHaveAttribute("stroke", "url(#accent-gradient)");
     expect(container.querySelectorAll("[style]")).toHaveLength(0);
+  });
+});
+
+// Tests de T5 (specs/primitives/Icon/tasks.md) — RF-6: tamaño solo por CSS y
+// unión de `className`. `.icon` fija `width/height: var(--icon-size,
+// var(--size-icon))` y `flex-shrink: 0` sin literales ni `@media` (inspección
+// del revisor sobre Icon.module.css: jsdom no calcula estilos, el tamaño
+// visual se verifica en QA visual — spec → Tests esperados).
+//
+// Justificación de las queries (constitución T3): un Icon sin `label` es
+// decorativo (RF-2) y no expone rol ni nombre accesible, y la spec no define
+// `data-testid` en la API; lo observable son las clases del raíz <svg>, así
+// que se consulta con `container.querySelector`, el mismo criterio justificado
+// en T1/T4. Las aserciones de clases siguen el criterio P2 de la fase con el
+// patrón canónico de la decisión #99 (decisiones: fallback `?? "…"` solo de
+// tipos bajo noUncheckedIndexedAccess; prohibidos `!` y `as string`; el
+// componente importa el mismo objeto `styles`, en runtime el fallback nunca
+// se usa y la aserción compara exactamente la clase aplicada).
+const iconClass = styles.icon ?? "icon";
+
+describe("Icon className and CSS sizing (RF-6)", () => {
+  it("applies the base .icon class on the svg by default", () => {
+    const { container } = render(<Icon name="mail" />);
+    const glyph = container.querySelector("svg");
+
+    expect(glyph).not.toBeNull();
+    // RF-6: sin prop `size`; el tamaño lo fija la clase `.icon` por CSS.
+    expect(glyph).toHaveClass(iconClass);
+  });
+
+  it("joins the received className to .icon on the svg itself, not replacing it", () => {
+    // Clase de consumidor (p. ej. `.glyph { --icon-size: … }` de ServiceCard,
+    // spec → Estilos y tokens): se UNE a `.icon` sobre el propio <svg>.
+    const consumerClass = "service-card-glyph";
+    const { container } = render(<Icon name="code" className={consumerClass} />);
+    const glyph = container.querySelector("svg");
+
+    expect(glyph).not.toBeNull();
+    expect(glyph).toHaveClass(iconClass);
+    expect(glyph).toHaveClass(consumerClass);
+  });
+
+  // extra: la API de la spec UNE `className` a `.icon` y T4 fija que
+  // tone="accent" agrega `.toneAccent` sobre el mismo raíz; se verifica que
+  // las tres coexisten (ninguna reemplaza a otra). Sin contraparte literal en
+  // "Tests esperados", pero es el contrato de unión del raíz.
+  it("keeps .icon, the tone=\"accent\" class and the received className together", () => {
+    const consumerClass = "contact-row-icon";
+    const { container } = render(
+      <Icon name="mail" tone="accent" className={consumerClass} />,
+    );
+    const glyph = container.querySelector("svg");
+
+    expect(glyph).not.toBeNull();
+    expect(glyph).toHaveClass(iconClass);
+    expect(glyph).toHaveClass(toneAccentClass);
+    expect(glyph).toHaveClass(consumerClass);
+  });
+});
+
+// Cierre del archivo (constitución T4, spec → Tests esperados): axe-core sobre
+// el componente, con y sin `label` (decorativo e informativo: los dos marcos
+// de RF-2/RF-3). Las dos combinaciones ya cubiertas por T2.
+describe("Icon accessibility audit", () => {
+  it("has no accessibility violations without a label", async () => {
+    const { container } = render(<Icon name="mail" />);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with a label", async () => {
+    const { container } = render(<Icon name="mail" label="Email address" />);
+
+    await expectNoA11yViolations(container);
   });
 });
