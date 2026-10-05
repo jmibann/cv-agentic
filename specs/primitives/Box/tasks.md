@@ -16,13 +16,6 @@
     el elemento raíz (aserción P2, sin `data-testid`); verde tras `feat(Box): T3`.
 
 - [x] **T4. Estilos por tokens, overflow y cierre a11y.** RF-4, RF-5, RF-6 — a8c515d
-
-- [ ] **T4b. Reparación del hallazgo menor del review de T4 (comentario obsoleto).** L1
-  - Hecho cuando: `fix(Box): T4b` actualiza el header de `Box.tsx` (línea ~6:
-    "Falta: los estilos por tokens con `overflow` (T4)") al estado real de la
-    pieza tras T4: los estilos por tokens con `overflow: visible` en `outer` ya
-    existen en `Box.module.css`; único export público inalterado; cero cambios
-    de código, tests o CSS. Verde tras el fix.
   - Hecho cuando: el módulo resuelve fondo/radio/padding/borde/sombra **solo**
     con tokens, sin colores literales ni `@media` (inspección del reviewer);
     `outer` con `overflow: visible` explícito e `inner` sin declaración de
@@ -31,3 +24,10 @@
     typecheck + test verdes tras `feat(Box): T4`.
   - Nota para el cierre de pieza: `index.ts` re-exporta `Box` y tipos (el plan lo
     lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
+
+- [x] **T4b. Reparación del hallazgo menor del review de T4 (comentario obsoleto).** L1 — 545a657
+  - Hecho cuando: `fix(Box): T4b` actualiza el header de `Box.tsx` (línea ~6:
+    "Falta: los estilos por tokens con `overflow` (T4)") al estado real de la
+    pieza tras T4: los estilos por tokens con `overflow: visible` en `outer` ya
+    existen en `Box.module.css`; único export público inalterado; cero cambios
+    de código, tests o CSS. Verde tras el fix.
