@@ -11,7 +11,7 @@
     (`as="aside" aria-label="Profile"` → `getByRole("complementary", { name: "Profile" })`);
     verde tras `feat(Box): T2`.
 
-- [ ] **T3. `className` se une en el único elemento.** RF-3
+- [x] **T3. `className` se une en el único elemento.** RF-3 — 1c00911
   - Hecho cuando: una `className` externa queda junto a la clase de variante en
     el elemento raíz (aserción P2, sin `data-testid`); verde tras `feat(Box): T3`.
 
