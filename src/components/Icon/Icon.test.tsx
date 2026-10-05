@@ -266,7 +266,7 @@ describe("Icon tone", () => {
     expect(container.querySelectorAll("[style]")).toHaveLength(0);
   });
 
-  it("adds no color class by default (tone=\"current\" heredado)", () => {
+  it("adds no color class by default (tone=\"current\" inherited)", () => {
     const { container } = render(<Icon name="mail" />);
     const glyph = container.querySelector("svg");
 
