@@ -21,6 +21,8 @@ import { describe, expect, it } from "vitest";
 
 import { render } from "@testing-library/react";
 
+import { expectNoA11yViolations } from "../../test/a11y";
+
 import { Box } from "./Box";
 
 import styles from "./Box.module.css";
@@ -183,5 +185,25 @@ describe("Box className joining (T3: RF-3)", () => {
     expect(root).toHaveClass(innerClass);
     expect(root).toHaveClass(consumerClass);
     expect(root).not.toHaveClass(outerClass);
+  });
+});
+
+// Cierre del archivo (constitución T4, tasks.md → T4 "Hecho cuando", spec →
+// Tests esperados): axe-core sobre las dos variantes (outer y inner). Box es
+// neutro para a11y (spec → Accesibilidad): la semántica sale del elemento
+// elegido con `as` más su nombre; el `div` suelto con texto no debe disparar
+// ninguna regla. Mismo criterio de cierre que Icon (dos casos, uno por marco
+// variante) y BrandIcon (un solo caso, una sola forma).
+describe("Box accessibility audit", () => {
+  it("has no accessibility violations rendering the default outer variant", async () => {
+    const { container } = render(<Box>surface content</Box>);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations rendering the inner variant", async () => {
+    const { container } = render(<Box variant="inner">inner content</Box>);
+
+    await expectNoA11yViolations(container);
   });
 });
