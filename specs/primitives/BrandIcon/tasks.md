@@ -8,7 +8,7 @@
     (con el test parametrizado de estructura: viewBox string no vacío, `d`
     string o array con al menos un `d` no vacío).
 
-- [ ] **T1b. Reparo del hallazgo menor del review de T1 (honestidad del comentario de origen).** RF-4, L1
+- [x] **T1b. Reparo del hallazgo menor del review de T1 (honestidad del comentario de origen).** RF-4, L1 — f8ddc10
   - Hecho cuando: `fix(BrandIcon): T1b` reescribe el comentario de origen de
     LinkedIn en `paths.ts` para afirmar solo lo verificado: el path es el que
     distribuyó `simple-icons` hasta v14 (geométrica y tipológicamente válido en
