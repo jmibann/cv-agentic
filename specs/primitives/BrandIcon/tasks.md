@@ -32,7 +32,7 @@
     `BRAND_NAMES` tiene valor no vacío para cada red (test rechaza `""`);
     verde tras `feat(BrandIcon): T3`.
 
-- [ ] **T4. Tamaño/herencia por CSS, `className` y cierre a11y.** RF-5, RF-6
+- [x] **T4. Tamaño/herencia por CSS, `className` y cierre a11y.** RF-5, RF-6 — 8e0b8c3
   - Hecho cuando: el módulo fija `width/height: var(--icon-size,
     var(--size-social-icon))` sin `@media` ni color/opacidad propios
     (inspección); `className` se une en el `<svg>` (P2); archivo termina con
