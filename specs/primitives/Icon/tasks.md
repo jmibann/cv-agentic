@@ -7,7 +7,7 @@
     generado (quitar una clave rompe `tsc`: verificar y restaurar, sin commitear
     el negativo); lint + typecheck + test verdes tras `feat(Icon): T1`.
 
-- [ ] **T2. Accesibilidad: decorativo, con label y `focusable`.** RF-2, RF-3, RF-7
+- [x] **T2. Accesibilidad: decorativo, con label y `focusable`.** RF-2, RF-3, RF-7 — 64ab8c3
   - Hecho cuando: sin `label` → `aria-hidden="true"` y ausente de
     `getByRole("img")`; con `label` → `getByRole("img", { name: label })` +
     `role="img"`; el `<svg>` tiene `focusable="false"` en ambos casos; verde
