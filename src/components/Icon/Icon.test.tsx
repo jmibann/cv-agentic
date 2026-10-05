@@ -121,6 +121,17 @@ describe("Icon accessibility", () => {
 // consultan con `container.querySelector`/`querySelectorAll`, el mismo criterio
 // justificado en T1. Las aserciones de clases siguen el criterio P2 de la
 // fase (`import styles` + `toHaveClass`).
+//
+// Nota de tipos: con `noUncheckedIndexedAccess` (tsconfig.json) cada clase del
+// módulo llega como `string | undefined` y jest-dom exige `string`. El fallback
+// es solo de tipos: el proxy de Vitest para CSS Modules y el build real siempre
+// exponen la clase pedida, y el componente importa el mismo objeto `styles`,
+// así que la aserción compara exactamente la clase aplicada (no se debilita
+// ningún test: en runtime el fallback nunca se usa).
+const stopStartClass = styles.stopStart ?? "stopStart";
+const stopEndClass = styles.stopEnd ?? "stopEnd";
+const defsClass = styles.defs ?? "defs";
+
 describe("AccentGradientDefs", () => {
   it("renders the accent-gradient linearGradient with userSpaceOnUse geometry (RF-4)", () => {
     const { container } = render(<AccentGradientDefs />);
@@ -146,10 +157,10 @@ describe("AccentGradientDefs", () => {
     // Offsets = posiciones 26.31 % / 93.75 % de --gradient-accent (spec).
     expect(stops).toHaveLength(2);
     expect(stops[0]).toHaveAttribute("offset", "0.2631");
-    expect(stops[0]).toHaveClass(styles.stopStart);
+    expect(stops[0]).toHaveClass(stopStartClass);
     expect(stops[0]).not.toHaveAttribute("style");
     expect(stops[1]).toHaveAttribute("offset", "0.9375");
-    expect(stops[1]).toHaveClass(styles.stopEnd);
+    expect(stops[1]).toHaveClass(stopEndClass);
     expect(stops[1]).not.toHaveAttribute("style");
   });
 
@@ -163,7 +174,7 @@ describe("AccentGradientDefs", () => {
     // definiciones en un SVG no renderizado).
     expect(defsSvg).toHaveAttribute("width", "0");
     expect(defsSvg).toHaveAttribute("height", "0");
-    expect(defsSvg).toHaveClass(styles.defs);
+    expect(defsSvg).toHaveClass(defsClass);
     // Sin estilos inline (regla dura 3 de DESIGN.md): nada de display:none.
     expect(defsSvg).not.toHaveAttribute("style");
     // extra: la Anatomía de la spec fija también en el <svg> de las defs
