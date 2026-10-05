@@ -133,7 +133,6 @@ se asigna a `--icon-size` es el que escala (sus `@media` viven en
 ## Accesibilidad
 
 - Sin `label`: `aria-hidden="true"`; con `label`: `role="img"` y `aria-label={label}`.
-- Un `label` de string vacío se trata como **decorativo** (equivale a no pasarlo: `aria-label=""` no produce nombre accesible).
 - `focusable="false"` siempre (RF-7).
 - `tone="gradient"` con `label` es una combinación válida: el gradiente decora
   el trazo (exento de par de contraste, ver `docs/tokens/contrast.md`) y el
