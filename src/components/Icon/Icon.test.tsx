@@ -20,6 +20,11 @@ import { SERVICE_ICONS } from "@data/constants";
 import { Icon } from "./Icon";
 import type { IconName, UiIconName } from "./Icon";
 
+// T3: definiciones compartidas del gradiente de acento (export del mismo
+// módulo, plan.md) y clases del CSS Module para los stops (criterio P2).
+import { AccentGradientDefs } from "./Icon";
+import styles from "./Icon.module.css";
+
 // Anotado readonly UiIconName[]: si un literal no pertenece a la unión,
 // `tsc` falla (la lista del test queda anclada al tipo de la spec).
 const UI_ICON_NAMES: readonly UiIconName[] = [
@@ -104,5 +109,67 @@ describe("Icon accessibility", () => {
       "focusable",
       "false",
     );
+  });
+});
+
+// Tests de T3 (specs/primitives/Icon/tasks.md) — RF-4: AccentGradientDefs
+// renderiza las definiciones compartidas que resuelve `stroke="url(#accent-gradient)"`.
+//
+// Justificación de las queries (constitución T3): `<linearGradient>` y `<stop>`
+// son definiciones SVG sin rol ni nombre accesible posible, y la spec no
+// define `data-testid` en la API; lo observable son sus atributos, así que se
+// consultan con `container.querySelector`/`querySelectorAll`, el mismo criterio
+// justificado en T1. Las aserciones de clases siguen el criterio P2 de la
+// fase (`import styles` + `toHaveClass`).
+describe("AccentGradientDefs", () => {
+  it("renders the accent-gradient linearGradient with userSpaceOnUse geometry (RF-4)", () => {
+    const { container } = render(<AccentGradientDefs />);
+    const gradient = container.querySelector("linearGradient");
+
+    expect(gradient).not.toBeNull();
+    expect(gradient).toHaveAttribute("id", "accent-gradient");
+    // userSpaceOnUse es obligatorio: con objectBoundingBox cada trazo toma
+    // su propia caja y las líneas rectas no se dibujan (spec → Gradiente).
+    expect(gradient).toHaveAttribute("gradientUnits", "userSpaceOnUse");
+    // Extremos fijos al espacio 0–24 del viewBox de lucide: reproducen el
+    // ángulo 137.84° de --gradient-accent (valores exactos de la spec).
+    expect(gradient).toHaveAttribute("x1", "0.62");
+    expect(gradient).toHaveAttribute("y1", "-0.56");
+    expect(gradient).toHaveAttribute("x2", "23.38");
+    expect(gradient).toHaveAttribute("y2", "24.56");
+  });
+
+  it("renders two stops at offsets 0.2631 and 0.9375 with colors by CSS class, no style attribute", () => {
+    const { container } = render(<AccentGradientDefs />);
+    const stops = container.querySelectorAll("stop");
+
+    // Offsets = posiciones 26.31 % / 93.75 % de --gradient-accent (spec).
+    expect(stops).toHaveLength(2);
+    expect(stops[0]).toHaveAttribute("offset", "0.2631");
+    expect(stops[0]).toHaveClass(styles.stopStart);
+    expect(stops[0]).not.toHaveAttribute("style");
+    expect(stops[1]).toHaveAttribute("offset", "0.9375");
+    expect(stops[1]).toHaveClass(styles.stopEnd);
+    expect(stops[1]).not.toHaveAttribute("style");
+  });
+
+  it("is invisible by size (0×0), not with display:none, and out of the a11y tree", () => {
+    const { container } = render(<AccentGradientDefs />);
+    const defsSvg = container.querySelector("svg");
+
+    // Invisible por tamaño: atributos 0×0 + posición absoluta dada por la
+    // clase del módulo (inspección del CSS: `position: absolute`; nunca
+    // `display: none`, porque algunos navegadores no resuelven `url(#…)` a
+    // definiciones en un SVG no renderizado).
+    expect(defsSvg).toHaveAttribute("width", "0");
+    expect(defsSvg).toHaveAttribute("height", "0");
+    expect(defsSvg).toHaveClass(styles.defs);
+    // Sin estilos inline (regla dura 3 de DESIGN.md): nada de display:none.
+    expect(defsSvg).not.toHaveAttribute("style");
+    // extra: la Anatomía de la spec fija también en el <svg> de las defs
+    // aria-hidden="true" y focusable="false" (no aparece en "Tests
+    // esperados", pero es parte del contrato de estructura).
+    expect(defsSvg).toHaveAttribute("aria-hidden", "true");
+    expect(defsSvg).toHaveAttribute("focusable", "false");
   });
 });
