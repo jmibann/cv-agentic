@@ -17,6 +17,11 @@
     el fix.
 
 - [ ] **T2. Render del `<svg>` por red.** RF-1
+  - Nota del review de T1b (menor, a ejecutar en esta ronda como `fix`
+    aparte): reformar la apertura del comentario de LinkedIn en `paths.ts`
+    (líneas 26-28: "Origen (RF-4): SVG oficial del kit de marca…") para que
+    exprese intención/pendiente en vez de hecho verificado, coherente con el
+    cierre que ya lo marca como pendiente.
   - Hecho cuando: test parametrizado: cada `network` renderiza `<svg>` con el
     `viewBox` de su entrada (default `0 0 24 24`) y al menos un `<path>` con
     `d` no vacío; verde tras `feat(BrandIcon): T2`.
