@@ -132,3 +132,56 @@ describe("Box inner variant and ARIA/id attributes (T2: RF-2, RF-3)", () => {
     expect(getByRole("region", { name: "Experience" })).toBe(root);
   });
 });
+
+// Tests de T3 (specs/primitives/Box/tasks.md) — la parte de RF-3 de
+// `className`: la clase externa se UNE a la clase de variante en el único
+// elemento raíz (spec → API: "className se une a la clase de la variante
+// sobre el elemento raíz (no la reemplaza)"; spec → Tests esperados:
+// "Concatena `className`"). El orden en el atributo `class` no resuelve
+// conflictos de especificidad (spec → API): rige la hoja de estilos, así que
+// el test solo verifica coexistencia en el mismo elemento, no el orden.
+//
+// Justificación de las queries (constitución T3): el mismo criterio ya
+// justificado en T1/T2 — Box sin `as`/ARIA no expone rol ni nombre accesible
+// y la API de la spec no define `data-testid`; lo observable son las clases
+// del raíz, se consulta con `container.querySelector(...)` y se asierta con
+// el patrón P2 canónico #99 (`styles.name ?? "name"` + `toHaveClass`;
+// prohibidos `!` y `as string`). La clase externa es un string llano del
+// consumidor (p. ej. la clase extra de Sidebar o ServiceCard). Casos:
+// variante default (`outer` + externa en el mismo `div`) e `inner` (externa +
+// `inner`, y NO `outer`).
+describe("Box className joining (T3: RF-3)", () => {
+  it("joins an external className to the default outer class on the root div", () => {
+    const consumerClass = "sidebar-panel";
+
+    const { container } = render(<Box className={consumerClass}>content</Box>);
+
+    // RF-3 ("Hecho cuando" de T3): ambas clases quedan en el único elemento,
+    // la raíz `div` por defecto (RF-1: `outer` intacta; spec → Anatomía: un
+    // único elemento contenedor).
+    const root = container.querySelector("div");
+
+    expect(root).toBeInTheDocument();
+    expect(root).toHaveClass(outerClass);
+    expect(root).toHaveClass(consumerClass);
+  });
+
+  it("joins an external className to the inner class and not the outer class when variant=\"inner\"", () => {
+    const consumerClass = "experience-block";
+
+    const { container } = render(
+      <Box variant="inner" className={consumerClass}>
+        content
+      </Box>,
+    );
+
+    // RF-2 + RF-3: `inner` + externa conviven en el raíz y `outer` sigue sin
+    // aplicarse (la unión no reactiva la variante).
+    const root = container.querySelector("div");
+
+    expect(root).toBeInTheDocument();
+    expect(root).toHaveClass(innerClass);
+    expect(root).toHaveClass(consumerClass);
+    expect(root).not.toHaveClass(outerClass);
+  });
+});
