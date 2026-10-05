@@ -17,6 +17,8 @@
 // unión de `className` (T3), estilos por tokens y cierre
 // `expectNoA11yViolations` (T4).
 
+import { describe, expect, it } from "vitest";
+
 import { render } from "@testing-library/react";
 
 import { Box } from "./Box";
