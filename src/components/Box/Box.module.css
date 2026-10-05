@@ -1,11 +1,19 @@
 /* Box — specs/primitives/Box/spec.md → Estilos y tokens.
-   T1: solo el contrato de nombres de clase que exige la API (`outer`, RF-1);
-   el componente ya la aplica y el test la verifica con el patrón P2 (#99).
-   Los estilos completos (fondo, radio, padding, borde, sombra, overflow y
-   responsive solo por tokens; RF-5/RF-6) llegan en T4, junto a `.inner` (T2).
+   T1/T2: solo el contrato de nombres de clase que exige la API (`outer`,
+   RF-1; `inner`, RF-2); el componente ya las aplica y los tests las verifican
+   con el patrón P2 (#99). Los estilos completos (fondo, radio, padding, borde,
+   sombra, overflow y responsive solo por tokens; RF-5/RF-6) llegan en T4.
    Sin colores literales ni @media propios (reglas duras de docs/DESIGN.md). */
 
 /* Variante default (RF-1): superficie flotante. Estilos completos: T4. */
 .outer {
+  /* estilos por tokens: T4 */
+}
+
+/* Variante `inner` (RF-2): bloque interno tintado, sin borde ni sombra.
+   T2 trae solo el nombre de clase (la elección de variante en Box.tsx y el
+   test P2); estilos por tokens (--color-surface-muted, --radius-box-inner,
+   --box-inner-padding) y ausencia de overflow: T4. */
+.inner {
   /* estilos por tokens: T4 */
 }

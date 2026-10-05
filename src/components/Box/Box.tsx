@@ -1,8 +1,9 @@
 // Box — superficie base del diseño (specs/primitives/Box/spec.md). T1: render
-// base (RF-1, RF-3): raíz `div` por defecto con la clase `outer` y
-// render de `children`; `as` cambia el elemento. La elección de clase por
-// `variant` (`inner`), los atributos `id`/ARIA y la unión de `className`
-// llegan en T2/T3; los estilos por tokens y `overflow`, en T4.
+// base (RF-1, RF-3): raíz `div` por defecto y render de `children`; `as`
+// cambia el elemento. T2: la clase se elige por `variant` (`inner`/`outer`,
+// RF-1/RF-2) y `id`/`aria-label`/`aria-labelledby` llegan al raíz (RF-3).
+// Falta: la unión de `className` (T3) y los estilos por tokens con
+// `overflow` (T4).
 
 import type { ReactNode } from "react";
 
@@ -23,14 +24,34 @@ export interface BoxProps {
   className?: string;
 }
 
-export function Box({ as, children }: BoxProps) {
-  // RF-1: sin `variant` rige `outer` (default). En T1 aún no se elige la
-  // clase por `variant` (la variante `inner` es T2), así que la clase fija
-  // es siempre `outer`.
+export function Box({
+  as,
+  variant,
+  children,
+  id,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledby,
+}: BoxProps) {
+  // RF-1/RF-2: sin `variant` rige `outer` (default); con `variant="inner"`
+  // se aplica SOLO `inner` (una única clase de variante, nunca ambas). Las
+  // clases del módulo van tal cual (string | undefined bajo
+  // noUncheckedIndexedAccess; React admite className undefined).
+  const variantClass = variant === "inner" ? styles.inner : styles.outer;
+
   const El = as ?? "div";
 
-  // La clase del módulo va tal cual (string | undefined bajo
-  // noUncheckedIndexedAccess; React admite className undefined). El join con
-  // la `className` del consumidor es T3.
-  return <El className={styles.outer}>{children}</El>;
+  // RF-3: al elemento solo le llegan `children`, `id`, `aria-label`,
+  // `aria-labelledby` y `className` (API cerrada, RF-4: sin `role`,
+  // `tabIndex` ni `...rest`). El join con la `className` del consumidor
+  // es T3: la prop sigue declarada en BoxProps y todavía no se transmite.
+  return (
+    <El
+      className={variantClass}
+      id={id}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledby}
+    >
+      {children}
+    </El>
+  );
 }
