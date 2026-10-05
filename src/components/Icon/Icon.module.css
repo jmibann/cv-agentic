@@ -1,6 +1,14 @@
 /* Icon — specs/primitives/Icon/spec.md → Gradiente / Estilos y tokens.
-   T3: defs del gradiente de acento (RF-4). `.toneAccent` (T4) y `.icon` (T5)
-   se agregan en sus tareas. */
+   T3: defs del gradiente de acento (RF-4). T4: `.toneAccent` (RF-4). `.icon`
+   (tamaño por --icon-size) se agrega en T5. */
+
+/* tone="accent" (RF-4/RF-6, spec → Estilos y tokens): el color de acento
+   sólido se aplica por clase, sin style inline ni atributos de color; el trazo
+   de lucide hereda el color con su stroke="currentColor" default. `tone`
+   "current" no agrega ninguna clase de color. */
+.toneAccent {
+  color: var(--color-accent);
+}
 
 /* <svg> de AccentGradientDefs: invisible por tamaño (width/height="0" como
    atributos en el componente), sacado del flujo con posición absoluta.
