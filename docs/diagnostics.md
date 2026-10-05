@@ -1,18 +1,13 @@
 # Diagnóstico — registro de puertas y auditorías
 
-Log mínimo del proyecto (decisión #86): el orchestrator agrega **una entrada**
-por cada cierre de puerta F y por cada auditoría, con los hashes de los commits
-relevantes. Última actualización: **2026-10-05** (saneado: el detalle de la
-auditoría inicial A–V pasó a un índice y a git; este archivo queda como log).
+Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
+**una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
+los hashes de los commits relevantes. Última actualización: **2026-10-05**
+(saneado del archivo + regla de mantenimiento).
 
-Lo vivo no vive aquí:
-
-| Qué | Dónde |
-|---|---|
-| Estado actual | `README.md` → "Estado actual" |
-| Memoria (estado, decisiones, aprendizajes, próximos pasos) | `docs/memory.md` |
-| Decisiones #1–#97 | `docs/README.md` → "Registro de decisiones" |
-| Informe de QA de F5 | `docs/qa-report.md` (cuando exista) |
+Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
+`docs/memory.md` · decisiones #1–#98 → `docs/README.md` · QA de F5 →
+`docs/qa-report.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
 archivo.
@@ -25,24 +20,42 @@ archivo.
 - Checks: lint · typecheck · test (n/n) · build (si aplica).
 - Decisiones: #NN → `docs/README.md`.
 - Commits: `<hash>` … (solo los relevantes).
-- Pendientes: <abiertos en este momento>; cierra: <los que resuelve esta entrada>.
+- Abre: <nuevos>; cierra: <los que resuelve esta entrada> (actualizá la tabla **Abiertos**).
 ```
 
-Las entradas van **más reciente arriba**. El consolidado de pendientes está en
-la sección siguiente.
+Las entradas van **más reciente arriba**. El consolidado vive en la tabla
+**Abiertos**.
 
-## Pendientes abiertos
+## Mantenimiento (decisión #98)
 
-- **F8** — `--size-avatar-sidebar: 9rem` (≥ 768) es **provisional** en
-  `tokens/tokens.css`; el valor final se fija en la QA visual de F5.
-- **F5** — QA visual completa (4 viewports × 2 temas × 2 idiomas); el informe
-  queda en `docs/qa-report.md` (#85).
-- **Deudas menores de F1** — `StrictMode` sin mandato, `value` de contexto sin
-  `useMemo` en ambos providers, typos "recalculera" en 2 comentarios y el
-  rastro `07eead6` (etiqueta/idioma del commit de T8) → detalle en
-  `docs/memory.md`.
+Cada **puerta F** o **decisión de reglas** agrega una entrada con el formato
+fijo de la "Plantilla de entrada" y actualiza la tabla **Abiertos** (lo cerrado
+**sale** de la tabla). Este archivo no lleva secciones de estado: el estado vive
+en `README.md` ("Estado actual") y en `docs/memory.md`. Si supera las **150
+líneas**, el orchestrator reduce, **en esa misma puerta F**, a **una línea**
+cada entrada anterior a las de las dos últimas puertas F:
+`fecha · título · #n · git show <hash>:docs/diagnostics.md` (hash de creación
+de la entrada); el detalle queda en git.
+
+## Abiertos
+
+| Ítem | Qué falta | Se cierra en |
+|---|---|---|
+| F8 | `--size-avatar-sidebar: 9rem` (≥ 768) es **provisional** en `tokens/tokens.css`; el valor final se fija con la captura de referencia | QA visual de F5 |
+| F5 | QA visual completa (4 viewports × 2 temas × 2 idiomas); informe en `docs/qa-report.md` (#85) | F5 |
+| Deudas menores de F1 | `StrictMode` sin mandato, `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md` | Sin fecha (se reevalúan en F2) |
 
 ## Entradas
+
+### 2026-10-05 — Regla de mantenimiento del log (#98)
+
+- Qué: regla propia del archivo: entrada por puerta F o decisión de reglas con
+  el formato fijo, tabla **Abiertos** como único consolidado, sin secciones de
+  estado y poda a una línea por entrada pasadas las 150 líneas.
+- Decisiones: **#98** (texto replicado en la skill, `orchestrator.md`,
+  `AGENTS.md`, `docs/agent-system.md` y `docs/memory.md`).
+- Commits: el de este cambio (`docs(sdd): add diagnostics maintenance rule (#98)`).
+- Abre: no cierra ningún ítem de la tabla.
 
 ### §VIII · 2026-10-03 — Cierre de F1
 

@@ -28,12 +28,19 @@ Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spe
   puertas). Categorías del kit: `foundation` (la pieza `Foundation` de F1,
   decisión #84), `primitives`, `controls`, `layout`, `content`, `pages`,
   `hooks`. F5 (QA) no tiene carpeta en `specs/` (decisión #85).
-- **Documentos de estado (decisión #86):** al cerrar cada **puerta F** (F1–F5)
-  y cuando el usuario aprueba una decisión que cambia reglas (nueva entrada en el
-  registro de `docs/README.md`), actualiza `docs/memory.md`, el `README.md` de la
-  raíz ("Estado actual") y agrega una entrada en `docs/diagnostics.md`. Las
-  puertas de pieza (spec, Clarificación, Plan + Tareas, Implementación) solo
-  actualizan `spec.md` (`Estado`) y `tasks.md`.
+- **Documentos de estado (decisiones #86 y #98):** al cerrar cada **puerta F**
+  (F1–F5) y cuando el usuario aprueba una decisión que cambia reglas (nueva
+  entrada en el registro de `docs/README.md`), actualiza `docs/memory.md`, el
+  `README.md` de la raíz ("Estado actual") y agrega una entrada en
+  `docs/diagnostics.md` con el formato fijo de su "Plantilla de entrada",
+  actualizando su tabla **Abiertos** (lo cerrado **sale** de la tabla). Ese
+  archivo no lleva secciones de estado: el estado vive en `README.md` y en
+  `docs/memory.md`. Si pasa de **150 líneas**, el orchestrator reduce, en esa
+  misma puerta F, a **una línea** cada entrada anterior a las de las dos
+  últimas puertas F: `fecha · título · #n · git show <hash>:docs/diagnostics.md`
+  (hash de creación); el detalle queda en git. Las puertas de pieza (spec,
+  Clarificación, Plan + Tareas, Implementación) solo actualizan `spec.md`
+  (`Estado`) y `tasks.md`.
 
 ## Constitución
 

@@ -126,8 +126,15 @@ Cada pieza tiene su carpeta `specs/<categoria>/<Name>/` (`spec.md`, `plan.md`,
 
 Los documentos de estado (`docs/memory.md`, `README.md`, `docs/diagnostics.md`)
 se actualizan **solo** al cerrar cada puerta F y ante una decisión del usuario
-que cambia reglas, como pide la skill (decisión #86). Las puertas de pieza solo
-tocan `spec.md` (`Estado`) y `tasks.md`.
+que cambia reglas, como pide la skill (decisión #86). En `docs/diagnostics.md`
+usás el formato fijo de su "Plantilla de entrada" y actualizás su tabla
+**Abiertos** (lo cerrado **sale** de la tabla); ese archivo no lleva secciones
+de estado: el estado vive en `README.md` y en `docs/memory.md`. Si pasa de
+**150 líneas**, en esa misma puerta F reducís a **una línea** cada entrada
+anterior a las de las dos últimas puertas F: `fecha · título · #n ·
+git show <hash>:docs/diagnostics.md` (hash de creación); el detalle queda en
+git (decisión #98). Las puertas de pieza solo tocan `spec.md` (`Estado`) y
+`tasks.md`.
 
 ## Cómo delegar una tarea
 
@@ -185,8 +192,12 @@ riesgos. Si el usuario señala piezas, rehacés solo esas y volvés a presentar.
 Resumí: pieza y fase SDD (o fase F), qué se hizo, resultado de
 lint/typecheck/test/build, informe del reviewer y pendientes. Esperá la
 aprobación explícita. Al cerrar una puerta F, actualizá además los documentos
-de estado (decisión #86); la entrada de `docs/diagnostics.md` lleva los hashes
-de commits relevantes.
+de estado (decisión #86); la entrada de `docs/diagnostics.md` lleva el formato
+fijo de su plantilla y los hashes de commits relevantes, actualizá su tabla
+**Abiertos** (lo cerrado sale de la tabla) y, si el archivo pasa de 150
+líneas, reducí a una línea cada entrada anterior a las de las dos últimas
+puertas F (`fecha · título · #n · git show <hash>:docs/diagnostics.md`, hash
+de creación; decisión #98).
 
 ## Commits de documentos
 

@@ -63,6 +63,13 @@ equivocada o incompleta, **se frena y se consulta al usuario**; no se
 - **Solo el orchestrator la actualiza**, al cerrar cada puerta F y ante una decisión del usuario que cambia reglas (skill `sdd`, decisión #86): estado actual,
   decisiones importantes (con su porqué) y errores a evitar. Los subagentes la leen; no la editan.
 - Mantenlo breve (máximo ~50 líneas): resume o elimina lo que ya no aporte.
+- El log del proyecto vive en **`docs/diagnostics.md`** (decisiones #86 y #98):
+  una entrada con formato fijo por puerta F o decisión de reglas, tabla
+  **Abiertos** siempre actualizada (lo cerrado **sale** de la tabla) y sin
+  secciones de estado (el estado está en `README.md` y en `docs/memory.md`);
+  si pasa de 150 líneas, el orchestrator reduce a **una línea** por entrada las
+  anteriores a las de las dos últimas puertas F (`fecha · título · #n ·
+  git show <hash>:docs/diagnostics.md`, hash de creación).
 - Si algo se convierte en una regla permanente, propón moverlo a `AGENTS.md` en lugar de dejarlo en la memoria.
 - No guardes nunca datos sensibles (claves, tokens, datos personales).
 
@@ -148,7 +155,8 @@ aprobadas". Cualquier otra: consultar al usuario.
   `foundations/`, `specs/`, `data/`, `.opencode/`) salvo pedido explícito del usuario.
   Excepciones: `data/*.generated.*` se regeneran con los scripts, nunca a mano;
   el orchestrator actualiza `README.md` ("Estado actual"), `docs/memory.md` y
-  `docs/diagnostics.md` al cerrar cada puerta F (decisión #86), escribe
+  `docs/diagnostics.md` al cerrar cada puerta F (decisión #86; formato fijo,
+  tabla Abiertos y poda a 150 líneas: #98), escribe
   `docs/qa-report.md` en F5 (decisión #85), mantiene el registro de
   `docs/README.md` y `docs/agent-system.md` (decisión #95), redacta
   `specs/**/plan.md`/`tasks.md` y edita `spec.md` solo con aprobación (`ask`).
