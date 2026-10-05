@@ -30,6 +30,19 @@ import { BrandIcon } from "./BrandIcon";
 // Import de T3 (se agrega sin tocar los de T1/T2): BRAND_NAMES (RF-2).
 import { BRAND_NAMES } from "./BrandIcon";
 
+// Imports de T4 (se agregan sin tocar los de T1–T3): la clase base del CSS
+// Module (patrón P2 canónico #99: `styles.name ?? "name"` + `toHaveClass`;
+// prohibidos `!` y `as string`), el cierre a11y de la constitución T4 y la
+// superficie pública del índice (nota de tasks.md → T4).
+import { expectNoA11yViolations } from "../../test/a11y";
+
+import styles from "./BrandIcon.module.css";
+
+import {
+  BRAND_NAMES as BRAND_NAMES_INDEX,
+  BrandIcon as BrandIconFromIndex,
+} from "./index";
+
 // Helper del test: normaliza `d` (string | string[]) a lista para recorrerla.
 function toPathList(d: string | string[]): string[] {
   return Array.isArray(d) ? d : [d];
@@ -177,4 +190,73 @@ describe("BRAND_NAMES (RF-2)", () => {
       expect(name.trim()).not.toBe("");
     },
   );
+});
+
+// Tests de T4 (specs/primitives/BrandIcon/tasks.md) — RF-5 y RF-6: tamaño y
+// herencia solo por CSS y unión de `className`. La cadena `width/height:
+// var(--icon-size, var(--size-social-icon))` sin `@media` ni color/opacidad
+// propios se verifica por INSPECCIÓN del revisor sobre BrandIcon.module.css
+// (spec → Estilos y tokens / Responsive; jsdom no calcula estilos — mismo
+// criterio RF-5/RF-6 declarado en la spec y en plan.md → Estrategia de tests).
+// El test ancla lo observable en jsdom: la clase base del módulo va sobre el
+// <svg> raíz y el `className` del consumidor se UNE (P2/spec → API: "no la
+// reemplaza"), donde el padre fija `--icon-size` y el color por currentColor.
+//
+// Justificación de las queries (constitución T3): el <svg> es decorativo por
+// spec (RF-3) y la API no define `data-testid`; lo observable son las clases
+// del raíz, así que se consulta con `container.querySelector("svg")`, el
+// mismo criterio justificado en T2/T3 (y en Icon T5). Las aserciones de clases
+// siguen el patrón P2 canónico #99 (fallback `?? "…"` solo de tipos bajo
+// noUncheckedIndexedAccess; el componente importa el mismo objeto `styles`).
+const brandIconClass = styles.brandIcon ?? "brandIcon";
+
+describe("BrandIcon CSS sizing and className joining (RF-5, RF-6)", () => {
+  it("applies the module base class on the svg by default", () => {
+    const { container } = render(<BrandIcon network="github" />);
+    const svg = container.querySelector("svg");
+
+    expect(svg).not.toBeNull();
+    // RF-5/RF-6: sin prop `size`; el tamaño lo fija la clase base por CSS.
+    expect(svg).toHaveClass(brandIconClass);
+  });
+
+  it("joins the received className to the base class on the svg, not replacing it", () => {
+    // Clase de consumidor (spec → Estilos y tokens: p. ej. la del Sidebar que
+    // fija `--icon-size`); se UNE a la clase base sobre el propio <svg>.
+    const consumerClass = "sidebar-social-glyph";
+    const { container } = render(
+      <BrandIcon network="linkedin" className={consumerClass} />,
+    );
+    const svg = container.querySelector("svg");
+
+    expect(svg).not.toBeNull();
+    expect(svg).toHaveClass(brandIconClass);
+    expect(svg).toHaveClass(consumerClass);
+  });
+
+  // extra: la nota de cierre de pieza en tasks.md (T4) agrega `index.ts` con
+  // la superficie pública (BrandIcon, BRAND_NAMES, tipos — plan.md →
+  // Archivos); "Tests esperados" de la spec no lo menciona, pero el gap de
+  // exportaciones se detectó en el review de Icon T1 y esta tarea lo cierra.
+  it("exposes BrandIcon and BRAND_NAMES through the module index", () => {
+    // Re-export puro: la misma identidad, no una envoltura ni una copia.
+    expect(BrandIconFromIndex).toBe(BrandIcon);
+    expect(BRAND_NAMES_INDEX).toBe(BRAND_NAMES);
+
+    // Y el componente re-exportado renderiza (usage desde la app: índice).
+    const { container } = render(<BrandIconFromIndex network="x" />);
+    expect(container.querySelector("svg")).not.toBeNull();
+  });
+});
+
+// Cierre del archivo (constitución T4, spec → Tests esperados): axe-core sobre
+// el componente renderizado. El único marco de BrandIcon es el decorativo
+// (RF-3: siempre aria-hidden; no hay variante informativa como en Icon); el
+// svg decorativo no debe disparar reglas.
+describe("BrandIcon accessibility audit", () => {
+  it("has no accessibility violations rendering a decorative logo", async () => {
+    const { container } = render(<BrandIcon network="github" />);
+
+    await expectNoA11yViolations(container);
+  });
 });
