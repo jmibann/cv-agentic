@@ -1,7 +1,8 @@
 // Icon — único punto de entrada a lucide-react (specs/primitives/Icon/spec.md).
 // T1: mapa explícito nombre → componente y render de todos los IconName
-// (RF-1). Accesibilidad (T2), `tone` (T3), AccentGradientDefs (T4) y tamaño
-// por CSS con `className` (T5) se agregan en las tareas siguientes.
+// (RF-1). T2: accesibilidad del conducto `label` (RF-2, RF-3, RF-7). `tone`
+// (T3), AccentGradientDefs (T4) y tamaño por CSS con `className` (T5) se
+// agregan en las tareas siguientes.
 
 import {
   BookOpen,
@@ -91,8 +92,19 @@ const ICON_MAP: Record<IconName, LucideIcon> = {
   shield: Shield,
 };
 
-export function Icon({ name }: IconProps) {
+export function Icon({ name, label }: IconProps) {
   const Glyph = ICON_MAP[name];
 
-  return <Glyph />;
+  // RF-7: focusable="false" siempre, con y sin label.
+  // Accesibilidad (RF-2/RF-3): el marcado se fija explícitamente en el
+  // componente, sin depender del default interno de lucide (pasar cualquier
+  // prop aria-* o role desactiva su aria-hidden automático, y un valor
+  // undefined dejaría el <svg> sin marcar).
+  // `label === ""` no es un nombre accesible válido: se trata como decorativo
+  // (RF-2); la spec no define el comportamiento con label vacío.
+  if (label) {
+    return <Glyph role="img" aria-label={label} focusable="false" />;
+  }
+
+  return <Glyph aria-hidden focusable="false" />;
 }
