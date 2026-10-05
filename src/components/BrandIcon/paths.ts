@@ -23,8 +23,8 @@ export interface BrandPath {
   d: string | string[];
 }
 
-// LinkedIn "in" monocromo, 24×24. Origen (RF-4): SVG oficial del kit de marca
-// de LinkedIn (https://brand.linkedin.com/downloads, logo "in" en versión
+// LinkedIn "in" monocromo, 24×24. Origen (RF-4), a verificar: SVG oficial
+// del kit de LinkedIn (https://brand.linkedin.com/downloads, logo "in"
 // monocroma). No está en simple-icons 16.33.0 (la marca lo retiró a pedido
 // propio en la v14; ver docs/BACKLOG.md → "Ícono de LinkedIn"): lo verificado
 // es que el path es el que distribuyó simple-icons bajo licencia CC0 hasta esa
