@@ -26,7 +26,7 @@
     `viewBox` de su entrada (default `0 0 24 24`) y al menos un `<path>` con
     `d` no vacío; verde tras `feat(BrandIcon): T2`.
 
-- [ ] **T3. `BRAND_NAMES` y decorativo a11y.** RF-2, RF-3
+- [x] **T3. `BRAND_NAMES` y decorativo a11y.** RF-2, RF-3 — 8de4610 (+chore config 6d107c6)
   - Hecho cuando: `getByRole` no lo encuentra (`aria-hidden="true"`),
     `focusable="false"` presente, `fill="currentColor"` en el svg;
     `BRAND_NAMES` tiene valor no vacío para cada red (test rechaza `""`);
