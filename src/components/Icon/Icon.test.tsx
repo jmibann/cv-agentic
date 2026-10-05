@@ -55,3 +55,54 @@ describe("Icon map", () => {
     expect(container.querySelector("svg")).toBeInTheDocument();
   });
 });
+
+// Tests de T2 (specs/primitives/Icon/tasks.md) — RF-2, RF-3 y RF-7: sin
+// `label` el ícono es decorativo (aria-hidden="true" y ausente del rol img);
+// con `label` es informativo (role="img" + aria-label); `focusable="false"`
+// en ambos casos.
+//
+// Justificación de las queries (constitución T3): con `label` el <svg> raíz
+// expone rol y nombre accesibles, así que se consulta con getByRole("img",
+// { name: label }) (RF-3). Sin `label` no hay nombre accesible posible
+// (RF-2), y lo observable son los atributos del raíz: se consulta con
+// container.querySelector("svg"), el mismo criterio justificado en T1
+// (la spec no define data-testid en la API).
+describe("Icon accessibility", () => {
+  it("is decorative without a label: aria-hidden and absent from getByRole(\"img\")", () => {
+    const { container, queryByRole } = render(<Icon name="mail" />);
+
+    expect(container.querySelector("svg")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(queryByRole("img")).toBeNull();
+  });
+
+  it("is informative with a label: role=\"img\" and accessible name", () => {
+    const label = "Email address";
+    const { getByRole } = render(<Icon name="mail" label={label} />);
+
+    const glyph = getByRole("img", { name: label });
+    expect(glyph).toHaveAttribute("role", "img");
+    expect(glyph).toHaveAttribute("aria-label", label);
+  });
+
+  it("sets focusable=\"false\" on the svg without a label (RF-7)", () => {
+    const { container } = render(<Icon name="download" />);
+
+    expect(container.querySelector("svg")).toHaveAttribute(
+      "focusable",
+      "false",
+    );
+  });
+
+  it("sets focusable=\"false\" on the svg with a label (RF-7)", () => {
+    const label = "Download CV";
+    const { getByRole } = render(<Icon name="download" label={label} />);
+
+    expect(getByRole("img", { name: label })).toHaveAttribute(
+      "focusable",
+      "false",
+    );
+  });
+});
