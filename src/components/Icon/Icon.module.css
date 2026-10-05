@@ -10,7 +10,7 @@
   position: absolute;
 }
 
-/* Colors de los <stop> solo desde tokens semánticos (regla dura 2 de
+/* Colores de los <stop> solo desde tokens semánticos (regla dura 2 de
    DESIGN.md): al ser custom properties, el gradiente cambia solo con el
    tema. */
 .stopStart {
