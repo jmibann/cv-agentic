@@ -16,7 +16,7 @@
     registrada en `docs/BACKLOG.md`. No toca tests ni otras líneas; verde tras
     el fix.
 
-- [ ] **T2. Render del `<svg>` por red.** RF-1
+- [x] **T2. Render del `<svg>` por red.** RF-1 — eb0d21c (+fix d654a26)
   - Nota del review de T1b (menor, a ejecutar en esta ronda como `fix`
     aparte): reformar la apertura del comentario de LinkedIn en `paths.ts`
     (líneas 26-28: "Origen (RF-4): SVG oficial del kit de marca…") para que
