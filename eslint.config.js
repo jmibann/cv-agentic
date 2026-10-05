@@ -36,7 +36,7 @@ export default tseslint.config(
         "error",
         {
           allowConstantExport: true,
-          allowExportNames: ["useTheme", "useLocale", "useCv"],
+          allowExportNames: ["useTheme", "useLocale", "useCv", "BRAND_NAMES"],
         },
       ],
     },
