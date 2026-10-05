@@ -121,8 +121,10 @@ export function Icon({ name, tone = "current", label }: IconProps) {
   // componente, sin depender del default interno de lucide (pasar cualquier
   // prop aria-* o role desactiva su aria-hidden automático, y un valor
   // undefined dejaría el <svg> sin marcar).
-  // `label === ""` no es un nombre accesible válido: se trata como decorativo
-  // (RF-2); la spec no define el comportamiento con label vacío.
+  // `label === ""` no es un nombre accesible válido y la rama `if (label)` lo
+  // trata como decorativo: así lo define la spec → Accesibilidad, "Un `label`
+  // de string vacío se trata como **decorativo** (equivale a no pasarlo:
+  // `aria-label=""` no produce nombre accesible)".
   if (label) {
     return (
       <Glyph {...toneProps} role="img" aria-label={label} focusable="false" />
