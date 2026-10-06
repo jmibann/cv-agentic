@@ -1,11 +1,11 @@
 // Button — acción principal con el gradiente de acento
 // (specs/primitives/Button/spec.md). T1: rama botón de la unión discriminada
 // por `href` (RF-1): sin `href` renderiza un <button> con el `type` recibido
-// (default "button") y el nombre accesible desde `children`. Ramas diferidas
-// a su tarea según tasks.md: onClick/disabled (T2), render del <a> con
-// href/rel/target/download (T3), ícono e iconPosition (T4), clases
-// size/fullWidth y unión de className (T5), estilos por tokens y pseudo-
-// estados (T6).
+// (default "button") y el nombre accesible desde `children`. T2: `onClick` y
+// `disabled` de la rama botón llegan al <button> (RF-3). Ramas diferidas a su
+// tarea según tasks.md: render del <a> con href/rel/target/download (T3),
+// ícono e iconPosition (T4), clases size/fullWidth y unión de className (T5),
+// estilos por tokens y pseudo-estados (T6).
 
 import type { ReactNode } from "react";
 
@@ -56,7 +56,19 @@ export function Button(props: ButtonProps) {
   // sin `rel` → "noopener noreferrer", RF-2/RF-9) y `download` (RF-8).
   const type = props.href === undefined ? (props.type ?? "button") : "button";
 
-  // API cerrada (spec → API): al botón solo llegan `type` y `children`;
-  // onClick/disabled llegan en T2, el ícono en T4, las clases en T5.
-  return <button type={type}>{props.children}</button>;
+  // RF-3 (T2): `onClick` y `disabled` solo existen en la rama sin `href`
+  // (spec → API); el mismo angostado por `href === undefined` que usa `type`
+  // los lee con tipos. En la rama link (provisoria hasta T3) quedan
+  // `undefined`: la unión no permite pasarlos, así que el angostado de TS
+  // los deja fuera del <a> futuro sin código extra.
+  const onClick = props.href === undefined ? props.onClick : undefined;
+  const disabled = props.href === undefined ? props.disabled : undefined;
+
+  // API cerrada (spec → API): al botón llegan `type`, `onClick`, `disabled` y
+  // `children`; el ícono en T4, las clases en T5.
+  return (
+    <button type={type} onClick={onClick} disabled={disabled}>
+      {props.children}
+    </button>
+  );
 }
