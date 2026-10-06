@@ -16,7 +16,7 @@
     (`content: ""`; inspección); el nombre accesible no cambia (test); verde tras
     `feat(SectionTitle): T3`.
 
-- [ ] **T4. `icon` (IconBox en el heading) y combinación decorated+icon.** RF-3
+- [x] **T4. `icon` (IconBox en el heading) y combinación decorated+icon.** RF-3 — 9dc375a
   - Hecho cuando: con `icon` el heading renderiza `IconBox` y su nombre
     accesible sigue siendo solo el texto; `decorated` + `icon` juntos conserva
     ambos tratamientos (clase decorated **y** IconBox presentes); el flex va en
