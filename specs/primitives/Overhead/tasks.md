@@ -10,7 +10,7 @@
     en `<dl>`); `className` queda unida al raíz (P2); verde tras
     `feat(Overhead): T2`.
 
-- [ ] **T3. Estilos (elipsis/muted/tamaño) y cierre a11y.** RF-3, RF-4, RF-5, RF-6
+- [x] **T3. Estilos (elipsis/muted/tamaño) y cierre a11y.** RF-3, RF-4, RF-5, RF-6 — 0a3cc07
   - Hecho cuando: el módulo declara `display: block` +
     `overflow: hidden; text-overflow: ellipsis; white-space: nowrap` sin
     `max-width` propio, color `--color-text-muted`, tamaño
