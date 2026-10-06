@@ -1,0 +1,27 @@
+/* CornerTab — specs/primitives/CornerTab/spec.md → Estilos y tokens (T1).
+   En T1 la clase base fija SOLO la fila "Posición" de la tabla de la spec
+   (RF-1): absolute/top/right con `z-index: var(--z-raised)` (token; regla 2
+   de docs/DESIGN.md; comment de tokens.css: "CornerTab sobre el contenido del
+   Box"). Cero colores literales, cero `@media` propios (el único `@media` del
+   módulo será el de `.float` en T3; RF-4: ninguna medida propia cambia por
+   breakpoint — `top`/`right` son 0, permitido por docs/tokens/breakpoints.md).
+   Cero pseudo-estados :hover/:focus y cero transiciones (spec → Estados:
+   ninguno propio; RF-6: hover/foco son del contenido). Sin margen externo
+   (docs/DESIGN.md → Do/Don't): el padre posiciona con gap; en T3 `.float`
+   usará márgenes negativos de calc() sobre --box-padding (compensación del
+   padding del Box, excepción igual a Separator/SectionTitle, no margen de
+   espaciado). Diferidos: fondo --color-surface-raised, bordes
+   border-left/bottom 1px --color-border (obligatorios, RF-5), radio
+   0/--radius-20/0/--radius-32 y layout interno flex (T4); alturas/padding
+   sm/md (T2). */
+
+/* Clase base del único elemento raíz (<div>, spec → Anatomía: un div
+   posicionado dentro del Box, que es position: relative). Valores exactos de
+   la fila "Posición" de la tabla "Estilos y tokens" (spec; rige en overlay,
+   RF-1). */
+.cornerTab {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: var(--z-raised);
+}
