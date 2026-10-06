@@ -9,6 +9,9 @@ export const uiEs = {
   controls: {
     label: "Ajustes de visualización",
     darkMode: "Modo oscuro",
+    // Cambio F3 (decisión 1=a): aria-label del toggle en tema oscuro
+    // (lo consume ThemeToggle en F3).
+    lightMode: "Modo claro",
     language: "Idioma",
   },
   sidebar: {

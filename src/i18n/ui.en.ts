@@ -7,6 +7,9 @@ export const uiEn = {
   controls: {
     label: "Display settings",
     darkMode: "Dark mode",
+    // Cambio F3 (decisión 1=a): aria-label del toggle en tema oscuro
+    // (lo consume ThemeToggle en F3).
+    lightMode: "Light mode",
     language: "Language",
   },
   sidebar: {

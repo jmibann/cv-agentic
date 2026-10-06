@@ -20,11 +20,18 @@ export function formatPeriod(
   locale: Locale,
   presentLabel: string,
 ): string {
-  const end = period.end === null ? presentLabel : formatEndpoint(period.end, locale);
-  return `${formatEndpoint(period.start, locale)} — ${end}`;
+  const end = period.end === null ? presentLabel : formatPeriodEndpoint(period.end, locale);
+  return `${formatPeriodEndpoint(period.start, locale)} — ${end}`;
 }
 
-function formatEndpoint(value: string, locale: Locale): string {
+/**
+ * Formatea un extremo de un período (Cambio F3, decisión 12=a; lo consume
+ * Timeline con `<time>` por extremo). `"YYYY"` se muestra tal cual;
+ * `"YYYY-MM"` se formatea con `Intl.DateTimeFormat(locale, { month: "short",
+ * year: "numeric" })`. `formatPeriod` usa esta misma función en ambos
+ * extremos: no cambia firma ni comportamiento (los tests F1 de T7 siguen).
+ */
+export function formatPeriodEndpoint(value: string, locale: Locale): string {
   const [year, month] = value.split("-");
   if (year === undefined || month === undefined) {
     // "YYYY" sin mes: solo el año, sin formatear (así lo fija RF-8:
