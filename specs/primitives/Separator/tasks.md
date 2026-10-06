@@ -13,7 +13,7 @@
     (inspección); `className` se une al raíz (P2); verde tras
     `feat(Separator): T2`.
 
-- [ ] **T3. Cierre a11y.** — RF-1, RF-2
+- [x] **T3. Cierre a11y.** — RF-1, RF-2 — 7c3af0c
   - Hecho cuando: el archivo termina con `expectNoA11yViolations` (dentro de un
     `Box outer` de armazón si hace falta para el escenario); lint + typecheck +
     test verdes tras `feat(Separator): T3`.
