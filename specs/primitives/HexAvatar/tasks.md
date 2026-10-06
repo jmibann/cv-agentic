@@ -7,7 +7,7 @@
     origen; el `<svg>` es 0×0 `position: absolute`, nunca `display: none`
     (inspección); verde tras `feat(HexAvatar): T1`.
 
-- [ ] **T2. Estructura `wrap > border > img` con `src`.** RF-1
+- [x] **T2. Estructura `wrap > border > img` con `src`.** RF-1 — 9137a67
   - Hecho cuando: el `<img>` recibe el `src`; contorno e imagen llevan sus
     clases del módulo (P2); los offsets 4px y tamaños `calc()` respecto de
     `--size-testimonial-avatar-w/h` (inspección); el `url(#hex-avatar-*)` de
