@@ -6,7 +6,7 @@
     propias (un solo `#accent-gradient` en el DOM del test); verde tras
     `feat(IconBox): T1`.
 
-- [ ] **T2. Raíz decorativa + `className`.** RF-2
+- [x] **T2. Raíz decorativa + `className`.** RF-2 — b0abecc
   - Hecho cuando: el `<span>` raíz tiene `aria-hidden="true"`; la `className`
     externa queda unida a la clase base del raíz (P2); verde tras
     `feat(IconBox): T2`.
