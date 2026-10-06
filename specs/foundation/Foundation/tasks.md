@@ -160,3 +160,15 @@ T3b (deuda L1 detectada en su review).
     (comentarios, no títulos); ④ `data/validate-cv.generated.js` importa
     `ajv/dist/runtime/ucs2length.js` al bundle (runtime-helper de ajv
     standalone; decide el usuario en la puerta F1).
+
+- [ ] **T12. Cambio F3 (previo a ControlsBar/T1 y Timeline/T2): `formatPeriodEndpoint` exportado + `controls.lightMode`.** RF-8 (+ Tests esperados de la spec actualizada) — Cambio aprobado en la Clarificación F3 (decisiones 1=a y 12=a, puerta de Plan F3)
+  - Hecho cuando: `src/i18n/formatPeriod.ts` exporta
+    `formatPeriodEndpoint(value, locale): string` (la actual `formatEndpoint`
+    privada, ahora exportada; `formatPeriod` queda con la misma firma y
+    comportamiento, sus tests F1 pasan sin tocar); pasan los nuevos tests de
+    la función (año suelto tal cual; `"YYYY-MM"` → `"Mar 2019"` en / `"mar 2019"`
+    es); `ui.en.ts` y `ui.es.ts` agregan `controls.lightMode`
+    ("Light mode" / "Modo claro") manteniendo `satisfies UiStrings` en verde;
+    `foundations/i18n.md` (tabla de claves y "Fechas y períodos") ya documenta
+    ambos (editado por el orchestrator en esta misma decisión); lint +
+    typecheck + test verdes. No toca nada más de F1.

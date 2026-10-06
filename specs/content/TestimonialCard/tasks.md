@@ -1,0 +1,10 @@
+# Tareas — TestimonialCard
+
+- [ ] **T1. Estructura: Box article, header con HexAvatar y extracto.** RF-4, RF-7
+  - Hecho cuando: `getByRole("article", { name: author })` con `<h3 id="testimonial-${testimonial.id}-name">` (fórmula fija; el article se nombra por él), `<p class=role>`, extracto con `testimonial.text`; `HexAvatar` con `alt=""` (armazón `HexAvatarDefs` + `AccentGradientDefs`); comilla `Icon quote tone="gradient"` decorativa sin nombre accesible; todavía **sin** botón ni `onClick` en ningún nodo (el botón es T2); verde tras `feat(TestimonialCard): T1`.
+
+- [ ] **T2. Botón estirado y `onOpen`.** RF-1
+  - Hecho cuando: `getByRole("button", { name: openLabel })` como único elemento enfocable del article (assert: es el único `tabIndex` >= 0 / único button del subtree); click, Enter y Espacio invocan `onOpen(testimonial.id)` exactamente una vez; el botón es `<button type="button">` con `::after` (inspección DOM: sin hijos textuales) y se muestra siempre (RF-1); `<article>` sin `onClick`/`tabIndex` (inspección); verde tras `feat(TestimonialCard): T2`.
+
+- [ ] **T3. Estilos por tokens, clamp, print propio y cierre a11y.** RF-2, RF-5, RF-6
+  - Hecho cuando: el módulo declara `.card` sobre el Box (position relative, flex column, `--radius-16`, `--testimonial-padding`, `height: 100%`, sin `margin-top`), avatar con `margin-top: calc(var(--testimonial-avatar-offset) * -1)`, header grid `auto 1fr` con `column-gap: 0.9375rem` fijo citado, extracto clamp 4 líneas (`-webkit-box`/`-webkit-line-clamp`/`overflow: hidden`), comilla `--icon-size: 2rem` + absolute con `--testimonial-quote-inset-*`, botón `position: static` reset + `::after { content: ""; inset: 0; border-radius: inherit }` + `cursor: pointer`, hover `.card` sombra `--shadow-control` con transición `box-shadow var(--duration-base) var(--ease-standard)`, anillo focus-visible en el `::after`, bloque `@media print` propio (clamp quitado + botón oculto) y **cero** `@media` de breakpoints (inspección); el archivo termina con `expectNoA11yViolations`; `index.ts` re-exporta `TestimonialCard` y tipos; lint + typecheck + test verdes tras `feat(TestimonialCard): T3`.

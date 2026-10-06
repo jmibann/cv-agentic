@@ -1,0 +1,16 @@
+# Tareas — TestimonialCarousel
+
+- [ ] **T1. Funciones puras de stops.** RF-3, RF-5 (base)
+  - Hecho cuando: `getScrollStops.ts` exporta ambas funciones sin DOM; pasan los 4 casos exactos de spec → Tests (clamp+dedup `[0,300,600]/300→[0,300]`; `/600→[0,300,600]`; `[0,300]/0→[0]`; `getActiveStop` 140→0, 160→1, 150→0); verde tras `feat(TestimonialCarousel): T1`.
+
+- [ ] **T2. Región única con slides y dialog cableado.** RF-1, RF-6
+  - Hecho cuando: `getByRole("region", { name })` sobre la `<section>` raíz con `aria-roledescription="carousel"` (nombre por `labelledBy`, con armazón `<h2 id>`, o `aria-label={labels.carousel}`); un `group` por testimonio con `aria-roledescription="slide"` y nombre "n of N" (1-based, `total = length`; `format` de i18n); `testimonials=[]` → `container` vacío; click en el botón de una card → `TestimonialDialog` abierto con ese autor; cerrar → desaparece y el estado vuelve a null (RF-6; armazones defs); sin segunda `<section>` anidada (inspección DOM raíz, decisión 20); verde tras `feat(TestimonialCarousel): T2`.
+
+- [ ] **T3. Bullets por stops con aria-current.** RF-3, RF-5
+  - Hecho cuando: con layout mockeado [0,300,600]/max 300 → **2** bullets con nombres "Go to slide 1"/"Go to slide 2" (regla stop→n de spec → Comportamiento); el del stop activo (scrollLeft 0) con `aria-current="true"`; `fireEvent.scroll` con scrollLeft 300 → aria-current pasa al bullet 2 (rAF: flush con `vi.waitFor`/mock de raf); 1 stop o menos → sin bullets (1 testimonio y 2-con-2-por-vista); 0 testimonios ya cúbrela T2; verde tras `feat(TestimonialCarousel): T3`.
+
+- [ ] **T4. Click de bullet → scrollTo con behavior.** RF-4
+  - Hecho cuando: click bullet 2 → `track.scrollTo({ left: 300, behavior: "auto" })` (mock de `scrollTo` + matchMedia default `matches=false`); con `matchMedia` stubeado a `matches=true` → `behavior: "smooth"`; un click, una llamada; verde tras `feat(TestimonialCarousel): T4`.
+
+- [ ] **T5. Estilos por tokens, print y cierre a11y.** RF-2, RF-7, RF-8
+  - Hecho cuando: el módulo declara track (`display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: var(--layout-gap); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; padding-block: var(--testimonial-headroom) 2rem; list-style: none; margin: 0; scrollbar-width: none;` + `::-webkit-scrollbar { display: none }`), slide `scroll-snap-align: start`, `@media (min-width: 768px)` con `grid-auto-columns: calc((100% - var(--layout-gap)) / 2)`, paginación centrada `gap: 0.625rem` `margin-top: var(--space-4)`, bullet (`--size-bullet`, `--color-track`, `--radius-round`, `::after` táctil 24×24 transparente, hover `--color-text-muted` solo inactivo, focus ring estándar), activo (`--size-bullet-active`, `--gradient-accent`, transición `width --duration-base --ease-emphasized`), `@media print` (track block/`overflow: visible`/padding headroom arriba, slide `break-inside: avoid` + `margin-top: var(--testimonial-headroom)` desde el segundo, paginación oculta) y cero otros media — todo por inspección; el archivo termina con `expectNoA11yViolations` (cerrado y con dialog abierto); `index.ts` re-exporta `TestimonialCarousel` y tipos; lint + typecheck + test verdes tras `feat(TestimonialCarousel): T5`.

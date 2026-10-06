@@ -81,7 +81,7 @@ para cambiar el nivel: la jerarquía está fijada en `docs/DESIGN.md` y
 | Período | `color: var(--color-text-muted); margin: 0;` |
 | Descripción | `margin: var(--space-1) 0 0;` |
 
-**Token nuevo (decisión 13): `--timeline-title-shift: 0.3125rem`** en `tokens/tokens.css` (valor fijo, no escala por breakpoint; reemplaza el literal `-0.3125rem` del título y documenta el acople con `--timeline-dot-top` que hoy solo vive en comentario). Lo agrega la misma tarea previa de `foundation` que exporta el formador por extremo (12=a) — no lo escribe el builder de Timeline.
+**Token nuevo (decisión 13): `--timeline-title-shift: 0.3125rem`** en `tokens/tokens.css` (valor fijo, no escala por breakpoint; reemplaza el literal `-0.3125rem` del título y documenta el acople con `--timeline-dot-top` que hoy solo vive en comentario). **Lo agrega el usuario** en la sección de componentes, antes de Timeline T3 (misma mecánica aprobada en #99 para `--button-small-padding-*`; `tokens/` es kit y los agentes no lo escriben). La línea exacta se presenta en la puerta de Plan + Tareas de F3.
 
 La línea y el halo usan `--color-track` (en oscuro = `--color-border`, para
 que se vean: `grey-200` oscuro es más oscuro que la card).

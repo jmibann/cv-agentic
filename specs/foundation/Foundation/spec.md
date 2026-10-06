@@ -132,6 +132,11 @@ export function formatPeriod(
   presentLabel: string,
 ): string;
 
+// Cambio F3 (Clarificación 12=a; lo consume Timeline con <time> por extremo):
+// mismo formateo de extremo que la actual `formatEndpoint` privada; `formatPeriod`
+// NO cambia de firma ni comportamiento.
+export function formatPeriodEndpoint(value: string, locale: Locale): string;
+
 // src/content/index.ts
 export const cvByLocale: Record<Locale, CvData>;  // load() lanza si validateCv falla
 
@@ -238,6 +243,9 @@ Fuente: `foundations/theming.md`, `foundations/i18n.md`,
   queda literal.
 - `formatPeriod`: años sueltos, año-mes en ambos extremos, `end: null`, ambos
   idiomas (casos de RF-8).
+- `formatPeriodEndpoint` (Cambio F3): `"2015"` → `"2015"`; `"2019-03"` →
+  `"Mar 2019"` (en) / `"mar 2019"` (es); coincide con cada extremo del
+  resultado de `formatPeriod` sobre los mismos datos.
 - **Paridad de contenido** (`content.test.ts`): `cv.en.json` y `cv.es.json` con
   los mismos ids en cada colección, en el mismo orden, y los campos no
   traducibles (lista canónica de `foundations/i18n.md`) idénticos.
