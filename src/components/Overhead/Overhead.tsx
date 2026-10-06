@@ -1,12 +1,12 @@
 // Overhead — etiqueta pequeña en mayúsculas que precede a un valor
 // (specs/primitives/Overhead/spec.md). T1: render base (RF-1): raíz con la
-// clase del módulo (única declaración por ahora: `text-transform: uppercase`)
-// y el `children` tal cual, sin transformar el string: las mayúsculas las pone
-// CSS y el DOM conserva la capitalización normal (spec → Accesibilidad).
-// T2 hecha: `as="dt"` renderiza `<dt>` (RF-2) y la `className` del consumidor
-// se UNE a la clase base del raíz. Pendientes de su tarea: elipsis,
-// `--color-text-muted`, `--font-size-overhead`, peso regular, `display: block`
-// y cierre `expectNoA11yViolations` (T3).
+// clase del módulo y el `children` tal cual, sin transformar el string: las
+// mayúsculas las pone CSS y el DOM conserva la capitalización normal (spec →
+// Accesibilidad). T2 hecha: `as="dt"` renderiza `<dt>` (RF-2) y la `className`
+// del consumidor se UNE a la clase base del raíz. T3 hecha: esa clase base
+// trae los estilos por tokens (display block, elipsis RF-3, --color-text-muted
+// RF-4 por uso restringido, --font-size-overhead RF-5, sin roles ni
+// interactividad RF-6) y el módulo se re-exporta desde `index.ts`.
 
 import type { ReactNode } from "react";
 

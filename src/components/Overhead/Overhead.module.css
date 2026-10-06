@@ -1,11 +1,26 @@
-/* Overhead — specs/primitives/Overhead/spec.md → Estilos y tokens (T1).
-   En T1 solo la transformación a mayúsculas (RF-1): el DOM conserva el texto
-   con su capitalización normal y las mayúsculas las pone este CSS. El resto
-   (display: block, elipsis, --color-text-muted, --font-size-overhead, peso
-   regular, cero @media) llega en T3. Sin colores literales y sin margen
+/* Overhead — specs/primitives/Overhead/spec.md → Estilos y tokens (T3).
+   Cero colores literales y cero @media propios (RF-5: el tamaño escala solo
+   por --font-size-overhead, que salta de 11px a 12px en ≥580 dentro de
+   tokens/tokens.css; spec → Responsive) y cero pseudo-estados :hover/:focus
+   ni cursor (RF-6: no es interactivo, sin roles ni estados). Sin margen
    externo: el padre separa con gap (docs/DESIGN.md → Do/Don't). */
 
-/* Clase base del único elemento raíz (span o dt según `as`, T2). */
+/* Clase base del único elemento raíz (span o dt según `as`, T2). Valores
+   exactos de la tabla "Estilos y tokens" de la spec: color
+   --color-text-muted (RF-4: nunca sobre --color-bg en claro —4.32:1—; el
+   reviewer lo verifica en el consumidor, F3: solo surface, surface-muted y
+   surface-raised); tamaño --font-size-overhead con --font-weight-regular;
+   text-transform: uppercase (RF-1: el DOM conserva la capitalización normal);
+   display: block con elipsis (RF-3: overflow: hidden + text-overflow:
+   ellipsis + white-space: nowrap SIN max-width propio —la restricción de
+   ancho es del contenedor, plan → Decisiones—). */
 .overhead {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-overhead);
+  font-weight: var(--font-weight-regular);
   text-transform: uppercase;
 }
