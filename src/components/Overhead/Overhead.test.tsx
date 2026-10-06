@@ -20,6 +20,9 @@ import { describe, expect, it } from "vitest";
 
 import { Overhead } from "./Overhead";
 
+// T3: helper de cierre a11y (constitución T4); import puro, no toca lo anterior.
+import { expectNoA11yViolations } from "../../test/a11y";
+
 // T2: el test importa el módulo solo para fijar el nombre real de la clase
 // base (`overhead`, resuelto por CSS Modules en runtime) y asierte la coexistencia
 // con la clase del consumidor en el raíz (precedente Badge).
@@ -123,5 +126,58 @@ describe("Overhead as prop and className joining (T2: RF-2)", () => {
     expect(root.parentElement?.tagName).toBe("DL");
     expect(root).toHaveClass(overheadClass);
     expect(root).toHaveClass(consumerClass);
+  });
+});
+
+// Tests de T3 (specs/primitives/Overhead/tasks.md) — RF-3, RF-4, RF-5 y RF-6,
+// y cierre del archivo (constitución T4, spec → Tests esperados:
+// "expectNoA11yViolations sin violaciones"). Dos casos de axe, uno por forma
+// del raíz (spec → Anatomía): el `span` suelto y el `dt` dentro de un `<dl>` de
+// armazón (RF-2: el contexto de la lista de definición lo arma el consumidor).
+// El armazón válido exige un `<dd>` tras el `<dt>`: axe viola `definition-list`
+// con un `<dl>` que solo contiene `<dt>` (la validez del contexto es del
+// consumidor, no del componente; análogo al "li válido solo si hay un ul" de
+// Badge T3). Mismo criterio de cierre que Badge/Box: axe sobre el `container`
+// del render.
+//
+// Qué cubre cada RF y cómo se verifica (plan → Estrategia de tests):
+// - RF-6 (no interactivo, sin roles añadidos): el axe de abajo sobre las dos
+//   formas del raíz (spec → Accesibilidad: texto plano; "No hacer": "No hacerlo
+//   interactivo ni agregarle roles").
+// - RF-3 (elipsis) y RF-5 (--font-size-overhead, cero @media propios):
+//   inspección del CSS por el reviewer; jsdom no computa el truncamiento ni
+//   los estilos (spec → RF-3: "Verificación: inspección del CSS").
+// - RF-4 (contraste sobre --color-bg): restricción de USO del consumidor
+//   (spec → RF-4: "la verifica el reviewer en el consumidor (el componente no
+//   conoce el fondo)"); no hay test posible dentro de la pieza, como declaró
+//   el plan (Decisiones) — no se inventa alcance.
+//
+// Decisión #101 (tarea 100 % inspección + axe sobre markup ya accesible): este
+// cierre nace VERDE on-arrival con el markup de T1/T2 (Overhead es texto plano
+// sin roles); lo que discrimina T3 —display block, elipsis sin max-width,
+// --color-text-muted, --font-size-overhead, peso regular, cero @media en
+// Overhead.module.css— se verifica por inspección del reviewer, no por test.
+// Nota: con el armazón ingenuo `<dl>` + solo `<dt>` el caso dt nacía ROJO, pero
+// por un error del test (axe `definition-list` exige `<dd>` tras el `<dt>`;
+// contexto válido = del consumidor, RF-2), no por falta de implementación → se
+// corrige el armazón antes del commit en rojo. Las aserciones de clase de T2 ya
+// pasan (`.overhead` existe desde T1) y leer el CSS como texto sería un rojo
+// artificial explícitamente descartado en #101.
+describe("Overhead accessibility audit (T3: RF-6)", () => {
+  it("has no accessibility violations rendering a loose span overhead", async () => {
+    const { container } = render(<Overhead>Email</Overhead>);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations rendering a dt overhead inside a dl", async () => {
+    const { container } = render(
+      <dl>
+        <Overhead as="dt">Email</Overhead>
+        <dd>alex@example.com</dd>
+      </dl>,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
