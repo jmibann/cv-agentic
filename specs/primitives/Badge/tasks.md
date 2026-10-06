@@ -5,7 +5,7 @@
     y `<li>` con `as="li"` (test con `<ul>` de armazón); verde tras
     `feat(Badge): T1`.
 
-- [ ] **T2. `className` unida al raíz.** RF-3
+- [x] **T2. `className` unida al raíz.** RF-3 — f0b7311
   - Hecho cuando: la clase externa queda junto a la base en el único elemento
     (aserción P2); verde tras `feat(Badge): T2`.
 
