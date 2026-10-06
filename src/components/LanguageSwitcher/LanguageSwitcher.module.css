@@ -1,0 +1,21 @@
+/* LanguageSwitcher — specs/controls/LanguageSwitcher/spec.md. T1: el módulo
+   nace SOLO con la clase base vacía para que la unión de `className` (G-B,
+   #99) coexista con una clase real desde el primer commit (precedente exacto
+   ThemeToggle T1 / Badge T2 / IconBox T2; el "Hecho cuando" de T1 no
+   inspecciona propiedades). Cero colores literales y cero @media propios
+   (spec → Responsive: tamaño fijo --size-control en todos los breakpoints,
+   RF-6); sin margen externo (docs/DESIGN.md → Do/Don't: ControlsBar separa con
+   gap). */
+
+/* Clase base del único elemento raíz (`div role="group"`, spec → Anatomía).
+   TODAS las propiedades por tokens de la tabla "Estilos y tokens" —
+   display: inline-flex, height --size-control, padding 0.1875rem, gap 0.125rem
+   (sin divisor, decisión 3 del plan), fondo --color-surface-raised, borde 1px
+   --color-border, --radius-12, --shadow-control, y las clases de botón
+   (min-width 2.25rem, --radius-8, --font-size-small/--font-weight-medium,
+   color --color-text → hover --color-accent-text, activo --gradient-accent +
+   --color-on-accent, anillo focus-visible, press con transición; RF-6 y
+   Estados) — llegan en T3. */
+.languageSwitcher {
+  /* propiedades en T3 */
+}
