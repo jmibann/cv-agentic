@@ -34,9 +34,11 @@ describe("IconBox structure (RF-1)", () => {
 
     // extra (Anatomía de la spec, tarea de estructura T1): el raíz es un
     // <span> y el ícono vive dentro; "Tests esperados" solo lista el stroke,
-    // pero esta tarea es justamente la estructura `<span>` + Icon.
-    const root = container.firstElementChild;
-    expect(root?.tagName).toBe("SPAN");
+    // pero esta tarea es justamente la estructura `<span>` + Icon. Se busca
+    // el <span> (no firstElementChild): en el fragmento el primer hijo es el
+    // <svg> de las defs del armazón.
+    const root = container.querySelector("span");
+    expect(root).not.toBeNull();
 
     // El glyph es el único <svg> con el atributo stroke: el <svg> del armazón
     // (defs) no lleva stroke, así que la query no lo confunde.
