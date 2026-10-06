@@ -273,6 +273,7 @@
   --timeline-line-width: 1px;
   --timeline-dot-ring: 0.25rem;
   --timeline-dot-top: 0.0625rem;                   /* alinea el punto con la primera línea del título (que sube 0.3125rem) */
+  --timeline-title-shift: 0.3125rem; /* fija el título de Timeline sobre su ítem: compensa --timeline-dot-top (acople documentado) */
   /* Testimonios */
   --testimonial-padding: 1rem;                     /* → 1.875rem 1.875rem 1.5rem (≥580) */
   --testimonial-padding-top: 1rem;                 /* → 1.875rem (≥580); parte superior de --testimonial-padding */
