@@ -1,6 +1,6 @@
 # Tareas — CornerTab
 
-- [ ] **T1. Render base overlay con `children`.** RF-1, RF-6
+- [x] **T1. Render base overlay con `children`.** RF-1, RF-6 — e189ed8
   - Hecho cuando: el raíz `<div>` renderiza los `children` y aplica la clase
     base (P2); el raíz no tiene `role` ni ningún atributo `aria-*` (test);
     la clase base fija absolute/top/right/`z-index: var(--z-raised)`
