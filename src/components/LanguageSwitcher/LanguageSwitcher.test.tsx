@@ -1,5 +1,6 @@
-// Tests de T1 y T2 (specs/controls/LanguageSwitcher/tasks.md) — T1: RF-1,
-// RF-4 · T2: RF-2, RF-3, RF-5 (estado activo, `setLocale` + guard, tab stops).
+// Tests de T1–T3 (specs/controls/LanguageSwitcher/tasks.md) — T1: RF-1,
+// RF-4 · T2: RF-2, RF-3, RF-5 (estado activo, `setLocale` + guard, tab stops) ·
+// T3: cierre a11y del archivo (RF-6 se verifica por INSPECCIÓN del CSS).
 // Armazón (plan → Decisiones "Harness doble"): el archivo corre con el mock de
 // módulo de `../../providers/LocaleProvider` ARMADO (`vi.mock` +
 // `vi.hoisted`): `useLocale()` devuelve `{ locale, setLocale: espión, t }`
@@ -31,9 +32,13 @@
 // clase base de la unión (#99) se fija con el patrón canónico
 // `styles.name ?? "name"` (prohibidos `!` y `as`), precedente ThemeToggle T1.
 //
-// Diferidos: T3 agrega el cierre `expectNoA11yViolations` (constitución T4: el
-// archivo termina con ese caso en T3, ídem ThemeToggle T3; los describes de T2
-// quedan ANTES de ese cierre), los estilos por tokens del módulo y `index.ts`.
+// Diferidos: ninguno en los tests — T3 AGREGÓ el cierre `expectNoA11yViolations`
+// al final del archivo (constitución T4, ídem ThemeToggle T3; los describes de
+// T1/T2 quedan ANTES de ese cierre, asserts intactos: agrego puro). Los estilos
+// por tokens del módulo y `index.ts` llegan en `feat(LanguageSwitcher): T3`: su
+// verificación es la INSPECCIÓN del CSS (pseudo-estados y @media no son
+// testeables en jsdom; decisión #101: el cierre nace VERDE on-arrival porque el
+// markup de T1/T2 ya es accesible — se declara en el mensaje del commit test).
 
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -45,6 +50,10 @@ import type { LocaleContextValue } from "../../providers/LocaleProvider";
 import type { Locale } from "@data/cv.types.generated";
 
 import { LanguageSwitcher } from "./LanguageSwitcher";
+
+// T3: helper de cierre a11y (constitución T4); import puro, no toca lo anterior
+// (precedente Badge/Overhead/SectionTitle).
+import { expectNoA11yViolations } from "../../test/a11y";
 
 // El test importa el módulo solo para fijar el nombre real de la clase base
 // (`languageSwitcher`, resuelto por CSS Modules en runtime) y asierte la
@@ -320,5 +329,76 @@ describe("LanguageSwitcher tab order (T2: RF-5)", () => {
     expect(
       screen.getByRole("button", { name: SPANISH_LABEL }),
     ).toHaveFocus();
+  });
+});
+
+// --- T3 · Cierre a11y (constitución T4) --------------------------------------
+// spec → Tests esperados, textual: "`expectNoA11yViolations` sin violaciones";
+// plan → Estrategia: "cierre `expectNoA11yViolations` con cada idioma activo"
+// (tasks T3 "Hecho cuando": "activo en en y en es"). Dos casos de axe, uno por
+// rama de idioma activo: el DOM auditado difiere en cuál botón carga
+// `aria-pressed="true"` (spec → Estados: la forma activa es gradiente +
+// on-accent, la inactiva plana — con el `lang` fijo de cada botón en ambos
+// casos). Criterio de cierre Button/Overhead/ThemeToggle: un caso por forma,
+// axe sobre el `container`.
+//
+// Armazón: LocaleProvider REAL (camino probado en T2: semilla vía
+// `document.documentElement.lang` ANTES del render, como el anti-flash; el
+// mock de módulo se DESARMA en el beforeEach del describe). Sin AccentGradientDefs:
+// el componente no pinta SVG con `tone="gradient"` (el gradiente activo es CSS
+// por tokens, RF-6 — y `color-contrast` está deshabilitado en axe/jsdom de
+// todos modos; ver src/test/a11y.ts).
+//
+// Decisión #101 (VERDE on-arrival, declarado en el commit test): el markup de
+// T1/T2 ya es accesible (grupo nombrado, botones con aria-label y pressed, sin
+// roles de radiogroup), así que el cierre nace verde; el discrimen real de T3
+// es la INSPECCIÓN de los estilos por tokens del módulo (precedente exacto
+// ThemeToggle T3). No es vacío: una regresión del patrón (p. ej. perder el
+// aria-label del grupo en alguna rama) la capturaría axe.
+describe("LanguageSwitcher accessibility audit (T3: cierre, spec → Tests)", () => {
+  // Desarma el mock de módulo: el `useLocale` del componente delega en el
+  // contexto real (las dos ramas de idioma solo se pueden sembrar así).
+  beforeEach(() => {
+    localeHarness.active = false;
+  });
+
+  it("has no accessibility violations with English active", async () => {
+    // Sin semilla: `lang` ausente → readInitialLocale cae en DEFAULT_LOCALE
+    // "en" (i18n.md). El assert de pressed FIJA la rama auditada (sin él el
+    // caso no distinguiría qué idioma está activo).
+    const { container } = render(
+      <LocaleProvider>
+        <LanguageSwitcher label={GROUP_LABEL} />
+      </LocaleProvider>,
+    );
+
+    expect(
+      screen.getByRole("button", { name: ENGLISH_LABEL }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with Español active", async () => {
+    // Semilla anti-flash: español ANTES del render (mismo camino que el
+    // describe de integración de T2; el afterEach global de setup.ts limpia
+    // `lang` y `localStorage` entre tests).
+    document.documentElement.lang = "es";
+
+    const { container } = render(
+      <LocaleProvider>
+        <LanguageSwitcher label={GROUP_LABEL} />
+      </LocaleProvider>,
+    );
+
+    // Fija que la rama semilla de verdad: sin este assert el caso duplicaría
+    // silenciosamente al de inglés y el cierre no cubriría "activo en es"
+    // (criterio ThemeToggle T3 con data-theme).
+    expect(document.documentElement).toHaveAttribute("lang", "es");
+    expect(
+      screen.getByRole("button", { name: SPANISH_LABEL }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await expectNoA11yViolations(container);
   });
 });
