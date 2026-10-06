@@ -1,0 +1,14 @@
+/* HexAvatar — specs/primitives/HexAvatar/spec.md → Forma / Estilos y tokens.
+   T1: `.defs`, el <svg> de las definiciones compartidas (RF-3).
+   Diferidos: `.wrap`/`.border`/`.image` y los clip-path url(#…) nacen en
+   T2; el `filter: var(--filter-avatar-drop)` del wrap y el tamaño fijo sin
+   @media se conectan en T4 (RF-4/RF-5; inspección). */
+
+/* <svg> de HexAvatarDefs: invisible por tamaño (width/height="0" como
+   atributos en el componente), sacado del flujo con posición absoluta.
+   Nunca display:none: algunos navegadores no resuelven referencias url(#…)
+   a definiciones dentro de un SVG no renderizado (spec → Forma; precedente
+   exacto Icon.module.css .defs). */
+.defs {
+  position: absolute;
+}
