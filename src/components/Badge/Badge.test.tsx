@@ -21,6 +21,9 @@ import { describe, expect, it } from "vitest";
 
 import { Badge } from "./Badge";
 
+// T3: helper de cierre a11y (constitución T4); import puro, no toca lo anterior.
+import { expectNoA11yViolations } from "../../test/a11y";
+
 // T2: el test importa el módulo solo para fijar el nombre real de la clase
 // base (resuelto por CSS Modules en runtime). El módulo nace con la unión de
 // `className` (feat(Badge): T2) con la clase base vacía; los estilos por
@@ -113,5 +116,37 @@ describe("Badge className joining (T2: RF-3)", () => {
     expect(root.parentElement?.tagName).toBe("UL");
     expect(root).toHaveClass(badgeClass);
     expect(root).toHaveClass(consumerClass);
+  });
+});
+
+// Tests de T3 (specs/primitives/Badge/tasks.md) — RF-4 (texto plano, sin roles
+// añadidos ni estados interactivos) y cierre del archivo (constitución T4,
+// spec → Tests esperados: "expectNoA11yViolations sin violaciones (como `li`
+// dentro de `ul`)"; "Hecho cuando": span y li-en-ul). Dos casos, uno por forma
+// del raíz (spec → Anatomía): el `span` suelto y el `li` dentro de un `<ul>` de
+// armazón (RF-2: el contexto de lista lo arma el consumidor; axe solo ve un
+// `li` válido si hay un `ul`, de lo contrario sería violación). Mismo criterio
+// de cierre que Box/BrandIcon: axe sobre el `container` del render.
+//
+// Decisión #101 (tarea 100 % inspección): este cierre puede nacer VERDE con el
+// markup ya accesible de T1/T2 (Badge es texto plano sin roles); lo que
+// discrimina T3 —cero literales de color, cero `@media`, cero `:hover`/`:focus`
+// en Badge.module.css— se verifica por inspección del reviewer, no por test
+// (plan → Estrategia de tests: "RF-4/RF-5 por inspección del CSS").
+describe("Badge accessibility audit (T3: RF-4)", () => {
+  it("has no accessibility violations rendering a loose span badge", async () => {
+    const { container } = render(<Badge>Staff Engineer</Badge>);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations rendering an li badge inside a ul", async () => {
+    const { container } = render(
+      <ul>
+        <Badge as="li">React</Badge>
+      </ul>,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
