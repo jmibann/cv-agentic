@@ -3,8 +3,9 @@
    T2: `.wrap`/`.border`/`.image` con la tabla "Estilos y tokens" (RF-1) y los
    clip-path url(#…) de cada clase (RF-3; su resolución se verifica por
    INSPECCIÓN: jsdom no aplica clip-path — "Hecho cuando" de T2).
-   Diferido: el `filter: var(--filter-avatar-drop)` del wrap y el `className`
-   unido se conectan en T4 (RF-4/RF-5; inspección).
+   T4: el `filter: var(--filter-avatar-drop)` del wrap (RF-4) conectado; la
+   sombra es drop-shadow NUNCA box-shadow (spec → "No hacer"; el token define
+   solo funciones drop-shadow, inspección RF-4/RF-5 — jsdom no computa filter).
    Tamaño fijo en todos los breakpoints (spec → Responsive; RF-5): el módulo
    no declara ningún `@media` — las medidas que escalan son tokens de
    tokens.css y las fijas (0.25rem/0.5rem, definidas textualmente por la
@@ -22,14 +23,18 @@
   position: absolute;
 }
 
-/* Wrap (T2, RF-1; fila "Wrap" de la tabla, replicada literal):
-   `display: inline-block; width: fit-content;`. El `filter:
-   var(--filter-avatar-drop)` de la misma fila NO va acá: es el "Hecho
-   cuando" de T4 (RF-4; drop-shadow porque box-shadow no respeta el recorte
-   — spec → Forma y "No hacer"). */
+/* Wrap (T2, RF-1; T4, RF-4; fila "Wrap" de la tabla, replicada literal en su
+   conjunto): `display: inline-block; width: fit-content; filter:
+   var(--filter-avatar-drop)`. La sombra va acá con `drop-shadow` porque
+   `box-shadow` no respeta el recorte hexagonal (spec → Forma y "No hacer":
+   NUNCA `box-shadow` en ningún elemento del módulo — RF-4, inspección; el
+   token de tokens.css solo compone funciones drop-shadow y vale `none` en
+   impresión). En jsdom `filter` no se computa (decisión #101): el cierre T4
+   lo verifica por inspección y el axe sobre el conjunto completo. */
 .wrap {
   display: inline-block;
   width: fit-content;
+  filter: var(--filter-avatar-drop);
 }
 
 /* Contorno (T2, RF-1; fila "Contorno"): el hexágono exterior con el color

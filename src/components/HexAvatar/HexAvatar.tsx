@@ -12,19 +12,21 @@
 // T3: el `alt` del prop conectado al `<img>` con default `""` (RF-2:
 // decorativa mientras no se pase `alt`; con `alt`, ese texto es el nombre
 // accesible).
-// Diferidos a su tarea: `filter: drop-shadow` del wrap, tamaño fijo,
-// `className` unida y cierre a11y (T4, RF-4/RF-5).
+// T4 (cierre de pieza): sombra del wrap con `filter: drop-shadow` (RF-4,
+// nunca `box-shadow`), tamaño fijo sin estados interactivos (RF-5, inspección
+// del módulo), `className` unida al `wrap` (spec → API) y `index.ts` con los
+// re-exports (HexAvatar, HexAvatarDefs y tipos).
 
 import styles from "./HexAvatar.module.css";
 
 // API (spec → API), declarada COMPLETA en T1 con el diferido marcado
 // (precedente Overhead/SectionTitle T1): `HexAvatar` la consume desde T2; la
-// unión de `className` al `wrap` se conecta en T4.
+// unión de `className` al `wrap` se conectó en T4.
 export interface HexAvatarProps {
   src: string;
   /** Default "". En card y dialog el nombre está al lado: la imagen es decorativa. */
   alt?: string;
-  /** Se une a la clase base del `wrap` (elemento raíz; unión en T4). */
+  /** Se une a la clase base del `wrap` (elemento raíz; unida desde T4). */
   className?: string;
 }
 
@@ -95,21 +97,38 @@ export function HexAvatarDefs() {
   );
 }
 
-// HexAvatar — avatar hexagonal (RF-1, T2; RF-2, T3). Anatomía EXACTA de
-// spec → Anatomía: `<span class="wrap"> > <span class="border"> > <img
-// class="image">`, sin atributos extra. El `alt` del prop se conecta al
-// `<img>` con default `""` (RF-2: MIENTRAS no se pase `alt`, imagen
-// decorativa; SI se pasa, ese texto queda como nombre accesible; el default
-// coincide con el `alt=""` del HTML de la Anatomía). `className` no se
-// destruye todavía: su unión al `wrap` es T4 (spec →
-// API; criterio Separator T1 / CornerTab, sin variables muertas). Las clases
-// del módulo llevan la geometría por inspección: tamaños sobre
+// HexAvatar — avatar hexagonal (RF-1, T2; RF-2, T3; RF-4/RF-5 y unión, T4).
+// Anatomía EXACTA de spec → Anatomía: `<span class="wrap"> > <span
+// class="border"> > <img class="image">`, sin atributos extra. El `alt` del
+// prop se conecta al `<img>` con default `""` (RF-2: MIENTRAS no se pase
+// `alt`, imagen decorativa; SI se pasa, ese texto queda como nombre
+// accesible; el default coincide con el `alt=""` del HTML de la Anatomía).
+// `className` se une a la clase base del `wrap` (spec → API; unión T4). Las
+// clases del módulo llevan la geometría por inspección: tamaños sobre
 // `--size-testimonial-avatar-w/h`, offsets de 4 px del anillo y los
 // `clip-path: url(#hex-avatar-outer/inner)` que resuelven las defs de arriba
-// (RF-3; jsdom no los computa).
-export function HexAvatar({ src, alt = "" }: HexAvatarProps) {
+// (RF-3; jsdom no los computa); el wrap agrega además la sombra
+// `filter: var(--filter-avatar-drop)` (RF-4: drop-shadow, nunca box-shadow;
+// inspección del módulo).
+export function HexAvatar({ src, alt = "", className }: HexAvatarProps) {
+  // T4 (spec → API; "Tests esperados" #4): la `className` del consumidor se
+  // UNE a la clase base del `wrap` —elemento raíz, el único al que llega
+  // (Anatomía: border/img son estructura interna)—, no la reemplaza. Mismo
+  // mecanismo aprobado en la fase (Badge/IconBox/Overhead/Separator/CornerTab/
+  // Icon): array + filtro de undefined + join, sin librerías; así no quedan
+  // clases vacías cuando `className` no se pasa. Orden canon base-primero →
+  // externa. Las clases del módulo son `string | undefined` bajo
+  // noUncheckedIndexedAccess.
+  const rootClassName = [styles.wrap, className]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
+  // RF-1/RF-2: anatomía exacta (T2/T3). RF-5: sin handlers, tabIndex ni
+  // atributos interactivos — el DOM sigue siendo el markup no interactivo de
+  // la Anatomía (la sombra del wrap es solo CSS, T4: filter drop-shadow en el
+  // módulo; jsdom no computa estilos).
   return (
-    <span className={styles.wrap}>
+    <span className={rootClassName}>
       <span className={styles.border}>
         <img className={styles.image} src={src} alt={alt} />
       </span>
