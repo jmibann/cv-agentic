@@ -1,10 +1,26 @@
-// Tests de T1 (specs/controls/LanguageSwitcher/tasks.md) — RF-1, RF-4.
-// Armazón: SIN LocaleProvider en T1 — el componente todavía no consume
-// contexto (la lectura de `useLocale()`, `aria-pressed`, `onClick`/guard y la
-// semilla del idioma vía `document.documentElement.lang` son de T2, plan →
-// Decisiones "Harness doble"; G-A: el provider es del consumidor). Aquí el
-// render es directo: `label` llega por prop (spec → API) y todo lo verificable
-// en T1 es markup estático del grupo y sus botones.
+// Tests de T1 y T2 (specs/controls/LanguageSwitcher/tasks.md) — T1: RF-1,
+// RF-4 · T2: RF-2, RF-3, RF-5 (estado activo, `setLocale` + guard, tab stops).
+// Armazón (plan → Decisiones "Harness doble"): el archivo corre con el mock de
+// módulo de `../../providers/LocaleProvider` ARMADO (`vi.mock` +
+// `vi.hoisted`): `useLocale()` devuelve `{ locale, setLocale: espión, t }`
+// controlable, así los call-count/guard (RF-2/RF-3) son exactos y los renders
+// van sin provider. La integración con el `LocaleProvider` REAL (pressed,
+// `<html lang>`, `localStorage["cv:locale"]`) DESARMA el harness en su propio
+// `beforeEach` (va primero el outer y luego el inner): semilla del idioma vía
+// `document.documentElement.lang = "es"` ANTES del render — `readInitialLocale`
+// lee SOLO ese atributo resuelto, el camino del anti-flash (precedente exacto
+// ThemeToggle T3 con `data-theme`); el `afterEach` global de
+// `src/test/setup.ts` limpia `lang` y `localStorage` entre tests. La
+// DELEGACIÓN del mock (`actual.useLocale()` cuando está desarmado) es
+// necesaria porque `vi.mock` actúa a nivel de archivo: un mock absoluto
+// rompería los describes de provider real del mismo archivo (desvío mínimo y
+// documentado del mock ingenuo "con `useLocale: () => …`" del plan). Sin mock,
+// los renders sueltos de T1 romperían en `feat(T2)` (el componente pasaría a
+// exigir provider) — con el harness armado por defecto, las líneas de T1
+// quedan intactas (agregado puro, skill sdd → "los test(Tn) solo agregan").
+// G-A: el componente NO toca storage ni DOM global; lang/storage se asertan
+// en integración y su lógica propia la cubre `LocaleProvider.test.tsx` (plan →
+// Decisiones).
 //
 // Justificación de las queries (constitución T3): patrón del spec → Tests
 // esperados, textual — `getByRole("group", { name: label })` (el nombre
@@ -15,13 +31,18 @@
 // clase base de la unión (#99) se fija con el patrón canónico
 // `styles.name ?? "name"` (prohibidos `!` y `as`), precedente ThemeToggle T1.
 //
-// Diferidos: T2 agrega activo/guard/setLocale (aria-pressed, Tab RF-5,
-// harness doble del plan); T3 agrega el cierre `expectNoA11yViolations`
-// (constitución T4: el archivo termina con ese caso en T3, ídem ThemeToggle),
-// los estilos por tokens del módulo y `index.ts`.
+// Diferidos: T3 agrega el cierre `expectNoA11yViolations` (constitución T4: el
+// archivo termina con ese caso en T3, ídem ThemeToggle T3; los describes de T2
+// quedan ANTES de ese cierre), los estilos por tokens del módulo y `index.ts`.
 
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Mock } from "vitest";
+
+import { LocaleProvider } from "../../providers/LocaleProvider";
+import type { LocaleContextValue } from "../../providers/LocaleProvider";
+import type { Locale } from "@data/cv.types.generated";
 
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
@@ -31,6 +52,60 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 // ThemeToggle/Badge/IconBox: el módulo nace con la unión de `className`, con
 // la clase base vacía; los estilos por tokens llegan en T3).
 import styles from "./LanguageSwitcher.module.css";
+
+// --- Harness b (plan → "Harness doble"): mock de módulo del provider -------
+// Estado mutable del espión: `vi.hoisted` corre antes que los imports
+// (requisito de `vi.mock`, cuyo factory se evalúa durante la carga de los
+// imports estáticos del archivo); por eso todo lo referenciable desde el
+// factory vive acá o dentro del propio factory. `active: true` por defecto:
+// el componente consume el valor falso SIN provider (el describe de
+// integración lo desarma en su propio beforeEach; ver encabezado). Tipado
+// honesto sin `as`: el objeto devuelto se anota `LocaleContextValue` — el
+// completo (locale + setLocale + `t` real: `uiEn` importado dinámicamente en
+// el factory, único `t` del tipo `UiStrings` del contexto).
+type SetLocaleFn = LocaleContextValue["setLocale"];
+
+interface LocaleHarness {
+  active: boolean;
+  locale: Locale;
+  setLocale: Mock<SetLocaleFn>;
+}
+
+const localeHarness = vi.hoisted((): LocaleHarness => ({
+  active: true,
+  locale: "en",
+  setLocale: vi.fn<SetLocaleFn>(),
+}));
+
+vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../providers/LocaleProvider")>();
+  const { uiEn } = await import("../../i18n/ui.en");
+  const harnessValue = (): LocaleContextValue => ({
+    locale: localeHarness.locale,
+    setLocale: localeHarness.setLocale,
+    t: uiEn,
+  });
+  return {
+    ...actual,
+    // Desarmado: delega en el `useLocale` REAL (el contexto del
+    // LocaleProvider de verdad); armado: valor falso con el espión
+    // (call-count exacto de RF-2/RF-3). `LocaleProvider`/`useCv` se
+    // conservan vía el spread de `actual`.
+    useLocale: () =>
+      localeHarness.active ? harnessValue() : actual.useLocale(),
+  };
+});
+
+// Harness por defecto de cada test: mock armado con idioma falso "en" y
+// contador del espión a cero. Vitest corre el beforeEach outer ANTES del
+// inner, así que el describe de integración puede desarmar tranquilo. Sin
+// afterEach: el propio beforeEach re-setea el estado completo cada vez.
+beforeEach(() => {
+  localeHarness.active = true;
+  localeHarness.locale = "en";
+  localeHarness.setLocale.mockReset();
+});
 
 // RF-4 / C3: el label del grupo llega traducido por prop (spec → API:
 // "Ej: \"Language\" / \"Idioma\""); el valor replica controls.language de
@@ -105,5 +180,145 @@ describe("LanguageSwitcher className joining (T1: spec → API, G-B)", () => {
     const group = screen.getByRole("group", { name: GROUP_LABEL });
     expect(group).toHaveClass(languageSwitcherClass);
     expect(group).toHaveClass(consumerClass);
+  });
+});
+
+// --- T2 · Harness a: LocaleProvider REAL (plan → "Harness doble") ----------
+// RF-2 se lee acá en integración (G-A): el "Hecho cuando" de T2 siembra el
+// idioma activo vía `document.documentElement.lang` ANTES del render —
+// `readInitialLocale()` del provider lee solo ese atributo, el mismo camino
+// que deja el script anti-flash de `index.html` (i18n.md → "Resolución del
+// idioma inicial"; precedente ThemeToggle T3 con `data-theme`). El afterEach
+// global de `src/test/setup.ts` limpia `lang` y `localStorage` entre tests.
+describe("LanguageSwitcher active state (T2: RF-2, real LocaleProvider)", () => {
+  // Desarma el mock de módulo: el `useLocale` del componente delega en el
+  // contexto real del LocaleProvider que envuelve el render.
+  beforeEach(() => {
+    localeHarness.active = false;
+  });
+
+  it("marks the button of the seeded active locale as pressed and the other as not pressed", () => {
+    // Semilla anti-flash: español activo. Sin esto el archivo entero nacería
+    // en "en" (DEFAULT_LOCALE) y el pressed inicial sería inmutable.
+    document.documentElement.lang = "es";
+
+    render(
+      <LocaleProvider>
+        <LanguageSwitcher label={GROUP_LABEL} />
+      </LocaleProvider>,
+    );
+
+    // spec → Tests esperados: "el del idioma activo tiene aria-pressed=true"
+    // (y por diferencia, el inactivo "false"; spec → Estados: opción inactiva
+    // sin fondo → el atributo lo refleja).
+    expect(
+      screen.getByRole("button", { name: SPANISH_LABEL }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: ENGLISH_LABEL }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+});
+
+describe("LanguageSwitcher locale change integration (T2: RF-2, real LocaleProvider, G-A)", () => {
+  beforeEach(() => {
+    localeHarness.active = false;
+  });
+
+  it("clicking the other locale toggles aria-pressed and updates html lang and cv:locale via the provider", async () => {
+    const user = userEvent.setup();
+    // Sin semilla: `lang` ausente → readInitialLocale cae en DEFAULT_LOCALE
+    // "en" (i18n.md) → el activo inicial es EN y el "otro" es ES.
+    render(
+      <LocaleProvider>
+        <LanguageSwitcher label={GROUP_LABEL} />
+      </LocaleProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: SPANISH_LABEL }));
+
+    // RF-2 + spec → Tests esperados: "Click en el otro → cambia
+    // aria-pressed, document.documentElement.lang, y
+    // localStorage['cv:locale'] (integración con el provider)". El
+    // componente solo llamó setLocale("es"): el cambio de `<html lang>` y
+    // la persistencia los aplica el provider (G-A — no se duplica acá la
+    // lógica, ya cubierta por LocaleProvider.test.tsx; se asiértan como
+    // efecto observable de la integración).
+    expect(
+      screen.getByRole("button", { name: SPANISH_LABEL }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: ENGLISH_LABEL }),
+    ).toHaveAttribute("aria-pressed", "false");
+    expect(document.documentElement).toHaveAttribute("lang", "es");
+    expect(localStorage.getItem("cv:locale")).toBe("es");
+  });
+});
+
+// --- T2 · Harness b: mock de módulo con espión (call-count exacto) ---------
+// plan → Decisiones: "tests de call-count/guard con vi.mock del provider
+// exponiendo useLocale con setLocale: vi.fn()". Renders SIN provider: con el
+// harness armado el `useLocale` mockeado no toca contexto. #96 no se roza:
+// mock de módulo, no espía sobre el re-export del hook.
+describe("LanguageSwitcher setLocale call (T2: RF-2, mocked provider)", () => {
+  it("calls setLocale once with the inactive locale when it is clicked", async () => {
+    const user = userEvent.setup();
+    // localeHarness: "en" activo (beforeEach outer); ES es el inactivo.
+    render(<LanguageSwitcher label={GROUP_LABEL} />);
+
+    await user.click(screen.getByRole("button", { name: SPANISH_LABEL }));
+
+    // RF-2: "CUANDO el usuario elige un idioma, EL SISTEMA invoca setLocale()
+    // del contexto" — con el mock, la invocación se ve como call exacto.
+    expect(localeHarness.setLocale).toHaveBeenCalledTimes(1);
+    expect(localeHarness.setLocale).toHaveBeenCalledWith("es");
+  });
+});
+
+describe("LanguageSwitcher guard on active locale (T2: RF-3, mocked provider)", () => {
+  it("does not call setLocale when the already-active locale is clicked", async () => {
+    const user = userEvent.setup();
+    render(<LanguageSwitcher label={GROUP_LABEL} />);
+
+    // El guard (decisión 2=a) solo aplica sobre el ACTIVO: se fija primero
+    // que EN lo está (aria-pressed="true"), para que el test no sea vacío —
+    // sin este assert, un componente sin pressed contaría cero llamadas por
+    // casualidad, no por el guard.
+    const activeButton = screen.getByRole("button", { name: ENGLISH_LABEL });
+    expect(activeButton).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(activeButton);
+
+    // RF-3 + spec → "No hacer": "No invocar setLocale() cuando el idioma
+    // elegido ya está activo".
+    expect(localeHarness.setLocale).not.toHaveBeenCalled();
+  });
+});
+
+// --- T2 · RF-5: tab stops ----------------------------------------------------
+// Con el harness armado (más simple: render suelto, el orden de tabulación
+// es propiedad del markup, no del contexto). Decisión #101 (VERDE on-arrival,
+// declarado): en T1 ambos botones ya son <button> focusables nativos, así que
+// este recorrido nace verde; el discrimen real de RF-5 es la INSPECCIÓN del
+// reviewer: sin patrón radiogroup (ni role, ni aria-checked, ni un solo tab
+// stop con onKeyDown de flechas — spec → "No hacer"); fabricar un rojo
+// leyendo el .tsx como texto desde el test está descartado en #101
+// (precedentes: ThemeToggle T2, Button T6, IconBox T3).
+describe("LanguageSwitcher tab order (T2: RF-5)", () => {
+  it("Tab focuses both buttons in LOCALES order (English then Español)", async () => {
+    const user = userEvent.setup();
+    render(<LanguageSwitcher label={GROUP_LABEL} />);
+
+    // RF-5 / spec → Accesibilidad: "Tab recorre ambos botones (no es un
+    // radiogroup)": dos tab stops consecutivos, en el orden de LOCALES.
+    await user.tab();
+    expect(
+      screen.getByRole("button", { name: ENGLISH_LABEL }),
+    ).toHaveFocus();
+
+    await user.tab();
+    expect(
+      screen.getByRole("button", { name: SPANISH_LABEL }),
+    ).toHaveFocus();
   });
 });
