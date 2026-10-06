@@ -47,6 +47,19 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### 2026-10-05 · Decisión #101 — tareas solo-inspección: rojo no exigible (en curso F2; no es puerta F)
+
+- Qué: al cerrar Box, el reviewer detecta que T4 (RF-4/5/6 por inspección + cierre
+  a11y sobre markup ya accesible; jsdom no carga CSS) no podía tener un `test(T4)`
+  en rojo sin inventar alcance. El usuario aprueba la regla: en tareas cuyo alcance
+  de test no discrimina el estado de la implementación, el rojo **no es exigible**;
+  el `test` declara el porqué y la verificación real es la inspección del reviewer.
+  P4 intacto para tareas con comportamiento observable nuevo (Icon T5 sí fue rojo).
+- Checks: n/a (decisión de proceso; repo verde al registrar: lint ✓ · typecheck ✓ · test 154/154 ✓ · build ✓ al cerrar Box).
+- Decisiones: **#101** → registro + `docs/memory.md`; se transmite en los encargos F2–F4 de tareas 100 % inspección.
+- Commits: Box T4 `a8c515d` (precedente), spec `implementada` `aaab301`.
+- Abre: nada; cierra: la duda de proceso planteada por el review de Box T4.
+
 ### 2026-10-05 · Decisión #100 — `allowExportNames` extendido a `BRAND_NAMES` (en curso F2; no es puerta F)
 
 - Qué: BrandIcon T3 frena en lint: `react-refresh/only-export-components` marca el objeto

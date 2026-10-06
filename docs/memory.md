@@ -9,7 +9,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
 - **F1 CERRADA** (2026-10-03): pieza `foundation/Foundation` `Estado: implementada`; T1–T11 + reparos T2b/T3b/T5b/T8b aprobadas (última: revisión completa **APROBADA** tras reparo T8b `ae59762`; **QA visual en navegador APROBADO** con app servida: anti-flash oscuro, RF-3 vivo, `theme-color`, es/en, Poppins autohosteada, 375/1440 sin overflow). App Vite/React/TS en la raíz con providers, i18n, contenido validado y tooling; `build` ✅, 53 tests.
 - **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84), 7 medios (#85–#91) y bajos (#92–#94): sin pendientes de auditoría.
-- **F2 Primitivas EN CURSO**: Icon **CERRADA** (spec `implementada`; T1–T5+T4b; revisión completa APROBADA `ee9ee34`). BrandIcon: T1 `9f0cc0b`, T1b `f8ddc10`, T2 `eb0d21c`+`d654a26`, T3 `8de4610` aprobadas; **falta T4** (CSS, `className`, `index.ts`, cierre a11y). Remaining F2: Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar (specs y plans/tareas aprobados; `/sdd-plan F2` hecho).
+- **F2 Primitivas EN CURSO (3/11)**: Icon, BrandIcon y **Box CERRADAS** (specs `implementada`; Box revisión completa APROBADA `aaab301`, T1–T4+T4b). Siguiente: **Button** (T1), luego Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar (specs y plans/tareas aprobados; `/sdd-plan F2` hecho).
 
 ## Decisiones (y por qué)
 
@@ -29,6 +29,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - **#85 F5 sin Tn**: QA del reviewer, informe en `docs/qa-report.md`; defectos → tarea nueva o Cambio de su pieza.
 - **#86** Estado/memoria/diagnostics solo por puerta F o decisión de reglas. **#98** Log `diagnostics.md`: formato fijo, tabla Abiertos, sin estado propio y poda a 150 líneas. **#99** P2 canónico: en tests, `const c = styles.name ?? "name"` + `toHaveClass(c)` (fallback solo de tipos; prohibidos `!` y `as string`; sin helper en `src/test/`). **#91** `npm run dev` lo corre el usuario.
   **#95** El orchestrator edita el registro (`docs/README.md`) y la doc de agentes (`docs/agent-system.md`).
+  **#101** Tareas solo-inspección (RF verificados por inspección + cierre a11y sobre markup ya accesible): el `test(<Name>): Tn` **no está obligado a quedar rojo** si su alcance no discrimina el estado de la implementación; debe declarar por qué y qué se inspecciona; la verificación real es la inspección del reviewer (F2/Box T4; descartado rojo artificial leyendo el CSS como texto).
 - **`skipLibCheck: true`** (F1/T2, aprobado por el usuario): jest-dom 7 y Vitest 5 declaran `Assertion` incompatibles
   en sus `.d.ts` (TS2428); el código propio sigue chequeando. Volver a `false` si jest-dom publica tipos compatibles.
 - **#96 `react-refresh` + hooks de provider** (F1/T5b, aprobado por el usuario, 2026-10-03): la API spíada fija
@@ -38,8 +39,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
   mismo mecanismo aplica a **constantes-objeto exportadas junto al componente cuando el plan las manda ahí**
   (`BRAND_NAMES` en `BrandIcon.tsx`; `allowExportNames` suma `"BRAND_NAMES"`, `6d107c6`). Frenar y consultar si un
   builder propone mover el dato a `.ts` o `eslint-disable`.
-- **Criterio L1 unificado** (T4/T3b): los comentarios de código van en español **también en `src/test/**`**
-  (títulos de tests, identificadores, rutas y citas entre backticks siguen en inglés). Deudas detectadas en review
+- **Criterio L1 unificado** (T4/T3b): los comentarios de código van en español **también en `src/test/**`**  (títulos de tests, identificadores, rutas y citas entre backticks siguen en inglés). Deudas detectadas en review
   se tratan como tarea de reparo tipo T2b/T3b, no se dejan pasar. Lo mismo **L2**: títulos de `describe`/`it` y
   mensajes de commit en inglés (deudas reparadas: T2b, `c42e33d`, T8b; deuda de forma `07eead6` registrada).
 - **#97 `ucs2length` de ajv aceptado en el bundle** (F1, decisión del usuario al cerrar la puerta): "no ajv en
