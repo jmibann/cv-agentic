@@ -1,0 +1,20 @@
+/* ControlsBar — specs/controls/ControlsBar/spec.md. El módulo NACE en T1 solo
+   con la clase base del raíz para la unión de la `className` externa (G-B,
+   spec → API), vacía: los estilos por tokens NO son observables por los tests
+   de T1 y llegan en T2 (tasks.md → RF-1/RF-5/RF-6; criterio de nacimiento del
+   módulo aprobado en ThemeToggle/LanguageSwitcher, donde la unión conectó en
+   T1 con la clase base vacía).
+
+   Diferido T2 (fila "Layout"/"Alto"/"Capa" de la tabla "Estilos y tokens",
+   verificación por INSPECCIÓN del CSS — #101, no testeable en jsdom):
+   display: flex; justify-content: flex-end; align-items: center;
+   gap: var(--controls-gap) (RF-6: único valor que escala, por token, sin
+   @media propios); height: var(--size-control) (RF-1); position: relative;
+   z-index: var(--z-controls) (RF-1, capa con token --z-*). RF-5: CERO
+   declaraciones de color de texto en el módulo (la pieza no pinta texto
+   propio; sus hijos traen sus tokens sobre --color-bg). Sin margen externo
+   (docs/DESIGN.md → Do/Don't: el padre/AppLayout posiciona). */
+.controlsBar {
+  /* Vacía a propósito: T2 fija layout/alto/capa por tokens (arriba, diferido
+     declarado). Su presencia acá solo da la clase base de la unión G-B. */
+}
