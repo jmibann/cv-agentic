@@ -1,6 +1,6 @@
 # Tareas — Overhead
 
-- [ ] **T1. Render con mayúsculas solo por CSS.** RF-1
+- [x] **T1. Render con mayúsculas solo por CSS.** RF-1 — 6a18005
   - Hecho cuando: `getByText("Email")` encuentra el texto **sin transformar**
     en el DOM y el módulo declara `text-transform: uppercase` (inspección);
     verde tras `feat(Overhead): T1`.
