@@ -1,5 +1,5 @@
 # HexAvatar
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
