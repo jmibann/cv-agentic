@@ -1,5 +1,5 @@
 # LanguageSwitcher
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 

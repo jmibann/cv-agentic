@@ -48,6 +48,14 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### 2026-10-06 · Decisión #102 — L2: subject inglés, cuerpo español sin acentos (en curso F3; no es puerta F)
+
+- Qué: ante la deuda de forma acumulada (ThemeToggle T3, LanguageSwitcher T1–T3: cuerpos en español con subjects en inglés), el usuario fija la lectura de L2: el **subject** Conventional va en inglés; el **cuerpo** en **español sin acentos** (canon de facto desde F1). *Descartado:* exigir cuerpos en inglés. No se enmienda historia. El encargo de delegación transmite la regla; `AGENTS.md`/constitución no se tocan (el usuario no lo pidió).
+- Checks: n/a (decisión de proceso; repo verde al registrar: lint ✓ · typecheck ✓ · test 257/24 ✓).
+- Decisiones: **#102** → registro (`docs/README.md`) + `docs/memory.md`.
+- Commits: cierre LanguageSwitcher (spec `implementada` + docs de estado, el de esta entrada).
+- Abre: nada; cierra: las deudas L2 de forma de ThemeToggle T3 y LanguageSwitcher (quedan en historia tal cual).
+
 ### §IX · 2026-10-06 — Cierre de F2
 
 - Qué: **F2 Primitivas cerrada (11/11)**: Icon, BrandIcon, Box, Button, Badge,
