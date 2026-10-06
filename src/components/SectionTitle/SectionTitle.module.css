@@ -1,11 +1,13 @@
 /* SectionTitle — specs/primitives/SectionTitle/spec.md → Estilos y tokens (T2:
-   nivel). El módulo fija las clases .h1/.h2/.h3 con su font-size por tokens
-   (RF-1: el tamaño sigue al nivel; spec → Estilos y tokens: "el tamaño no
-   depende de la tipografía global por etiqueta" — plan → Decisiones: el
-   componente es self-contained). Cero literales de px y cero @media propios
-   (RF-6: --font-size-h1/2/3 escalan dentro de tokens/tokens.css; spec →
-   Responsive). Sin colores, sin margen: .decorated con su ::after llega en T3,
-   .withIcon en T4 y los márgenes RF-5 en T5 (tasks.md). */
+   nivel; T3: decorated). El módulo fija las clases .h1/.h2/.h3 con su
+   font-size por tokens (RF-1: el tamaño sigue al nivel; spec → Estilos y
+   tokens: "el tamaño no depende de la tipografía global por etiqueta" — plan →
+   Decisiones: el componente es self-contained) y .decorated con su ::after de
+   barra de gradiente (RF-2). Cero literales de px y cero @media propios
+   (RF-6: --font-size-h1/2/3 y --size-title-bar-*/--title-bar-offset escalan
+   dentro de tokens/tokens.css; spec → Responsive). Quedan diferidos (tasks.md):
+   .withIcon en T4, los márgenes RF-5 (margin-bottom de .decorated incluido) y
+   la unión de className externa en T5. */
 
 /* Nivel h1: tamaño exacto de --font-size-h1 (24px < 580 → 32px ≥ 580, salto
    definido en tokens/tokens.css;RF-6). */
@@ -21,4 +23,31 @@
 /* Nivel h3: tamaño exacto de --font-size-h3 (16px < 580 → 18px ≥ 580). */
 .h3 {
   font-size: var(--font-size-h3);
+}
+
+/* decorated (T3, RF-2; spec → Estilos y tokens "decorated"): ancla el ::after
+   de la barra. Solo `position: relative`: el `margin-bottom:
+   var(--title-decorated-gap)` corresponde a RF-5 y llega en T5 (tasks.md). */
+.decorated {
+  position: relative;
+}
+
+/* Barra de gradiente debajo del título (RF-2; spec → "No hacer": sin `<hr>` ni
+   `<span>` real: es un pseudo-elemento decorativo). Sin contenido textual
+   (`content: ""`: no se lee; spec → Accesibilidad): ancho y alto por
+   --size-title-bar-* (30px×3px < 580 → 40px×5px ≥ 580, escalado en
+   tokens/tokens.css; RF-6, sin @media propios), fondo --gradient-accent, radio
+   --radius-8, anclada abajo-izquierda del heading con `bottom:
+   calc(var(--title-bar-offset) * -1)` (10px < 580 → 17px ≥ 580) y `left: 0`
+   (literales permitidos por la spec; precedente Button: pseudo-elementos
+   decorativos por inspección, jsdom no los computa — #101). */
+.decorated::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--title-bar-offset) * -1);
+  width: var(--size-title-bar-w);
+  height: var(--size-title-bar-h);
+  background: var(--gradient-accent);
+  border-radius: var(--radius-8);
 }
