@@ -5,6 +5,9 @@
     base (P2); el raíz no tiene `role` ni ningún atributo `aria-*` (test);
     la clase base fija absolute/top/right/`z-index: var(--z-raised)`
     (inspección); verde tras `feat(CornerTab): T1`.
+  - Nota: la unión de `className` externa al raíz (spec → API, plan →
+    Interfaz) no estaba repartida en las tareas; se cubre en T1 (gap detectado
+    al delegar, mismo tratamiento que la nota de `index.ts`).
 
 - [ ] **T2. Variantes `size`.** RF-2
   - Hecho cuando: default `md`; `sm` y `md` aplican clases distintas (P2);
