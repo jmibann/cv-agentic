@@ -3,7 +3,7 @@
 - [x] **T1. Render conectado a `useTheme()` (requiere Foundation T12).** RF-1, RF-2, RF-3, RF-6 — 79ffa1f
   - Hecho cuando: `<button>` con `aria-pressed` según `theme`, label `darkModeLabel` en claro / `lightModeLabel` en oscuro, ícono `lucide-moon` en claro y `lucide-sun` en oscuro, y click → `toggleTheme()` (integration: `dataset.theme` + storage cambian); el componente no referencia `localStorage` ni `document.documentElement` (inspección); verde tras `feat(ThemeToggle): T1`.
 
-- [ ] **T2. Teclado nativo.** RF-4
+- [x] **T2. Teclado nativo.** RF-4 — 2a094ed (commit único `test`, verde on-arrival declarado #101; sin `feat` por no haber comportamiento nuevo que implementar)
   - Hecho cuando: foco con Tab + Espacio alterna (test con `user-event`); sin handlers propios `onKeyDown` (inspección: Enter/Espacio nativos del `<button>`); verde on-arrival donde el alcance no discrimina, declarado per #101; verde tras el commit correspondiente.
 
 - [ ] **T3. Estilos por tokens y cierre a11y.** RF-4 (anillo), RF-5
