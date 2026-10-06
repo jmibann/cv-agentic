@@ -1,4 +1,6 @@
-// Tests de T1 (specs/controls/ControlsBar/tasks.md) — RF-2, RF-3.
+// Tests de T1–T2 (specs/controls/ControlsBar/tasks.md) — T1: RF-2, RF-3 ·
+// T2: cierre a11y del archivo (RF-1/RF-5/RF-6 se verifican por INSPECCIÓN del
+// CSS de ControlsBar.module.css, no testeable en jsdom; decisión #101).
 // Armazón (plan → Estrategia de tests): ThemeProvider + LocaleProvider REALES
 // (spec → Tests esperados, textual: "los tests envuelven ThemeProvider y
 // LocaleProvider — los hijos consumen ambos contextos"). Semilla default
@@ -25,14 +27,14 @@
 // componente). La clase base de la unión (#99) se fija con el patrón canónico
 // `styles.name ?? "name"` (prohibidos `!` y `as`; precedente ThemeToggle/LS).
 //
-// Diferidos (declarados): el cierre `expectNoA11yViolations` del archivo lo
-// asigna T2 en tasks.md ("el archivo termina con expectNoA11yViolations") y se
-// agrega con su commit `test(ControlsBar): T2` (constitución T4 se cumple al
-// completar el archivo; criterio LS/ThemeToggle T3). Los asserts de layout
-// (RF-1/RF-5/RF-6: flex-end, --size-control, --z-controls, --controls-gap) son
-// INSPECCIÓN del CSS en T2 (#101, no testeable en jsdom). RF-4 (orden tras el
-// skip link) y la unicidad del banner son invariantes de AppLayout/F4
-// (plan → Decisiones): sin tarea ni test acá.
+// Diferidos: ninguno en los tests — T2 AGREGÓ el cierre `expectNoA11yViolations`
+// al final del archivo (constitución T4; tasks.md → T2 "el archivo termina con
+// expectNoA11yViolations"; ídem LS/ThemeToggle T3, asserts de T1 intactos:
+// agregado puro). Los asserts de layout (RF-1/RF-5/RF-6: flex-end,
+// --size-control, --z-controls, --controls-gap) son INSPECCIÓN del CSS en T2
+// (#101, no testeable en jsdom) y se verifican contra la tabla "Estilos y
+// tokens" de la spec. RF-4 (orden tras el skip link) y la unicidad del banner
+// son invariantes de AppLayout/F4 (plan → Decisiones): sin tarea ni test acá.
 // extra: el describe de unión G-B del raíz no está en la lista de "Tests
 // esperados" de la spec, pero la API la exige (spec → API: "Se une a la clase
 // base del <header> raíz") y T1 la implementa; se agrega como rojo discrimin-
@@ -47,6 +49,10 @@ import { LocaleProvider } from "../../providers/LocaleProvider";
 import { ThemeProvider } from "../../providers/ThemeProvider";
 
 import { ControlsBar } from "./ControlsBar";
+
+// T2: helper de cierre a11y (constitución T4); import puro, no toca lo anterior
+// (precedente Badge/Overhead/LanguageSwitcher).
+import { expectNoA11yViolations } from "../../test/a11y";
 
 // El test importa el módulo solo para fijar el nombre real de la clase base
 // (`controlsBar`, resuelto por CSS Modules en runtime) y asierte la
@@ -166,5 +172,48 @@ describe("ControlsBar className joining (T1: spec → API, G-B)", () => {
     const banner = screen.getByRole("banner");
     expect(banner).toHaveClass(controlsBarClass);
     expect(banner).toHaveClass(consumerClass);
+  });
+});
+
+// Test de T2 (specs/controls/ControlsBar/tasks.md) — cierre del archivo
+// (constitución T4; spec → Tests esperados: "expectNoA11yViolations sin
+// violaciones").
+//
+// UNA SOLA RAMA auditada, la default (en + claro, la misma semilla de
+// renderBar): la spec lista UN solo caso de axe, a diferencia de las hermanas
+// (ThemeToggle → Tests "cierre en las dos ramas de tema" según su plan;
+// LanguageSwitcher → "con cada idioma activo") y la spec manda: no se inventa
+// alcance (skill sdd → EARS/Tests esperados). Refuerzo: la única diferencia
+// entre las ramas en/es del DOM auditado es el TEXTO de los labels (roles,
+// estructura header > group > controles y atributos idénticos — el rename ya
+// lo fijan los describes de T1), y la diferencia de tema vive DENTRO de
+// ThemeToggle (su label/aria-pressed/glifo), ya auditada en las dos ramas del
+// cierre T3 de su propio archivo. La rama se FIJA con el assert del group en
+// inglés (criterio TT/LS T3: sin un assert de rama el caso no distingue lo
+// que audita).
+//
+// Sin AccentGradientDefs ni HexAvatarDefs (regla del agente): los hijos no
+// usan `Icon tone="gradient"` (ThemeToggle monta `tone="current"`;
+// LanguageSwitcher no usa Icon) y la barra no pinta SVG propio.
+//
+// Decisión #101 (VERDE on-arrival, declarado en el commit test): el markup de
+// T1 ya es accesible (banner semántico, group nombrado, toggle button con
+// aria-pressed y botones del switcher nombrados), así que el cierre nace
+// verde; lo que discrimina T2 es la INSPECCIÓN de los estilos por tokens del
+// módulo (RF-1/RF-5/RF-6: pseudo-clases y @media no son testeables en jsdom;
+// leer el CSS como texto sería un rojo artificial descartado en #101;
+// precedente exacto ThemeToggle/LS T3). No es vacío: una regresión del patrón
+// (p. ej. perder el aria-label del group o del switcher) la capturaría axe.
+describe("ControlsBar accessibility audit (T2: cierre, spec → Tests)", () => {
+  it("has no accessibility violations with the default English/light branch", async () => {
+    const { container } = renderBar();
+
+    // Fija la rama auditada (en + claro por defecto, sin data-theme ni lang
+    // sembrados: readInitialTheme → "light", readInitialLocale → "en").
+    expect(
+      screen.getByRole("group", { name: GROUP_LABEL_EN }),
+    ).toBeInTheDocument();
+
+    await expectNoA11yViolations(container);
   });
 });
