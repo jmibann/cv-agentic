@@ -9,7 +9,7 @@
     `font-size: var(--font-size-h1/2/3)` (inspección: sin literales de px);
     verde tras `feat(SectionTitle): T2`.
 
-- [ ] **T3. `decorated`: barra `::after`.** RF-2
+- [x] **T3. `decorated`: barra `::after`.** RF-2 — 05a3339
   - Hecho cuando: la clase `decorated` aplica `position: relative` + `::after`
     con `--gradient-accent`, `--size-title-bar-*`, `bottom:
     calc(var(--title-bar-offset) * -1)` y **sin contenido textual**
