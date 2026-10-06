@@ -1,6 +1,6 @@
 # Tareas — Badge
 
-- [ ] **T1. Render `span` por defecto y `li` con `as`.** RF-1, RF-2
+- [x] **T1. Render `span` por defecto y `li` con `as`.** RF-1, RF-2 — 2d748da
   - Hecho cuando: `getByText` encuentra el texto; el raíz es `span` por defecto
     y `<li>` con `as="li"` (test con `<ul>` de armazón); verde tras
     `feat(Badge): T1`.
