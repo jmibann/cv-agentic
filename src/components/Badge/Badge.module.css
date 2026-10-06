@@ -1,11 +1,29 @@
-/* Badge — specs/primitives/Badge/spec.md → Estilos y tokens.
-   T2 trae el contrato de nombre de clase que exige la unión de `className`
-   (RF-3: la externa se une a la clase base del raíz; mismo patrón que Box T1).
-   Regla vacía a propósito: los estilos por tokens (fondo --color-surface-muted,
-   --radius-8, --font-size-badge, --line-height-tight, padding 0.5rem 1rem,
-   white-space: nowrap, inline-flex; RF-4/RF-5) se declaran en T3. */
+/* Badge — specs/primitives/Badge/spec.md → Estilos y tokens (T3).
+   Cero colores literales, cero @media propios (RF-5: el tamaño de texto escala
+   solo por --font-size-badge, que salta de 11px a 13px en ≥768 dentro de
+   tokens/tokens.css — excepción documentada en la spec → Responsive) y cero
+   pseudo-estados :hover/:focus (RF-4: no es interactivo, sin estados). Sin
+   margen externo: el padre separa con gap (docs/DESIGN.md → Do/Don't). */
 
-/* Clase base del único elemento raíz (span o li según `as`). */
+/* Clase base del único elemento raíz (span o li según `as`). Valores exactos
+   de la tabla "Estilos y tokens" de la spec: fondo --color-surface-muted;
+   texto --color-text con --font-size-badge, --font-weight-regular y
+   line-height --line-height-tight; radio --radius-8; display inline-flex con
+   align-items: center; white-space: nowrap (los chips no se parten; la lista
+   hace wrap en el padre). El padding `0.5rem 1rem` es medida FIJA definida
+   literalmente en la spec (no cambia por breakpoint y no existe token de
+   padding de badge en tokens.css): literal permitido según
+   docs/tokens/breakpoints.md → "Las medidas fijas... pueden ser literales en
+   el CSS del componente si su spec las define". */
 .badge {
-  /* estilos por tokens: T3 */
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  border-radius: var(--radius-8);
+  font-size: var(--font-size-badge);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-tight);
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
 }

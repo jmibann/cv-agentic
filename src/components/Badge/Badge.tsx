@@ -2,8 +2,8 @@
 // (specs/primitives/Badge/spec.md). T1: render base (RF-1, RF-2): el raíz es
 // `<span>` por defecto y `<li>` con `as="li"`, con `children` como texto.
 // T2 hecha: la `className` del consumidor se UNE a la clase base del raíz
-// (RF-3) en Badge.module.css (`badge`; regla aún vacía). T3: estilos por
-// tokens en esa clase base (RF-4, RF-5), `index.ts` y cierre a11y.
+// (RF-3) en Badge.module.css (`badge`). T3 hecha: esa clase base trae los
+// estilos por tokens (RF-4, RF-5) y el módulo se re-exporta desde `index.ts`.
 
 import styles from "./Badge.module.css";
 
