@@ -1,5 +1,5 @@
 # Separator
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
