@@ -1,0 +1,26 @@
+/* Button — specs/primitives/Button/spec.md → Estilos y tokens (T5).
+   El módulo nace con las dos clases que la spec fija para `size="small"` y
+   `fullWidth` (RF-6); la base del raíz (fondo --gradient-accent, tipografía,
+   radio, sombra, brillo ::before, focus-visible y disabled) llega en T6 con
+   sus pseudo-estados. Cero colores literales, cero @media propios: el
+   responsive de la base sale de --button-padding-* y --font-size-button
+   (spec → Responsive); los dos tokens de small son fijos por diseño
+   (tokens.css: "no escala"). */
+
+/* size="small" (spec → Estilos y tokens, columna `small`): padding con los
+   tokens fijos --button-small-padding-block/inline (10/16px) y SIN brillo:
+   el ::before de la base (que define T6) se anula con `content: none`
+   (plan.md → decisión T-4). */
+.small {
+  padding-block: var(--button-small-padding-block);
+  padding-inline: var(--button-small-padding-inline);
+}
+
+.small::before {
+  content: none;
+}
+
+/* fullWidth (spec → Estilos y tokens: "fullWidth → width: 100%"). */
+.fullWidth {
+  width: 100%;
+}

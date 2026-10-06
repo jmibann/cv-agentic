@@ -7,19 +7,21 @@
 // `target="_blank"` (RF-2), `rel` explícito tal cual (RF-9) y `download`
 // transmitido con su valor (RF-8). T4: `icon` renderiza el ícono decorativo
 // (`Icon` sin `label`, aria-hidden propio de Icon) y `iconPosition` resuelve
-// el orden REAL de nodos en el DOM (RF-4, RF-7). Ramas diferidas a su tarea
-// según tasks.md: clases size/fullWidth y unión de className (T5), estilos por
-// tokens y pseudo-estados (T6).
+// el orden REAL de nodos en el DOM (RF-4, RF-7). T5: `size="small"` y
+// `fullWidth` aplican su clase del módulo sobre el raíz de las dos ramas y se
+// unen a la `className` externa (RF-6; spec → API y Estilos y tokens). Diferido
+// a T6 según tasks.md: estilos base por tokens y pseudo-estados del módulo.
 
 import type { ReactNode } from "react";
 
 import { Icon } from "../Icon";
 import type { IconName } from "../Icon";
 
-// Props comunes a las dos ramas (spec → API). `size`/`fullWidth`/`className`
-// se declaran ya —la API es la de la spec— pero se ignoran en el render hasta
-// su tarea (T5); `icon`/`iconPosition` se consumen desde T4. No se agregan
-// props extra.
+import styles from "./Button.module.css";
+
+// Props comunes a las dos ramas (spec → API). `icon`/`iconPosition` se
+// consumen desde T4; `size`/`fullWidth`/`className` desde T5 (clases del
+// módulo unidas a la externa sobre el raíz). No se agregan props extra.
 interface CommonProps {
   children: ReactNode;
   /** Default "default". */
@@ -69,6 +71,24 @@ export function Button(props: ButtonProps) {
       </>
     );
 
+  // T5 (RF-6, spec → API y Estilos y tokens): `size="small"` y `fullWidth`
+  // aplican su clase del módulo sobre el raíz y la `className` externa se UNE
+  // a ellas (spec → API: "se une a la clase base del elemento raíz (<button>
+  // o <a>)"). Las tres props viven en CommonProps, así que el mismo cálculo
+  // rige en las dos ramas. Mismo mecanismo de join ya aprobado en Icon/Box:
+  // array + filtro de undefined + join, sin librerías; clases del módulo
+  // primero y la externa después (precedente). Las clases del módulo son
+  // `string | undefined` bajo noUncheckedIndexedAccess. En T5 el módulo aún
+  // no define clase base para el raíz (eso entra en T6): sin clases de
+  // variante ni `className` externa se pasa `undefined` al atributo, no una
+  // cadena vacía.
+  const classParts = [
+    props.size === "small" ? styles.small : undefined,
+    props.fullWidth ? styles.fullWidth : undefined,
+    props.className,
+  ].filter((cls): cls is string => cls !== undefined);
+  const rootClassName = classParts.length > 0 ? classParts.join(" ") : undefined;
+
   // T3 (RF-2, RF-8, RF-9): rama link. Comparar `href` contra `undefined`
   // angosta `props` a la variante con `href` de la unión discriminada, así
   // que `rel`/`target`/`download` se leen con sus tipos y las props propias
@@ -81,9 +101,16 @@ export function Button(props: ButtonProps) {
     const rel = props.rel ?? (props.target ? "noopener noreferrer" : undefined);
 
     // Nombre accesible desde `children` (spec → Accesibilidad); `content` ya
-    // trae el ícono decorativo en su posición (T4). Clases diferidas a T5.
+    // trae el ícono decorativo en su posición (T4). T5: `rootClassName` rige
+    // también en el <a> (props de CommonProps; spec → API).
     return (
-      <a href={props.href} target={props.target} rel={rel} download={props.download}>
+      <a
+        href={props.href}
+        target={props.target}
+        rel={rel}
+        download={props.download}
+        className={rootClassName}
+      >
         {content}
       </a>
     );
@@ -92,11 +119,13 @@ export function Button(props: ButtonProps) {
   // RF-1 (T1): tras el guard, TS angosta a la rama sin `href` donde existe
   // `type`; `props.type ?? "button"` aplica el default de la spec → API.
   // RF-3 (T2): el mismo angostado lee `onClick` y `disabled` con sus tipos.
+  // T5: `rootClassName` lleva las clases del módulo y la `className` externa.
   return (
     <button
       type={props.type ?? "button"}
       onClick={props.onClick}
       disabled={props.disabled}
+      className={rootClassName}
     >
       {content}
     </button>
