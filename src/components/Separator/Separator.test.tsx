@@ -15,13 +15,16 @@
 // `container.querySelector`, el mismo criterio estructural justificado en
 // IconBox/Overhead.
 //
-// Diferido a su tarea según tasks.md: cierre `expectNoA11yViolations` (T3;
-// tasks.md lo asigna explícitamente a la última tarea, patrón de diferido de
-// Overhead/Badge). Los valores del módulo de T2 (línea 1px `--color-track`,
-// full-bleed y `margin-block: var(--separator-gap)`; RF-3/RF-4/RF-5) se
-// verifican por **inspección del CSS** (jsdom no los computa; spec → "Tests
-// esperados"; decisión #101: el `test(Separator): T2` solo discrimina la
-// unión de `className`, que es la parte discriminate-testable de la tarea).
+// Cierre `expectNoA11yViolations` (T3): tasks.md lo difería a la última tarea
+// (patrón Overhead/Badge) y llega al final de este archivo. Los
+// valores del módulo de T2 (línea 1px `--color-track`, full-bleed y
+// `margin-block: var(--separator-gap)`; RF-3/RF-4/RF-5) se verifican por
+// **inspección del CSS** (jsdom no los computa; spec → "Tests esperados";
+// decisión #101: el `test(Separator): T2` solo discrimina la unión de
+// `className`, que es la parte discriminate-testable de esa tarea; y el
+// `test(Separator): T3` nace verde on-arrival —ver el describe final— porque
+// en T3 no queda nada discriminate-testable: el markup ya era accesible desde
+// T1 y el `index.ts` de cierre no es observable por tests).
 
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
@@ -35,6 +38,13 @@ import { Separator } from "./Separator";
 // queda rojo por "Failed to resolve import ./Separator.module.css", rojo
 // legítimo del mismo patrón aprobado en IconBox T2).
 import styles from "./Separator.module.css";
+
+// T3: helper de cierre a11y (constitución T4) y `Box variant="outer"` de
+// armazón para el escenario realista (spec → Propósito y "No hacer": el
+// Separator vive dentro de un Box outer; el full-bleed del RF-3 depende de su
+// `--box-padding`). Imports puros: no tocan los casos de T1/T2.
+import { expectNoA11yViolations } from "../../test/a11y";
+import { Box } from "../Box";
 
 describe("Separator decorative root (T1: RF-1, RF-2)", () => {
   it('renders a div root marked decorative with aria-hidden="true"', () => {
@@ -107,6 +117,47 @@ describe("Separator className joining (T2)", () => {
   });
 });
 
-// El cierre del archivo (constitución T4, spec → "Tests esperados":
-// `expectNoA11yViolations`) se agrega en T3 (tasks.md lo asigna a la última
-// tarea): ese describe final irá aquí.
+// Tests de T3 (specs/primitives/Separator/tasks.md) — cierre del archivo
+// (constitución T4; spec → "Tests esperados": "expectNoA11yViolations sin
+// violaciones"; "Hecho cuando" de T3) sobre RF-1 y RF-2: axe confirma que el
+// raíz decorativo con `aria-hidden="true"` (RF-1) no aporta violaciones y que
+// la ausencia de `<hr>`/`role="separator"` (RF-2) deja el markup limpio. Dos
+// casos, uno por escenario (precedente Overhead T3: un caso por forma del
+// markup observado):
+//
+// - Separator suelto: válido y barato — el componente no conoce su contenedor
+//   (spec → Accesibilidad no exige armazón) y es lo que ya asiertean T1/T2.
+// - Separator dentro de un `Box variant="outer"` de armazón: escenario real
+//   (spec → Propósito: "separa bloques dentro de un `Box variant=\"outer\"`";
+//   "No hacer": no usarlo fuera de un Box outer porque el full-bleed depende
+//   de `--box-padding`). Box no añade roles en su default `as="div"`
+//   (specs/primitives/Box), así que el armazón no introduce ruido de acceso.
+//
+// Decisión #101 (cierre axe sobre markup ya accesible): este describe nace
+// VERDE on-arrival con el markup de T1/T2 — el Separator ya era un `<div>`
+// decorativo sin rol desde T1 y la unión de `className` (la parte
+// discriminate-testable de T2) está asierteada allá; en T3 no queda nada
+// nuevo discriminate-testable: el grosor/full-bleed/margen (RF-3/RF-4/RF-5)
+// son inspección del CSS (jsdom no los computa) y el `index.ts` de la nota de
+// cierre de pieza no es observable por tests (llega en el `feat(Separator):
+// T3`). Mismo criterio declarado que Badge T3 (`514d1e7`) y Overhead T3
+// (`44711ba`); leer el CSS como texto para fabricar un rojo está
+// explícitamente descartado en #101.
+describe("Separator accessibility audit (T3: RF-1, RF-2)", () => {
+  it("has no accessibility violations rendering a loose decorative separator", async () => {
+    const { container } = render(<Separator />);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations rendering a separator inside a Box outer scaffold", async () => {
+    // Escenario real (spec → Propósito): el separador vive dentro de la card.
+    const { container } = render(
+      <Box variant="outer">
+        <Separator />
+      </Box>,
+    );
+
+    await expectNoA11yViolations(container);
+  });
+});
