@@ -1,6 +1,6 @@
 # Tareas — LanguageSwitcher
 
-- [ ] **T1. Grupo con opciones por `LOCALES`.** RF-1, RF-4
+- [x] **T1. Grupo con opciones por `LOCALES`.** RF-1, RF-4 — ce164bc
   - Hecho cuando: `getByRole("group", { name: label })` con dos botones en el orden de `LOCALES`, `textContent` "EN"/"ES", `aria-label` "English"/"Español" y `lang` propio en cada botón (tests); verde tras `feat(LanguageSwitcher): T1`.
 
 - [ ] **T2. Estado activo, `setLocale` y guard.** RF-2, RF-3, RF-5
