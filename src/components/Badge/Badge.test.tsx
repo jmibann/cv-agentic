@@ -21,6 +21,16 @@ import { describe, expect, it } from "vitest";
 
 import { Badge } from "./Badge";
 
+// T2: el test importa el módulo solo para fijar el nombre real de la clase
+// base (resuelto por CSS Modules en runtime). El módulo nace con la unión de
+// `className` (feat(Badge): T2) con la clase base vacía; los estilos por
+// tokens llegan en T3.
+import styles from "./Badge.module.css";
+
+// Patrón P2 canónico #99 (`styles.name ?? "name"`; prohibidos `!` y
+// `as string`): el fallback es solo de tipos bajo `noUncheckedIndexedAccess`.
+const badgeClass = styles.badge ?? "badge";
+
 describe("Badge base render (T1: RF-1, RF-2)", () => {
   it("renders the children text in a <span> root by default", () => {
     const { getByText } = render(<Badge>Staff Engineer</Badge>);
@@ -49,5 +59,59 @@ describe("Badge base render (T1: RF-1, RF-2)", () => {
     // El <li> queda como hijo directo del <ul> (un solo elemento, sin
     // wrappers: spec → Anatomía).
     expect(root.parentElement?.tagName).toBe("UL");
+  });
+});
+
+// Tests de T2 (specs/primitives/Badge/tasks.md) — RF-3 (unión de `className`):
+// la clase externa del consumidor queda JUNTO a la clase base (`badge`, de
+// Badge.module.css) en el único elemento raíz (spec → API: "Se une a la clase
+// base del elemento raíz"; spec → Tests esperados: "Concatena `className`";
+// "Hecho cuando" de T2: aserción P2 de coexistencia). El orden en el atributo
+// `class` no resuelve conflictos de especificidad (precedente Box/Icon): rige
+// la hoja de estilos, así que el test verifica coexistencia, no el orden.
+//
+// Justificación de las queries (constitución T3): Badge expone su texto en el
+// raíz (spec → Accesibilidad: texto plano sin roles extra), así que el único
+// elemento se obtiene con `getByText` —la misma query accesible ya justificada
+// en T1— y se asierte `tagName` + clases sobre ese elemento; sin
+// `data-testid` (la API de la spec no define ninguno). Casos: `span` default y
+// `li` con `as="li"` (la spec define un único raíz: la unión debe ocurrir en
+// ambos).
+describe("Badge className joining (T2: RF-3)", () => {
+  it("joins an external className to the base class on the default span root", () => {
+    const consumerClass = "sidebar-role";
+
+    const { getByText } = render(
+      <Badge className={consumerClass}>Staff Engineer</Badge>,
+    );
+
+    // RF-3: la externa coexiste con la base en el único elemento (el raíz
+    // `span` por defecto; spec → Anatomía).
+    const root = getByText("Staff Engineer");
+
+    expect(root.tagName).toBe("SPAN");
+    expect(root).toHaveClass(badgeClass);
+    expect(root).toHaveClass(consumerClass);
+  });
+
+  it("joins an external className to the base class on the li root when as=\"li\"", () => {
+    const consumerClass = "skill-chip";
+
+    const { getByText } = render(
+      <ul>
+        <Badge as="li" className={consumerClass}>
+          React
+        </Badge>
+      </ul>,
+    );
+
+    // RF-2 + RF-3: la unión aplica al mismo raíz sea `span` o `li` (un único
+    // elemento por spec: no hay un segundo nodo que reciba la clase).
+    const root = getByText("React");
+
+    expect(root.tagName).toBe("LI");
+    expect(root.parentElement?.tagName).toBe("UL");
+    expect(root).toHaveClass(badgeClass);
+    expect(root).toHaveClass(consumerClass);
   });
 });
