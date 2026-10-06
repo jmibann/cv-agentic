@@ -5,7 +5,7 @@
     en el DOM y el módulo declara `text-transform: uppercase` (inspección);
     verde tras `feat(Overhead): T1`.
 
-- [ ] **T2. `as="dt"` con armazón `<dl>`.** RF-2
+- [x] **T2. `as="dt"` con armazón `<dl>`.** RF-2 — 62aedbf
   - Hecho cuando: default `span`; `as="dt"` renderiza `<dt>` (el test lo envuelve
     en `<dl>`); `className` queda unida al raíz (P2); verde tras
     `feat(Overhead): T2`.
