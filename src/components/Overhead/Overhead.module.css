@@ -1,0 +1,11 @@
+/* Overhead — specs/primitives/Overhead/spec.md → Estilos y tokens (T1).
+   En T1 solo la transformación a mayúsculas (RF-1): el DOM conserva el texto
+   con su capitalización normal y las mayúsculas las pone este CSS. El resto
+   (display: block, elipsis, --color-text-muted, --font-size-overhead, peso
+   regular, cero @media) llega en T3. Sin colores literales y sin margen
+   externo: el padre separa con gap (docs/DESIGN.md → Do/Don't). */
+
+/* Clase base del único elemento raíz (span o dt según `as`, T2). */
+.overhead {
+  text-transform: uppercase;
+}
