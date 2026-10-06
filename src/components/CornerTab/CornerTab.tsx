@@ -9,8 +9,10 @@
 // ni ningún atributo `aria-*` en el raíz: es contenedor visual, los estados
 // de hover/foco pertenecen a su contenido (tabs, botón); más fuerte que
 // Separator, acá tampoco `aria-hidden` (la tab envuelve contenido accesible).
-// Diferidos según tasks.md: variantes `size` sm/md (T2), `placement="float"`
-// y su único `@media (min-width: 992px)` (T3), fondo `surface-raised`, bordes
+// T2 agrega las variantes `size` (RF-2): `.md`/`.sm` del módulo, default `md`
+// (spec → API), unidas a la base en el orden canon de la fase (base →
+// variante → externa). Diferidos según tasks.md: `placement="float"` y su
+// único `@media (min-width: 992px)` (T3), fondo `surface-raised`, bordes
 // obligatorios, radio asimétrico, layout interno, ausencia de sombra y cierre
 // `expectNoA11yViolations` + `index.ts` (T4).
 
@@ -18,15 +20,16 @@ import type { ReactNode } from "react";
 
 import styles from "./CornerTab.module.css";
 
-// API (spec → API), completa desde T1. `size` y `placement` quedan **tipadas
-// sin comportamiento** hasta su tarea (T2/T3): no se destruyen acá para no
-// crear variables muertas (precedente Separator T1, que tampoco destruía sus
-// diferidas); la firma recibirá los parámetros al conectarse. `children` y
-// `className` sí se conectan en T1 ("Hecho cuando" y nota de tasks.md).
+// API (spec → API), completa desde T1. `placement` sigue **tipada sin
+// comportamiento** hasta T3 (no se destruye acá para no crear variables
+// muertas; precedente Separator T1, que tampoco destruía sus diferidas; la
+// firma recibirá el parámetro al conectarse). `size` se conecta en T2
+// (variante .md/.sm, default "md"). `children` y `className` se conectaron
+// en T1 ("Hecho cuando" y nota de tasks.md).
 export interface CornerTabProps {
   children: ReactNode;
   /** "md": altura de nav (--size-nav-tab-height). "sm": compacta (Show
-   * Contacts). Default "md". (Comportamiento en T2.) */
+   * Contacts). Default "md". */
   size?: "sm" | "md";
   /**
    * "overlay" (default): siempre posicionada en absoluto sobre la esquina.
@@ -38,18 +41,28 @@ export interface CornerTabProps {
   className?: string;
 }
 
-export function CornerTab({ children, className }: CornerTabProps) {
+export function CornerTab({ children, className, size = "md" }: CornerTabProps) {
   // RF-1 (T1): la clase base `cornerTab` del módulo fija la posición de
   // overlay (absolute/top/right/`--z-raised`); rige hoy para todo placement y
   // en T3 `.float` la sobrescribe ≥ 992px (inspección del CSS; jsdom no la
-  // computa). `size`/`placement` (T2/T3) aún no destruyen: sin comportamiento.
+  // computa). `placement` (T3) aún no destruye: sin comportamiento.
+  // T2 (RF-2): `size` aplica su variante del módulo —mapa trivial como Box
+  // (cada variante tiene su clase y SIEMPRE se aplica una: `sm` y `md` son
+  // clases distintas; spec → "Tests esperados")—. Default `"md"` por
+  // destructuración (spec → API: "Default \"md\""). Las alturas/padding de
+  // cada clase (filas `size` de la tabla de la spec) se verifican por
+  // inspección del CSS: jsdom no carga hojas de estilos.
+  const sizeClass = size === "sm" ? styles.sm : styles.md;
+
   // T1 (spec → API, P2): la `className` del consumidor se UNE a la clase base
   // sobre el único elemento raíz (no la reemplaza). Mismo mecanismo aprobado
   // en Box/Icon/BrandIcon/Badge/IconBox/Overhead/Separator: array + filtro de
-  // undefined + join, base primero, sin librerías; así no quedan clases vacías
-  // cuando `className` no se pasa. Las clases del módulo son
-  // `string | undefined` bajo noUncheckedIndexedAccess.
-  const rootClassName = [styles.cornerTab, className]
+  // undefined + join, sin librerías; así no quedan clases vacías cuando
+  // `className` no se pasa. Orden canon de la fase (Button T5/T6): base →
+  // variante (`size`; `placement` se insertará acá en T3) → className
+  // externa. Las clases del módulo son `string | undefined` bajo
+  // noUncheckedIndexedAccess.
+  const rootClassName = [styles.cornerTab, sizeClass, className]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 

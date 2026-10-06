@@ -10,10 +10,13 @@
    (docs/DESIGN.md → Do/Don't): el padre posiciona con gap; en T3 `.float`
    usará márgenes negativos de calc() sobre --box-padding (compensación del
    padding del Box, excepción igual a Separator/SectionTitle, no margen de
-   espaciado). Diferidos: fondo --color-surface-raised, bordes
-   border-left/bottom 1px --color-border (obligatorios, RF-5), radio
-   0/--radius-20/0/--radius-32 y layout interno flex (T4); alturas/padding
-   sm/md (T2). */
+    espaciado). Nombres de variante: `.md`/`.sm` = valor exacto del prop
+    `size` (criterio de la fase: Button `.small`/`.fullWidth`, Box
+    `.outer`/`.inner`; registrado aquí según el encargo de T2). Diferidos:
+    fondo --color-surface-raised, bordes border-left/bottom 1px
+    --color-border (obligatorios, RF-5), radio 0/--radius-20/0/--radius-32,
+    layout interno flex y `display` (T4); `placement="float"` y su único
+    @media (T3). */
 
 /* Clase base del único elemento raíz (<div>, spec → Anatomía: un div
    posicionado dentro del Box, que es position: relative). Valores exactos de
@@ -24,4 +27,27 @@
   top: 0;
   right: 0;
   z-index: var(--z-raised);
+}
+
+/* size="md" (default; RF-2, T2): fila `size="md"` de la tabla de la spec con
+   sus tokens — --size-nav-tab-height (3rem → 3.75rem ≥992) y
+   --corner-tab-padding-inline (20px → 2rem ≥992) escalan en tokens.css, así
+   que el módulo no agrega @media (regla de docs/tokens/breakpoints.md: toda
+   medida que cambia por breakpoint es token). Variante siempre presente
+   (md o sm): la base no declara alto/padding propios. */
+.md {
+  min-height: var(--size-nav-tab-height);
+  padding-inline: var(--corner-tab-padding-inline);
+}
+
+/* size="sm" (compacta, Show Contacts; RF-2, T2): fila `size="sm"` de la
+   tabla de la spec. Literales fijos 2.75rem/1.25rem PERMITIDOS: son medidas
+   que NO cambian por breakpoint y las define la spec
+   (docs/tokens/breakpoints.md → "Las medidas fijas (que no cambian por
+   breakpoint) pueden ser literales en el CSS del componente si su spec las
+   define"; plan.md → Decisiones: "size='sm' usa los literales fijos
+   2.75rem/1.25rem permitidos por breakpoints.md (no escalan)"). */
+.sm {
+  min-height: 2.75rem;
+  padding-inline: 1.25rem;
 }
