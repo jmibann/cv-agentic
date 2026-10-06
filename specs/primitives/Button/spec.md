@@ -1,5 +1,5 @@
 # Button
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
