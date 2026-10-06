@@ -1,6 +1,6 @@
 # Tareas — IconBox
 
-- [ ] **T1. Estructura: `<span>` con `Icon tone="gradient"` centrado.** RF-1
+- [x] **T1. Estructura: `<span>` con `Icon tone="gradient"` centrado.** RF-1 — 53c0a21
   - Hecho cuando: el test (con `AccentGradientDefs` de armazón) encuentra un
     `svg` con `stroke="url(#accent-gradient)"`; el IconBox no renderiza defs
     propias (un solo `#accent-gradient` en el DOM del test); verde tras
