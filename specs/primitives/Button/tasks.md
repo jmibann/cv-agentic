@@ -27,7 +27,7 @@
     bloqueado hasta que el usuario las agregue) y `::before { content: none }`;
     `fullWidth` → `width: 100%` por clase; verde tras `feat(Button): T5`.
 
-- [ ] **T6. Estilos base, pseudo-estados y cierre a11y.** RF-5, RF-6
+- [x] **T6. Estilos base, pseudo-estados y cierre a11y.** RF-5, RF-6 — bc2f4c2
   - Hecho cuando: el módulo resuelve fondo `--gradient-accent`, texto
     `--color-on-accent`, radio, sombra y `::before` (`bottom: 0`,
     `z-index: var(--z-below)`, botón con `position: relative;
