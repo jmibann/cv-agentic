@@ -9,7 +9,7 @@
     Interfaz) no estaba repartida en las tareas; se cubre en T1 (gap detectado
     al delegar, mismo tratamiento que la nota de `index.ts`).
 
-- [ ] **T2. Variantes `size`.** RF-2
+- [x] **T2. Variantes `size`.** RF-2 — 79ab04e
   - Hecho cuando: default `md`; `sm` y `md` aplican clases distintas (P2);
     alturas/padding según tabla de la spec (`--size-nav-tab-height` +
     `--corner-tab-padding-inline` / literales fijos 2.75rem y 1.25rem)
