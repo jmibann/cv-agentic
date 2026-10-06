@@ -1,0 +1,29 @@
+/* Separator — specs/primitives/Separator/spec.md → Estilos y tokens (T2).
+   Cero colores literales, cero pseudo-estados (spec → Estados: no es
+   interactivo) y cero @media propios (spec → Responsive: la separación
+   vertical escala por --separator-gap y el full-bleed sigue a --box-padding,
+   tokens con sus saltos dentro de tokens/tokens.css). El margen externo
+   (margin-block) es la excepción documentada a "sin margen externo" de
+   docs/DESIGN.md → Do/Don't: el full-bleed depende del padding del Box padre
+   y por eso el separador se posiciona a sí mismo (RF-5, decisión #54; spec →
+   "No hacer": no tomarlo como precedente). */
+
+/* Clase base del único elemento raíz (<div> decorativo, spec → Anatomía).
+   Valores exactos de la tabla "Estilos y tokens" de la spec: alto 1px; color
+   de línea --color-track; full-bleed con margin-inline negativo + width
+   calcado desde --box-padding (RF-3); separación vertical en AMBOS lados con
+   margin-block: var(--separator-gap) (RF-4; plan → Decisiones P-2: descartado
+   margin-block-end solo porque la línea quedaría pegada al bloque anterior).
+   El `1px` es una medida FIJA definida literalmente en la tabla de la spec
+   ("Alto | 1px"): no existe token genérico de grosor de línea en tokens.css
+   (--timeline-line-width es una medida interna de Timeline, no reutilizable),
+   y docs/tokens/breakpoints.md permite literales de medidas fijas "si su
+   spec las define". Los dos calc() son literal textual de la spec; no hay
+   @media porque ninguna medida propia cambia por breakpoint. */
+.separator {
+  height: 1px;
+  background-color: var(--color-track);
+  margin-inline: calc(var(--box-padding) * -1);
+  width: calc(100% + var(--box-padding) * 2);
+  margin-block: var(--separator-gap);
+}

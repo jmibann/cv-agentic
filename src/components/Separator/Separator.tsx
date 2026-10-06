@@ -4,32 +4,44 @@
 // `<div>` con `aria-hidden="true"`, sin `role` y sin `<hr>` (un `<hr>`
 // anunciaría un cambio de tema del contenido; spec → Accesibilidad y
 // "No hacer"). Sin hijos: es decoración pura (spec → Anatomía).
-// Diferidos según tasks.md: la línea 1px `--color-track`, el full-bleed
-// calculado desde `--box-padding` y el `margin-block: var(--separator-gap)`
-// (T2 — el módulo `Separator.module.css` nace ahí con su `feat`, precedente
-// IconBox/SectionTitle; en T1 no hay nada que estilizar), la unión de
-// `className` al raíz (T2) y el cierre `expectNoA11yViolations` (T3).
+// T2 hecha: el módulo `Separator.module.css` nace con la línea 1px
+// `--color-track`, el full-bleed calculado desde `--box-padding` (RF-3) y el
+// `margin-block: var(--separator-gap)` en ambos lados (RF-4, RF-5) — valores
+// por inspección del CSS (jsdom no los computa; spec → "Tests esperados") — y
+// la `className` del consumidor se UNE a la clase base (`separator`) del raíz
+// (P2). Queda diferido según tasks.md: el cierre `expectNoA11yViolations`
+// (T3).
 
-// API (spec → API): `SeparatorProps { className?: string }`, tipada desde T1
-// pero **sin conectar**: `className` queda declarada sin comportamiento (su
-// unión a la clase base del `<div>` raíz se conecta en T2, plan → Interfaz;
-// P2), igual que `decorated`/`icon`/`className` en T1 de SectionTitle. En T1
-// la función no recibe parámetros: ninguna prop tiene efecto en el render
-// todavía (alternativa descartada: `(_props: SeparatorProps)`, que viola
-// `@typescript-eslint/no-unused-vars` con `args: "after-used"` — el prefijo
-// `_` del convenio solo funciona delante de un argumento usado).
+import styles from "./Separator.module.css";
+
+// API (spec → API): `SeparatorProps { className?: string }`, tipada desde T1 y
+// **conectada en T2**: su unión a la clase base del `<div>` raíz (plan →
+// Interfaz; P2).
 export interface SeparatorProps {
-  /** Se une a la clase base del `<div>` raíz (comportamiento en T2). */
+  /** Se une a la clase base del `<div>` raíz. */
   className?: string;
 }
 
-export function Separator() {
+export function Separator({ className }: SeparatorProps) {
   // RF-1 (T1): el raíz es un `<div>` decorativo con `aria-hidden="true"` (la
-  // línea de 1px la dibuja el módulo desde T2; spec → Estilos y tokens:
-  // grosor por inspección del CSS, jsdom no lo computa).
-  // RF-2 (T1): sin `role="separator"` y sin `<hr>` (spec → "No hacer"): el
-  // separador es decoración dentro del Box outer. Sin hijos requeridos.
-  // La unión de `className` NO se conecta todavía (T2): la firma recibirá
-  // `SeparatorProps` al conectarla.
-  return <div aria-hidden="true" />;
+  // línea de 1px la dibuja la clase base del módulo; grosor por inspección
+  // del CSS, jsdom no lo computa).
+  // RF-2 (T1, intacto en T2): sin `role="separator"` y sin `<hr>` (spec →
+  // "No hacer"): el separador es decoración dentro del Box outer. Sin hijos.
+  // T2 (spec → API, P2): la `className` del consumidor se UNE a la clase base
+  // sobre el único elemento raíz (no la reemplaza). Mismo mecanismo aprobado
+  // en Box/Icon/BrandIcon/Badge/IconBox/Overhead: array + filtro de undefined
+  // + join, base primero, sin librerías; así no quedan clases vacías cuando
+  // `className` no se pasa. Las clases del módulo son `string | undefined`
+  // bajo noUncheckedIndexedAccess.
+  const rootClassName = [styles.separator, className]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
+  // RF-3/RF-4/RF-5 (T2): full-bleed (`margin-inline` negativo + `width`
+  // calculado desde `--box-padding`), alto 1px con `--color-track` y
+  // `margin-block: var(--separator-gap)` en ambos lados viven en la clase
+  // base del módulo (verificación por inspección; spec → Estilos y tokens y
+  // Responsive: sin @media propios).
+  return <div aria-hidden="true" className={rootClassName} />;
 }
