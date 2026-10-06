@@ -38,6 +38,11 @@ import { HexAvatarDefs } from "./HexAvatar";
 // T1; ningún assert anterior se toca — constitución T2).
 import { HexAvatar } from "./HexAvatar";
 
+// T4: helper de cierre a11y (constitución T4) para el describe final. Import
+// separado (criterio #101): el commit `test(HexAvatar): T4` es puramente
+// aditivo sobre el archivo de T1–T3.
+import { expectNoA11yViolations } from "../../test/a11y";
+
 // T1: el módulo nace con el feat de esta tarea solo con `.defs` (el patrón
 // #99 fija el nombre real de la clase resuelta por CSS Modules en runtime).
 import styles from "./HexAvatar.module.css";
@@ -260,6 +265,90 @@ describe("HexAvatar alt (T3: RF-2)", () => {
   });
 });
 
-// Cierre `expectNoA11yViolations`: diferido a T4 por tasks.md ("archivo
-// termina con expectNoA11yViolations" en T4; patrón Separator/CornerTab).
-// No se adelanta: los commits `test` solo agregan tests de su tarea.
+// Tests de T4 (specs/primitives/HexAvatar/tasks.md) — cierre de la pieza:
+// unión de `className` al `wrap` raíz (spec → API; "Tests esperados" #4) y
+// cierre `expectNoA11yViolations` ("Tests esperados" #7; "Hecho cuando" de T4:
+// "archivo termina con expectNoA11yViolations (con HexAvatarDefs montado)";
+// constitución T4). El marcador de diferido escrito en T1 se reemplaza acá:
+// ningún assert de T1–T3 se toca (constitución T2; los `test` solo agregan
+// tests — este diff no borra ni relajar ninguna aserción anterior).
+//
+// Rojo/verde por escenario (decisión #101):
+// - Unión de `className`: **nace ROJO** — en el commit `test(HexAvatar): T4`
+//   el componente no destruye `className` (diferido declarado en T2/T3), así
+//   que la clase externa no aparece en el `wrap`; el `feat` la conecta.
+// - Cierre axe: **nace VERDE on-arrival** y se declara (patrón Separator T3
+//   `564911f` / CornerTab T4): el markup ya era accesible desde T2/T3 (img
+//   decorativa con `alt=""` o con nombre, spans sin rol, defs `aria-hidden`);
+//   en T4 no queda nada discriminate-testable nuevo — el `filter:
+//   var(--filter-avatar-drop)` del wrap (RF-4), la ausencia de `box-shadow`,
+//   la ausencia de `@media` (tamaño fijo, RF-5) y de reglas
+//   `:hover`/`:focus`/transiciones (no es interactivo; spec → Estados) se
+//   verifican por INSPECCIÓN del `.module.css` (jsdom no computa `filter`;
+//   #101: leer el CSS como texto para fabricar un rojo está explícitamente
+//   descartado) y el `index.ts` de la nota de cierre no es observable por
+//   tests (llega en el `feat(HexAvatar): T4`).
+//
+// Justificación de las queries (constitución T3): unión — el `wrap` es el
+// `<span>` raíz de la Anatomía (sin rol ni nombre), selección estructural ya
+// justificada en T2, aserción de clases con el patrón P2 canónico #99
+// (`styles.wrap ?? "wrap"` + `toHaveClass`; prohibidos `!` y `as string`) y
+// el precedente Icon T5/CornerTab T1 de coexistencia base + externa (el orden
+// en el atributo `class` no se verifica, precedente de la fase). Cierre —
+// los dos escenarios son los dos marcos de RF-2 ya cubiertos por T3:
+// decorativo (`alt=""` por default) y con nombre accesible.
+//
+// Armazón del cierre (spec → Forma: "Los tests de componentes que usan
+// HexAvatar montan también `HexAvatarDefs`"): cada render del axe lleva
+// `HexAvatarDefs` junto al avatar para que los `url(#hex-avatar-outer/inner)`
+// del `clip-path` referencien defs presentes en el documento (en jsdom la
+// resolución no se computa, pero el armazón replica el montaje real de
+// AppLayout — RF-3/RF-6 de AppLayout — y axe audita el conjunto completo,
+// incluidas las defs: su `aria-hidden="true"` las mantiene fuera del árbol).
+
+describe("HexAvatar className joining (T4: spec Tests #4)", () => {
+  it("joins an external className to the base wrap class on the root span", () => {
+    const consumerClass = "testimonial-avatar";
+
+    const { container } = render(
+      <HexAvatar src="/x.png" className={consumerClass} />,
+    );
+
+    // Spec → API: `className` "se une a la clase base del `wrap` (elemento
+    // raíz)" — composición base-primero + externa después (canon de la fase:
+    // Badge/IconBox/Separator/CornerTab); la clase externa COEXISTE con la
+    // base, no la reemplaza.
+    const wrap = container.querySelector("span");
+    expect(wrap).not.toBeNull();
+    expect(wrap).toHaveClass(wrapClass);
+    expect(wrap).toHaveClass(consumerClass);
+  });
+});
+
+describe("HexAvatar accessibility audit (T4: RF-5; spec Tests #7)", () => {
+  it("has no accessibility violations rendering a decorative avatar with the shared defs mounted", async () => {
+    // Escenario real (spec → Propósito: card y dialog ponen el nombre al
+    // lado): imagen decorativa con `alt=""` (default de la API).
+    const { container } = render(
+      <>
+        <HexAvatarDefs />
+        <HexAvatar src="/x.png" />
+      </>,
+    );
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations rendering a named avatar with the shared defs mounted", async () => {
+    // Segundo marco de RF-2 (spec → Accesibilidad): uso futuro con `alt`
+    // descriptivo → el img queda en el árbol con su nombre.
+    const { container } = render(
+      <>
+        <HexAvatarDefs />
+        <HexAvatar src="/x.png" alt="Foto de X" />
+      </>,
+    );
+
+    await expectNoA11yViolations(container);
+  });
+});
