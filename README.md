@@ -4,7 +4,7 @@ Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-10-05)
+## Estado actual (2026-10-06)
 
 | Qué | Estado |
 |---|---|
@@ -22,8 +22,8 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | Contenido del CV en JSON (esquema + validación) | ✅ Operativo desde F1: esquema + generados (`gen:types`, `build:validator`) + `validate:content` en verde; contenido inicial en `src/content/cv.{en,es}.json` |
 | `spec.md` de `foundation/Foundation` + `plan.md` / `tasks.md` | ✅ Aprobados; Tareas de las demás piezas: al inicio de su fase F |
 | **F1 Foundation** (pieza `foundation/Foundation`, Tn por encargo) | ✅ **Cerrada (2026-10-03)**: spec `Estado: implementada`; T1–T11 + T2b/T3b/T5b/T8b aprobadas; revisión completa APROBADA; QA visual en navegador APROBADO. Cambios: `skipLibCheck`, #96 (`react-refresh` hooks), #97 (`ucs2length` aceptado). Deudas menores en `docs/memory.md` |
-| **F2 Primitivas** (Icon, BrandIcon, Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar — 11 piezas) | ⏳ **EN CURSO (5/11 cerradas, 2026-10-05)**: Icon, BrandIcon, Box, Button y Badge con spec `Estado: implementada` (revisión completa APROBADA + `build` ✅ por pieza). Plan + Tareas de las 11 aprobados en la puerta de fase. Decisiones aplicadas en F2: #99 (patrón P2), #100 (`BRAND_NAMES` en `allowExportNames`), #101 (verde-on-arrival en T6 de Button y T3 de Badge, declarado en los commits). **Siguiente: Overhead T1**; luego IconBox → SectionTitle → Separator → CornerTab → HexAvatar |
-| F2 → seguimientos abiertos | Combo hover+focus del Button (el `outline` gana siempre; la spec no fija el combo) → **F5** · Badge RF-6 ("no dentro de `Box inner`") se verifica en los consumidores → **F3/F4** (SkillList/Sidebar) · `--button-small-padding-*` literales: promover a token si se repite en otro componente |
+| **F2 Primitivas** (Icon, BrandIcon, Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar — 11 piezas) | ⏳ **EN CURSO (6/11 cerradas, 2026-10-06)**: Icon, BrandIcon, Box, Button, Badge y Overhead con spec `Estado: implementada` (revisión completa APROBADA + `build` ✅ por pieza). Plan + Tareas de las 11 aprobados en la puerta de fase. Decisiones aplicadas en F2: #99 (patrón P2), #100 (`BRAND_NAMES` en `allowExportNames`), #101 (verde-on-arrival en T6 de Button, T3 de Badge y T3 de Overhead, declarado en los commits; en Overhead T3 el reviewer además validó el armazón `<dl>` con `<dd>` para axe como corrección legítima del test, no rojo por falta de implementación). **Siguiente: IconBox T1**; luego SectionTitle → Separator → CornerTab → HexAvatar |
+| F2 → seguimientos abiertos | Combo hover+focus del Button (el `outline` gana siempre; la spec no fija el combo) → **F5** · Badge RF-6 ("no dentro de `Box inner`") se verifica en los consumidores → **F3/F4** (SkillList/Sidebar) · Overhead RF-4 (nunca sobre `--color-bg` en claro) se verifica en los consumidores → **F3/F4** (Sidebar) · `--button-small-padding-*` literales: promover a token si se repite en otro componente |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
 

@@ -9,7 +9,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - **Modelo único de spec aprobado**: `specs/<categoria>/<Name>/spec.md` con `Estado: aprobada` y `Requisitos (EARS)` en las 27.
 - **F1 CERRADA** (2026-10-03): pieza `foundation/Foundation` `Estado: implementada`; T1–T11 + reparos T2b/T3b/T5b/T8b aprobadas (última: revisión completa **APROBADA** tras reparo T8b `ae59762`; **QA visual en navegador APROBADO** con app servida: anti-flash oscuro, RF-3 vivo, `theme-color`, es/en, Poppins autohosteada, 375/1440 sin overflow). App Vite/React/TS en la raíz con providers, i18n, contenido validado y tooling; `build` ✅, 53 tests.
 - **Auditoría de arquitectura 2026-10-02**: 6 puntos corregidos (#75–#80); re-auditoría: 4 medios (#81–#82); tercera: 2 altos (#83–#84), 7 medios (#85–#91) y bajos (#92–#94): sin pendientes de auditoría.
-- **F2 Primitivas EN CURSO (5/11 cerradas, 2026-10-05)**: Icon, BrandIcon, Box, Button y **Badge CERRADAS** (specs `implementada`; última puerta: revisión completa Badge APROBADA + build ✅, `1962e3f`). 180 tests verdes. Decisiones aplicadas en F2: #99, #100, #101 (Button T6 y Badge T3 nacieron verdes on-arrival, declarado en los commits). **Siguiente: Overhead T1** (`specs/primitives/Overhead/`), luego IconBox → SectionTitle → Separator → CornerTab → HexAvatar. Plan/tareas de las 11 ya aprobados (puerta de fase).
+- **F2 Primitivas EN CURSO (6/11 cerradas, 2026-10-06)**: Icon, BrandIcon, Box, Button, Badge y **Overhead CERRADAS** (specs `implementada`; última puerta: revisión completa Overhead APROBADA + build ✅, `b2783f6`). 187 tests verdes. Decisiones aplicadas en F2: #99, #100, #101 (Button T6, Badge T3 y Overhead T3 nacieron verdes on-arrival, declarado en los commits). **Siguiente: IconBox T1** (`specs/primitives/IconBox/`), luego SectionTitle → Separator → CornerTab → HexAvatar. Plan/tareas de las 11 ya aprobados (puerta de fase).
 
 ## Decisiones (y por qué)
 
@@ -29,7 +29,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 - **#85 F5 sin Tn**: QA del reviewer, informe en `docs/qa-report.md`; defectos → tarea nueva o Cambio de su pieza.
 - **#86** Estado/memoria/diagnostics solo por puerta F o decisión de reglas. **#98** Log `diagnostics.md`: formato fijo, tabla Abiertos, sin estado propio y poda a 150 líneas. **#99** P2 canónico: en tests, `const c = styles.name ?? "name"` + `toHaveClass(c)` (fallback solo de tipos; prohibidos `!` y `as string`; sin helper en `src/test/`). **#91** `npm run dev` lo corre el usuario.
   **#95** El orchestrator edita el registro (`docs/README.md`) y la doc de agentes (`docs/agent-system.md`).
-  **#101** Tareas solo-inspección (RF verificados por inspección + cierre a11y sobre markup ya accesible): el `test(<Name>): Tn` **no está obligado a quedar rojo** si su alcance no discrimina el estado de la implementación; debe declarar por qué y qué se inspecciona; la verificación real es la inspección del reviewer (F2/Box T4; descartado rojo artificial leyendo el CSS como texto).
+  **#101** Tareas solo-inspección (RF verificados por inspección + cierre a11y sobre markup ya accesible): el `test(<Name>): Tn` **no está obligado a quedar rojo** si su alcance no discrimina el estado de la implementación; debe declarar por qué y qué se inspecciona; la verificación real es la inspección del reviewer (F2/Box T4; descartado rojo artificial leyendo el CSS como texto). Overhead T3: el `<dl>` de armazón con solo `<dt>` nacía rojo por axe `definition-list` (error del test, no de implementación); corregir el armazón con `<dd>` dentro del mismo `test` commit es legítimo.
 - **`skipLibCheck: true`** (F1/T2, aprobado por el usuario): jest-dom 7 y Vitest 5 declaran `Assertion` incompatibles
   en sus `.d.ts` (TS2428); el código propio sigue chequeando. Volver a `false` si jest-dom publica tipos compatibles.
 - **#96 `react-refresh` + hooks de provider** (F1/T5b, aprobado por el usuario, 2026-10-03): la API spíada fija
@@ -65,7 +65,7 @@ La actualiza **solo el orchestrator** al cerrar cada puerta F o ante una decisi�
 
 ## Próximos pasos
 
-- **F2 primitivas (5/11 cerradas)**: seguir con **Overhead T1** (`specs/primitives/Overhead/`), en el orden de `specs/README.md`: Overhead → IconBox → SectionTitle → Separator → CornerTab → HexAvatar. Plan/tareas ya aprobados. Aplicar en cada encargo: #99, #101 (tareas solo-inspección), criterio L1/L2; seguir la senda de las 5 cerradas (revisión por tarea + revisión completa con `build` + puerta de usuario).
+- **F2 primitivas (6/11 cerradas)**: seguir con **IconBox T1** (`specs/primitives/IconBox/`), en el orden de `specs/README.md`: IconBox → SectionTitle → Separator → CornerTab → HexAvatar. Plan/tareas ya aprobados. Aplicar en cada encargo: #99, #101 (tareas solo-inspección), criterio L1/L2; seguir la senda de las 6 cerradas (revisión por tarea + revisión completa con `build` + puerta de usuario).
 - **Unidad de trabajo por tarea** (decisión #69): `test(<Name>): Tn` → `feat(<Name>): Tn`; `feat`/`fix` no tocan
   tests y `test` solo agrega; el orchestrator escribe `plan.md`/`tasks.md` y marca cada Tn tras el OK del reviewer.
 - Comandos `/sdd-*` (decisión #71): orchestrator o reviewer, argumento `<categoria>/<Name>`; MCP `chrome-devtools` solo para el reviewer.
