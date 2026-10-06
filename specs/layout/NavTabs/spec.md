@@ -14,12 +14,14 @@ color de acento, inactivos en color de texto.
 ## Requisitos (EARS)
 
 - RF-1: CUANDO el componente recibe `items`, ENTONCES EL SISTEMA renderiza un `role="tablist"` nombrado con un `role="tab"` por item en ese orden, aplicando roving tabindex (solo el tab activo con `tabIndex=0`).
-- RF-2: EL SISTEMA mantiene un único tabpanel cuyo contenido cambia: todos los tabs apuntan con `aria-controls` a ese mismo id.
+- RF-2: EL SISTEMA hace que **todos los tabs apunten con `aria-controls` al mismo `panelId`** (un único tabpanel); la existencia y el contenido de ese panel son responsabilidad de AppLayout, no verificables en esta pieza.
 - RF-3: CUANDO el usuario hace click en un tab inactivo, ENTONCES EL SISTEMA invoca `onChange(id)` una vez; SI hace click en el tab activo, ENTONCES no lo invoca.
-- RF-4: CUANDO el foco está en un tab y se pulsa Flecha, Home o End, ENTONCES EL SISTEMA mueve el foco y activa el tab resultante, con vuelta circular en los extremos.
-- RF-5: EL SISTEMA distingue el tab activo con `--color-accent-text` y `aria-selected="true"`; los inactivos van al 80% de opacidad y al 100% con subrayado de 2px en hover.
-- RF-6: EL SISTEMA mantiene la navegación visible en todos los breakpoints, sin hamburguesa, drawer ni overlay.
+- RF-4: CUANDO el foco está en un tab y se pulsa `keydown` de Flecha ←/→, Home o End, ENTONCES EL SISTEMA mueve el foco al tab resultante (vuelta circular en los extremos) **y emite `onChange` de ese tab** (activación automática: lo visual depende del re-render del padre, que es controlado); SI el tab resultante es el mismo (un solo item), ENTONCES no emite `onChange`; SI se pulsa Espacio, ENTONCES EL SISTEMA hace `preventDefault` (no scrollea la página) y activa por click nativo; Enter y las demás teclas quedan al comportamiento nativo sin efecto adicional. ↑/↓ no mueven el foco (tablist horizontal).
+- RF-5: EL SISTEMA distingue el tab activo con `--color-accent-text` y `aria-selected="true"`; los inactivos van al 80% de opacidad y al 100% con subrayado de 2px en hover. Verificación: `aria-selected` por test; el resto por inspección del CSS + QA F5.
+- RF-6: EL SISTEMA mantiene la navegación visible en todos los breakpoints, sin hamburguesa, drawer ni overlay. En impresión la ocultan los estilos compartidos (G-D: ningún `@media print` propio).
 - RF-7: SI `items` viene vacío, ENTONCES EL SISTEMA no renderiza nada (un tablist sin tabs es inválido para axe).
+
+**Invariantes del consumidor (AppLayout):** `activeId` debe coincidir siempre con un `item.id` (useHashTab garantiza id válido o default); NavTabs **no** valida ni hace fallback. Los `item.id` se usan tal cual en `getTabId`: sin espacios ni caracteres problemáticos (invariante de AppLayout/`useHashTab`).
 
 ## Anatomía
 
@@ -56,6 +58,7 @@ export interface NavTabsProps {
   onChange: (id: string) => void;
   panelId: string;                  // id del tabpanel
   label: string;                    // aria-label del tablist, traducido
+  /** Se une al raíz de la pieza — se transmite a la clase base de `CornerTab` (G-B). */
   className?: string;
 }
 
@@ -67,12 +70,13 @@ export const getTabId = (id: string) => `tab-${id}`;
 
 | Interacción | Resultado |
 |---|---|
-| Click en un tab | `onChange(id)` |
-| Flecha → / ← (foco en un tab) | Mueve el foco al siguiente/anterior **y lo activa** (activación automática), con vuelta circular |
-| Home / End | Foco y activación del primero / último |
+| Click en un tab | `onChange(id)`; el foco queda en el tab pulsado (nativo del `<button>`, NavTabs no re-gestiona el foco tras click) |
+| Flecha → / ← (foco en un tab) | Mueve el foco al siguiente/anterior **y emite `onChange`** (activación automática; lo visual depende del padre), con vuelta circular |
+| Home / End | Foco y `onChange` del primero / último |
 | Tab | Sale del tablist hacia el tabpanel (solo el tab activo es tabulable) |
-| Enter / Espacio | Activa el tab con foco (nativo del `<button>`; relevante si se cambia a activación manual) |
-| Click en el tab ya activo | No llama a `onChange` |
+| Enter | Activa el tab con foco (click nativo del `<button>`) |
+| Espacio | `preventDefault` (no scrollea la página) + activa por click nativo |
+| Click en el tab ya activo | No llama `onChange` |
 
 **Roving tabindex:** el tab activo tiene `tabIndex=0`; el resto, `-1`.
 
@@ -121,10 +125,10 @@ El activo se distingue **por color** (acento vs texto) con contrastes
 
 | Viewport | Comportamiento |
 |---|---|
-| ≥ lg (992) | Tab tamaño completo y **flotante** (`placement="float"`): el `h1` del panel fluye a su izquierda usando el ancho real de la tab, sin reservas fijas. |
+| ≥ lg (992) | Tab tamaño completo y **flotante** (`placement="float"`): el `h1` del panel fluye a su izquierda usando el ancho real de la tab, sin reservas fijas. **Dependencia de contrato (CornerTab → float):** el contenido que sigue al tab en el tramo que convive con ella **no** puede crear contexto de formato propio (flex/grid/`overflow`≠visible/`flow-root`); lo garantiza AppLayout y lo verifica el reviewer en F4/F5. |
 | < lg | Tab compacta, **siempre visible**, anclada a la derecha. El `h1` del panel va debajo (AppLayout agrega el espacio). |
 
-No hay hamburguesa, drawer ni overlay en ningún tamaño. Con 2 ítems entra en 320px.
+No hay hamburguesa, drawer ni overlay en ningún tamaño. "Con 2 ítems entra en 320px" es verificación de **QA F5** (no de test ni inspección).
 
 ## Accesibilidad
 

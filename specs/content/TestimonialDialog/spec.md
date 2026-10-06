@@ -8,12 +8,12 @@ atrapado, Esc, top layer y `::backdrop` sin librerías).
 
 ## Requisitos (EARS)
 
-- RF-1: SI `testimonial` es `null`, ENTONCES no hay diálogo abierto; SI la prop pasa de `null` a un valor, ENTONCES EL SISTEMA lo abre con `dialog.showModal()`.
-- RF-2: EL SISTEMA cierra el diálogo únicamente con `dialog.close()`, y el evento `close` es el único lugar que llama `onClose()` (solo si el testimonial vigente no es `null`).
-- RF-3: CUANDO el usuario cierra (botón Close, backdrop o Esc), ENTONCES EL SISTEMA invoca `onClose` exactamente una vez; SI el padre pone `testimonial` a `null`, ENTONCES cierra sin invocar `onClose`.
-- RF-4: CUANDO el diálogo está abierto, ENTONCES EL SISTEMA muestra autor, rol y texto completo, con nombre accesible igual al autor (`aria-labelledby` al `h2`), foco inicial en el botón Close y cierre con Esc.
-- RF-5: EL SISTEMA aplica el backdrop, bloquea el scroll del fondo con `html:has(dialog[open]) { overflow: hidden; }` y no imprime el diálogo en `@media print`.
-- RF-6: EL SISTEMA renderiza dos columnas a 580px o más y una sola con la comilla oculta por debajo de 580px, con ancho y alto máximos sobre el viewport y sin medidas nuevas por breakpoint; el avatar sale de `HexAvatar` (decorativo).
+- RF-1: SI `testimonial` es `null`, ENTONCES EL SISTEMA **no renderiza nada** (montaje condicional, decisión 18=b: no hay `<dialog>` en el DOM — coincide con Test 1); SI recibe un valor no nulo, ENTONCES monta el `<dialog>` y lo abre con `dialog.showModal()` en un effect tras el mount.
+- RF-2: EL SISTEMA cierra el diálogo con `dialog.close()` cuando el disparador es el botón Close o el backdrop; el cierre por **Esc es nativo** (el navegador no llama `close()` pero dispara el evento `close`); en todos los casos el evento `close` del `<dialog>` es el **único lugar que llama `onClose()`** (solo si el testimonial vigente no es `null`).
+- RF-3: CUANDO el usuario cierra (botón Close, backdrop o Esc), ENTONCES EL SISTEMA invoca `onClose` exactamente una vez; SI el padre pone `testimonial` a `null`, ENTONCES cierra sin invocar `onClose`. Un click cuyo `target` es el dialog pero cae **dentro de la franja de `padding`** del dialog NO cierra (decisión 19): el cierre por click exige `target === dialog` **y** punto fuera del bounding rect del dialog (backdrop real).
+- RF-4: CUANDO el diálogo está abierto, ENTONCES EL SISTEMA muestra autor, rol y texto completo (`testimonial.text`), con nombre accesible igual al autor (`aria-labelledby` al `h2`) y cierre con Esc. El foco inicial en el botón Close es **nativo de `showModal`**: sin autofocus propio; se verifica en QA F5 (jsdom no lo implementa).
+- RF-5: EL SISTEMA aplica el backdrop con `::backdrop` y no imprime el diálogo. El bloqueo de scroll del fondo (`html:has(dialog[open]) { overflow: hidden; }`) **ya vive en `global.css` desde F1**: sin tarea en esta pieza, verificar que alcanza. El `@media print { display: none }` vive en el **módulo de la pieza** (G-D-1, decisión 19). Verificación de `::backdrop` y print: inspección del CSS.
+- RF-6: EL SISTEMA renderiza dos columnas a 580px o más y una sola con la comilla oculta por debajo de 580px, con ancho y alto máximos sobre el viewport y sin medidas nuevas por breakpoint; el avatar sale de `HexAvatar` (decorativo). SI el contenido excede la altura máxima, `.layout` scrollea (`overflow-y: auto`, decisión 19); el dialog conserva sus máximos. Verificación del layout: inspección + QA F5.
 
 ## Anatomía
 
@@ -56,16 +56,19 @@ export interface TestimonialDialogProps {
 
 | Disparador | Qué hace el componente |
 |---|---|
-| `testimonial` pasa de `null` a un valor | `dialog.showModal()` (si no estaba abierto) |
+| `testimonial` pasa de `null` a un valor | Monta el `<dialog>` (no existía) y lo abre con `dialog.showModal()` en effect de mount (RF-1) |
 | Botón Close | `dialog.close()` — **no** llama `onClose` directamente |
-| Click en el backdrop (`event.target === dialog`) | `dialog.close()` — **no** llama `onClose` directamente |
-| Esc | cierre nativo del navegador |
+| Click en el backdrop (`target === dialog` **y** punto fuera del bounding rect del dialog; el padding NO cierra, RF-3) | `dialog.close()` — **no** llama `onClose` directamente |
+| Esc | cierre nativo del navegador; dispara el evento `close` |
 | Evento `close` del `<dialog>` | **único lugar que llama `onClose()`**, y solo si el `testimonial` actual (leído de un ref con el último valor de la prop) no es `null` |
-| `testimonial` pasa a `null` desde el padre | `dialog.close()` si `dialog.open`; el evento `close` resultante **no** llama `onClose` (el testimonial ya es `null`) |
+| `testimonial` pasa a `null` desde el padre | Cleanup del effect de montaje: `dialog.close()` si `dialog.open` y desmontaje; el `close` resultante **no** llama `onClose` (el ref ya es `null`) |
+| Valor → valor distinto sin pasar por `null` | No puede ocurrir con el padre real (Carousel RF-6 lo prohíbe): la pieza no define transición directo; el contrato es del consumidor |
 
 Resultado: cada cierre iniciado por el usuario llama `onClose` **exactamente
 una vez**, y un cierre iniciado por el padre no lo llama. Aun así, el padre
 debe implementar `onClose` de forma idempotente (p. ej. `setSelectedId(null)`).
+El **retorno de foco** al botón que abrió el diálogo es nativo (`close()` antes
+del desmontaje); se verifica en QA F5.
 
 ## Estilos y tokens
 
@@ -73,19 +76,21 @@ debe implementar `onClose` de forma idempotente (p. ej. `setSelectedId(null)`).
 |---|---|
 | Dialog | `background: var(--color-surface); color: var(--color-text); border: 0; border-radius: var(--radius-20); padding: var(--box-padding); width: min(40rem, calc(100vw - 2rem)); max-height: calc(100dvh - 2rem); box-shadow: var(--shadow-dialog);` |
 | Backdrop | `::backdrop { background: var(--color-overlay); }` |
-| Entrada | `opacity` 0→1 y `transform: scale(0.96)`→1 en `--duration-base` (con `@starting-style` o clase al abrir); reducido con `prefers-reduced-motion` |
-| Close | `position: absolute; top: var(--space-4); right: var(--space-4);` botón `--size-control` cuadrado, radio `--radius-12`, fondo `--color-surface-muted`, color `--color-text`; ícono `Icon name="x"` |
-| Layout | Grid `auto 1fr`, `gap: var(--space-6)` |
+| Entrada | `opacity` 0→1 y `transform: scale(0.96)`→1 en `--duration-base var(--ease-standard)` **solo de entrada** (decisión 19: sin animación de salida), con `@starting-style` como único mecanismo; la reducción queda en los tokens de duración (sin `@media (prefers-reduced-motion)` propio) |
+| Layout | Grid `auto 1fr`, `gap: var(--space-6)`; `overflow-y: auto` (scroll interno si el texto excede la altura máxima — RF-6/decisión 19) |
+| Close | `position: absolute; top: var(--space-4); right: var(--space-4);` botón `--size-control` cuadrado, radio `--radius-12`, fondo `--color-surface-muted`, color `--color-text`; ícono `Icon name="x"` con tamaño default (`--size-icon`, sin `--icon-size` propio) |
+| Comilla | `Icon name="quote" tone="gradient"` con `.quote { --icon-size: 2rem; }` (misma convención que TestimonialCard), en la columna aside **debajo del avatar** (anatomía); oculta < 580px (RF-6) |
 | Avatar | `HexAvatar` (misma primitiva que TestimonialCard; no se reimplementa) |
-| Scroll del fondo | `html:has(dialog[open]) { overflow: hidden; }` en `global.css` (excepción nombrada en la regla dura 3 de `docs/DESIGN.md`) |
+| Scroll del fondo | `html:has(dialog[open]) { overflow: hidden; }` **ya existe en `global.css` (F1)**: sin tarea propia, verificar que alcanza |
+| Impresión | `@media print { display: none }` en el **módulo de la pieza** (G-D-1) |
 
 ## Estados
 
 | Estado | Efecto |
 |---|---|
-| Cerrado | no renderiza contenido visible (`<dialog>` sin `open`) |
+| Cerrado | **no montado**: no hay `<dialog>` en el DOM (RF-1, decisión 18=b) |
 | Abierto | modal en top layer con backdrop |
-| Close hover | color `--color-accent-text` |
+| Close hover | color `--color-accent-text`; transición de `color` `--duration-base var(--ease-standard)` (G-E) |
 | Close focus-visible | `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);` |
 
 ## Responsive
@@ -108,23 +113,28 @@ El dialog no se imprime (`display: none` en `@media print`).
 
 ## Tests esperados
 
-jsdom no implementa `showModal`/`close` de forma completa: `src/test/setup.ts`
-debe definir un mock mínimo (`showModal` → `open = true`; `close` → `open = false` + dispara el evento `close`), o usar una
-versión de jsdom que lo soporte. Documentarlo en el setup.
+jsdom no implementa `showModal`/`close` completos: el mock mínimo **ya está
+provisto por F1** en `src/test/setup.ts` (`showModal` → atributo `open`; `close`
+→ quita `open` + dispara el evento `close`, también sobre dialog cerrado — el
+guard `dialog.open` del ciclo lo hace compatible). Los tests **verifican que
+el mock alcanza**; ninguna tarea de la pieza toca `src/test/` (post-F1). Los
+renders con `HexAvatar`/comilla gradient montan `HexAvatarDefs` y
+`AccentGradientDefs` como armazón (contratos de HexAvatar → Forma e Icon).
 
-1. Con `testimonial = null` no hay dialog abierto (`queryByRole("dialog")` es null).
-2. Con un testimonio: `getByRole("dialog", { name: author })`, muestra rol y texto completo.
+1. Con `testimonial = null` no hay dialog en el DOM (`queryByRole("dialog")` es null; RF-1 montaje condicional).
+2. Con un testimonio: `getByRole("dialog", { name: author })`, muestra rol y texto completo (`testimonial.text`).
 3. Click en Close → `onClose` **exactamente una vez**.
 4. Evento `close` del dialog (simula Esc) → `onClose` exactamente una vez.
-5. Click en el backdrop (evento con `target` = dialog) → `onClose` una vez; click en el contenido no cierra.
+5. Click en el backdrop (`target = dialog` + coordenada fuera del bounding rect) → `onClose` una vez; click dentro del contenido **y click en la franja de padding** (target = dialog, dentro del rect) no cierran (RF-3).
 6. El padre pasa `testimonial` a `null` con el dialog abierto → se cierra y `onClose` **no** se llama.
 7. `closeLabel` es el nombre del botón de cerrar.
-8. `expectNoA11yViolations` sin violaciones con el dialog abierto.
+8. `expectNoA11yViolations` sin violaciones con el dialog abierto (armazón defs montado).
 
 ## No hacer
 
 - No llamar `onClose` desde el botón Close ni desde el backdrop: solo lo llama el evento `close` del `<dialog>`.
 - No reemplazar el `<dialog>` nativo por un modal hecho con `div` ni por una librería: foco atrapado, Esc y top layer son nativos.
 - No reimplementar el avatar: se usa `HexAvatar`.
-- No imprimir el diálogo (`display: none` en `@media print`).
+- No imprimir el diálogo: `display: none` en `@media print` del **módulo de la pieza** (G-D-1; no va en global).
 - No agregar medidas por breakpoint: ancho y alto máximos van por `min()`/`calc()` sobre el viewport.
+- No tocar `src/test/setup.ts` (el mock de dialog ya existe; post-F1 nadie escribe ahí).

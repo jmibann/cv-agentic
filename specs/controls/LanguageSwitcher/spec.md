@@ -7,19 +7,19 @@ Elegir el idioma del sitio (EN / ES). Vive en la ControlsBar, junto al ThemeTogg
 
 ## Requisitos (EARS)
 
-- RF-1: EL SISTEMA muestra una opción por cada valor de `LOCALES` de `@data/constants`, en ese orden, con texto visible fijo (`EN` / `ES`).
-- RF-2: CUANDO el usuario elige un idioma, ENTONCES EL SISTEMA cambia `document.documentElement.lang`, persiste `localStorage["cv:locale"]` dentro de `try/catch` y actualiza `aria-pressed`.
-- RF-3: CUANDO el usuario activa el idioma que ya está activo, ENTONCES EL SISTEMA no produce ningún cambio observable.
+- RF-1: EL SISTEMA muestra una opción por cada valor de `LOCALES` de `@data/constants`, en ese orden, con texto visible fijo (`EN` / `ES`). Verificación: test de `getAllByRole("button")` en orden y con el `textContent` esperado.
+- RF-2: CUANDO el usuario elige un idioma, ENTONCES EL SISTEMA invoca `setLocale()` del contexto; el cambio de `document.documentElement.lang` y la persistencia en `localStorage["cv:locale"]` con `try/catch` son responsabilidad del `LocaleProvider` (G-A: el componente no toca storage ni DOM global). Verificación: integración componente+provider (los tests envuelven `LocaleProvider`) + `aria-pressed` propio.
+- RF-3: CUANDO el usuario activa el idioma que ya está activo, ENTONCES EL SISTEMA **no invoca `setLocale()`** (guard en el componente; decisión 2=a). Verificación: test con `setLocale` espiado.
 - RF-4: EL SISTEMA expone el contenedor como `role="group"` con `aria-label` traducido y cada opción como `<button type="button">` con su `aria-label` y su atributo `lang`.
-- RF-5: EL SISTEMA recorre ambos botones con Tab; no implementa el patrón radiogroup.
-- RF-6: EL SISTEMA mantiene el tamaño fijo con `--size-control` y no declara `@media` propios.
+- RF-5: EL SISTEMA expone ambos botones como tab stops consecutivos (Tab los recorre); no implementa el patrón radiogroup. Verificación: test de foco con Tab + inspección (sin roles de radiogroup).
+- RF-6: EL SISTEMA mantiene el tamaño fijo con `--size-control` y no declara `@media` propios. (Verificación: inspección del CSS.)
 
 ## Anatomía
 
 ```
 ┌────┬────┐
-│ EN │ ES │   control segmentado: grupo con dos botones
-└────┴────┘
+│ EN │ ES │   control segmentado: grupo con dos botones, SIN divisor:
+└────┴────┘   la separación es solo el `gap: 0.125rem` sobre el fondo del grupo
 ```
 
 ## API
@@ -28,6 +28,7 @@ Elegir el idioma del sitio (EN / ES). Vive en la ControlsBar, junto al ThemeTogg
 export interface LanguageSwitcherProps {
   /** Label del grupo, ya traducido. Ej: "Language" / "Idioma". */
   label: string;
+  /** Se une a la clase base del `role="group"` raíz (G-B). */
   className?: string;
 }
 ```
@@ -60,7 +61,7 @@ Nombres fijos (no se traducen):
 | Opción inactiva hover | color `--color-accent-text` |
 | Opción activa (`aria-pressed="true"`) | fondo `--gradient-accent`, color `--color-on-accent`; sin cambio en hover |
 | Focus-visible | `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);` |
-| Active (press) | `transform: translateY(1px)` (`--duration-fast`) |
+| Active (press) | `transform: translateY(1px)` con `transition: transform var(--duration-fast) var(--ease-standard)` (G-E; DESIGN prohíbe `transition: all`) |
 
 ## Responsive
 
@@ -78,17 +79,23 @@ Tamaño fijo en todos los breakpoints (`--size-control`); sin `@media` propios.
 ## Tests esperados
 
 - `getByRole("group", { name: label })` con dos botones.
+- Orden y texto visible: `getAllByRole("button")` → `["EN", "ES"]` (textContent, orden de `LOCALES`).
 - Botones con nombre "English" y "Español"; el del idioma activo tiene `aria-pressed="true"`.
 - Click en el otro → cambia `aria-pressed`, `document.documentElement.lang`,
-  y `localStorage["cv:locale"]`.
-- Click en el activo no llama a `setLocale` de nuevo (o no cambia nada observable).
+  y `localStorage["cv:locale"]` (integración con el provider).
+- Click en el activo: `setLocale` **no** vuelve a invocarse (guard RF-3, spy).
+- Tab recorre ambos botones en orden (RF-5).
 - Cada botón tiene su atributo `lang`.
 - `expectNoA11yViolations` sin violaciones.
+
+(Los tests envuelven con `LocaleProvider` — seed del idioma inicial vía
+`document.documentElement.lang` antes del render, como hace el anti-flash — y
+reseteaan `lang` y `localStorage` en `afterEach`.)
 
 ## No hacer
 
 - No implementar el patrón radiogroup (flechas, un solo tab stop): son dos botones que se recorren con Tab.
 - No traducir los nombres de los idiomas (`EN`/`ES`, "English"/"Español"): son fijos.
 - No hardcodear la lista de idiomas: sale de `LOCALES` de `@data/constants`, en ese orden.
-- No producir cambios observables al activar el idioma que ya está activo.
-- No leer ni escribir `localStorage` fuera de `try/catch`, ni con otra clave que `cv:locale`.
+- No invocar `setLocale()` cuando el idioma elegido ya está activo (RF-3).
+- No leer ni escribir `localStorage` ni tocar `document.documentElement.lang` desde el componente: eso es del `LocaleProvider` (G-A); su `try/catch` y la clave `cv:locale` aplican ahí.

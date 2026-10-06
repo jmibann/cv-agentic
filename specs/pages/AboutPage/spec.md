@@ -9,10 +9,10 @@ testimonios. Se renderiza dentro del tabpanel de AppLayout.
 ## Requisitos (EARS)
 
 - RF-1: EL SISTEMA renderiza siempre el `h1` con `t.about.title`.
-- RF-2: CUANDO `profile.about` tiene párrafos, ENTONCES EL SISTEMA renderiza `.intro` con un `<p>` por elemento; SI `services` o `testimonials` están vacíos, ENTONCES no renderiza su `<section>` correspondiente.
+- RF-2: CUANDO `profile.about` tiene párrafos, ENTONCES EL SISTEMA renderiza `.intro` con un `<p>` por elemento; SI `services` está vacío, ENTONCES no renderiza su `<section>`; SI `testimonials` está vacío, ENTONCES no renderiza ni el `h2` ni el carrusel (decisión 20 de la Clarificación F3: el testimonio ya no vive en una `<section>` de la página — la región es la `<section>` propia del `TestimonialCarousel`, nombrada con `labelledBy`).
 - RF-3: EL SISTEMA obtiene los datos con `useCv()` y los textos con `useLocale().t`, y arma los labels del carrusel con `format` de i18n a partir de `t.testimonials`.
 - RF-4: EL SISTEMA mantiene `.page` en flujo de bloque normal (sin flex ni grid ni `overflow` distinto de `visible`) para que el `h1` fluya junto a la solapa flotante de NavTabs.
-- RF-5: EL SISTEMA expone un único `h1`, nombra cada `<section>` con su `h2` (`aria-labelledby`) y renderiza los servicios como `<ul>`.
+- RF-5: EL SISTEMA expone un único `h1`, nombra cada región con su `h2` (la de servicios, su `<section aria-labelledby>`; la de testimonios, la `<section>` del propio carrusel vía `labelledBy` — RF-1 de TestimonialCarousel) y renderiza los servicios como `<ul>`.
 - RF-6: EL SISTEMA aplica solo layout: sin estilos visuales, con servicios en 1 columna que pasan a 2 a partir de lg.
 
 ## Anatomía
@@ -31,10 +31,9 @@ testimonios. Se renderiza dentro del tabpanel de AppLayout.
     </ul>
   </section>
 
-  <section aria-labelledby="about-testimonials-title">               <!-- si hay testimonials -->
-    <SectionTitle as="h2" id="about-testimonials-title">Testimonials</SectionTitle>
-    <TestimonialCarousel testimonials={cv.testimonials} labels={carouselLabels} labelledBy="about-testimonials-title" />
-  </section>
+  <!-- si hay testimonials: hermanos directos en .page; la región es la <section> del carrusel (decisión 20) -->
+  <SectionTitle as="h2" id="about-testimonials-title">Testimonials</SectionTitle>
+  <TestimonialCarousel testimonials={cv.testimonials} labels={carouselLabels} labelledBy="about-testimonials-title" />
 </div>
 ```
 
@@ -97,7 +96,7 @@ responsive (1 / 2 por vista).
 ## Accesibilidad
 
 - Un único `h1` (el del panel).
-- Cada `<section>` nombrada por su `h2` → aparece como región.
+- Cada región nombrada por su `h2`: la de servicios, `<section>` de la página; la de testimonios, la `<section>` propia del carrusel (decisión 20) → ambas aparecen como región.
 - La lista de servicios es `<ul>`: se anuncia la cantidad.
 
 ## Tests esperados
@@ -107,8 +106,8 @@ responsive (1 / 2 por vista).
 1. Heading nivel 1 con `t.about.title`.
 2. Un párrafo por cada elemento de `profile.about`.
 3. Región con nombre `t.about.services` que contiene un `article` por servicio.
-4. Región con nombre `t.about.testimonials` que contiene el carrusel.
-5. Con `services` vacío no existe la región de servicios; ídem testimonios.
+4. Región con nombre `t.about.testimonials` que contiene el carrusel (es la `<section>` del carrusel, no un wrapper de la página).
+5. Con `services` vacío no existe la región de servicios; con `testimonials` vacío no existen ni el `h2` "Testimonials" ni la región (RF-2).
 6. Con `locale = "es"` muestra los textos de `ui.es` y el contenido de `cv.es`.
 7. `expectNoA11yViolations` sin violaciones.
 
