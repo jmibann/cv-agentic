@@ -22,7 +22,7 @@
     ambos tratamientos (clase decorated **y** IconBox presentes); el flex va en
     el propio heading sin wrapper (inspección); verde tras `feat(SectionTitle): T4`.
 
-- [ ] **T5. `className`, márgenes y cierre a11y.** RF-5, RF-6
+- [x] **T5. `className`, márgenes y cierre a11y.** RF-5, RF-6 — 734b06c
   - Hecho cuando: `className` unida al heading raíz (P2); `margin-bottom` según
     RF-5 — h1 solo con `decorated` usa `--title-decorated-gap`, h2 `1.25rem`,
     h3 `0.5rem`, h1 sin decorar no declara margen propio (inspección); cero
