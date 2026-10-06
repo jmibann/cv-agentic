@@ -1,0 +1,11 @@
+/* Badge — specs/primitives/Badge/spec.md → Estilos y tokens.
+   T2 trae el contrato de nombre de clase que exige la unión de `className`
+   (RF-3: la externa se une a la clase base del raíz; mismo patrón que Box T1).
+   Regla vacía a propósito: los estilos por tokens (fondo --color-surface-muted,
+   --radius-8, --font-size-badge, --line-height-tight, padding 0.5rem 1rem,
+   white-space: nowrap, inline-flex; RF-4/RF-5) se declaran en T3. */
+
+/* Clase base del único elemento raíz (span o li según `as`). */
+.badge {
+  /* estilos por tokens: T3 */
+}

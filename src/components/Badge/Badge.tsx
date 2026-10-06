@@ -1,11 +1,11 @@
 // Badge — etiqueta compacta sobre fondo tintado
 // (specs/primitives/Badge/spec.md). T1: render base (RF-1, RF-2): el raíz es
 // `<span>` por defecto y `<li>` con `as="li"`, con `children` como texto.
-// T2: la `className` del consumidor se unirá a la clase base del raíz (RF-3);
-// en T1 queda declarada en la API pero inerte (todavía no se aplica). T3:
-// clase base y estilos por tokens en Badge.module.css (RF-4, RF-5) y cierre
-// a11y; aquí aún no se importa el módulo (el "Hecho cuando" de T1 solo exige
-// elemento + texto).
+// T2 hecha: la `className` del consumidor se UNE a la clase base del raíz
+// (RF-3) en Badge.module.css (`badge`; regla aún vacía). T3: estilos por
+// tokens en esa clase base (RF-4, RF-5), `index.ts` y cierre a11y.
+
+import styles from "./Badge.module.css";
 
 // Elementos válidos para `as` (spec → API): span por defecto; `li` para los
 // chips de SkillList (RF-2: la validez del contexto de lista es del
@@ -18,16 +18,25 @@ export interface BadgeProps {
   /** Solo texto: los chips no anidan elementos ni íconos. */
   children: string;
   as?: BadgeElement;
-  /** Se une a la clase base del elemento raíz (unión: T2; inerte en T1). */
+  /** Se une a la clase base del elemento raíz (unión aplicada en T2, RF-3). */
   className?: string;
 }
 
-export function Badge({ as, children }: BadgeProps) {
+export function Badge({ as, children, className }: BadgeProps) {
   // RF-1/RF-2: default `span`; `as` cambia el elemento raíz. Mismo patrón que
   // Box (`const El = as ?? "div"`).
   const El = as ?? "span";
 
-  // RF-1: un solo elemento, el texto directo en el raíz (spec → Anatomía). Sin
-  // `className` en el raíz todavía (T2/T3) y sin roles añadidos (RF-4).
-  return <El>{children}</El>;
+  // RF-3 / T2 (spec → API): la `className` del consumidor se UNE a la clase
+  // base sobre el único elemento raíz (no la reemplaza). Mismo mecanismo
+  // aprobado en Box/Icon/BrandIcon: array + filtro de undefined + join, sin
+  // librerías; así no quedan clases vacías cuando `className` no se pasa. Las
+  // clases del módulo son `string | undefined` bajo noUncheckedIndexedAccess.
+  // Base primero (precedente). Aplica a ambos `as`: la spec define un único
+  // raíz. Sin roles añadidos (RF-4).
+  const rootClassName = [styles.badge, className]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
+  return <El className={rootClassName}>{children}</El>;
 }
