@@ -161,7 +161,7 @@ T3b (deuda L1 detectada en su review).
     `ajv/dist/runtime/ucs2length.js` al bundle (runtime-helper de ajv
     standalone; decide el usuario en la puerta F1).
 
-- [ ] **T12. Cambio F3 (previo a ControlsBar/T1 y Timeline/T2): `formatPeriodEndpoint` exportado + `controls.lightMode`.** RF-8 (+ Tests esperados de la spec actualizada) — Cambio aprobado en la Clarificación F3 (decisiones 1=a y 12=a, puerta de Plan F3)
+- [x] **T12. Cambio F3 (previo a ControlsBar/T1 y Timeline/T2): `formatPeriodEndpoint` exportado + `controls.lightMode`.** RF-8 (+ Tests esperados de la spec actualizada) — Cambio aprobado en la Clarificación F3 (decisiones 1=a y 12=a, puerta de Plan F3) — 29b063f
   - Hecho cuando: `src/i18n/formatPeriod.ts` exporta
     `formatPeriodEndpoint(value, locale): string` (la actual `formatEndpoint`
     privada, ahora exportada; `formatPeriod` queda con la misma firma y
