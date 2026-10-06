@@ -1,0 +1,24 @@
+/* SectionTitle — specs/primitives/SectionTitle/spec.md → Estilos y tokens (T2:
+   nivel). El módulo fija las clases .h1/.h2/.h3 con su font-size por tokens
+   (RF-1: el tamaño sigue al nivel; spec → Estilos y tokens: "el tamaño no
+   depende de la tipografía global por etiqueta" — plan → Decisiones: el
+   componente es self-contained). Cero literales de px y cero @media propios
+   (RF-6: --font-size-h1/2/3 escalan dentro de tokens/tokens.css; spec →
+   Responsive). Sin colores, sin margen: .decorated con su ::after llega en T3,
+   .withIcon en T4 y los márgenes RF-5 en T5 (tasks.md). */
+
+/* Nivel h1: tamaño exacto de --font-size-h1 (24px < 580 → 32px ≥ 580, salto
+   definido en tokens/tokens.css;RF-6). */
+.h1 {
+  font-size: var(--font-size-h1);
+}
+
+/* Nivel h2: tamaño exacto de --font-size-h2 (18px < 580 → 24px ≥ 580). */
+.h2 {
+  font-size: var(--font-size-h2);
+}
+
+/* Nivel h3: tamaño exacto de --font-size-h3 (16px < 580 → 18px ≥ 580). */
+.h3 {
+  font-size: var(--font-size-h3);
+}
