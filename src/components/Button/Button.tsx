@@ -5,17 +5,21 @@
 // `disabled` de la rama botón llegan al <button> (RF-3). T3: con `href`
 // renderiza un <a> con ese destino, `rel` default de seguridad con
 // `target="_blank"` (RF-2), `rel` explícito tal cual (RF-9) y `download`
-// transmitido con su valor (RF-8). Ramas diferidas a su tarea según tasks.md:
-// ícono e iconPosition (T4), clases size/fullWidth y unión de className (T5),
-// estilos por tokens y pseudo-estados (T6).
+// transmitido con su valor (RF-8). T4: `icon` renderiza el ícono decorativo
+// (`Icon` sin `label`, aria-hidden propio de Icon) y `iconPosition` resuelve
+// el orden REAL de nodos en el DOM (RF-4, RF-7). Ramas diferidas a su tarea
+// según tasks.md: clases size/fullWidth y unión de className (T5), estilos por
+// tokens y pseudo-estados (T6).
 
 import type { ReactNode } from "react";
 
+import { Icon } from "../Icon";
 import type { IconName } from "../Icon";
 
-// Props comunes a las dos ramas (spec → API). `size`/`icon`/`iconPosition`/
-// `fullWidth`/`className` se declaran ya —la API es la de la spec— pero se
-// ignoran en el render hasta su tarea (T4/T5); no se agregan props extra.
+// Props comunes a las dos ramas (spec → API). `size`/`fullWidth`/`className`
+// se declaran ya —la API es la de la spec— pero se ignoran en el render hasta
+// su tarea (T5); `icon`/`iconPosition` se consumen desde T4. No se agregan
+// props extra.
 interface CommonProps {
   children: ReactNode;
   /** Default "default". */
@@ -46,6 +50,25 @@ export type ButtonProps =
     });
 
 export function Button(props: ButtonProps) {
+  // T4 (RF-4, RF-7): el ícono es `Icon` SIN `label` → decorativo
+  // (aria-hidden="true" que el propio Icon fija; plan.md → Interfaz). La
+  // posición resuelve el ORDEN REAL de nodos en el DOM — svg antes del label
+  // con "start" (default de la spec → API) y después con "end" — no con
+  // `order: -1` de CSS (plan.md → Decisiones). `icon`/`iconPosition` viven en
+  // CommonProps (spec → API), así que el mismo contenido aplica a las dos
+  // ramas (<button> y <a>). Sin `icon`, el contenido es solo el label.
+  const { icon, iconPosition = "start" } = props;
+  const content =
+    icon === undefined ? (
+      props.children
+    ) : (
+      <>
+        {iconPosition === "start" && <Icon name={icon} />}
+        {props.children}
+        {iconPosition === "end" && <Icon name={icon} />}
+      </>
+    );
+
   // T3 (RF-2, RF-8, RF-9): rama link. Comparar `href` contra `undefined`
   // angosta `props` a la variante con `href` de la unión discriminada, así
   // que `rel`/`target`/`download` se leen con sus tipos y las props propias
@@ -57,11 +80,11 @@ export function Button(props: ButtonProps) {
     // un `rel` recibido se usa TAL CUAL, sin fusionar.
     const rel = props.rel ?? (props.target ? "noopener noreferrer" : undefined);
 
-    // Nombre accesible desde `children` (spec → Accesibilidad); ícono
-    // diferido a T4 y clases a T5.
+    // Nombre accesible desde `children` (spec → Accesibilidad); `content` ya
+    // trae el ícono decorativo en su posición (T4). Clases diferidas a T5.
     return (
       <a href={props.href} target={props.target} rel={rel} download={props.download}>
-        {props.children}
+        {content}
       </a>
     );
   }
@@ -75,7 +98,7 @@ export function Button(props: ButtonProps) {
       onClick={props.onClick}
       disabled={props.disabled}
     >
-      {props.children}
+      {content}
     </button>
   );
 }
