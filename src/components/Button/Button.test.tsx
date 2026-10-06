@@ -182,3 +182,101 @@ describe("Button link branch (T3: RF-2, RF-8, RF-9)", () => {
     ).toHaveAttribute("download");
   });
 });
+
+// Tests de T4 (specs/primitives/Button/tasks.md) — RF-4, RF-7 y "Tests
+// esperados" de la spec: "icon renderiza un svg aria-hidden y el nombre
+// accesible sigue siendo solo el texto; con iconPosition='end' el svg aparece
+// después del texto en el DOM (RF-7)". El ícono es `Icon` SIN `label`
+// (plan.md → Interfaz: decorativo por el aria-hidden que el propio Icon fija).
+//
+// Justificación de las queries (constitución T3): el raíz <button>/<a> se
+// consulta por rol + nombre (getByRole) y el nombre accesible se verifica con
+// toHaveAccessibleName (RF-4: sigue siendo SOLO el texto). El <svg>
+// decorativo no tiene rol ni nombre accesible (está fuera del árbol
+// accesible), así que no existe query RTL posible para él: se inspecciona con
+// root.querySelector("svg") — el mismo criterio ya justificado en los tests
+// de Icon (T1/T2, sin data-testid porque la API no define ninguno) — y el
+// ORDEN de nodos se mide con compareDocumentPosition contra el nodo de texto
+// del label: getByRole no expresa orden y el "Hecho cuando" de T4 exige orden
+// real en el DOM, no `order: -1` de CSS (plan.md → Decisiones).
+//
+// `icon`/`iconPosition` viven en CommonProps (spec → API), así que RF-4 y
+// RF-7 aplican a las dos ramas: se cubre también el caso link, no es un extra
+// fuera de la spec sino la aplicación completa de RF-4 al <a>.
+describe("Button decorative icon and iconPosition (T4: RF-4, RF-7)", () => {
+  // Devuelve el <svg> decorativo y el nodo de texto del label con tipos
+  // concretos para poder usarlos abajo; si falta alguno (el caso en rojo de
+  // T4: el ícono aún no se renderiza) el test falla con mensaje claro sin
+  // debilitar ninguna aserción.
+  const getIconParts = (root: HTMLElement, labelText: string) => {
+    const svg = root.querySelector("svg");
+    const label = Array.from(root.childNodes).find(
+      (node) =>
+        node.nodeType === Node.TEXT_NODE &&
+        (node.textContent?.trim() ?? "") === labelText,
+    );
+    if (svg === null || label === undefined) {
+      throw new Error(
+        `Falta ${svg === null ? "el <svg> decorativo" : "el nodo de texto del label"} en el raíz del Button`,
+      );
+    }
+    return { svg, label };
+  };
+
+  it("renders the icon as a decorative aria-hidden svg keeping the accessible name as only the label text", () => {
+    const { getByRole } = render(<Button icon="download">Download CV</Button>);
+
+    // RF-4: el nombre accesible no se altera por el ícono (exacto, sin
+    // contribución del svg).
+    const button = getByRole("button", { name: "Download CV" });
+    expect(button).toHaveAccessibleName("Download CV");
+
+    const { svg } = getIconParts(button, "Download CV");
+    expect(svg).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("places the svg before the label text by default (iconPosition start)", () => {
+    const { getByRole } = render(<Button icon="download">Download CV</Button>);
+
+    // RF-7 (default "start"): orden real de nodos en el DOM.
+    const button = getByRole("button", { name: "Download CV" });
+    const { svg, label } = getIconParts(button, "Download CV");
+    expect(
+      svg.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("places the svg after the label text when iconPosition=\"end\"", () => {
+    const { getByRole } = render(
+      <Button icon="download" iconPosition="end">
+        Download CV
+      </Button>,
+    );
+
+    // RF-7: con "end" el svg queda DESPUÉS del label en el DOM.
+    const button = getByRole("button", { name: "Download CV" });
+    const { svg, label } = getIconParts(button, "Download CV");
+    expect(
+      svg.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_PRECEDING,
+    ).toBeTruthy();
+  });
+
+  it("renders the decorative icon on the link branch with the accessible name intact and the svg first", () => {
+    const { getByRole } = render(
+      <Button href="/files/cv.pdf" icon="download">
+        Download CV
+      </Button>,
+    );
+
+    // RF-4 + RF-7 en la rama link (CommonProps de la spec → API): ícono
+    // decorativo, nombre solo el texto y posición default "start".
+    const link = getByRole("link", { name: "Download CV" });
+    expect(link).toHaveAccessibleName("Download CV");
+
+    const { svg, label } = getIconParts(link, "Download CV");
+    expect(svg).toHaveAttribute("aria-hidden", "true");
+    expect(
+      svg.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+});
