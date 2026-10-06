@@ -3,7 +3,8 @@
 // no agrega `role` **ni ningún atributo `aria-*`** (RF-6: "no agrega roles ni
 // atributos aria-* a la tab; los estados de hover y foco pertenecen a su
 // contenido" — el contrato es más fuerte que el de Separator: no hay ni un
-// `aria-*`, se recorre `getAttributeNames()` filtrando el prefijo `aria-`).
+// `aria-*`, se recorren los atributos del raíz (`root.attributes`) filtrando
+// el prefijo `aria-`).
 // La nota de T1 en tasks.md suma además la unión de la `className` externa al
 // raíz (spec → API, plan → Interfaz; gap de reparto cubierto en T1), con el
 // canon de la fase: coexistencia base-primero + externa (Badge/IconBox/
@@ -114,5 +115,55 @@ describe("CornerTab overlay base render (T1: RF-1, RF-6)", () => {
     expect(root).not.toBeNull();
     expect(root).toHaveClass(cornerTabClass);
     expect(root).toHaveClass(consumerClass);
+  });
+});
+
+// Tests de T2 (specs/primitives/CornerTab/tasks.md) — RF-2: variantes `size`.
+// "Hecho cuando": default `md`; `sm` y `md` aplican clases distintas (P2)
+// (spec → "Tests esperados": "`size='sm'` / `'md'` aplican clases distintas;
+// default `md` (aserción con el criterio de CSS Modules de la fase); API:
+// Default "md"). Las alturas/padding de cada variante (filas `size="md"` y
+// `size="sm"` de la tabla de la spec: --size-nav-tab-height +
+// --corner-tab-padding-inline / literales fijos 2.75rem y 1.25rem) se
+// verifican por INSPECCIÓN del CSS (decisiones #101 y del plan → Estrategia
+// de tests: jsdom no carga hojas de estilos; mismo criterio que RF-1 en T1).
+// Las clases siguen el patrón P2 canónico #99 (`styles.name ?? "name"` +
+// `toHaveClass`; prohibidos `!` y `as string`). La selección del raíz usa la
+// misma query estructural justificada en T1 (el `<div>` raíz no tiene rol ni
+// nombre accesibles por RF-6).
+const mdClass = styles.md ?? "md";
+const smClass = styles.sm ?? "sm";
+
+describe("CornerTab size variants (T2: RF-2)", () => {
+  it("applies the .md class and not .sm when size is omitted (default md)", () => {
+    // spec → API: `size` default "md". Sin prop, el raíz lleva la variante md
+    // (y NO la de sm: clases distintas).
+    const { container } = render(<CornerTab>Experience</CornerTab>);
+
+    const root = container.querySelector("div");
+    expect(root).not.toBeNull();
+    expect(root).toHaveClass(mdClass);
+    expect(root).not.toHaveClass(smClass);
+  });
+
+  it("applies the .sm class and not .md when size=\"sm\" (distinct classes)", () => {
+    // "Hecho cuando" de T2: `sm` y `md` aplican clases distintas (P2): con
+    // sm presente, md queda ausente.
+    const { container } = render(<CornerTab size="sm">Show Contacts</CornerTab>);
+
+    const root = container.querySelector("div");
+    expect(root).not.toBeNull();
+    expect(root).toHaveClass(smClass);
+    expect(root).not.toHaveClass(mdClass);
+  });
+
+  it("applies the .md class and not .sm when size=\"md\" is passed explicitly", () => {
+    // `md` explícito aplica la misma variante que el default (RF-2).
+    const { container } = render(<CornerTab size="md">Experience</CornerTab>);
+
+    const root = container.querySelector("div");
+    expect(root).not.toBeNull();
+    expect(root).toHaveClass(mdClass);
+    expect(root).not.toHaveClass(smClass);
   });
 });
