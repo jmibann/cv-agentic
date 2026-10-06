@@ -25,6 +25,18 @@ import { SectionTitle } from "./SectionTitle";
 // Cierre a11y (constitución T4); import puro, no toca lo anterior.
 import { expectNoA11yViolations } from "../../test/a11y";
 
+// T2: el test importa el módulo solo para fijar el nombre real de la clase de
+// nivel (`.h1/.h2/.h3`, resueltos por CSS Modules en runtime) y asierte que el
+// heading raíz la aplica (precedente Overhead/IconBox; el módulo nace con su
+// feat, como en IconBox T2).
+import styles from "./SectionTitle.module.css";
+
+// Patrón P2 canónico #99 (`styles.name ?? "name"`; prohibidos `!` y
+// `as string`): el fallback es solo de tipos bajo `noUncheckedIndexedAccess`.
+const h1Class = styles.h1 ?? "h1";
+const h2Class = styles.h2 ?? "h2";
+const h3Class = styles.h3 ?? "h3";
+
 describe("SectionTitle heading levels and id passthrough (T1: RF-1, RF-4)", () => {
   it("renders an h1 heading with the accessible name when as=\"h1\"", () => {
     const { getByRole } = render(<SectionTitle as="h1">About Me</SectionTitle>);
@@ -70,6 +82,51 @@ describe("SectionTitle heading levels and id passthrough (T1: RF-1, RF-4)", () =
     const heading = getByRole("heading", { level: 2, name: "Experience" });
 
     expect(heading).toHaveAttribute("id", "experience-title");
+  });
+});
+
+// Tests de T2 (specs/primitives/SectionTitle/tasks.md) — RF-1 (segunda parte):
+// cada nivel aplica su clase de tamaño desde el módulo (`.h1/.h2/.h3` con
+// `font-size: var(--font-size-h1/2/3)`; spec → Estilos y tokens: "el tamaño
+// sigue al nivel, no a la tipografía global por etiqueta"). La verificación es
+// por clase aplicada al heading raíz (P2); el `font-size` con tokens y la
+// ausencia de literales px se verifican por inspección del CSS (jsdom no
+// computa estilos; constitución P1, spec → RF-6).
+//
+// Justificación de las queries (constitución T3): las mismas queries de rol ya
+// justificadas en T1 (`getByRole("heading", { level, name })`); la aserción
+// `toHaveClass` usa el nombre real de la clase resuelto por CSS Modules con el
+// criterio #99 (constantes arriba), sin `data-testid`.
+describe("SectionTitle level size classes from the module (T2: RF-1)", () => {
+  it("applies the module .h1 size class to the root heading when as=\"h1\"", () => {
+    const { getByRole } = render(<SectionTitle as="h1">About Me</SectionTitle>);
+
+    // "Hecho cuando" de T2: el nivel h1 aplica la clase .h1 del módulo al
+    // heading raíz (sin wrapper; RF-1: el tamaño sigue al nivel).
+    const heading = getByRole("heading", { level: 1, name: "About Me" });
+
+    expect(heading).toHaveClass(h1Class);
+  });
+
+  it("applies the module .h2 size class to the root heading when as=\"h2\"", () => {
+    const { getByRole } = render(<SectionTitle as="h2">Education</SectionTitle>);
+
+    // Ídem para h2 (spec → "Tests esperados": ídem h2/h3).
+    const heading = getByRole("heading", { level: 2, name: "Education" });
+
+    expect(heading).toHaveClass(h2Class);
+  });
+
+  it("applies the module .h3 size class to the root heading when as=\"h3\"", () => {
+    const { getByRole } = render(
+      <SectionTitle as="h3">University</SectionTitle>,
+    );
+
+    // Ídem para h3. En T2 solo la clase base de nivel; la unión de la
+    // `className` externa se conecta en T5 (P2 completo).
+    const heading = getByRole("heading", { level: 3, name: "University" });
+
+    expect(heading).toHaveClass(h3Class);
   });
 });
 
