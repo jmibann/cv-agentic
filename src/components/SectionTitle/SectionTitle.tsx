@@ -9,12 +9,16 @@
 // T3 hecha: `decorated` une la clase `.decorated` del módulo a la clase base
 // de nivel en el heading raíz (RF-2: la barra la dibuja su `::after` puro en
 // CSS, sin contenido textual; el `margin-bottom` de RF-5 llega en T5).
-// Diferidos según tasks.md: `icon` (IconBox en el heading, T4) y unión de
-// `className` y márgenes RF-5 (T5).
+// T4 hecha: `icon` monta un `IconBox` como PRIMER hijo del heading (antes del
+// texto, en orden de DOM; RF-3: decorativo por su `aria-hidden`, no altera el
+// nombre accesible) y une la clase `.withIcon` —el flex va en el propio
+// heading, sin wrapper (spec → "with icon")—. `decorated` + `icon` es
+// combinación válida: ambas clases coexisten (spec → "decorated + icon").
+// Diferidos según tasks.md: unión de `className` y márgenes RF-5 (T5).
 
 import type { ReactNode } from "react";
 
-// Solo el tipo para `icon` (API de la spec); el IconBox se monta en T4.
+import { IconBox } from "../IconBox";
 import type { IconName } from "../Icon";
 
 import styles from "./SectionTitle.module.css";
@@ -31,7 +35,7 @@ export interface SectionTitleProps {
   children: ReactNode;
   /** Barra de gradiente debajo (RF-2; T3). */
   decorated?: boolean;
-  /** IconBox a la izquierda (comportamiento en T4). */
+  /** IconBox a la izquierda (RF-3; T4: primer hijo del heading, sin wrapper). */
   icon?: IconName;
   /** Para `aria-labelledby` de la sección (RF-4). */
   id?: string;
@@ -40,7 +44,13 @@ export interface SectionTitleProps {
   className?: string;
 }
 
-export function SectionTitle({ as, children, id, decorated }: SectionTitleProps) {
+export function SectionTitle({
+  as,
+  children,
+  id,
+  decorated,
+  icon,
+}: SectionTitleProps) {
   // RF-1: el nivel viene de `as` sin conversión (mismo patrón `const El = as`
   // de Overhead; la unión es de intrinsic elements y React acepta cualquiera
   // como tag). RF-4: `id` va directo al heading; si no se pasa, React omite el
@@ -57,17 +67,29 @@ export function SectionTitle({ as, children, id, decorated }: SectionTitleProps)
   // array + filtro de undefined + join, base primero; así no quedan clases
   // vacías. La unión de la `className` externa NO se conecta todavía (T5,
   // P2 completo).
+  // T4 (RF-3, spec → Estilos y tokens "with icon"): con `icon` se UNE además
+  // `.withIcon` (el flex en el propio heading). `decorated` + `icon` es
+  // combinación válida (spec → "decorated + icon"): ambas clases coexisten
+  // sobre el mismo heading, no se excluyen.
   const El = as;
 
   const rootClassName = [
     styles[as],
     decorated ? styles.decorated : undefined,
+    icon ? styles.withIcon : undefined,
   ]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 
+  // T4 (RF-3; spec → "with icon": "IconBox a la izquierda; texto a
+  // continuación"): el IconBox es el PRIMER hijo del heading, antes del
+  // children, en orden de DOM; sin wrapper (el heading es el único elemento
+  // raíz y el que lleva el flex, spec → Anatomía/plan → Interfaz). Su raíz es
+  // `aria-hidden` (IconBox RF-2), así que el nombre accesible del heading es
+  // solo el texto (spec → Accesibilidad). Sin `icon` no se monta nada.
   return (
     <El id={id} className={rootClassName}>
+      {icon ? <IconBox icon={icon} /> : null}
       {children}
     </El>
   );

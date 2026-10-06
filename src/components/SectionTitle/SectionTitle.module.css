@@ -1,13 +1,14 @@
 /* SectionTitle — specs/primitives/SectionTitle/spec.md → Estilos y tokens (T2:
-   nivel; T3: decorated). El módulo fija las clases .h1/.h2/.h3 con su
-   font-size por tokens (RF-1: el tamaño sigue al nivel; spec → Estilos y
-   tokens: "el tamaño no depende de la tipografía global por etiqueta" — plan →
-   Decisiones: el componente es self-contained) y .decorated con su ::after de
-   barra de gradiente (RF-2). Cero literales de px y cero @media propios
-   (RF-6: --font-size-h1/2/3 y --size-title-bar-*/--title-bar-offset escalan
-   dentro de tokens/tokens.css; spec → Responsive). Quedan diferidos (tasks.md):
-   .withIcon en T4, los márgenes RF-5 (margin-bottom de .decorated incluido) y
-   la unión de className externa en T5. */
+   nivel; T3: decorated; T4: with icon). El módulo fija las clases .h1/.h2/.h3
+   con su font-size por tokens (RF-1: el tamaño sigue al nivel; spec → Estilos
+   y tokens: "el tamaño no depende de la tipografía global por etiqueta" — plan
+   → Decisiones: el componente es self-contained), .decorated con su ::after de
+   barra de gradiente (RF-2) y .withIcon con el flex sobre el propio heading
+   (RF-3; spec → "with icon": sin wrapper). Cero literales de px y cero @media
+   propios (RF-6: --font-size-h1/2/3 y --size-title-bar-*/--title-bar-offset
+   escalan dentro de tokens/tokens.css; spec → Responsive). Quedan diferidos
+   (tasks.md): los márgenes RF-5 (margin-bottom de .decorated incluido) y la
+   unión de className externa en T5. */
 
 /* Nivel h1: tamaño exacto de --font-size-h1 (24px < 580 → 32px ≥ 580, salto
    definido en tokens/tokens.css;RF-6). */
@@ -50,4 +51,21 @@
   height: var(--size-title-bar-h);
   background: var(--gradient-accent);
   border-radius: var(--radius-8);
+}
+
+/* with icon (T4, RF-3; spec → Estilos y tokens "with icon"): el flex va
+   SOBRE EL PROPIO heading, sin wrapper (spec → Anatomía/plan → Interfaz).
+   IconBox a la izquierda y texto a continuación, separados por
+   gap: var(--space-4) (1rem; único espaciado interno, sin márgenes en los
+   hijos — "gap del padre para espaciar", DESIGN → Do/Don't; el margen externo
+   de RF-5 llega en T5). Alineación centrada por align-items: center. Sin
+   @media ni literales: --space-4 escala en tokens/tokens.css (RF-6).
+   decorated + icon es combinación válida (spec → "decorated + icon"): ambas
+   clases coexisten en el mismo heading; la barra ::after se ancla al borde
+   inferior-izquierdo del heading completo (left: 0) y position: absolute la
+   excluye del flujo flex. */
+.withIcon {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
 }
