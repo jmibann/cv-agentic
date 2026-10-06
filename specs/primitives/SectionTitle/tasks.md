@@ -1,6 +1,6 @@
 # Tareas — SectionTitle
 
-- [ ] **T1. Headings por nivel con `id`.** RF-1, RF-4
+- [x] **T1. Headings por nivel con `id`.** RF-1, RF-4 — ec409cf
   - Hecho cuando: `as="h1| h2| h3"` renderiza `getByRole("heading", { level,
     name })` y `id` llega al heading; verde tras `feat(SectionTitle): T1`.
 
