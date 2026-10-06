@@ -14,7 +14,7 @@
     cada clase se verifica leyendo el `.module.css` (jsdom no aplica
     `clip-path`); verde tras `feat(HexAvatar): T2`.
 
-- [ ] **T3. `alt`: decorativo por defecto.** RF-2
+- [x] **T3. `alt`: decorativo por defecto.** RF-2 — bcfe9ec
   - Hecho cuando: sin `alt` → `alt=""` y no aparece en `getByRole("img")`;
     con `alt="Foto de X"` → `getByRole("img", { name: "Foto de X" })`; verde
     tras `feat(HexAvatar): T3`.
