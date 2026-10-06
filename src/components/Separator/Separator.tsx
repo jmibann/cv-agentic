@@ -9,8 +9,10 @@
 // `margin-block: var(--separator-gap)` en ambos lados (RF-4, RF-5) — valores
 // por inspección del CSS (jsdom no los computa; spec → "Tests esperados") — y
 // la `className` del consumidor se UNE a la clase base (`separator`) del raíz
-// (P2). Queda diferido según tasks.md: el cierre `expectNoA11yViolations`
-// (T3).
+// (P2). T3 hecha (cierre de pieza): el archivo de test cierra con
+// `expectNoA11yViolations` (suelto y dentro de un `Box variant="outer"` de
+// armazón) y el módulo se re-exporta desde `index.ts` (Separator + el tipo
+// SeparatorProps; nota de tasks.md).
 
 import styles from "./Separator.module.css";
 
