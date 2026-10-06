@@ -5,7 +5,7 @@
     `queryByRole("separator")` es `null` y no hay `<hr>` en el DOM; verde tras
     `feat(Separator): T1`.
 
-- [ ] **T2. Línea + full-bleed + margen por tokens.** RF-3, RF-4, RF-5
+- [x] **T2. Línea + full-bleed + margen por tokens.** RF-3, RF-4, RF-5 — 05dd5b0
   - Hecho cuando: el módulo declara alto 1px, `background-color:
     var(--color-track)`, `margin-inline: calc(var(--box-padding) * -1)` +
     `width: calc(100% + var(--box-padding) * 2)` y
