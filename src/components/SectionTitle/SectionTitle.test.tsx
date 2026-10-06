@@ -306,6 +306,73 @@ describe("SectionTitle with icon (T4: RF-3)", () => {
   });
 });
 
+// Tests de T5 (specs/primitives/SectionTitle/tasks.md) — spec → API: la
+// `className` externa se UNE a la clase base del heading raíz (el único
+// elemento; sin wrapper). Composición canónica de la fase (precedente
+// Box/Icon/Badge/Overhead/IconBox): base de nivel primero, después
+// `decorated`/`withIcon` si aplican y la externa al final; como en
+// Badge/IconBox, el orden en el atributo `class` no resuelve conflictos de
+// especificidad (rige la hoja de estilos), así que el test verifica
+// coexistencia, no el orden.
+//
+// Justificación de las queries (constitución T3): las mismas queries de rol ya
+// justificadas en T1 (`getByRole("heading", { level, name })`); la clase
+// externa es una cadena arbitraria del consumidor, no una clase del módulo, así
+// que el patrón #99 (`styles.name ?? "name"`) no aplica aquí: se pasa como
+// prop y se asierte con `toHaveClass` directo (sin `data-testid`).
+//
+// #101: lo discriminate-testable de T5 es la unión de `className` (nace ROJO:
+// hoy la prop está tipada pero no se conecta, `toHaveClass(consumerClass)`
+// falla). Los márgenes RF-5 y la ausencia de `@media` (RF-6) son verificación
+// por INSPECCIÓN del CSS (RF-5 lo dice explícitamente: "jsdom no computa
+// márgenes"); no se lee el CSS como texto en un test (#101).
+describe("SectionTitle className joining (T5: spec → API)", () => {
+  it("joins an external className to the base level class on the root heading", () => {
+    const consumerClass = "about-title";
+
+    const { getByRole } = render(
+      <SectionTitle as="h1" className={consumerClass}>
+        About Me
+      </SectionTitle>,
+    );
+
+    // "Hecho cuando" de T5 (P2): la externa coexiste con la base de nivel en
+    // el heading raíz (el único elemento; sin wrapper, spec → API).
+    const heading = getByRole("heading", { level: 1, name: "About Me" });
+
+    expect(heading).toHaveClass(h1Class);
+    expect(heading).toHaveClass(consumerClass);
+  });
+
+  it("joins an external className alongside decorated and withIcon when all combine", () => {
+    const consumerClass = "section-heading";
+
+    const { getByRole } = render(
+      <>
+        <AccentGradientDefs />
+        <SectionTitle
+          as="h2"
+          decorated
+          icon="book-open"
+          className={consumerClass}
+        >
+          Education
+        </SectionTitle>
+      </>,
+    );
+
+    // Composición completa en el mismo raíz: base de nivel + decorated +
+    // withIcon + externa conviven; ninguna pisa a las demás (spec → API +
+    // "decorated + icon (combinación válida)").
+    const heading = getByRole("heading", { level: 2, name: "Education" });
+
+    expect(heading).toHaveClass(h2Class);
+    expect(heading).toHaveClass(decoratedClass);
+    expect(heading).toHaveClass(withIconClass);
+    expect(heading).toHaveClass(consumerClass);
+  });
+});
+
 // Cierre del archivo (constitución T4, spec → Tests esperados): axe sobre el
 // markup de T1. Un heading con texto ya es accesible en T1 (la barra `::after`
 // decorativa llega en T3 y el IconBox `aria-hidden` en T4, ninguno afecta
@@ -316,6 +383,27 @@ describe("SectionTitle accessibility audit", () => {
       <SectionTitle as="h1" id="about-me">
         About Me
       </SectionTitle>,
+    );
+
+    await expectNoA11yViolations(container);
+  });
+
+  // T5 (cierre ampliado, hallazgo del review de T4): axe también sobre la
+  // combinación `decorated` + `icon` (spec → Estilos y tokens: combinación
+  // válida; "Tests esperados": decorated **y** IconBox juntos).
+  // #101 verde on-arrival: el markup ya es accesible desde T3/T4 (barra
+  // `::after` sin contenido textual, IconBox `aria-hidden`); el caso amplía la
+  // auditoría al combo, no introduce comportamiento nuevo.
+  it("has no accessibility violations with the decorated + icon combination", async () => {
+    const { container } = render(
+      <>
+        {/* Armazón: las defs del gradiente que resuelve el glyph (patrón T4);
+            en la app las monta AppLayout una sola vez. */}
+        <AccentGradientDefs />
+        <SectionTitle as="h2" id="education" decorated icon="book-open">
+          Education
+        </SectionTitle>
+      </>,
     );
 
     await expectNoA11yViolations(container);
