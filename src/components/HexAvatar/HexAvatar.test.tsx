@@ -33,6 +33,11 @@ import { describe, expect, it } from "vitest";
 
 import { HexAvatarDefs } from "./HexAvatar";
 
+// T2: el componente `HexAvatar` (la unión de imports queda separada para que
+// el commit `test(HexAvatar): T2` sea puramente aditivo sobre el archivo de
+// T1; ningún assert anterior se toca — constitución T2).
+import { HexAvatar } from "./HexAvatar";
+
 // T1: el módulo nace con el feat de esta tarea solo con `.defs` (el patrón
 // #99 fija el nombre real de la clase resuelta por CSS Modules en runtime).
 import styles from "./HexAvatar.module.css";
@@ -123,6 +128,93 @@ describe("HexAvatarDefs clip paths (T1: RF-3)", () => {
     // de estructura (mismo contrato de defs invisibles).
     expect(defsSvg).toHaveAttribute("aria-hidden", "true");
     expect(defsSvg).toHaveAttribute("focusable", "false");
+  });
+});
+
+// Tests de T2 (specs/primitives/HexAvatar/tasks.md) — RF-1: estructura
+// `wrap > border > img` con `src`. "Hecho cuando": el `<img>` recibe el `src`
+// (spec → "Tests esperados" #1); contorno e imagen llevan sus clases del
+// módulo (P2; "Tests esperados" #5, aserción de clase con el criterio #99);
+// la wrapper raíz también lleva `.wrap` (spec → Anatomía: `wrap` es el
+// elemento raíz). Rojo esperado (decisión #101): en el commit
+// `test(HexAvatar): T2` `HexAvatar` aún no existe en el módulo (el rojo llega
+// por "does not provide an export named 'HexAvatar'"; patrón aprobado en la
+// pieza: el import sin resolver de T1).
+//
+// Justificación de las queries (constitución T3): el `<img>` de T2 es
+// decorativo (`alt=""` fijo hasta T3, RF-2), sin nombre accesible, así que
+// `getByRole("img")` no puede seleccionarlo (spec → "Tests esperados" #2 lo
+// asierte EN T3, no acá); y los `<span>` de la Anatomía no exponen rol ni
+// nombre. La API de la spec no define `data-testid`. Se usa selección
+// estructural (`container.querySelector("img"/"span")`), el mismo criterio
+// justificado en Icon T2 (svg decorativo) y CornerTab T1 (raíz sin rol).
+//
+// Lo que queda por INSPECCIÓN del `.module.css` ("Hecho cuando" de T2; jsdom
+// no aplica `clip-path` ni computa estilos — decisión #101, descartado leer
+// el CSS como texto en un test): que `.border` y `.image` referencien
+// `url(#hex-avatar-outer)` / `url(#hex-avatar-inner)`, los offsets 0.25rem
+// (4 px del anillo) y los tamaños `calc()` respecto de
+// `--size-testimonial-avatar-w/h`. Tampoco se monta `HexAvatarDefs` como
+// armazón acá: su resolución `url(#…)` no se computa en jsdom (spec → Forma:
+// el montaje junto a las defs lo garantizan AppLayout y los tests de los
+// componentes que USAN HexAvatar; el cierre axe será T4 con defs montadas).
+
+// Patrón P2 canónico #99 (`styles.name ?? "name"`; prohibidos `!` y
+// `as string`): el fallback es solo de tipos bajo `noUncheckedIndexedAccess`.
+const wrapClass = styles.wrap ?? "wrap";
+const borderClass = styles.border ?? "border";
+const imageClass = styles.image ?? "image";
+
+describe("HexAvatar structure and src (T2: RF-1)", () => {
+  it("renders an img that receives the src prop", () => {
+    const { container } = render(<HexAvatar src="/x.png" />);
+
+    // RF-1 ("Hecho cuando" de T2; spec → "Tests esperados" #1): el `<img>`
+    // recibe el `src`. Es el discriminate real de T2: sin componente no hay
+    // img; con componente sin el prop conectado el atributo falta.
+    const img = container.querySelector("img");
+    expect(img).not.toBeNull();
+    expect(img).toHaveAttribute("src", "/x.png");
+  });
+
+  it("renders the exact wrap > border > img structure with the module classes", () => {
+    const { container } = render(<HexAvatar src="/x.png" />);
+
+    // Spec → Anatomía: exactamente dos `<span>` y un `<img>`, anidados
+    // wrap > border > img, sin elementos extra.
+    expect(container.querySelectorAll("span")).toHaveLength(2);
+    expect(container.querySelectorAll("img")).toHaveLength(1);
+
+    const wrap = container.querySelector("span");
+    expect(wrap).not.toBeNull();
+    expect(wrap?.tagName).toBe("SPAN");
+    // P2: la wrapper raíz lleva su clase del módulo (elemento raíz de la API
+    // → `className` se une acá en T4; la clase base ya rige en T2).
+    expect(wrap).toHaveClass(wrapClass);
+
+    const border = wrap?.querySelector("span");
+    expect(border).not.toBeNull();
+    expect(border?.tagName).toBe("SPAN");
+    // "Tests esperados" #5: el contorno lleva su clase del módulo.
+    expect(border).toHaveClass(borderClass);
+
+    const img = border?.querySelector("img");
+    expect(img).not.toBeNull();
+    // "Tests esperados" #5: la imagen lleva su clase del módulo.
+    expect(img).toHaveClass(imageClass);
+
+    // extra: Anatomía es exacta ("dos spans + img; sin atributos extra") —
+    // la spec no fija un RF de ausencia de atributos (HexAvatar no tiene el
+    // RF-6 de CornerTab), pero el HTML de spec → Anatomía solo muestra
+    // `class`, y esta aserción sella la estructura contra atributos
+    // inventados sin tocar nada testeado por T3/T4 (allí `alt` sigue en el
+    // `<img>`, no en los spans).
+    expect(Array.from(wrap?.attributes ?? []).map((a) => a.name)).toEqual([
+      "class",
+    ]);
+    expect(Array.from(border?.attributes ?? []).map((a) => a.name)).toEqual([
+      "class",
+    ]);
   });
 });
 
