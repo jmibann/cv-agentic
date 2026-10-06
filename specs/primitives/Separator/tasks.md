@@ -1,6 +1,6 @@
 # Tareas — Separator
 
-- [ ] **T1. Raíz decorativa.** RF-1, RF-2
+- [x] **T1. Raíz decorativa.** RF-1, RF-2 — 1a1c8bd
   - Hecho cuando: renderiza un `<div>` con `aria-hidden="true"`;
     `queryByRole("separator")` es `null` y no hay `<hr>` en el DOM; verde tras
     `feat(Separator): T1`.
