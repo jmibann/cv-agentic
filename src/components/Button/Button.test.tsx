@@ -18,6 +18,8 @@ import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
+import { expectNoA11yViolations } from "../../test/a11y";
+
 import { Button } from "./Button";
 
 import styles from "./Button.module.css";
@@ -376,5 +378,36 @@ describe("Button size, fullWidth classes and className join (T5: RF-6)", () => {
     expect(link).toHaveClass(smallClass);
     expect(link).toHaveClass(fullWidthClass);
     expect(link).toHaveClass(externalClass);
+  });
+});
+
+// Cierre del archivo (constitución T4, tasks.md → T6 "Hecho cuando", spec →
+// Tests esperados): axe-core sobre las dos formas del raíz — <button> con
+// ícono y <a> (button y link). Los pseudo-estados de T6 (focus-visible,
+// disabled, hover) NO son testeables en jsdom (spec → RF-5 y plan.md →
+// Decisiones): se verifican por inspección del CSS + axe, que es lo que este
+// cierre aporta junto con la inspección del reviewer. El ícono decorativo
+// entra en el caso button porque RF-4 lo define sobre el raíz y axe debe
+// confirmar que el aria-hidden del svg no genera violación (misma lógica de
+// cierre que Box/Icon: un caso por forma del componente; BrandIcon uno solo).
+// No se monta AccentGradientDefs: Button usa Icon con el tone default
+// ("current"), sin referencia al gradiente compartido.
+describe("Button accessibility audit (T6: RF-5, RF-6)", () => {
+  it("has no accessibility violations on the button branch with a decorative icon", async () => {
+    const { container } = render(<Button icon="download">Download CV</Button>);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations on the link branch", async () => {
+    // Forma real de uso (spec → Propósito): "Download CV" como <a> con
+    // download e ícono al final; el nombre accesible sigue siendo el texto.
+    const { container } = render(
+      <Button href="/files/cv.pdf" download="cv-2026.pdf" icon="download" iconPosition="end">
+        Download CV
+      </Button>,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
