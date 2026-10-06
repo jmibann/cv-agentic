@@ -4,10 +4,14 @@
 // RF-4: `div role="group"` con `aria-label={label}` y un
 // `<button type="button">` por locale con su `aria-label` fijo ("English" /
 // "Español") y su atributo `lang` propio; la `className` del consumidor va
-// UNIDA a la clase base del raíz (G-B, #99). T2 hará: `useLocale()`,
-// `aria-pressed` del idioma activo, `onClick` → `setLocale(next)` con guard
-// RF-3 (click en el activo no invoca) y teclado Tab RF-5. T3 hará: estilos por
-// tokens en el módulo, `index.ts` y cierre a11y de los tests.
+// UNIDA a la clase base del raíz (G-B, #99). T2 hecha: `useLocale()` (excepción
+// C2 documentada, igual que ThemeToggle con `useTheme`), `aria-pressed={locale
+// === code}` del idioma activo (RF-2, spec → Estados) y `onClick` →
+// `setLocale(code)` SOLO si el idioma no está activo (guard RF-3, decisión
+// 2=a del plan; spec → "No hacer"); RF-5 no pide código: ambos `<button>` son
+// tab stops consecutivos NATIVOS (no es radiogroup: sin roles de grupo, sin
+// manejo de flechas). T3 hará: estilos por tokens en el módulo, `index.ts` y
+// cierre a11y de los tests.
 // G-A / "No hacer" (spec): este componente NO lee ni escribe
 // `localStorage["cv:locale"]` ni toca `document.documentElement.lang`: la
 // aplicación del cambio y la persistencia son del LocaleProvider. "No hacer":
@@ -16,6 +20,8 @@
 
 import { LOCALES } from "@data/constants";
 import type { Locale } from "@data/cv.types.generated";
+
+import { useLocale } from "../../providers/LocaleProvider";
 
 import styles from "./LanguageSwitcher.module.css";
 
@@ -50,6 +56,13 @@ export function LanguageSwitcher({
   label,
   className,
 }: LanguageSwitcherProps) {
+  // RF-2 (T2): el estado activo y el cambio vienen del contexto de idioma
+  // (spec → API: "Consume useLocale()"), la excepción C2 documentada en
+  // specs/README.md, misma que ThemeToggle. El componente NO lee ni escribe
+  // storage ni DOM global (G-A): solo invoca setLocale(code) y deja que el
+  // LocaleProvider aplique `<html lang>` y `cv:locale`.
+  const { locale, setLocale } = useLocale();
+
   // T1 (G-B, unión canónica #99): la clase base va primera y se le UNE la
   // externa (no la reemplaza). Mismo mecanismo aprobado en
   // Box/Icon/BrandIcon/Badge/IconBox/ThemeToggle: array + filtro de undefined
@@ -63,18 +76,30 @@ export function LanguageSwitcher({
   // RF-1: un botón por `LOCALES`, EN ESE ORDEN (map sobre la lista, nunca
   // JSX fijo por idioma). RF-4: `type="button"` (botón de acción, no submit),
   // `aria-label` fijo por locale y `lang` propio para pronunciación (spec →
-  // Accesibilidad). Sin `onClick` ni `aria-pressed` todavía: son del estado
-  // activo, T2 (RF-2/RF-3).
+  // Accesibilidad). T2: `aria-pressed={isActive}` (RF-2 / Estados: activa con
+  // "true", inactiva con "false") y `onClick` con el guard RF-3 (decisión 2=a:
+  // click en el activo NO invoca setLocale). RF-5: sin código — dos botones
+  // nativos son tab stops consecutivos; "No hacer": cero patrón radiogroup.
   return (
     <div role="group" aria-label={label} className={rootClassName}>
-      {LOCALES.map((locale) => {
-        const option = LOCALE_OPTIONS[locale];
+      {LOCALES.map((code) => {
+        const option = LOCALE_OPTIONS[code];
+        const isActive = locale === code;
         return (
           <button
-            key={locale}
+            key={code}
             type="button"
             lang={option.lang}
             aria-label={option.ariaLabel}
+            aria-pressed={isActive}
+            onClick={() => {
+              // Guard RF-3: elegir el idioma ya activo no invoca setLocale
+              // (spec → Accesibilidad: "Hacer click en el idioma activo no
+              // hace nada (sigue presionado)"; "No hacer").
+              if (!isActive) {
+                setLocale(code);
+              }
+            }}
           >
             {option.text}
           </button>
