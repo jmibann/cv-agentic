@@ -15,10 +15,12 @@
 // (spec → API) no aplica clase float; `placement="float"` aplica `.float`,
 // que solo pinta ≥ 992px (único `@media` del módulo; en < 992 la base sigue
 // rigiendo — RF-3; contenido del media y ausencia de `@media print` (RF-4)
-// por inspección: jsdom no lo computa, #101). Diferidos según tasks.md:
-// fondo `surface-raised`, bordes obligatorios, radio asimétrico, layout
-// interno, ausencia de sombra y cierre `expectNoA11yViolations` + `index.ts`
-// (T4).
+// por inspección: jsdom no lo computa, #101). T4 cierra la pieza: la forma
+// (fondo `surface-raised`, bordes 1px obligatorios, radio asimétrico, layout
+// interno flex, sin sombra — RF-5) vive en la clase base del módulo, el
+// archivo de test termina con `expectNoA11yViolations` y `index.ts` re-exporta
+// CornerTab y CornerTabProps (nota de cierre en tasks.md). El TSX no cambia:
+// la forma es solo CSS y el markup ya era el de la spec desde T1 (RF-6).
 
 import type { ReactNode } from "react";
 

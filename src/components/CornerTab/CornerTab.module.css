@@ -1,12 +1,19 @@
 /* CornerTab — specs/primitives/CornerTab/spec.md → Estilos y tokens (T1 base;
-   T2 variantes size; T3 placement float). En T1 la clase base fija SOLO la
-   fila "Posición" de la tabla de la spec
+   T2 variantes size; T3 placement float; T4 forma completa de la clase base:
+   fondo, bordes, radio y layout interno — RF-5). La clase base fija la fila
+   "Posición" de la tabla de la spec
    (RF-1): absolute/top/right con `z-index: var(--z-raised)` (token; regla 2
    de docs/DESIGN.md; comment de tokens.css: "CornerTab sobre el contenido del
-   Box"). Cero colores literales; el único `@media` del módulo es el de
+   Box") más las filas "Fondo"/"Borde"/"Radio"/"Layout interno" (T4, abajo).
+   Cero colores literales (regla 1 de docs/DESIGN.md): fondo
+   --color-surface-raised y bordes --color-border, ambos tokens semánticos que
+   existen en los dos temas; el único `@media` del módulo es el de
    `.float` en T3 (RF-3; abajo) y ningún `@media print` propio (RF-4: la
    oculta el estilo compartido de foundations/layout.md; resolución R-1 del
-   plan). Ninguna medida propia cambia por breakpoint — `top`/`right` son 0,
+   plan; "La tab siempre está visible en todos los breakpoints de pantalla" —
+   spec → Responsive: ninguna regla del módulo la oculta en pantalla; los
+   colores del fondo/borde los resuelve cada tema vía tokens). Ninguna medida
+   propia cambia por breakpoint — `top`/`right` son 0,
    permitido por docs/tokens/breakpoints.md).
    Cero pseudo-estados :hover/:focus y cero transiciones (spec → Estados:
    ninguno propio; RF-6: hover/foco son del contenido). Sin margen externo
@@ -17,20 +24,48 @@
    `size` (criterio de la fase: Button `.small`/`.fullWidth`, Box
    `.outer`/`.inner`; registrado aquí según el encargo de T2); `.float` =
    valor exacto del prop `placement` (mismo criterio, encargo de T3).
-   Diferidos:
-   fondo --color-surface-raised, bordes border-left/bottom 1px
-   --color-border (obligatorios, RF-5), radio 0/--radius-20/0/--radius-32,
-   layout interno flex y `display` (T4). */
+   Sombra: NINGUNA (spec → tabla "Sombra | ninguna" y "No hacer": "no agregarle
+   sombra 'para separarla'"; docs/DESIGN.md → Do/Don't: "CornerTab con borde
+   1px" vs "CornerTab sin borde o con sombra") — por eso el módulo no declara
+   `box-shadow` en ninguna regla. */
 
 /* Clase base del único elemento raíz (<div>, spec → Anatomía: un div
    posicionado dentro del Box, que es position: relative). Valores exactos de
-   la fila "Posición" de la tabla "Estilos y tokens" (spec; rige en overlay,
-   RF-1). */
+   la tabla "Estilos y tokens" (spec; la fila "Posición" rige en overlay,
+   RF-1, y las filas "Fondo"/"Borde"/"Radio"/"Layout interno" llegan en T4,
+   RF-5, SIEMPRE visibles: en pantalla en todos los breakpoints — RF-4 — y en
+   ambos temas).
+   Borde OBLIGATORIO siempre (RF-5): en oscuro --color-surface-raised contra
+   --color-surface es 1.14:1 — fila "Oscuro: `surface-raised` sobre `surface`
+   | 1.14 | Solo con borde de 1px --color-border" y regla 4 de
+   docs/tokens/contrast.md: "--color-surface-raised siempre lleva borde de
+   1px (--color-border); sin él la CornerTab no se distingue de la card en
+   oscuro"; en claro rige el "SIEMPRE" del RF-5 (y el comment de
+    --color-border en tokens.css: "bordes 1px (CornerTab, controles)"). El
+    `1px` es una medida FIJA definida literalmente en
+   la tabla de la spec ("Borde | border-left: 1px solid var(--color-border);
+   border-bottom: 1px solid var(--color-border);"): no existe token genérico
+   de grosor de línea en tokens.css (--timeline-line-width es una medida
+   interna de Timeline, no reutilizable), y docs/tokens/breakpoints.md permite
+   literales de medidas fijas "si su spec las define" (misma justificación
+   aprobada en Separator T2, línea 1px de --color-track).
+   Radio: `0 var(--radius-20) 0 var(--radius-32)` literal de la fila "Radio"
+   (arriba-der = radio del Box; los 0 son permitidos por breakpoints.md). El
+   `display: flex; align-items: center;` es la fila "Layout interno" (centra
+   verticalmente el contenido: tab de NavTabs / botón Show Contacts; spec →
+   Estados: ninguno propio — los estados del contenido no viven acá).
+   Sin box-shadow (cabecera; spec → "No hacer"). */
 .cornerTab {
   position: absolute;
   top: 0;
   right: 0;
   z-index: var(--z-raised);
+  background-color: var(--color-surface-raised);
+  border-left: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0 var(--radius-20) 0 var(--radius-32);
+  display: flex;
+  align-items: center;
 }
 
 /* size="md" (default; RF-2, T2): fila `size="md"` de la tabla de la spec con
