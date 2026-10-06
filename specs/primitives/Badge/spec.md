@@ -1,5 +1,5 @@
 # Badge
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
