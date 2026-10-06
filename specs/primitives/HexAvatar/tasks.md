@@ -19,7 +19,7 @@
     con `alt="Foto de X"` → `getByRole("img", { name: "Foto de X" })`; verde
     tras `feat(HexAvatar): T3`.
 
-- [ ] **T4. Sombra, tamaño fijo, `className` y cierre a11y.** RF-4, RF-5
+- [x] **T4. Sombra, tamaño fijo, `className` y cierre a11y.** RF-4, RF-5 — b0b2b2c
   - Hecho cuando: el wrap declara `filter: var(--filter-avatar-drop)` sin
     ningún `box-shadow` (inspección); ningún `@media` ni regla
     `:hover`/`:focus`/transición; `className` unida al `wrap` (P2); archivo
