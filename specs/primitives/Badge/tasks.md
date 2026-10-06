@@ -9,7 +9,7 @@
   - Hecho cuando: la clase externa queda junto a la base en el único elemento
     (aserción P2); verde tras `feat(Badge): T2`.
 
-- [ ] **T3. Estilos por tokens, no interactivo y cierre a11y.** RF-4, RF-5, RF-6
+- [x] **T3. Estilos por tokens, no interactivo y cierre a11y.** RF-4, RF-5, RF-6 — 10202fd
   - Hecho cuando: el módulo resuelve fondo `--color-surface-muted`,
     `--radius-8`, `--font-size-badge`, `--line-height-tight`, padding
     `0.5rem 1rem`, `white-space: nowrap`, `inline-flex` (inspección: cero
