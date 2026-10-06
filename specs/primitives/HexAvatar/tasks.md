@@ -1,6 +1,6 @@
 # Tareas — HexAvatar
 
-- [ ] **T1. `HexAvatarDefs` con los dos `clipPath` de la geometría fija.** RF-3
+- [x] **T1. `HexAvatarDefs` con los dos `clipPath` de la geometría fija.** RF-3 — 09c9e03
   - Hecho cuando: el test renderiza `HexAvatarDefs` y encuentra dos `clipPath`
     con ids `hex-avatar-outer` e `hex-avatar-inner`, `clipPathUnits="objectBoundingBox"`;
     los `d` transcriben los vértices/radios de "Forma" (spec) con comentario de
