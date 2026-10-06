@@ -1,5 +1,5 @@
 # Box
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
