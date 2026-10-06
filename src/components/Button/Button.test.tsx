@@ -15,7 +15,8 @@
 // expectNoA11yViolations (T6).
 
 import { render } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "./Button";
 
@@ -46,5 +47,53 @@ describe("Button element branch (T1: RF-1)", () => {
       "type",
       "submit",
     );
+  });
+});
+
+// Tests de T2 (specs/primitives/Button/tasks.md) — RF-3 y "Tests esperados"
+// de la spec: "onClick se llama al hacer click; no se llama si disabled". El
+// "Hecho cuando" agrega el criterio de que el <button> quede deshabilitado.
+//
+// Queries (constitución T3): la misma que en T1 — rol "button" con el nombre
+// accesible; el handler se observa con vi.fn(). Sin data-testid.
+//
+// Click sobre el botón deshabilitado: se usa `user.click` SIN configuración
+// extra (user-event ^14 simula al navegador: no despacha eventos en controles
+// disabled y su pointerEventsCheck no dispara porque jsdom no aplica la hoja
+// de estilos del componente). Si el check de pointer-events llegara a lanzar,
+// la corrección sería setup({ pointerEventsCheck: 0 }) documentado acá, nunca
+// .skip ni debilitar la aserción. Medido con el run en rojo/verde de la tarea.
+describe("Button onClick and disabled (T2: RF-3)", () => {
+  it("calls the onClick handler when the button is clicked", async () => {
+    const handleClick = vi.fn();
+    const user = userEvent.setup();
+    const { getByRole } = render(
+      <Button onClick={handleClick}>Download CV</Button>,
+    );
+
+    // RF-3: con onClick y sin disabled, user-event invoca el handler.
+    await user.click(getByRole("button", { name: "Download CV" }));
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call the onClick handler and renders the <button> disabled", async () => {
+    const handleClick = vi.fn();
+    const user = userEvent.setup();
+    const { getByRole } = render(
+      <Button disabled onClick={handleClick}>
+        Download CV
+      </Button>,
+    );
+
+    const button = getByRole("button", { name: "Download CV" });
+
+    // "Hecho cuando" de T2: con `disabled` el <button> queda deshabilitado
+    // (atributo nativo: RF-3 y spec → Estados).
+    expect(button).toBeDisabled();
+
+    // RF-3 (rama SI): el handler no se invoca cuando está disabled.
+    await user.click(button);
+    expect(handleClick).not.toHaveBeenCalled();
   });
 });
