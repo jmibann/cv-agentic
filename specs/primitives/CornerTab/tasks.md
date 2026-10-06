@@ -22,7 +22,7 @@
     `calc()` sobre `--box-padding` y `margin-left: var(--space-6)` — sin
     literales de tamaño (inspección); verde tras `feat(CornerTab): T3`.
 
-- [ ] **T4. Forma (bordes/radio/fondo), visible en pantalla y cierre a11y.** RF-4, RF-5, RF-6
+- [x] **T4. Forma (bordes/radio/fondo), visible en pantalla y cierre a11y.** RF-4, RF-5, RF-6 — d12b270
   - Hecho cuando: el módulo pinta siempre `border-left/bottom: 1px solid
     var(--color-border)` sobre `--color-surface-raised` y
     `border-radius: 0 var(--radius-20) 0 var(--radius-32)`, sin sombra; ningún
