@@ -1,14 +1,25 @@
-/* IconBox — specs/primitives/IconBox/spec.md → Estilos y tokens. En T2 el
-   módulo nace con la clase base del <span> raíz VACÍA: la unión P2 de
-   `className` necesita una clase base real sobre la que unirse (decisión del
-   plan; precedente Badge T2). En producción una clase vacía es inocua. Las
-   propiedades completas llegan en T3: cuadrado --size-icon-box, fondo
-   --color-surface-muted, --radius-12, inline-flex centrado y flex-shrink: 0
-   (RF-3). Cero colores literales, cero @media propios (RF-3), cero
-   :hover/:focus/transiciones (RF-4) y cero margen externo: el espaciado con
-   el texto acompañante lo pone el consumidor (spec → No hacer;
-   docs/DESIGN.md → Do/Don't). */
+/* IconBox — specs/primitives/IconBox/spec.md → Estilos y tokens (T3).
+   Cero colores literales, cero @media propios (RF-3: el tamaño es fijo, lo da
+   --size-icon-box; spec → Responsive) y cero pseudo-estados :hover/:focus ni
+   transiciones (RF-4: no es interactivo, sin estados). Sin margen propio: el
+   espaciado con el texto acompañante lo pone el consumidor, gap de
+   Sidebar/ResumeSection (spec → No hacer; docs/DESIGN.md → Do/Don't,
+   decisión #54). */
 
+/* Clase base del único elemento raíz (<span>, spec → Anatomía). Valores
+   exactos de la tabla "Estilos y tokens" de la spec: cuadrado con
+   --size-icon-box en ancho y alto (mismo token, 3rem); fondo
+   --color-surface-muted; radio --radius-12; inline-flex centrado
+   (align-items + justify-content) y flex-shrink: 0 para no comprimirse dentro
+   de padres flex. IconBox NO declara --icon-size: el ícono toma el fallback
+   default de Icon (--size-icon) (plan.md → Decisiones C-1). */
 .iconBox {
-  /* Vacía a propósito en T2: los estilos por tokens son el alcance de T3. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--size-icon-box);
+  height: var(--size-icon-box);
+  background: var(--color-surface-muted);
+  border-radius: var(--radius-12);
 }

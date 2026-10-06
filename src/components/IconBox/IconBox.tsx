@@ -3,9 +3,10 @@
 // un `Icon tone="gradient"` centrado. T2 hecha: el raíz es siempre decorativo
 // (`aria-hidden="true"`, RF-2) y la `className` del consumidor se UNE a la
 // clase base (`iconBox`) del raíz (P2); el módulo nace en T2 con la clase base
-// vacía. T3 pendiente: las propiedades de IconBox.module.css (cuadrado
+// vacía. T3 hecha: IconBox.module.css fija los estilos por tokens (cuadrado
 // --size-icon-box, --color-surface-muted, --radius-12, inline-flex centrado y
-// flex-shrink: 0; RF-3) y el re-export desde `index.ts`. IconBox NO monta las
+// flex-shrink: 0; RF-3/RF-4) y `index.ts` re-exporta IconBox e IconBoxProps.
+// IconBox NO monta las
 // defs del gradiente: la unicidad del montaje es de AppLayout (RF-1 de la spec
 // y plan.md → Decisiones); el test las monta como armazón (patrón de Icon).
 
@@ -36,7 +37,7 @@ export function IconBox({ icon, className }: IconBoxProps) {
   // base primero, sin librerías; así no quedan clases vacías cuando
   // `className` no se pasa. Las clases del módulo son `string | undefined`
   // bajo noUncheckedIndexedAccess. El centrado visual (`inline-flex` +
-  // `align-items`/`justify-content`) llega con T3 en la clase base.
+  // `align-items`/`justify-content`) rige desde T3 en la clase base.
   const rootClassName = [styles.iconBox, className]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
