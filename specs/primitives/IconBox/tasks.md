@@ -11,7 +11,7 @@
     externa queda unida a la clase base del raíz (P2); verde tras
     `feat(IconBox): T2`.
 
-- [ ] **T3. Estilos por tokens y cierre a11y.** RF-3, RF-4, RF-5
+- [x] **T3. Estilos por tokens y cierre a11y.** RF-3, RF-4, RF-5 — bc78ac8
   - Hecho cuando: el módulo fija cuadrado `--size-icon-box`, fondo
     `--color-surface-muted`, `--radius-12`, `inline-flex` centrado y
     `flex-shrink: 0`, sin margen propio, sin `@media`, sin
