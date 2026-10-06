@@ -1,0 +1,15 @@
+/* ThemeToggle — specs/controls/ThemeToggle/spec.md. T1: el módulo nace SOLO
+   con la clase base vacía para que la unión de `className` (G-B, #99) coexista
+   con una clase real desde el primer commit (precedente exacto Badge T2 /
+   IconBox T2; el "Hecho cuando" de T1 no inspecciona propiedades). Cero
+   colores literales y cero @media propios (spec → Responsive: tamaño fijo,
+   RF-5); sin margen externo (docs/DESIGN.md → Do/Don't). */
+
+/* Clase base del único elemento raíz (<button>, spec → Anatomía). TODAS las
+   propiedades por tokens de la tabla "Estilos y tokens" — tamaño
+   --size-control cuadrado, fondo --color-surface-raised, borde 1px
+   --color-border, --radius-12, --shadow-control, color/hover, anillo
+   focus-visible y press con transición (RF-4/RF-5) — llegan en T3. */
+.themeToggle {
+  /* propiedades en T3 */
+}
