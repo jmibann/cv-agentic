@@ -12,14 +12,22 @@
 // componente transformara el string en JS ("EMAIL" en el DOM), `getByText` con
 // el texto original fallaría: el test discrimina exactamente RF-1.
 //
-// Diferidos a su tarea según tasks.md: `as="dt"` con armazón `<dl>` y unión de
-// `className` (T2); elipsis/muted/tamaño/bloque y cierre
+// Diferidos a su tarea según tasks.md: elipsis/muted/tamaño/bloque y cierre
 // `expectNoA11yViolations` (T3).
 
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { Overhead } from "./Overhead";
+
+// T2: el test importa el módulo solo para fijar el nombre real de la clase
+// base (`overhead`, resuelto por CSS Modules en runtime) y asierte la coexistencia
+// con la clase del consumidor en el raíz (precedente Badge).
+import styles from "./Overhead.module.css";
+
+// Patrón P2 canónico #99 (`styles.name ?? "name"`; prohibidos `!` y
+// `as string`): el fallback es solo de tipos bajo `noUncheckedIndexedAccess`.
+const overheadClass = styles.overhead ?? "overhead";
 
 describe("Overhead base render (T1: RF-1)", () => {
   it("renders the children text untransformed in the DOM (uppercase comes from CSS)", () => {
@@ -32,5 +40,88 @@ describe("Overhead base render (T1: RF-1)", () => {
 
     expect(root).toBeInTheDocument();
     expect(root.textContent).toBe("Email");
+  });
+});
+
+// Tests de T2 (specs/primitives/Overhead/tasks.md) — RF-2 (`as="dt"` renderiza
+// un `<dt>`; la validez del contexto de la `<dl>` es del consumidor, así que
+// el test lo envuelve en un `<dl>` de armazón) y unión de `className` al único
+// raíz (spec → API: "Se une a la clase base del elemento raíz"; spec → Tests
+// esperados: "Concatena `className`"; "Hecho cuando" de T2: default `span`,
+// `<dt>` con `as="dt"` y `className` unida al raíz (P2)).
+//
+// Justificación de las queries (constitución T3): Overhead expone su texto en
+// el raíz sin roles añadidos (spec → Accesibilidad, RF-6), así que el único
+// elemento se obtiene con `getByText` —la misma query accesible ya justificada
+// en T1— y se asierte `tagName` + clases sobre ese elemento; sin `data-testid`
+// (la API de la spec no define ninguno). El orden en el atributo `class` no
+// resuelve conflictos de especificidad (precedente Box/Icon/Badge): rige la
+// hoja de estilos, así que el test verifica coexistencia, no el orden.
+describe("Overhead as prop and className joining (T2: RF-2)", () => {
+  // extra: el "Hecho cuando" de T2 exige "default `span`"; "Tests esperados"
+  // de la spec no lo lista explícitamente (solo cubre `as="dt"` y la unión de
+  // `className`), pero sale directo de spec → Anatomía y API (default "span").
+  it("renders a <span> root by default", () => {
+    const { getByText } = render(<Overhead>Email</Overhead>);
+
+    // "Hecho cuando" de T2: sin `as`, el raíz sigue siendo <span> (spec →
+    // Anatomía: `<span>` en bloque, o `<dt>` según `as`).
+    const root = getByText("Email");
+
+    expect(root.tagName).toBe("SPAN");
+  });
+
+  it("renders a <dt> inside the dl scaffold when as=\"dt\"", () => {
+    // RF-2: con `as="dt"` el raíz es <dt>; el <dl> de armazón lo arma el test
+    // (la validez del contexto es del consumidor, no del componente).
+    const { getByText } = render(
+      <dl>
+        <Overhead as="dt">Email</Overhead>
+      </dl>,
+    );
+
+    const root = getByText("Email");
+
+    expect(root.tagName).toBe("DT");
+    // El <dt> queda como hijo directo del <dl> (un solo elemento, sin
+    // wrappers: spec → Anatomía).
+    expect(root.parentElement?.tagName).toBe("DL");
+  });
+
+  it("joins an external className to the base class on the default span root", () => {
+    const consumerClass = "contact-overhead";
+
+    const { getByText } = render(
+      <Overhead className={consumerClass}>Email</Overhead>,
+    );
+
+    // Unión (spec → API): la clase externa coexiste con la base (`overhead`)
+    // en el único elemento raíz (el `span` por defecto).
+    const root = getByText("Email");
+
+    expect(root.tagName).toBe("SPAN");
+    expect(root).toHaveClass(overheadClass);
+    expect(root).toHaveClass(consumerClass);
+  });
+
+  it("joins an external className to the base class on the dt root when as=\"dt\"", () => {
+    const consumerClass = "contact-overhead";
+
+    const { getByText } = render(
+      <dl>
+        <Overhead as="dt" className={consumerClass}>
+          Email
+        </Overhead>
+      </dl>,
+    );
+
+    // RF-2 + unión: la unión aplica al mismo raíz sea `span` o `dt` (la spec
+    // define un único raíz: no hay un segundo nodo que reciba la clase).
+    const root = getByText("Email");
+
+    expect(root.tagName).toBe("DT");
+    expect(root.parentElement?.tagName).toBe("DL");
+    expect(root).toHaveClass(overheadClass);
+    expect(root).toHaveClass(consumerClass);
   });
 });
