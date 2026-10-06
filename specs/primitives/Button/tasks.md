@@ -1,6 +1,6 @@
 # Tareas — Button
 
-- [ ] **T1. `<button>` con `type` de la prop.** RF-1
+- [x] **T1. `<button>` con `type` de la prop.** RF-1 — 6b87744
   - Hecho cuando: sin `href` renderiza `getByRole("button", { name })` con
     `type="button"` por defecto y `type="submit"` llega al DOM; verde tras
     `feat(Button): T1`.
