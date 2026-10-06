@@ -8,9 +8,11 @@
 // `t.controls` (RF-3: al cambiar el idioma del provider, los hijos renuevan
 // sus nombres — la traducción vive en ui.{en,es}.ts, C3) y la `className`
 // del consumidor UNIDA a la clase base del raíz (G-B, API de la spec).
-// T2 diferida: estilos por tokens del módulo (RF-1 flex-end/--size-control/
-// --z-controls, RF-5 cero texto propio, RF-6 gap por --controls-gap sin
-// @media) e `index.ts` (tasks.md).
+// T2 hecha: el módulo fija los estilos por tokens de la tabla (RF-1
+// flex-end/--size-control/--z-controls, RF-5 cero texto propio, RF-6 gap por
+// --controls-gap sin @media) e `index.ts` re-exporta el componente y su tipo
+// (tasks.md). El tsx NO cambia en T2: su marcado de T1 ya deja el group como
+// único hijo del flujo y la posición vertical/ancho las define AppLayout.
 // C2 (excepción documentada, specs/README.md → reglas comunes + plan →
 // Decisiones): ControlsBar sí consume `useLocale()` — es la fuente de los
 // labels que pasa a sus hijos; en T1 usa solo `.t` (el idioma activo del

@@ -1,20 +1,43 @@
-/* ControlsBar — specs/controls/ControlsBar/spec.md. El módulo NACE en T1 solo
-   con la clase base del raíz para la unión de la `className` externa (G-B,
-   spec → API), vacía: los estilos por tokens NO son observables por los tests
-   de T1 y llegan en T2 (tasks.md → RF-1/RF-5/RF-6; criterio de nacimiento del
-   módulo aprobado en ThemeToggle/LanguageSwitcher, donde la unión conectó en
-   T1 con la clase base vacía).
+/* ControlsBar — specs/controls/ControlsBar/spec.md. T2 completa la clase base
+   del raíz con TODAS las propiedades de la tabla "Estilos y tokens" (el
+   diferido de T1 queda hecho; verificación por INSPECCIÓN del CSS — decisión
+   #101: layout, capa y ausencia de @media no son testeables en jsdom):
+   RF-1 (flex-right, alto --size-control, capa --z-controls), RF-5 (cero
+   texto/color propio) y RF-6 (igual en todos los breakpoints: el único valor
+   que escala es el gap, por token, sin @media propios). Cero @media — ni de
+   layout ni print (spec → Responsive y "No hacer"; G-D: en impresión la
+   ocultan los estilos compartidos de src/styles/global.css, F4). Cero colores
+   literales (regla 1 de docs/DESIGN.md) y cero fondo/borde/gradiente/texto
+   propios: la barra no pinta nada, el texto que muestra viene de sus hijos,
+   que traen sus tokens sobre --color-bg (RF-5; spec → Estilos: nunca
+   --color-text-muted). Sin margen externo (docs/DESIGN.md → Do/Don't): el
+   padre/AppLayout posiciona (la posición vertical en --gutter-top y el ancho
+   full-width del <header> son de AppLayout, spec → RF-1). */
 
-   Diferido T2 (fila "Layout"/"Alto"/"Capa" de la tabla "Estilos y tokens",
-   verificación por INSPECCIÓN del CSS — #101, no testeable en jsdom):
-   display: flex; justify-content: flex-end; align-items: center;
-   gap: var(--controls-gap) (RF-6: único valor que escala, por token, sin
-   @media propios); height: var(--size-control) (RF-1); position: relative;
-   z-index: var(--z-controls) (RF-1, capa con token --z-*). RF-5: CERO
-   declaraciones de color de texto en el módulo (la pieza no pinta texto
-   propio; sus hijos traen sus tokens sobre --color-bg). Sin margen externo
-   (docs/DESIGN.md → Do/Don't: el padre/AppLayout posiciona). */
+/* Clase base del único elemento raíz (<header>, spec → Anatomía). Valores
+   exactos de la tabla "Estilos y tokens":
+   - Layout (fila "Layout"): display: flex con justify-content: flex-end y
+     align-items: center — los controles quedan alineados a la derecha y
+     fuera de las cards (RF-1; el único hijo del flujo es el group, spec →
+     Anatomía). El gap escala SOLO por token (RF-6): --controls-gap =
+     var(--space-2) (8px) < 580 → var(--space-3) (12px) ≥ 580
+     (tokens.css líneas 265 y 318; el @media vive en tokens.css, nunca acá
+     — docs/tokens/breakpoints.md: un componente jamás redefine una medida
+     en su propio @media).
+   - Alto (fila "Alto"): height --size-control (2.5rem, tokens.css línea
+     206 —ThemeToggle/LanguageSwitcher; no escala por breakpoint).
+   - Capa (fila "Capa"): position: relative con z-index --z-controls (20,
+     tokens.css línea 232; z-index SIEMPRE con token --z-*, regla dura 2 de
+     docs/DESIGN.md).
+   - Cero width/max-width/padding: el ancho full-width y la posición
+     vertical los define AppLayout (fila "Posición vertical"; RF-1) — no se
+     inventa alcance. */
 .controlsBar {
-  /* Vacía a propósito: T2 fija layout/alto/capa por tokens (arriba, diferido
-     declarado). Su presencia acá solo da la clase base de la unión G-B. */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: var(--size-control);
+  gap: var(--controls-gap);
+  position: relative;
+  z-index: var(--z-controls);
 }
