@@ -1,4 +1,5 @@
-// Tests de T1 (specs/controls/ThemeToggle/tasks.md) — RF-1, RF-2, RF-3, RF-6.
+// Tests de T1 y T2 (specs/controls/ThemeToggle/tasks.md) — T1: RF-1, RF-2,
+// RF-3, RF-6 · T2: RF-4 (teclado nativo; ver describe final).
 // Armazón: ThemeProvider REAL (spec → Tests esperados: "los tests envuelven
 // ThemeProvider"; plan → Estrategia de tests): RF-1/RF-2 se verifican en
 // integración — tras el click cambian `aria-pressed`, el label, `dataset.theme`
@@ -18,9 +19,10 @@
 // La clase base de la unión (#99) se fija con el patrón canónico
 // `styles.name ?? "name"` (prohibidos `!` y `as`).
 //
-// Teclado (T2) y el cierre `expectNoA11yViolations` (T3, en las dos ramas de
-// tema) no van acá: tasks.md los asigna a las tareas siguientes (criterio
-// Separator/Sidebar de la fase); no se adelantan.
+// Diferidos: T2 (teclado nativo, RF-4) se agregó al final del archivo; el
+// cierre `expectNoA11yViolations` (T3, en las dos ramas de tema), los estilos
+// por tokens del módulo y `index.ts` siguen en T3 (tasks.md; criterio
+// Separator/Sidebar de la fase): no se adelantan.
 
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -58,8 +60,10 @@ describe("ThemeToggle light render (T1: RF-2, RF-3)", () => {
 
     // "Hecho cuando" de T1: <button> con aria-pressed según theme (claro →
     // "false", RF-2) y label darkModeLabel en claro (RF-3). `type="button"`
-    // (spec → plan → Interfaz): botón dentro de la futura ControlsBar, nunca
-    // de submit.
+    // viene de la convención real del repo (`Button` lo trae como atributo
+    // explícito de la API del <button>; spec → Anatomía: "un único <button>"
+    // — NO de "plan → Interfaz", que solo fija las props): botón dentro de la
+    // futura ControlsBar, nunca de submit.
     const button = screen.getByRole("button", { name: DARK_LABEL });
     expect(button).toHaveAttribute("type", "button");
     expect(button).toHaveAttribute("aria-pressed", "false");
@@ -124,5 +128,46 @@ describe("ThemeToggle className joining (T1: spec → API, G-B)", () => {
     const button = screen.getByRole("button", { name: DARK_LABEL });
     expect(button).toHaveClass(themeToggleClass);
     expect(button).toHaveClass(consumerClass);
+  });
+});
+
+describe("ThemeToggle keyboard operation (T2: RF-4)", () => {
+  // Decisión #101 (VERDE on-arrival, declarado): este escenario nace verde con
+  // el código de T1 porque la operatividad por teclado es NATIVA del <button>
+  // raíz (spec → Accesibilidad: "Opera con Enter/Espacio (nativo del
+  // <button>)"; spec → Tests esperados: "Teclado: foco con Tab y Espacio
+  // alterna"). El discrimen real de T2 es la INSPECCIÓN del reviewer: el
+  // componente NO declara handlers propios de teclado (onKeyDown/onKeyUp) —
+  // ThemeToggle.tsx solo tiene `onClick`—; fabricar un rojo leyendo el .tsx
+  // como texto desde el test está explícitamente descartado en #101
+  // (precedentes: Button T6 / Badge T3 / Overhead T3 / IconBox T3). Enter no
+  // se teste aparte: en un <button> comparte el activation behavior con
+  // Espacio y la spec no lo lista como escenario separado (no se inventa
+  // alcance). El anillo `focus-visible` de RF-4 es inspección del CSS en T3.
+  it("focuses with Tab and toggles with Space via native button activation", async () => {
+    const user = userEvent.setup();
+    renderToggle();
+
+    // Foco con Tab: el <button> es focusable nativo y único elemento del
+    // armazón.
+    await user.tab();
+    const button = screen.getByRole("button", { name: DARK_LABEL });
+    expect(button).toHaveFocus();
+
+    // Espacio alterna (RF-4 sobre la integración de RF-1/RF-2 ya fijada en
+    // T1): aria-pressed true, label pasa a lightModeLabel (RF-3), y el
+    // provider aplica data-theme/storage (G-A: el componente no los toca).
+    await user.keyboard(" ");
+    const pressedButton = screen.getByRole("button", { name: LIGHT_LABEL });
+    expect(pressedButton).toHaveAttribute("aria-pressed", "true");
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(localStorage.getItem("cv:theme")).toBe("dark");
+
+    // "alterna": un segundo Espacio vuelve a claro (toggle, no one-shot).
+    await user.keyboard(" ");
+    const releasedButton = screen.getByRole("button", { name: DARK_LABEL });
+    expect(releasedButton).toHaveAttribute("aria-pressed", "false");
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+    expect(localStorage.getItem("cv:theme")).toBe("light");
   });
 });
