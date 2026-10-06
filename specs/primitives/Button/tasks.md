@@ -5,7 +5,7 @@
     `type="button"` por defecto y `type="submit"` llega al DOM; verde tras
     `feat(Button): T1`.
 
-- [ ] **T2. `onClick` y `disabled`.** RF-3
+- [x] **T2. `onClick` y `disabled`.** RF-3 — 754288e
   - Hecho cuando: user-event invoca el handler; con `disabled` no se invoca y
     el `<button>` queda deshabilitado; verde tras `feat(Button): T2`.
 
