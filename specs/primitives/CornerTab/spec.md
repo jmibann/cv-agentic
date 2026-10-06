@@ -1,5 +1,5 @@
 # CornerTab
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
