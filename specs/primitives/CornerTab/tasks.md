@@ -15,7 +15,7 @@
     `--corner-tab-padding-inline` / literales fijos 2.75rem y 1.25rem)
     (inspección); verde tras `feat(CornerTab): T2`.
 
-- [ ] **T3. `placement="float"` y su `@media`.** RF-3, RF-4
+- [x] **T3. `placement="float"` y su `@media`.** RF-3, RF-4 — 1fa4dcd
   - Hecho cuando: `float` aplica su clase (P2) y `overlay` (default) no; el
     único `@media` del módulo es `(min-width: 992px)` con
     `position: relative; z-index: auto; float: right` + márgenes negativos de
