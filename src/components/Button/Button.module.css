@@ -1,17 +1,127 @@
-/* Button — specs/primitives/Button/spec.md → Estilos y tokens (T5).
-   El módulo nace con las dos clases que la spec fija para `size="small"` y
-   `fullWidth` (RF-6); la base del raíz (fondo --gradient-accent, tipografía,
-   radio, sombra, brillo ::before, focus-visible y disabled) llega en T6 con
-   sus pseudo-estados. Cero colores literales, cero @media propios: el
-   responsive de la base sale de --button-padding-* y --font-size-button
-   (spec → Responsive); los dos tokens de small son fijos por diseño
-   (tokens.css: "no escala"). */
+/* Button — specs/primitives/Button/spec.md → Estilos y tokens y Estados
+   (T5 trajo las clases de `size="small"` y `fullWidth`; T6 completa la clase
+   base del raíz — fondo, texto, radio, sombra y el brillo ::before — y los
+   pseudo-estados hover/active/focus-visible/disabled con sus transiciones).
+   Cero colores literales y cero @media propios (RF-5/RF-6): el responsive de
+   la base sale de --button-padding-* y --font-size-button, que escalan en
+   tokens/tokens.css (spec → Responsive); los valores de small son fijos por
+   diseño (tokens.css: "no escala). Las únicas medidas literales del módulo
+   (alto/ancho del brillo, gap, translateY y las opacidades 0.9/0.5) son las
+   que fija la tabla de la spec → Estilos y tokens y su sección Estados:
+   medidas internas de componente permitidas por la regla dura 2 de
+   docs/DESIGN.md, no valores inventados aquí. Verificación de pseudo-estados:
+   inspección + axe (RF-5; no son testeables en jsdom). */
 
-/* size="small" (spec → Estilos y tokens, columna `small`): padding con los
-   tokens fijos --button-small-padding-block/inline (10/16px) y SIN brillo:
-   el ::before de la base (que define T6) se anula con `content: none`
+/* Clase base del raíz (spec → Estilos y tokens; llega SIEMPRE primero en el
+   join de Button.tsx, antes de .small/.fullWidth y de la className externa).
+   Fondo --gradient-accent, texto --color-on-accent con --font-weight-regular y
+   --font-size-button, radio --radius-20, sombra --shadow-accent y padding con
+   --button-padding-block/inline (shorthand de la tabla; .small lo pisa por
+   orden). Borde: ninguno (tabla). Cursor pointer. Sin margen externo: el padre
+   posiciona con gap (specs/README.md → reglas comunes).
+   `position: relative; z-index: var(--z-base)`: el botón crea su propio
+   contexto de apilamiento para que el brillo ::before (z --z-below) no quede
+   detrás de la card (parenthetical de la fila Brillo de la spec).
+   `font-family`: los <button> no heredan la fuente del body (estilo de UA);
+   sin esto la fila Texto de la spec (--font-size-button/--font-weight-regular,
+   Poppins por --font-family) no resolvería en el botón.
+   Transiciones (spec → Estados + foundations/motion.md → Catálogo): hover
+   anima `opacity` y `box-shadow` con --duration-base; press anima `transform`
+   con --duration-fast; easing default --ease-standard. Propiedades concretas,
+   nunca `transition: all` (spec → No hacer). */
+.button {
+  position: relative;
+  z-index: var(--z-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: var(--button-padding-block) var(--button-padding-inline);
+  border: none;
+  border-radius: var(--radius-20);
+  background: var(--gradient-accent);
+  box-shadow: var(--shadow-accent);
+  color: var(--color-on-accent);
+  font-family: var(--font-family);
+  font-size: var(--font-size-button);
+  font-weight: var(--font-weight-regular);
+  cursor: pointer;
+  transition:
+    opacity var(--duration-base) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
+}
+
+/* Brillo difuso bajo el botón (spec → Anatomía y tabla, fila Brillo): el halo
+   lo da SOLO el blur del token --shadow-accent-glow (sin background), alto
+   1rem, ancho 64%, anclado abajo con `bottom: 0` (plan.md → decisión T-3) y
+   centrado en horizontal con left 50% + translateX (mecanismo de centrado; la
+   spec fija el resultado, no la sintaxis). `z-index: var(--z-below)`: dentro
+   del contexto de apilamiento del raíz queda tras el fondo del botón. */
+.button::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64%;
+  height: 1rem;
+  z-index: var(--z-below);
+  box-shadow: var(--shadow-accent-glow);
+  transition: box-shadow var(--duration-base) var(--ease-standard);
+}
+
+/* Hover (spec → Estados; motion.md → Catálogo "Hover de Button"): opacidad
+   0.9 (contraste registrado en docs/tokens/contrast.md: ≥ 4.92:1) y sombra y
+   brillo a `none`, ambos con transición --duration-base (declarada en la
+   base). `:not(:disabled)`: con `disabled` no hay efecto hover (RF-5 y spec →
+   Estados). En el <a> el guard es inofensivo: nunca está disabled (la unión
+   de la API no admite `disabled` con `href`). */
+.button:not(:disabled):hover {
+  opacity: 0.9;
+  box-shadow: none;
+}
+
+.button:not(:disabled):hover::before {
+  box-shadow: none;
+}
+
+/* Active (spec → Estados): press de 1px con --duration-fast (motion.md →
+   Catálogo "Press de Button / controles"). */
+.button:active {
+  transform: translateY(1px);
+}
+
+/* Focus-visible (RF-5, spec → Estados): anillo estándar del kit (regla dura 7
+   de docs/DESIGN.md: --focus-ring-width/--focus-ring-offset con
+   --color-focus-ring, solo :focus-visible) más la sombra de foco del token
+   --shadow-accent-focus. Después de hover para que el box-shadow de foco
+   gane cuando ambos estados coinciden. */
+.button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--shadow-accent-focus);
+}
+
+/* Disabled (RF-5, spec → Estados; solo aplica al <button>: la API excluye
+   `disabled` de la rama link). Opacidad 0.5 y cursor not-allowed; exento de
+   contraste (WCAG 1.4.3, docs/tokens/contrast.md). El hover ya queda fuera
+   por el :not(:disabled) de arriba. */
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* size="small" (spec → Estilos y tokens, columna `small`): tipografía
+   --font-size-small, gap mayor (0.5rem, "intencional: botón compacto centrado
+   en el ícono") y padding con los tokens fijos
+   --button-small-padding-block/inline (10/16px; longhand declarado después
+   del shorthand de la base: gana por orden con igual especificidad). SIN
+   brillo: el ::before de la base se anula con `content: none`
    (plan.md → decisión T-4). */
 .small {
+  font-size: var(--font-size-small);
+  gap: 0.5rem;
   padding-block: var(--button-small-padding-block);
   padding-inline: var(--button-small-padding-inline);
 }

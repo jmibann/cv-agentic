@@ -9,8 +9,11 @@
 // (`Icon` sin `label`, aria-hidden propio de Icon) y `iconPosition` resuelve
 // el orden REAL de nodos en el DOM (RF-4, RF-7). T5: `size="small"` y
 // `fullWidth` aplican su clase del módulo sobre el raíz de las dos ramas y se
-// unen a la `className` externa (RF-6; spec → API y Estilos y tokens). Diferido
-// a T6 según tasks.md: estilos base por tokens y pseudo-estados del módulo.
+// unen a la `className` externa (RF-6; spec → API y Estilos y tokens). T6: el
+// módulo define la clase base del raíz (fondo/tipografía/radio/sombra, brillo
+// ::before y pseudo-estados focus-visible/disabled, RF-5/RF-6) y esa clase
+// base SIEMPRE se une primero en el join, antes de las variantes y de la
+// externa; los estilos se aplican también al <a> (rama link sin `disabled`).
 
 import type { ReactNode } from "react";
 
@@ -71,23 +74,28 @@ export function Button(props: ButtonProps) {
       </>
     );
 
-  // T5 (RF-6, spec → API y Estilos y tokens): `size="small"` y `fullWidth`
-  // aplican su clase del módulo sobre el raíz y la `className` externa se UNE
-  // a ellas (spec → API: "se une a la clase base del elemento raíz (<button>
-  // o <a>)"). Las tres props viven en CommonProps, así que el mismo cálculo
-  // rige en las dos ramas. Mismo mecanismo de join ya aprobado en Icon/Box:
-  // array + filtro de undefined + join, sin librerías; clases del módulo
-  // primero y la externa después (precedente). Las clases del módulo son
-  // `string | undefined` bajo noUncheckedIndexedAccess. En T5 el módulo aún
-  // no define clase base para el raíz (eso entra en T6): sin clases de
-  // variante ni `className` externa se pasa `undefined` al atributo, no una
-  // cadena vacía.
+  // T5 (RF-6, spec → API y Estilos y tokens) + T6 (clase base del módulo):
+  // `size="small"` y `fullWidth` aplican su clase del módulo sobre el raíz y
+  // la `className` externa se UNE a ellas (spec → API: "se une a la clase
+  // base del elemento raíz (<button> o <a>)"). Las tres props viven en
+  // CommonProps, así que el mismo cálculo rige en las dos ramas. Mismo
+  // mecanismo de join ya aprobado en Icon/Box: array + filtro de undefined +
+  // join, sin librerías; clases del módulo primero y la externa después
+  // (precedente). Las clases del módulo son `string | undefined` bajo
+  // noUncheckedIndexedAccess. Con T6 el módulo define la clase base `.button`
+  // (fondo, tipografía, radio, sombra, brillo ::before y pseudo-estados), así
+  // que va SIEMPRE como primer elemento del array, antes de
+  // `.small`/`.fullWidth`: en el CSS los overrides de small vienen después
+  // (misma especificidad, gana por orden) y el atributo `class` ya no puede
+  // quedar vacío — el caso `undefined` de T5, cuando la clase base aún no
+  // existía, dejó de darse.
   const classParts = [
+    styles.button,
     props.size === "small" ? styles.small : undefined,
     props.fullWidth ? styles.fullWidth : undefined,
     props.className,
   ].filter((cls): cls is string => cls !== undefined);
-  const rootClassName = classParts.length > 0 ? classParts.join(" ") : undefined;
+  const rootClassName = classParts.join(" ");
 
   // T3 (RF-2, RF-8, RF-9): rama link. Comparar `href` contra `undefined`
   // angosta `props` a la variante con `href` de la unión discriminada, así
