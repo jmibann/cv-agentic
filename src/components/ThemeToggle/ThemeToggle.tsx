@@ -4,9 +4,12 @@
 // `aria-pressed` reflejando el tema, `aria-label` que nombra el modo al que se
 // va, ícono decorativo (luna en claro, sol en oscuro), `onClick` →
 // `toggleTheme()` y la `className` del consumidor UNIDA a la clase base del
-// raíz (G-B). Pendientes: T2 teclado nativo (RF-4), T3 estilos por tokens del
-// módulo (focus-visible, tamaño --size-control; RF-4/RF-5), `index.ts` y el
-// cierre a11y de los tests.
+// raíz (G-B). T2 hecha: teclado nativo del <button> (RF-4; sin handlers
+// propios — este archivo solo declara `onClick`). T3 hecha: estilos por tokens
+// en el módulo (focus-visible, tamaño --size-control, press; RF-4/RF-5),
+// `index.ts` y cierre a11y de los tests en las dos ramas de tema. El módulo
+// NO fija el tamaño del glifo ni cursor: los dos se resuelven por la tabla de
+// la spec (ver comentarios de ThemeToggle.module.css).
 // G-A / D3 (spec → No hacer): este componente NO lee ni escribe `localStorage`
 // ni toca `document.documentElement`/`data-theme`: la aplicación y la
 // persistencia (try/catch, clave cv:theme) son del ThemeProvider.

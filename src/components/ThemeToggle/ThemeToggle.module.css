@@ -1,15 +1,94 @@
-/* ThemeToggle — specs/controls/ThemeToggle/spec.md. T1: el módulo nace SOLO
-   con la clase base vacía para que la unión de `className` (G-B, #99) coexista
-   con una clase real desde el primer commit (precedente exacto Badge T2 /
-   IconBox T2; el "Hecho cuando" de T1 no inspecciona propiedades). Cero
-   colores literales y cero @media propios (spec → Responsive: tamaño fijo,
-   RF-5); sin margen externo (docs/DESIGN.md → Do/Don't). */
-
-/* Clase base del único elemento raíz (<button>, spec → Anatomía). TODAS las
-   propiedades por tokens de la tabla "Estilos y tokens" — tamaño
+/* ThemeToggle — specs/controls/ThemeToggle/spec.md. T3 completa la clase base
+   del único raíz con TODAS las propiedades de la tabla "Estilos y tokens" y de
+   la sección Estados (el diferido de T1/T2 queda hecho): tamaño
    --size-control cuadrado, fondo --color-surface-raised, borde 1px
-   --color-border, --radius-12, --shadow-control, color/hover, anillo
-   focus-visible y press con transición (RF-4/RF-5) — llegan en T3. */
+   --color-border, radio --radius-12, sombra --shadow-control, color
+   --color-text con hover --color-accent-text, anillo focus-visible estándar y
+   press de 1px con su transición (RF-4 anillo, RF-5). Cero colores literales
+   (regla 1 de docs/DESIGN.md) y cero @media propios (spec → Responsive: tamaño
+   fijo --size-control en todos los breakpoints; RF-5; el único literal de
+   medida del módulo es el 1px del borde, fijado textualmente por la tabla y
+   por Estados — ver el comentario de la base). Cero gradiente en el fondo y
+   cero sombra extra: el fondo es --color-surface-raised plano y la ÚNICA
+   sombra es --shadow-control (tabla, filas "Fondo" y "Sombra"). Sin margen
+   externo (docs/DESIGN.md → Do/Don't): el padre (ControlsBar) posiciona con
+   gap. Verificación de pseudo-estados (hover, focus-visible, active):
+   inspección del CSS + axe (spec → RF-4: "inspección del CSS"; los
+   pseudo-estados no son testeables en jsdom; criterio Button T6). */
+
+/* Clase base del único elemento raíz (<button>, spec → Anatomía: "Un único
+   <button> cuadrado de solo ícono"). Valores exactos de la tabla "Estilos y
+   tokens":
+   - Tamaño: --size-control en width y height (fila "Tamaño": 2.5rem cuadrado;
+     token que no escala por breakpoint — RF-5: el módulo no declara @media).
+   - Fondo --color-surface-raised (fila "Fondo"); el borde 1px --color-border
+     (fila "Borde") es OBLIGATORIO también en claro: en oscuro
+     surface-raised/surface es 1.14:1 y la regla 4 de docs/tokens/contrast.md
+     fija "--color-surface-raised siempre lleva borde de 1px --color-border"
+     (mismo criterio aprobado en CornerTab T4; comment de tokens.css, línea de
+     --color-border: "bordes 1px (CornerTab, controles)").
+   - El `1px` literal es la medida FIJA que define textualmente la tabla
+     ("Borde | 1px solid var(--color-border)"): no existe token genérico de
+     grosor de línea en tokens.css y docs/tokens/breakpoints.md permite
+     literales de medidas fijas "si su spec las define" (misma justificación
+     de Separator/CornerTab; también el 1px del translateY de Estados, abajo).
+   - Radio --radius-12, sombra --shadow-control, color --color-text (filas
+     "Radio", "Sombra", "Color").
+   - display/align/justify: necesidad MECÁNICA de centrar el glifo en la caja
+     cuadrada solo-ícono que fija la tabla (spec → Anatomía y filas "Tamaño" e
+     "Ícono"; sin flex el <svg> inline no se centra en la caja de 2.5rem). No
+     es un valor inventado ni pinta nada la tabla: criterio del display:block
+     mecánico aceptado en HexAvatar T2 ("no contradice ningún valor de la
+     tabla").
+   - Fila "Ícono" (tamaño --size-icon): NO se fija acá — lo resuelve la clase
+     base .icon de Icon con su fallback var(--size-icon) (T1 monta Icon sin
+     --icon-size; Icon.module.css, T5 de su spec).
+   - Sin cursor: pointer: ni la tabla ni Estados de ESTA spec lo listan (a
+     diferencia de Button, cuya spec lo declara explícito: "Cursor pointer");
+     la spec manda y no se inventa alcance (constitución; spec → No hacer).
+   - Transición: SOLO transform con --duration-fast/--ease-standard, literal
+     de la fila Active de Estados (G-E; docs/DESIGN.md prohíbe transition:
+     all). El hover no anima color: la spec no lo declara. Declarada en la
+     base (no en :active) para que también anime la vuelta del press
+     (mecanismo Button T6). */
 .themeToggle {
-  /* propiedades en T3 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-12);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-control);
+  color: var(--color-text);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+/* Hover (spec → Estados y fila "Color" de la tabla: --color-text →
+   --color-accent-text). Al no haber texto en el raíz, el color afecta al
+   glifo porque Icon tone="current" hereda el color del botón (T1; trazo
+   currentColor de lucide). Contraste registrado en docs/tokens/contrast.md:
+   accent-text sobre surface-raised 5.47 (claro) y 10.60 (oscuro) ✅. */
+.themeToggle:hover {
+  color: var(--color-accent-text);
+}
+
+/* Focus-visible (RF-4; spec → tabla y Estados): anillo estándar del kit,
+   literal exacto del de Button.module.css (--focus-ring-width solid
+   --color-focus-ring con --focus-ring-offset; regla dura 7 de docs/DESIGN.md,
+   solo en :focus-visible). Sin box-shadow de foco extra: la tabla fija como
+   única sombra --shadow-control (Button agrega --shadow-accent-focus porque
+   SU spec lo lista; esta no). */
+.themeToggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Active / press (spec → Estados, fila "Active (press)"): translateY(1px) con
+   la transición declarada en la base. El 1px es literal textual de la propia
+   fila ("transform: translateY(1px)"), medida fija definida por la spec y
+   permitida (mismo literal aceptado en Button; docs/tokens/breakpoints.md). */
+.themeToggle:active {
+  transform: translateY(1px);
 }
