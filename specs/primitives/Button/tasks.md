@@ -15,7 +15,7 @@
     explícito llega tal cual sin fusionar; `download` se transmite con su
     valor; verde tras `feat(Button): T3`.
 
-- [ ] **T4. Ícono decorativo y `iconPosition`.** RF-4, RF-7
+- [x] **T4. Ícono decorativo y `iconPosition`.** RF-4, RF-7 — cc7a5ed
   - Hecho cuando: `icon` renderiza `<svg>` con `aria-hidden` y el nombre
     accesible sigue siendo solo el texto; con `iconPosition="end"` el svg está
     **después** del label en el DOM (default: antes); verde tras `feat(Button): T4`.
