@@ -20,6 +20,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { Button } from "./Button";
 
+import styles from "./Button.module.css";
+
 describe("Button element branch (T1: RF-1)", () => {
   it("renders a <button> whose accessible name comes from children when no href is given", () => {
     const { getByRole } = render(<Button>Download CV</Button>);
@@ -278,5 +280,101 @@ describe("Button decorative icon and iconPosition (T4: RF-4, RF-7)", () => {
     expect(
       svg.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+});
+
+// Tests de T5 (specs/primitives/Button/tasks.md) — RF-6 y "Tests esperados"
+// de la spec: "size='small' y fullWidth aplican sus clases (aserción con el
+// criterio de CSS Modules de la fase)". El "Hecho cuando" de T5 fija además
+// que ambas clases del módulo se aplican SOBRE EL RAÍZ junto a la `className`
+// externa (spec → API: "se une a la clase base del elemento raíz (<button> o
+// <a>)"; `size`/`fullWidth`/`className` viven en CommonProps, así que rigen
+// en las dos ramas — mismo criterio con el que T4 cubrió el ícono en el <a>).
+// Los VALORES que la spec asigna a esas clases (padding small con
+// var(--button-small-padding-block/inline) y `::before { content: none }`;
+// `width: 100%`) se verifican por inspección del CSS (jsdom no calcula
+// estilos; P1 en manos del reviewer), acá se verifica el contrato de clases.
+//
+// Justificación de las queries (constitución T3): el raíz <button>/<a> expone
+// rol + nombre accesible (getByRole) y ES el elemento que lleva las clases,
+// sin data-testid. Las aserciones de clases siguen el patrón P2 canónico #99
+// (`styles.name ?? "name"` + `toHaveClass`; prohibidos `!` y `as string`): en
+// runtime el objeto `styles` es el mismo que importa el componente y el
+// fallback es solo de tipos bajo `noUncheckedIndexedAccess`.
+//
+// Defaults (`size` "default", `fullWidth` false; spec → API): la spec no
+// asigna ninguna clase al default —la tabla de Estilos y tokens solo nombra
+// `small` y `fullWidth`—, así que lo verificable es que omitidas las props el
+// raíz NO lleve esas clases.
+const smallClass = styles.small ?? "small";
+const fullWidthClass = styles.fullWidth ?? "fullWidth";
+
+describe("Button size, fullWidth classes and className join (T5: RF-6)", () => {
+  it("applies the module .small class on the <button> root when size=\"small\"", () => {
+    const { getByRole } = render(<Button size="small">Download CV</Button>);
+
+    // T5 "Hecho cuando": size="small" aplica su clase del módulo en el raíz.
+    expect(getByRole("button", { name: "Download CV" })).toHaveClass(
+      smallClass,
+    );
+  });
+
+  it("does not apply the size or fullWidth classes when the props are omitted (defaults)", () => {
+    const { getByRole } = render(<Button>Download CV</Button>);
+    const button = getByRole("button", { name: "Download CV" });
+
+    // Spec → API: default `size="default"` y `fullWidth={false}`; ninguna
+    // clase de la tabla les corresponde (solo `small` y `fullWidth`).
+    expect(button).not.toHaveClass(smallClass);
+    expect(button).not.toHaveClass(fullWidthClass);
+  });
+
+  it("applies the module .fullWidth class on the root when fullWidth is set", () => {
+    const { getByRole } = render(<Button fullWidth>Download CV</Button>);
+
+    // T5 "Hecho cuando": fullWidth → su clase del módulo (width: 100% en CSS).
+    expect(getByRole("button", { name: "Download CV" })).toHaveClass(
+      fullWidthClass,
+    );
+  });
+
+  it("joins the external className together with .small and .fullWidth on the same root", () => {
+    // Clase de consumidor (precedente Icon/Box: se UNE, no reemplaza; orden:
+    // clases del módulo primero, externa después).
+    const externalClass = "sidebar-download";
+    const { getByRole } = render(
+      <Button size="small" fullWidth className={externalClass}>
+        Download CV
+      </Button>,
+    );
+    const button = getByRole("button", { name: "Download CV" });
+
+    // T5 "Hecho cuando": ambas clases del módulo conviven con la className
+    // externa sobre el raíz.
+    expect(button).toHaveClass(smallClass);
+    expect(button).toHaveClass(fullWidthClass);
+    expect(button).toHaveClass(externalClass);
+  });
+
+  it("applies the classes and the joined className on the link branch root", () => {
+    const externalClass = "hero-download";
+    const { getByRole } = render(
+      <Button
+        href="/files/cv.pdf"
+        size="small"
+        fullWidth
+        className={externalClass}
+      >
+        Download CV
+      </Button>,
+    );
+    const link = getByRole("link", { name: "Download CV" });
+
+    // CommonProps (spec → API): size/fullWidth/className rigen también en el
+    // <a>; el docstring de `className` lo dice explícito ("el elemento raíz
+    // (<button> o <a>)"). No es un extra: es la aplicación completa de la API.
+    expect(link).toHaveClass(smallClass);
+    expect(link).toHaveClass(fullWidthClass);
+    expect(link).toHaveClass(externalClass);
   });
 });
