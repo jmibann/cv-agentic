@@ -20,7 +20,7 @@
     accesible sigue siendo solo el texto; con `iconPosition="end"` el svg está
     **después** del label en el DOM (default: antes); verde tras `feat(Button): T4`.
 
-- [ ] **T5. `size="small"` y `fullWidth` (clases).** RF-6
+- [x] **T5. `size="small"` y `fullWidth` (clases).** RF-6 — 1d69f14
   - Hecho cuando: ambas aplican su clase del módulo (P2) sobre el raíz junto a
     la `className` externa; el módulo resuelve small con
     `var(--button-small-padding-block/inline)` (existen en `tokens.css` —
