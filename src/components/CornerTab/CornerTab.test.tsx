@@ -41,6 +41,12 @@ import { CornerTab } from "./CornerTab";
 // aplicada y la coexistencia con la clase del consumidor en el raíz.
 import styles from "./CornerTab.module.css";
 
+// T4: helper de cierre a11y (constitución T4) y `Box variant="outer"` de
+// armazón para el escenario real (spec → Propósito: la tab vive pegada a la
+// esquina de un Box outer). Imports puros: no tocan los casos de T1–T3.
+import { expectNoA11yViolations } from "../../test/a11y";
+import { Box } from "../Box";
+
 // Patrón P2 canónico #99 (`styles.name ?? "name"`; prohibidos `!` y
 // `as string`): el fallback es solo de tipos bajo `noUncheckedIndexedAccess`.
 const cornerTabClass = styles.cornerTab ?? "cornerTab";
@@ -219,5 +225,56 @@ describe("CornerTab placement float class (T3: RF-3)", () => {
     const root = container.querySelector("div");
     expect(root).not.toBeNull();
     expect(root).not.toHaveClass(floatClass);
+  });
+});
+
+// Tests de T4 (specs/primitives/CornerTab/tasks.md) — cierre del archivo
+// (constitución T4; spec → "Tests esperados": "expectNoA11yViolations sin
+// violaciones"; "Hecho cuando" de T4: "archivo termina con
+// expectNoA11yViolations"). Dos casos, uno por escenario (precedente Separator
+// T3 `564911f`, mismo cierre de pieza):
+//
+// - CornerTab suelto con children de texto: lo que ya asiertean T1–T3 —el
+//   componente no conoce su contenedor y la spec → Accesibilidad no exige
+//   armazón—; axe confirma que el raíz `<div>` sin `role` ni ningún `aria-*`
+//   (RF-6, ya verificado por atributos en T1) no aporta violaciones.
+// - CornerTab dentro de un `Box variant="outer"` de armazón: escenario real
+//   (spec → Propósito: base visual de NavTabs y del botón Show Contacts de la
+//   card del Sidebar). Box en su default `as="div"` no añade roles
+//   (specs/primitives/Box), así que el armazón no introduce ruido de acceso;
+//   el botón conserva rol y nombre dentro de la tab (refuerzo de RF-6: los
+//   estados viven en el contenido).
+//
+// Decisión #101 (cierre axe sobre markup ya accesible): este describe nace
+// VERDE on-arrival con el markup de T1–T3 — el raíz ya era un `<div>` sin
+// `role` ni `aria-*` desde T1 y `size`/`placement` solo cambian clases —; en
+// T4 no queda nada discriminate-testable: fondo `--color-surface-raised`,
+// bordes 1px `--color-border` obligatorios, radio asimétrico y ausencia de
+// sombra (RF-5) y la visibilidad en todos los breakpoints de pantalla sin
+// `@media print` propio (RF-4) se verifican por INSPECCIÓN del CSS (jsdom no
+// lo computa; #101: leer el CSS como texto para fabricar un rojo está
+// explícitamente descartado) y el `index.ts` de la nota de cierre de pieza no
+// es observable por tests (llega en el `feat(CornerTab): T4`). Mismo criterio
+// declarado que Separator T3 (`564911f`) y Badge T3 (`514d1e7`).
+describe("CornerTab accessibility audit (T4: RF-6)", () => {
+  it("has no accessibility violations rendering a loose corner tab with text children", async () => {
+    const { container } = render(<CornerTab>Experience</CornerTab>);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations rendering a corner tab inside a Box outer scaffold", async () => {
+    // Escenario real (spec → Propósito): la solapa pegada a la esquina de la
+    // card con su contenido interactivo (Show Contacts: `size="sm"`, spec →
+    // API y tabla de tamaños).
+    const { container } = render(
+      <Box variant="outer">
+        <CornerTab size="sm">
+          <button type="button">Show Contacts</button>
+        </CornerTab>
+      </Box>,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
