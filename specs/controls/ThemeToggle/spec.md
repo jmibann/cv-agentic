@@ -1,5 +1,5 @@
 # ThemeToggle
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
