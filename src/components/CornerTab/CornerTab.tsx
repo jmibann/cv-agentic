@@ -11,21 +11,25 @@
 // Separator, acá tampoco `aria-hidden` (la tab envuelve contenido accesible).
 // T2 agrega las variantes `size` (RF-2): `.md`/`.sm` del módulo, default `md`
 // (spec → API), unidas a la base en el orden canon de la fase (base →
-// variante → externa). Diferidos según tasks.md: `placement="float"` y su
-// único `@media (min-width: 992px)` (T3), fondo `surface-raised`, bordes
-// obligatorios, radio asimétrico, layout interno, ausencia de sombra y cierre
-// `expectNoA11yViolations` + `index.ts` (T4).
+// variante → externa). T3 conecta `placement` (RF-3): default `"overlay"`
+// (spec → API) no aplica clase float; `placement="float"` aplica `.float`,
+// que solo pinta ≥ 992px (único `@media` del módulo; en < 992 la base sigue
+// rigiendo — RF-3; contenido del media y ausencia de `@media print` (RF-4)
+// por inspección: jsdom no lo computa, #101). Diferidos según tasks.md:
+// fondo `surface-raised`, bordes obligatorios, radio asimétrico, layout
+// interno, ausencia de sombra y cierre `expectNoA11yViolations` + `index.ts`
+// (T4).
 
 import type { ReactNode } from "react";
 
 import styles from "./CornerTab.module.css";
 
-// API (spec → API), completa desde T1. `placement` sigue **tipada sin
-// comportamiento** hasta T3 (no se destruye acá para no crear variables
-// muertas; precedente Separator T1, que tampoco destruía sus diferidas; la
-// firma recibirá el parámetro al conectarse). `size` se conecta en T2
-// (variante .md/.sm, default "md"). `children` y `className` se conectaron
-// en T1 ("Hecho cuando" y nota de tasks.md).
+// API (spec → API), completa desde T1. `placement` queda **tipada y conectada
+// en T3** (default "overlay"; RF-3: `float` aplica su clase del módulo). No se
+// destruyó antes de T3 para no crear variables muertas (precedente Separator
+// T1, que tampoco destruía sus diferidas). `size` se conecta en T2 (variante
+// .md/.sm, default "md"). `children` y `className` se conectaron en T1 ("Hecho
+// cuando" y nota de tasks.md).
 export interface CornerTabProps {
   children: ReactNode;
   /** "md": altura de nav (--size-nav-tab-height). "sm": compacta (Show
@@ -34,18 +38,25 @@ export interface CornerTabProps {
   /**
    * "overlay" (default): siempre posicionada en absoluto sobre la esquina.
    * "float": absoluta en < lg; en ≥ lg flota a la derecha (en el flujo).
-   * Solo lo usa NavTabs. (Comportamiento en T3.)
+   * Solo lo usa NavTabs. (Comportamiento conectado en T3.)
    */
   placement?: "overlay" | "float";
   /** Se une a la clase base del `<div>` raíz. */
   className?: string;
 }
 
-export function CornerTab({ children, className, size = "md" }: CornerTabProps) {
+export function CornerTab({
+  children,
+  className,
+  placement = "overlay",
+  size = "md",
+}: CornerTabProps) {
   // RF-1 (T1): la clase base `cornerTab` del módulo fija la posición de
-  // overlay (absolute/top/right/`--z-raised`); rige hoy para todo placement y
-  // en T3 `.float` la sobrescribe ≥ 992px (inspección del CSS; jsdom no la
-  // computa). `placement` (T3) aún no destruye: sin comportamiento.
+  // overlay (absolute/top/right/`--z-raised`). T3 (RF-3): para `float` la
+  // base sigue rigiendo en < 992px ("SI el viewport es < 992px, ENTONCES
+  // permanece absoluta") y `.float` la sobrescribe ≥ 992 dentro del único
+  // @media del módulo (inspección del CSS; jsdom no computa posición ni
+  // media queries — #101).
   // T2 (RF-2): `size` aplica su variante del módulo —mapa trivial como Box
   // (cada variante tiene su clase y SIEMPRE se aplica una: `sm` y `md` son
   // clases distintas; spec → "Tests esperados")—. Default `"md"` por
@@ -54,15 +65,28 @@ export function CornerTab({ children, className, size = "md" }: CornerTabProps) 
   // inspección del CSS: jsdom no carga hojas de estilos.
   const sizeClass = size === "sm" ? styles.sm : styles.md;
 
+  // T3 (RF-3): mapa `placement` → clase, mismo patrón que `size` (plan →
+  // Funciones puras: "mapa placement/size → clases"). Default `"overlay"` por
+  // destructuración (spec → API): NO aplica clase float; solo
+  // `placement="float"` la aplica. Los demás valores devuelven `undefined`,
+  // que el filtro de abajo descarta para que no queden clases vacías en el
+  // join.
+  const placementClass = placement === "float" ? styles.float : undefined;
+
   // T1 (spec → API, P2): la `className` del consumidor se UNE a la clase base
   // sobre el único elemento raíz (no la reemplaza). Mismo mecanismo aprobado
   // en Box/Icon/BrandIcon/Badge/IconBox/Overhead/Separator: array + filtro de
   // undefined + join, sin librerías; así no quedan clases vacías cuando
   // `className` no se pasa. Orden canon de la fase (Button T5/T6): base →
-  // variante (`size`; `placement` se insertará acá en T3) → className
-  // externa. Las clases del módulo son `string | undefined` bajo
+  // variante `size` → variante `placement` (T3) → className externa. Las
+  // clases del módulo son `string | undefined` bajo
   // noUncheckedIndexedAccess.
-  const rootClassName = [styles.cornerTab, sizeClass, className]
+  const rootClassName = [
+    styles.cornerTab,
+    sizeClass,
+    placementClass,
+    className,
+  ]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 

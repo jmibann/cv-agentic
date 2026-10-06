@@ -1,22 +1,26 @@
-/* CornerTab — specs/primitives/CornerTab/spec.md → Estilos y tokens (T1).
-   En T1 la clase base fija SOLO la fila "Posición" de la tabla de la spec
+/* CornerTab — specs/primitives/CornerTab/spec.md → Estilos y tokens (T1 base;
+   T2 variantes size; T3 placement float). En T1 la clase base fija SOLO la
+   fila "Posición" de la tabla de la spec
    (RF-1): absolute/top/right con `z-index: var(--z-raised)` (token; regla 2
    de docs/DESIGN.md; comment de tokens.css: "CornerTab sobre el contenido del
-   Box"). Cero colores literales, cero `@media` propios (el único `@media` del
-   módulo será el de `.float` en T3; RF-4: ninguna medida propia cambia por
-   breakpoint — `top`/`right` son 0, permitido por docs/tokens/breakpoints.md).
+   Box"). Cero colores literales; el único `@media` del módulo es el de
+   `.float` en T3 (RF-3; abajo) y ningún `@media print` propio (RF-4: la
+   oculta el estilo compartido de foundations/layout.md; resolución R-1 del
+   plan). Ninguna medida propia cambia por breakpoint — `top`/`right` son 0,
+   permitido por docs/tokens/breakpoints.md).
    Cero pseudo-estados :hover/:focus y cero transiciones (spec → Estados:
    ninguno propio; RF-6: hover/foco son del contenido). Sin margen externo
    (docs/DESIGN.md → Do/Don't): el padre posiciona con gap; en T3 `.float`
-   usará márgenes negativos de calc() sobre --box-padding (compensación del
+   usa márgenes negativos de calc() sobre --box-padding (compensación del
    padding del Box, excepción igual a Separator/SectionTitle, no margen de
-    espaciado). Nombres de variante: `.md`/`.sm` = valor exacto del prop
-    `size` (criterio de la fase: Button `.small`/`.fullWidth`, Box
-    `.outer`/`.inner`; registrado aquí según el encargo de T2). Diferidos:
-    fondo --color-surface-raised, bordes border-left/bottom 1px
-    --color-border (obligatorios, RF-5), radio 0/--radius-20/0/--radius-32,
-    layout interno flex y `display` (T4); `placement="float"` y su único
-    @media (T3). */
+   espaciado). Nombres de variante: `.md`/`.sm` = valor exacto del prop
+   `size` (criterio de la fase: Button `.small`/`.fullWidth`, Box
+   `.outer`/`.inner`; registrado aquí según el encargo de T2); `.float` =
+   valor exacto del prop `placement` (mismo criterio, encargo de T3).
+   Diferidos:
+   fondo --color-surface-raised, bordes border-left/bottom 1px
+   --color-border (obligatorios, RF-5), radio 0/--radius-20/0/--radius-32,
+   layout interno flex y `display` (T4). */
 
 /* Clase base del único elemento raíz (<div>, spec → Anatomía: un div
    posicionado dentro del Box, que es position: relative). Valores exactos de
@@ -50,4 +54,39 @@
 .sm {
   min-height: 2.75rem;
   padding-inline: 1.25rem;
+}
+
+/* placement="float" (RF-3, T3): ÚNICO @media del módulo, el de `lg`
+   (min-width: 992px) fijado por spec → Responsive (el literal 992px dentro
+   del @media es la forma canónica: "Los @media no aceptan custom properties,
+   así que se escriben literales" — docs/tokens/breakpoints.md → Reglas; y es
+   uno de los cuatro valores de ancho permitidos).
+   FUERA del @media la clase .float NO pinta nada: RF-3 (spec) — "SI el
+   viewport es < 992px, ENTONCES permanece absoluta" —, así que en < 992 la
+   base `.cornerTab` de T1 (absolute/top/right/--z-raised) sigue rigiendo
+   también para float. Por eso `.float` se declara SOLO dentro del @media
+   (bloque textual de spec → Responsive): fuera de él la clase no pinta nada
+   (encargo de T3: "la clase `.float` NO pinta nada sin el media"); no hace
+   falta una regla vacía adicional.
+   Dentro del @media solo cambios de posicionamiento/float (layout) y medidas
+   que son tokens, calc() de tokens o 0 (docs/tokens/breakpoints.md → Reglas;
+   plan → Decisiones): position: relative y z-index: auto salen del absoluto y
+   del apilamiento (resolución R-2 del plan: descartado conservar --z-raised,
+   apilaría en el flujo sin necesidad; `auto` es keyword, no un literal
+   numérico); los márgenes negativos de calc() sobre --box-padding compensan
+   el padding del Box para que la tab siga pegada a la esquina (excepción de
+   margen ya documentada en la cabecera del módulo) y --space-6 da el aire
+   entre el h1 y la tab (spec → Responsive, bloque textual `.float`, replicado
+   aquí literalmente).
+   RF-4: ningún @media print propio — en impresión la oculta el estilo
+   compartido de foundations/layout.md (plan → Decisiones, resolución R-1). */
+@media (min-width: 992px) {
+  .float {
+    position: relative; /* sale del absoluto; sigue anclada a la esquina */
+    z-index: auto; /* en el flujo no apila (RF-3) */
+    float: right;
+    margin-top: calc(var(--box-padding) * -1);
+    margin-right: calc(var(--box-padding) * -1);
+    margin-left: var(--space-6); /* aire entre el h1 y la tab */
+  }
 }
