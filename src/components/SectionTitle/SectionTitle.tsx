@@ -8,13 +8,19 @@
 // tamaño sigue al nivel, no a la tipografía global por etiqueta).
 // T3 hecha: `decorated` une la clase `.decorated` del módulo a la clase base
 // de nivel en el heading raíz (RF-2: la barra la dibuja su `::after` puro en
-// CSS, sin contenido textual; el `margin-bottom` de RF-5 llega en T5).
+// CSS, sin contenido textual; el `margin-bottom` de RF-5 se conectó en T5).
 // T4 hecha: `icon` monta un `IconBox` como PRIMER hijo del heading (antes del
 // texto, en orden de DOM; RF-3: decorativo por su `aria-hidden`, no altera el
 // nombre accesible) y une la clase `.withIcon` —el flex va en el propio
 // heading, sin wrapper (spec → "with icon")—. `decorated` + `icon` es
 // combinación válida: ambas clases coexisten (spec → "decorated + icon").
-// Diferidos según tasks.md: unión de `className` y márgenes RF-5 (T5).
+// T5 hecha: la `className` externa se UNE al final de la composición del
+// heading raíz (spec → API: "se une a la clase base del heading"; orden de la
+// fase: base de nivel, decorated/withIcon si aplican, externa al final;
+// precedente Box/Icon/Badge/Overhead/IconBox). Los márgenes RF-5 viven en el
+// módulo (`.h2`/`.h3` y `.h1.decorated`; inspección: jsdom no computa
+// márgenes) y `index.ts` re-exporta la superficie pública (nota de cierre de
+// pieza en tasks.md).
 
 import type { ReactNode } from "react";
 
@@ -23,13 +29,13 @@ import type { IconName } from "../Icon";
 
 import styles from "./SectionTitle.module.css";
 
-// API (spec → API): `as` obligatorio (el nivel lo decide el contexto; RF-1:
-// nunca se infiere del tamaño), `children`, `id` (RF-4). `decorated` conectado
-// en T3 (RF-2: clase `.decorated` cuya barra `::after` es puro CSS; el
-// `margin-bottom: var(--title-decorated-gap)` de RF-5 corresponde a T5), `icon`
-// se conecta en T4 (IconBox a la izquierda en el propio heading, sin alterar
-// el nombre accesible) y `className` en T5 (unión a la clase base del heading
-// raíz).
+// API (spec → API), completa tras T5: `as` obligatorio (el nivel lo decide el
+// contexto; RF-1: nunca se infiere del tamaño), `children`, `id` (RF-4),
+// `decorated` (T3; RF-2: clase `.decorated` cuya barra `::after` es puro CSS;
+// el `margin-bottom: var(--title-decorated-gap)` de RF-5 vive en el módulo,
+// anclado a `.h1.decorated`, T5), `icon` (T4: IconBox a la izquierda en el
+// propio heading, sin alterar el nombre accesible) y `className` (T5: unida al
+// final de la composición de la clase base del heading raíz).
 export interface SectionTitleProps {
   as: "h1" | "h2" | "h3";
   children: ReactNode;
@@ -40,7 +46,7 @@ export interface SectionTitleProps {
   /** Para `aria-labelledby` de la sección (RF-4). */
   id?: string;
   /** Se une a la clase base del heading (el elemento raíz; sin wrapper)
-   * (comportamiento en T5). */
+   * (unión conectada en T5, al final de la composición). */
   className?: string;
 }
 
@@ -50,6 +56,7 @@ export function SectionTitle({
   id,
   decorated,
   icon,
+  className,
 }: SectionTitleProps) {
   // RF-1: el nivel viene de `as` sin conversión (mismo patrón `const El = as`
   // de Overhead; la unión es de intrinsic elements y React acepta cualquiera
@@ -65,8 +72,10 @@ export function SectionTitle({
   // `::after` en CSS: sin nodos extra, sin alterar el nombre accesible).
   // Mismo mecanismo aprobado en Box/Icon/BrandIcon/Badge/Overhead/IconBox:
   // array + filtro de undefined + join, base primero; así no quedan clases
-  // vacías. La unión de la `className` externa NO se conecta todavía (T5,
-  // P2 completo).
+  // vacías. T5: la `className` externa se agrega AL FINAL de la composición
+  // (spec → API: "se une a la clase base del heading"; precedente IconBox/
+  // Badge: base primero, externa después; el orden del atributo `class` no
+  // resuelve especificidad, rige la hoja de estilos).
   // T4 (RF-3, spec → Estilos y tokens "with icon"): con `icon` se UNE además
   // `.withIcon` (el flex en el propio heading). `decorated` + `icon` es
   // combinación válida (spec → "decorated + icon"): ambas clases coexisten
@@ -77,6 +86,7 @@ export function SectionTitle({
     styles[as],
     decorated ? styles.decorated : undefined,
     icon ? styles.withIcon : undefined,
+    className,
   ]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");

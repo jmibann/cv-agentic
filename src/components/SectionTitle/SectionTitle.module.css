@@ -6,31 +6,68 @@
    barra de gradiente (RF-2) y .withIcon con el flex sobre el propio heading
    (RF-3; spec → "with icon": sin wrapper). Cero literales de px y cero @media
    propios (RF-6: --font-size-h1/2/3 y --size-title-bar-*/--title-bar-offset
-   escalan dentro de tokens/tokens.css; spec → Responsive). Quedan diferidos
-   (tasks.md): los márgenes RF-5 (margin-bottom de .decorated incluido) y la
-   unión de className externa en T5. */
+   escalan dentro de tokens/tokens.css; spec → Responsive). T5 conecta los
+   márgenes RF-5 (margin-bottom de .h2/.h3 y de la combinación .h1.decorated;
+   verificación por inspección: jsdom no computa márgenes) y la unión de
+   className externa en el .tsx. Los literales 1.25rem/0.5rem NO violan RF-6:
+   son los literales fijados textualmente por RF-5 (spec → RF-6: "los márgenes
+   título→contenido son los literales de RF-5"; plan → Decisiones: descartado
+   crear tokens nuevos porque no escalan por breakpoint). */
+
+/* T5 añade los márgenes RF-5 (spec → RF-5, cita: "h1 **decorado**
+   --title-decorated-gap (un h1 sin `decorated` toma el margen global de
+   headings, foundations/typography.md), h2 `1.25rem`, h3 `0.5rem`"): son la
+   ÚNICA excepción a "sin margen externo" (spec → Propósito; docs/DESIGN.md →
+   Do/Don't) y los literales 1.25rem/0.5rem los fija textualmente la spec
+   (RF-5/RF-6; plan → Decisiones: "márgenes título→contenido son los literales
+   de RF-5"; descartado: tokens nuevos, no escalan por breakpoint). Ningún
+   OTRO margen se declara. Verificación: inspección (jsdom no computa
+   márgenes; #101). */
 
 /* Nivel h1: tamaño exacto de --font-size-h1 (24px < 580 → 32px ≥ 580, salto
-   definido en tokens/tokens.css;RF-6). */
+   definido en tokens/tokens.css;RF-6). Sin margin-bottom propio: un h1 NO
+   decorado toma el margen global de headings (RF-5; plan → Decisiones S-1;
+   foundations/typography.md → "Márgenes de títulos"). El decorado lo recibe
+   anclado a .h1.decorated más abajo. */
 .h1 {
   font-size: var(--font-size-h1);
 }
 
-/* Nivel h2: tamaño exacto de --font-size-h2 (18px < 580 → 24px ≥ 580). */
+/* Nivel h2: tamaño exacto de --font-size-h2 (18px < 580 → 24px ≥ 580) y
+   margen título→contenido de RF-5 (literal fijado por la spec). Aplica también
+   al h2 decorated: "El margen sigue la regla RF-5 por nivel" (spec →
+   "decorated + icon"). */
 .h2 {
   font-size: var(--font-size-h2);
+  margin-bottom: 1.25rem;
 }
 
-/* Nivel h3: tamaño exacto de --font-size-h3 (16px < 580 → 18px ≥ 580). */
+/* Nivel h3: tamaño exacto de --font-size-h3 (16px < 580 → 18px ≥ 580) y margen
+   RF-5 (literal fijado por la spec). */
 .h3 {
   font-size: var(--font-size-h3);
+  margin-bottom: 0.5rem;
 }
 
 /* decorated (T3, RF-2; spec → Estilos y tokens "decorated"): ancla el ::after
-   de la barra. Solo `position: relative`: el `margin-bottom:
-   var(--title-decorated-gap)` corresponde a RF-5 y llega en T5 (tasks.md). */
+   de la barra. Solo `position: relative`: el margen del h1 decorado (RF-5)
+   vive en la regla compuesta .h1.decorated, más abajo (T5). */
 .decorated {
   position: relative;
+}
+
+/* margen del h1 decorado (T5, RF-5; spec → RF-5, cita: "h1 **decorado**
+   --title-decorated-gap (un h1 sin `decorated` toma el margen global de
+   headings, foundations/typography.md)"). DECISIÓN de expresión: regla
+   compuesta .h1.decorated, NO un margin-bottom dentro de .decorated a secas:
+   decorated + icon es combinación válida también sobre h2/h3 y "El margen
+   sigue la regla RF-5 por nivel" (spec → "decorated + icon"); un
+   margin-bottom en .decorated (especificidad 0-1-0) pelearía con el de .h2/
+   .h3 (misma especificidad) solo por orden de aparición. Anclado a la clase
+   de nivel, la compuesta (0-2-0) gana únicamente cuando el nivel es h1 Y hay
+   barra, y un h2/h3 decorated conserva el margen de su nivel. */
+.h1.decorated {
+  margin-bottom: var(--title-decorated-gap);
 }
 
 /* Barra de gradiente debajo del título (RF-2; spec → "No hacer": sin `<hr>` ni
@@ -58,7 +95,8 @@
    IconBox a la izquierda y texto a continuación, separados por
    gap: var(--space-4) (1rem; único espaciado interno, sin márgenes en los
    hijos — "gap del padre para espaciar", DESIGN → Do/Don't; el margen externo
-   de RF-5 llega en T5). Alineación centrada por align-items: center. Sin
+   de RF-5 lo aportan .h2/.h3 y .h1.decorated, no esta clase). Alineación
+   centrada por align-items: center. Sin
    @media ni literales: --space-4 escala en tokens/tokens.css (RF-6).
    decorated + icon es combinación válida (spec → "decorated + icon"): ambas
    clases coexisten en el mismo heading; la barra ::after se ancla al borde
