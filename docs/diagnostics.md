@@ -2,8 +2,8 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
-los hashes de los commits relevantes. Última actualización: **2026-10-05**
-(saneado del archivo + regla de mantenimiento + entrada #100 con poda #98).
+los hashes de los commits relevantes. Última actualización: **2026-10-06**
+(cierre de F2; poda #98 de las entradas de decisión 2026-10-04/05).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
 `docs/memory.md` · decisiones #1–#98 → `docs/README.md` · QA de F5 →
@@ -43,55 +43,47 @@ de la entrada); el detalle queda en git.
 |---|---|---|
 | F8 | `--size-avatar-sidebar: 9rem` (≥ 768) es **provisional** en `tokens/tokens.css`; el valor final se fija con la captura de referencia | QA visual de F5 |
 | F5 | QA visual completa (4 viewports × 2 temas × 2 idiomas); informe en `docs/qa-report.md` (#85) | F5 |
-| Deudas menores de F1 | `StrictMode` sin mandato, `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md` | Sin fecha (se reevalúan en F2) |
+| Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
+| Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
 
-### 2026-10-05 · Decisión #101 — tareas solo-inspección: rojo no exigible (en curso F2; no es puerta F)
+### §IX · 2026-10-06 — Cierre de F2
 
-- Qué: al cerrar Box, el reviewer detecta que T4 (RF-4/5/6 por inspección + cierre
-  a11y sobre markup ya accesible; jsdom no carga CSS) no podía tener un `test(T4)`
-  en rojo sin inventar alcance. El usuario aprueba la regla: en tareas cuyo alcance
-  de test no discrimina el estado de la implementación, el rojo **no es exigible**;
-  el `test` declara el porqué y la verificación real es la inspección del reviewer.
-  P4 intacto para tareas con comportamiento observable nuevo (Icon T5 sí fue rojo).
-- Checks: n/a (decisión de proceso; repo verde al registrar: lint ✓ · typecheck ✓ · test 154/154 ✓ · build ✓ al cerrar Box).
-- Decisiones: **#101** → registro + `docs/memory.md`; se transmite en los encargos F2–F4 de tareas 100 % inspección.
-- Commits: Box T4 `a8c515d` (precedente), spec `implementada` `aaab301`.
-- Abre: nada; cierra: la duda de proceso planteada por el review de Box T4.
+- Qué: **F2 Primitivas cerrada (11/11)**: Icon, BrandIcon, Box, Button, Badge,
+  Overhead, IconBox, SectionTitle, Separator, CornerTab y HexAvatar con spec
+  `Estado: implementada`. Por pieza: revisión por tarea + revisión completa +
+  `build` ✅. Mecanismos aplicados: #99 (aserción P2), #100 (`BRAND_NAMES`),
+  #101 extendido en la práctica (verdes on-arrival declarados en Button T6,
+  Badge T3, Overhead T3/T4, SectionTitle T3/T5, Separator T3, CornerTab T4,
+  HexAvatar T3/T4; **commit único `feat` sin `test`** cuando no hay nada
+  discriminate-testable: IconBox T3). Decisiones de delegación registradas en
+  las notas de `tasks.md` (gaps de reparto de `index.ts` en todas y de
+  `className` en CornerTab T1, `31adfb5`). El reviewer validó `display: block`
+  en HexAvatar T2 como necesidad mecánica fiel (no Cambio) y recálculo propio
+  de la geometría de "Forma" en T1. Las restricciones de uso de primitivas
+  (Badge RF-6, Overhead RF-4, IconBox RF-5, Separator RF-4 gap, CornerTab
+  no-BFC y float ≥992, combo hover+focus Button, Safari/H-8, F8) se verifican
+  en F3/F4/F5 según sus specs.
+- Checks: lint ✓ · typecheck ✓ · test **236/236 (22 archivos)** ✓ · build ✓
+  por pieza y al cerrar (HEAD `1a0ec18`, árbol limpio).
+- Decisiones: ninguna nueva de regla en esta puerta; #99/#100/#101 ya
+  registrados (entradas podadas abajo; detalle en git). Deudas menores F2 →
+  tabla **Abiertos**.
+- Commits: specs `implementada` ×11 `ee9ee34` `765834a` `aaab301` `76c348d`
+  `1962e3f` `b2783f6` `cc2cb0d` `ac47b8e` `d21b3aa` `3a6da02` `1a0ec18`; feats
+  de HexAvatar `09c9e03` `9137a67` `bcfe9ec` `b0b2b2c`; docs de estado por
+  pieza (`d0da569` … `c5a7879`).
+- Abre: fila "Deudas menores de F2" en **Abiertos**; cierra: nada propio — la
+  fila de deudas de F1 se **reevaluó** y permanece; F8 y F5 siguen abiertos.
 
-### 2026-10-05 · Decisión #100 — `allowExportNames` extendido a `BRAND_NAMES` (en curso F2; no es puerta F)
+### 2026-10-05 · Decisión #101 — tareas solo-inspección: rojo no exigible · #101 · `git show 81ef2ff:docs/diagnostics.md`
 
-- Qué: BrandIcon T3 frena en lint: `react-refresh/only-export-components` marca el objeto
-  `BRAND_NAMES` exportado junto al componente (la tabla del plan y B-3 lo mandatan en el `.tsx`;
-  `allowConstantExport` solo exceptúa literales/plantillas/binarios). El usuario aprueba la
-  extensión A del mecanismo #96: `"BRAND_NAMES"` en `allowExportNames`. Lo aplica `foundation`
-  (dueño de configs, post-F1) y el builder cierra el `feat`. T3 luego **APROBADA** por el reviewer.
-- Checks: lint ✓ · typecheck ✓ · test ✓ (139/139; BrandIcon 43).
-- Decisiones: **#100** → registro + `docs/memory.md` (extensión de #96; nombre nuevo = aprobación del usuario).
-- Commits: `1e41bb6` (test T3) · `6d107c6` (chore eslint) · `8de4610` (feat T3) · docs `c3d97ce`.
-- Abre: nada; cierra: el freno de lint de T3. Además: el archivo pasaba de 150 líneas → se aplica la
-  poda de #98 (entraciones §VI, R–V y K–Q reducidas a una línea; detalle en git, hash `dd7b35b`).
+### 2026-10-05 · Decisión #100 — `allowExportNames` extendido a `BRAND_NAMES` · #100 · `git show d5f5bff:docs/diagnostics.md`
 
-### 2026-10-05 · Decisión #99 — patrón canónico de aserción P2 (en curso F2; no es puerta F)
+### 2026-10-05 · Decisión #99 — patrón canónico de aserción P2 · #99 · `git show e28fe86:docs/diagnostics.md`
 
-- Qué: Icon T3/T4 detecta fricción entre el criterio P2 y `noUncheckedIndexedAccess`
-  (`styles.x` es `string | undefined`); el reviewer la dictamina no debilitante y el
-  usuario fija el patrón canónico: `const c = styles.name ?? "name"` + `toHaveClass(c)`.
-- Descartado: helper en `src/test/` (sin dueño de escritura desde F1) y criterio libre por builder.
-- Decisiones: **#99** → registro + `docs/memory.md`; se transmite en cada encargo F2–F4.
-- Abre: nada; cierra: la duda metodológica de Icon T3/T4. Además, el usuario agregó
-  `--button-small-padding-*` a `tokens/tokens.css` (T-2=A de la Clarificación F2), aún **sin commitear**.
-
-### 2026-10-05 — Regla de mantenimiento del log (#98)
-
-- Qué: regla propia del archivo: entrada por puerta F o decisión de reglas con
-  el formato fijo, tabla **Abiertos** como único consolidado, sin secciones de
-  estado y poda a una línea por entrada pasadas las 150 líneas.
-- Decisiones: **#98** (texto replicado en la skill, `orchestrator.md`,
-  `AGENTS.md`, `docs/agent-system.md` y `docs/memory.md`).
-- Commits: el de este cambio (`docs(sdd): add diagnostics maintenance rule (#98)`).
-- Abre: no cierra ningún ítem de la tabla.
+### 2026-10-05 — Regla de mantenimiento del log · #98 · `git show 4730d8d:docs/diagnostics.md`
 
 ### §VIII · 2026-10-03 — Cierre de F1
 
