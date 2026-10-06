@@ -3,7 +3,7 @@
 - [x] **T1. Grupo con opciones por `LOCALES`.** RF-1, RF-4 — ce164bc
   - Hecho cuando: `getByRole("group", { name: label })` con dos botones en el orden de `LOCALES`, `textContent` "EN"/"ES", `aria-label` "English"/"Español" y `lang` propio en cada botón (tests); verde tras `feat(LanguageSwitcher): T1`.
 
-- [ ] **T2. Estado activo, `setLocale` y guard.** RF-2, RF-3, RF-5
+- [x] **T2. Estado activo, `setLocale` y guard.** RF-2, RF-3, RF-5 — 4aa9918
   - Hecho cuando: el botón del idioma activo (sembrado vía `document.documentElement.lang`) tiene `aria-pressed="true"`; click en el otro conmuta `aria-pressed` y llama `setLocale(next)` (mock espiado); click en el activo **no** llama `setLocale` (guard RF-3); Tab enfoca ambos botones en orden (RF-5); verde tras `feat(LanguageSwitcher): T2`.
 
 - [ ] **T3. Estilos por tokens y cierre a11y.** RF-6
