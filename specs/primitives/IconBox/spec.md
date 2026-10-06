@@ -1,5 +1,5 @@
 # IconBox
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
