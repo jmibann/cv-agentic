@@ -9,8 +9,10 @@
 // HexAvatar los montan como armazón (spec → Forma).
 // T2: el componente `HexAvatar` (RF-1) con la estructura exacta de
 // spec → Anatomía: `wrap > border > img` recibiendo el `src`.
-// Diferidos a su tarea: el `alt` del prop (hoy `""` fijo, coincidente con el
-// default de la API; T3, RF-2); `filter: drop-shadow` del wrap, tamaño fijo,
+// T3: el `alt` del prop conectado al `<img>` con default `""` (RF-2:
+// decorativa mientras no se pase `alt`; con `alt`, ese texto es el nombre
+// accesible).
+// Diferidos a su tarea: `filter: drop-shadow` del wrap, tamaño fijo,
 // `className` unida y cierre a11y (T4, RF-4/RF-5).
 
 import styles from "./HexAvatar.module.css";
@@ -93,21 +95,23 @@ export function HexAvatarDefs() {
   );
 }
 
-// HexAvatar — avatar hexagonal (RF-1, T2). Anatomía EXACTA de spec → Anatomía:
-// `<span class="wrap"> > <span class="border"> > <img class="image">`, sin
-// atributos extra (el `alt=""` fijo es el del HTML de la Anatomía y coincide
-// con el default de la API — RF-2 decorativo—; el prop `alt` se conecta en
-// T3). `className` no se destruye todavía: su unión al `wrap` es T4 (spec →
+// HexAvatar — avatar hexagonal (RF-1, T2; RF-2, T3). Anatomía EXACTA de
+// spec → Anatomía: `<span class="wrap"> > <span class="border"> > <img
+// class="image">`, sin atributos extra. El `alt` del prop se conecta al
+// `<img>` con default `""` (RF-2: MIENTRAS no se pase `alt`, imagen
+// decorativa; SI se pasa, ese texto queda como nombre accesible; el default
+// coincide con el `alt=""` del HTML de la Anatomía). `className` no se
+// destruye todavía: su unión al `wrap` es T4 (spec →
 // API; criterio Separator T1 / CornerTab, sin variables muertas). Las clases
 // del módulo llevan la geometría por inspección: tamaños sobre
 // `--size-testimonial-avatar-w/h`, offsets de 4 px del anillo y los
 // `clip-path: url(#hex-avatar-outer/inner)` que resuelven las defs de arriba
 // (RF-3; jsdom no los computa).
-export function HexAvatar({ src }: HexAvatarProps) {
+export function HexAvatar({ src, alt = "" }: HexAvatarProps) {
   return (
     <span className={styles.wrap}>
       <span className={styles.border}>
-        <img className={styles.image} src={src} alt="" />
+        <img className={styles.image} src={src} alt={alt} />
       </span>
     </span>
   );
