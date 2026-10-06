@@ -1,5 +1,5 @@
 # Overhead
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
