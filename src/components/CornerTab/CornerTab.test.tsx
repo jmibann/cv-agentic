@@ -167,3 +167,57 @@ describe("CornerTab size variants (T2: RF-2)", () => {
     expect(root).not.toHaveClass(smClass);
   });
 });
+
+// Tests de T3 (specs/primitives/CornerTab/tasks.md) — RF-3: `placement="float"`
+// y su `@media`. "Hecho cuando": `float` aplica su clase (P2) y `overlay`
+// (default) no (spec → "Tests esperados": "`placement='float'` aplica su
+// clase; default `overlay` no la aplica"). Lo testeable en jsdom es la
+// APLICACIÓN de la clase: el contenido del único `@media (min-width: 992px)`
+// del módulo (`position: relative; z-index: auto; float: right` + márgenes
+// negativos de calc() sobre --box-padding y margin-left: var(--space-6),
+// bloque textual de spec → Responsive) NO se computa en jsdom y queda por
+// INSPECCIÓN del CSS (decisiones #101 y RF-3; mismo criterio que RF-1 en T1 y
+// #99 para la aserción de clases). RF-4 tampoco discrimina acá: la ausencia
+// de `@media print` propio es por inspección (plan → Estrategia de tests).
+// La selección del raíz usa la misma query estructural justificada en T1
+// (el `<div>` raíz no tiene rol ni nombre accesibles por RF-6).
+const floatClass = styles.float ?? "float";
+
+describe("CornerTab placement float class (T3: RF-3)", () => {
+  it("applies the .float class when placement=\"float\"", () => {
+    // "Hecho cuando" de T3: con placement="float" el raíz aplica la clase
+    // float del módulo (P2; además conserva la clase base: la clase float
+    // solo la sobrescribe ≥ 992px por inspección — RF-3: en < 992 permanece
+    // absoluta).
+    const { container } = render(
+      <CornerTab placement="float">Experience</CornerTab>,
+    );
+
+    const root = container.querySelector("div");
+    expect(root).not.toBeNull();
+    expect(root).toHaveClass(floatClass);
+    expect(root).toHaveClass(cornerTabClass);
+  });
+
+  it("does not apply the .float class when placement is omitted (default overlay)", () => {
+    // spec → API: `placement` default "overlay"; spec → "Tests esperados":
+    // default `overlay` no aplica la clase float.
+    const { container } = render(<CornerTab>Experience</CornerTab>);
+
+    const root = container.querySelector("div");
+    expect(root).not.toBeNull();
+    expect(root).not.toHaveClass(floatClass);
+  });
+
+  it("does not apply the .float class when placement=\"overlay\" is passed explicitly", () => {
+    // `overlay` explícito se comporta igual que el default: solo posiciona
+    // en absoluto (RF-1), sin la clase float.
+    const { container } = render(
+      <CornerTab placement="overlay">Experience</CornerTab>,
+    );
+
+    const root = container.querySelector("div");
+    expect(root).not.toBeNull();
+    expect(root).not.toHaveClass(floatClass);
+  });
+});
