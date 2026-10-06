@@ -218,6 +218,48 @@ describe("HexAvatar structure and src (T2: RF-1)", () => {
   });
 });
 
+// Tests de T3 (specs/primitives/HexAvatar/tasks.md) — RF-2: `alt` decorativo
+// por defecto; con `alt`, ese texto es el nombre accesible. "Hecho cuando":
+// sin `alt` → `alt=""` y la imagen no aparece en `getByRole("img")` (spec →
+// "Tests esperados" #2); con `alt="Foto de X"` →
+// `getByRole("img", { name: "Foto de X" })` (spec → "Tests esperados" #3).
+// Rojo esperado (decisión #101): en el commit `test(HexAvatar): T3` el
+// componente tiene `alt=""` literal fijo (diferido declarado en T2), así que
+// el caso con nombre falla por nombre accesible ausente; el caso decorativo
+// pasa desde el inicio porque `""` es también el default de la API (spec →
+// API) — no es un assert debilitado: #2 exige exactamente ese comportamiento
+// y el discriminate real de la tarea es el caso con nombre.
+//
+// Justificación de las queries (constitución T3): el caso con nombre usa
+// rol + nombre accesible (`getByRole("img", { name })`, precedente Icon). El
+// caso decorativo necesita dos manos: la AUSENCIA se aserta por rol
+// (`queryByRole("img")` → null: un `<img>` con `alt=""` queda fuera del árbol
+// de accesibilidad) y el literal `alt=""` exige acceder al elemento excluido
+// de ese árbol, donde toda query por rol está prohibida por definición →
+// selección estructural `querySelector("img")`, el mismo criterio justificado
+// en T2 y en Icon T2 (svg decorativo).
+
+describe("HexAvatar alt (T3: RF-2)", () => {
+  it('defaults to a decorative image: alt="" and absent from getByRole("img")', () => {
+    const { container, queryByRole } = render(<HexAvatar src="/x.png" />);
+
+    // Spec → "Tests esperados" #2: sin `alt` → `alt=""`...
+    const img = container.querySelector("img");
+    expect(img).not.toBeNull();
+    expect(img).toHaveAttribute("alt", "");
+    // ...y la imagen no aparece en getByRole("img") (RF-2: decorativa).
+    expect(queryByRole("img")).toBeNull();
+  });
+
+  it("exposes the alt prop as the accessible name", () => {
+    const { getByRole } = render(<HexAvatar src="/x.png" alt="Foto de X" />);
+
+    // Spec → "Tests esperados" #3 / RF-2: el texto del prop queda como
+    // nombre accesible de la imagen.
+    expect(getByRole("img", { name: "Foto de X" })).toBeInTheDocument();
+  });
+});
+
 // Cierre `expectNoA11yViolations`: diferido a T4 por tasks.md ("archivo
 // termina con expectNoA11yViolations" en T4; patrón Separator/CornerTab).
 // No se adelanta: los commits `test` solo agregan tests de su tarea.
