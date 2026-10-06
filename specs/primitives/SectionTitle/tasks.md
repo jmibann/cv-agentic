@@ -4,7 +4,7 @@
   - Hecho cuando: `as="h1| h2| h3"` renderiza `getByRole("heading", { level,
     name })` y `id` llega al heading; verde tras `feat(SectionTitle): T1`.
 
-- [ ] **T2. Tamaño por nivel desde el módulo.** RF-1
+- [x] **T2. Tamaño por nivel desde el módulo.** RF-1 — 4b6c08a
   - Hecho cuando: cada nivel aplica su clase `.h1/.h2/.h3` (P2) con
     `font-size: var(--font-size-h1/2/3)` (inspección: sin literales de px);
     verde tras `feat(SectionTitle): T2`.
