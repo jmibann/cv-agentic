@@ -15,15 +15,26 @@
 // `container.querySelector`, el mismo criterio estructural justificado en
 // IconBox/Overhead.
 //
-// Diferidos a su tarea según tasks.md: línea 1px `--color-track`, full-bleed,
-// `margin-block: var(--separator-gap)` y unión de `className` al raíz (T2) y
-// cierre `expectNoA11yViolations` (T3; tasks.md lo asigna explícitamente a la
-// última tarea, patrón de diferido de Overhead/Badge).
+// Diferido a su tarea según tasks.md: cierre `expectNoA11yViolations` (T3;
+// tasks.md lo asigna explícitamente a la última tarea, patrón de diferido de
+// Overhead/Badge). Los valores del módulo de T2 (línea 1px `--color-track`,
+// full-bleed y `margin-block: var(--separator-gap)`; RF-3/RF-4/RF-5) se
+// verifican por **inspección del CSS** (jsdom no los computa; spec → "Tests
+// esperados"; decisión #101: el `test(Separator): T2` solo discrimina la
+// unión de `className`, que es la parte discriminate-testable de la tarea).
 
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { Separator } from "./Separator";
+
+// T2: el test importa el módulo solo para fijar el nombre real de la clase
+// base (`separator`, resuelto por CSS Modules en runtime) y asierte la
+// coexistencia con la clase del consumidor en el raíz (precedente IconBox/
+// Badge: el módulo nace con el `feat` de T2; en el commit `test` este import
+// queda rojo por "Failed to resolve import ./Separator.module.css", rojo
+// legítimo del mismo patrón aprobado en IconBox T2).
+import styles from "./Separator.module.css";
 
 describe("Separator decorative root (T1: RF-1, RF-2)", () => {
   it('renders a div root marked decorative with aria-hidden="true"', () => {
@@ -58,3 +69,44 @@ describe("Separator decorative root (T1: RF-1, RF-2)", () => {
     expect(root).not.toHaveAttribute("role");
   });
 });
+
+// Tests de T2 (specs/primitives/Separator/tasks.md) — unión de `className` al
+// único raíz (spec → API; plan → Interfaz: "`className` unida al raíz (P2)";
+// "Hecho cuando" de T2: "`className` se une al raíz"). El resto del "Hecho
+// cuando" (alto 1px, `--color-track`, full-bleed con `calc()` de
+// `--box-padding`, `margin-block: var(--separator-gap)`, sin `@media` propios)
+// es inspección del CSS (decisión #101).
+//
+// Justificación de las queries (constitución T3): como en T1, el Separator es
+// puramente decorativo (`aria-hidden="true"`), su raíz no expone rol ni nombre
+// accesible y la API de la spec no define `data-testid`; se reutiliza la query
+// estructural ya justificada (`container.querySelector("div")`: el raíz es el
+// único <div>; spec → Anatomía). La aserción de la clase sigue el patrón P2
+// canónico #99 (`styles.name ?? "name"` + `toHaveClass`; prohibidos `!` y
+// `as string`): en runtime el objeto `styles` es el mismo que importa el
+// componente y el fallback es solo de tipos bajo `noUncheckedIndexedAccess`.
+// El orden en el atributo `class` no se verifica (precedente Box/Icon/Badge/
+// IconBox): la coexistencia es el contrato; ante conflictos rige la hoja de
+// estilos.
+const separatorClass = styles.separator ?? "separator";
+
+describe("Separator className joining (T2)", () => {
+  it("joins an external className to the base class on the root div", () => {
+    const consumerClass = "sidebar-separator";
+
+    const { container } = render(<Separator className={consumerClass} />);
+
+    // Unión (spec → API, P2): la clase externa coexiste con la base
+    // (`separator`) en el único elemento raíz (composición base primero +
+    // externa después, canon de la fase: Badge/IconBox/Overhead).
+    const root = container.querySelector("div");
+
+    expect(root).not.toBeNull();
+    expect(root).toHaveClass(separatorClass);
+    expect(root).toHaveClass(consumerClass);
+  });
+});
+
+// El cierre del archivo (constitución T4, spec → "Tests esperados":
+// `expectNoA11yViolations`) se agrega en T3 (tasks.md lo asigna a la última
+// tarea): ese describe final irá aquí.
