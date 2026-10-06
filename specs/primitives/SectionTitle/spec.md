@@ -1,5 +1,5 @@
 # SectionTitle
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
