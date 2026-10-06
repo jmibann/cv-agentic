@@ -36,6 +36,10 @@ import styles from "./SectionTitle.module.css";
 const h1Class = styles.h1 ?? "h1";
 const h2Class = styles.h2 ?? "h2";
 const h3Class = styles.h3 ?? "h3";
+// T3: misma regla #99 para la clase `decorated` (el módulo la recibe con su
+// feat; en rojo, `styles.decorated` aún es undefined y el fallback
+// "decorated" es justo el nombre que el componente aún no aplica).
+const decoratedClass = styles.decorated ?? "decorated";
 
 describe("SectionTitle heading levels and id passthrough (T1: RF-1, RF-4)", () => {
   it("renders an h1 heading with the accessible name when as=\"h1\"", () => {
@@ -127,6 +131,55 @@ describe("SectionTitle level size classes from the module (T2: RF-1)", () => {
     const heading = getByRole("heading", { level: 3, name: "University" });
 
     expect(heading).toHaveClass(h3Class);
+  });
+});
+
+// Tests de T3 (specs/primitives/SectionTitle/tasks.md) — RF-2: `decorated`
+// aplica su clase al heading raíz (P2, criterio #99) y el nombre accesible del
+// heading NO cambia (spec → Accesibilidad: "la barra es `::after` (sin
+// contenido textual): no se lee"). El `::after` en sí (`content: ""`,
+// `--gradient-accent`, `--size-title-bar-*`, `bottom:
+// calc(var(--title-bar-offset) * -1)`) se verifica por inspección del CSS, no
+// leyendo el CSS como texto en un test (#101; jsdom no computa pseudo-elementos;
+// precedente Button: pseudo-elementos decorativos por inspección).
+//
+// Justificación de las queries (constitución T3): las mismas queries de rol ya
+// justificadas en T1 (`getByRole("heading", { level, name })`); el `name`
+// exacto ("About Me") con `decorated` afirma que el nombre accesible es
+// idéntico al de la versión sin decorar (T1/T2). La aserción de texto del
+// heading descarta barras con contenido textual real (`<hr>`/`<span>`,
+// prohibidos en spec → "No hacer").
+describe("SectionTitle decorated gradient bar (T3: RF-2)", () => {
+  it("applies the module decorated class to the root heading when decorated", () => {
+    const { getByRole } = render(
+      <SectionTitle as="h1" decorated>
+        About Me
+      </SectionTitle>,
+    );
+
+    // "Hecho cuando" de T3: la clase `decorated` del módulo se une a la clase
+    // base del nivel en el heading raíz (sin wrapper).
+    const heading = getByRole("heading", { level: 1, name: "About Me" });
+
+    expect(heading).toHaveClass(decoratedClass);
+    expect(heading).toHaveClass(h1Class);
+  });
+
+  it("keeps the same accessible name and text content when decorated", () => {
+    const { getByRole } = render(
+      <SectionTitle as="h1" decorated>
+        About Me
+      </SectionTitle>,
+    );
+
+    // RF-2 / spec → Accesibilidad: la barra es un `::after` sin contenido
+    // textual: no se lee. `getByRole` con el MISMO `name` que sin decorar
+    // (T1) discrimina por nombre accesible exacto; el texto del heading sigue
+    // siendo solo el `children` (no hay `<hr>` ni `<span>` con texto).
+    const heading = getByRole("heading", { level: 1, name: "About Me" });
+
+    expect(heading).toBeInTheDocument();
+    expect(heading.textContent).toBe("About Me");
   });
 });
 
