@@ -9,7 +9,7 @@
   - Hecho cuando: user-event invoca el handler; con `disabled` no se invoca y
     el `<button>` queda deshabilitado; verde tras `feat(Button): T2`.
 
-- [ ] **T3. Link: `href`, `rel` y `download`.** RF-2, RF-8, RF-9
+- [x] **T3. Link: `href`, `rel` y `download`.** RF-2, RF-8, RF-9 — c037d1c
   - Hecho cuando: con `href` renderiza `getByRole("link")` con ese `href`;
     `target="_blank"` sin `rel` agrega `noopener noreferrer`; un `rel`
     explícito llega tal cual sin fusionar; `download` se transmite con su
