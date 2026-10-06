@@ -1,6 +1,6 @@
 # Tareas — ThemeToggle
 
-- [ ] **T1. Render conectado a `useTheme()` (requiere Foundation T12).** RF-1, RF-2, RF-3, RF-6
+- [x] **T1. Render conectado a `useTheme()` (requiere Foundation T12).** RF-1, RF-2, RF-3, RF-6 — 79ffa1f
   - Hecho cuando: `<button>` con `aria-pressed` según `theme`, label `darkModeLabel` en claro / `lightModeLabel` en oscuro, ícono `lucide-moon` en claro y `lucide-sun` en oscuro, y click → `toggleTheme()` (integration: `dataset.theme` + storage cambian); el componente no referencia `localStorage` ni `document.documentElement` (inspección); verde tras `feat(ThemeToggle): T1`.
 
 - [ ] **T2. Teclado nativo.** RF-4
