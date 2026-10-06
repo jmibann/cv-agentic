@@ -10,8 +10,11 @@
 // `setLocale(code)` SOLO si el idioma no está activo (guard RF-3, decisión
 // 2=a del plan; spec → "No hacer"); RF-5 no pide código: ambos `<button>` son
 // tab stops consecutivos NATIVOS (no es radiogroup: sin roles de grupo, sin
-// manejo de flechas). T3 hará: estilos por tokens en el módulo, `index.ts` y
-// cierre a11y de los tests.
+// manejo de flechas). T3 hecha: estilos por tokens en el módulo (RF-6: grupo
+// segmentado + clase de botón `.option` con hover de inactivo, activo por
+// selector `[aria-pressed="true"]` con --gradient-accent/--color-on-accent,
+// anillo focus-visible y press con transición solo-transform; cero @media
+// propios), `index.ts` y cierre a11y del archivo de tests.
 // G-A / "No hacer" (spec): este componente NO lee ni escribe
 // `localStorage["cv:locale"]` ni toca `document.documentElement.lang`: la
 // aplicación del cambio y la persistencia son del LocaleProvider. "No hacer":
@@ -80,6 +83,12 @@ export function LanguageSwitcher({
   // "true", inactiva con "false") y `onClick` con el guard RF-3 (decisión 2=a:
   // click en el activo NO invoca setLocale). RF-5: sin código — dos botones
   // nativos son tab stops consecutivos; "No hacer": cero patrón radiogroup.
+  // T3 (RF-6): cada <button> recibe la clase base del módulo (`styles.option`);
+  // el estado activo NO es una clase: lo pinta el selector de atributo
+  // `.option[aria-pressed="true"]` del CSS (literal de la tabla "Estilos y
+  // tokens"; `aria-pressed` es la única fuente del estado — no se duplica en
+  // el DOM con una clase). La `className` externa del consumidor sigue solo
+  // en el raíz (G-B), nunca en los botones.
   return (
     <div role="group" aria-label={label} className={rootClassName}>
       {LOCALES.map((code) => {
@@ -89,6 +98,7 @@ export function LanguageSwitcher({
           <button
             key={code}
             type="button"
+            className={styles.option}
             lang={option.lang}
             aria-label={option.ariaLabel}
             aria-pressed={isActive}

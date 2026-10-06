@@ -1,21 +1,145 @@
-/* LanguageSwitcher — specs/controls/LanguageSwitcher/spec.md. T1: el módulo
-   nace SOLO con la clase base vacía para que la unión de `className` (G-B,
-   #99) coexista con una clase real desde el primer commit (precedente exacto
-   ThemeToggle T1 / Badge T2 / IconBox T2; el "Hecho cuando" de T1 no
-   inspecciona propiedades). Cero colores literales y cero @media propios
-   (spec → Responsive: tamaño fijo --size-control en todos los breakpoints,
-   RF-6); sin margen externo (docs/DESIGN.md → Do/Don't: ControlsBar separa con
-   gap). */
+/* LanguageSwitcher — specs/controls/LanguageSwitcher/spec.md. T3 completa el
+   módulo con TODAS las propiedades de la tabla "Estilos y tokens" y de la
+   sección Estados (el diferido de T1/T2 queda hecho): grupo segmentado (clase
+   base del raíz) y botón de opción (.option) con hover de inactivo, activo por
+   gradiente, anillo focus-visible y press de 1px con su transición (RF-6).
+   Cero colores literales (regla 1 de docs/DESIGN.md; único keyword permitido y
+   usado: transparent, regla 1) y cero @media propios (spec → Responsive:
+   tamaño fijo --size-control en todos los breakpoints; RF-6). Los únicos
+   literales de medida del módulo (0.1875rem, 0.125rem, 1px del borde, 2.25rem
+   y el 1px del translateY) son las medidas FIJAS que define textualmente la
+   tabla de la spec: docs/tokens/breakpoints.md las permite "si su spec las
+   define" (mismo criterio aprobado en ThemeToggle T3 / Separator / CornerTab).
+   Sin margen externo (docs/DESIGN.md → Do/Don't): el padre (ControlsBar)
+   posiciona con gap. Verificación de pseudo-estados (hover, focus-visible,
+   active) y del cero @media: inspección del CSS + axe (RF-6; no son testeables
+   en jsdom; criterio Button T6 / ThemeToggle T3). */
 
-/* Clase base del único elemento raíz (`div role="group"`, spec → Anatomía).
-   TODAS las propiedades por tokens de la tabla "Estilos y tokens" —
-   display: inline-flex, height --size-control, padding 0.1875rem, gap 0.125rem
-   (sin divisor, decisión 3 del plan), fondo --color-surface-raised, borde 1px
-   --color-border, --radius-12, --shadow-control, y las clases de botón
-   (min-width 2.25rem, --radius-8, --font-size-small/--font-weight-medium,
-   color --color-text → hover --color-accent-text, activo --gradient-accent +
-   --color-on-accent, anillo focus-visible, press con transición; RF-6 y
-   Estados) — llegan en T3. */
+/* Clase base del único elemento raíz (div role="group", spec → Anatomía:
+   control segmentado SIN divisor: la separación entre opciones es solo el
+   gap sobre el fondo del grupo — decisión 3 del plan). Valores exactos de la
+   fila "Grupo" de la tabla:
+   - display: inline-flex + height --size-control (2.5rem; token de tamaño que
+     NO escala por breakpoint — RF-6) + padding 0.1875rem (3px) + gap 0.125rem
+     (2px): literales de la propia fila (medidas fijas definidas por la spec;
+     breakpoints.md).
+   - Fondo --color-surface-raised, borde 1px solid --color-border, radio
+     --radius-12, sombra --shadow-control (filas "Grupo": la ÚNICA sombra del
+     control es esta; cero sombra extra en el botón). El borde 1px es
+     OBLIGATORIO también en claro: en oscuro surface-raised/surface es 1.14:1
+     y la regla 4 de docs/tokens/contrast.md fija "--color-surface-raised
+     siempre lleva borde de 1px --color-border" (mismo criterio de
+     ThemeToggle T3; comment de la línea --color-border en tokens.css:
+     "bordes 1px (CornerTab, controles)").
+   - Sin align-items: la tabla no lo lista y el stretch por defecto del grid/
+     flex es lo que hace que los botones llenen la altura interna del grupo
+     (necesidad mecánica resuelta por el default; criterio ThemeToggle T3 de
+     no inventar propiedades). */
 .languageSwitcher {
-  /* propiedades en T3 */
+  display: inline-flex;
+  height: var(--size-control);
+  padding: 0.1875rem;
+  gap: 0.125rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-12);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-control);
+}
+
+/* Botón de opción (.option, clase base que se aplica a AMBOS <button> desde
+   el tsx; la externa del consumidor sigue solo en el raíz — G-B). Criterio
+   "activo" (fila "Botón activo (aria-pressed=true)" de la tabla):
+   SELECTOR DE ATRIBUTO dentro del módulo, no clase de variante — la tabla
+   nombra literalmente el atributo DOM, que además es el estado único que el
+   componente ya expone (T2: aria-pressed={locale === code}). Comparado con
+   Button: allí las variantes de PROP (size/fullWidth) son clases porque
+   ningún atributo DOM las expresa, y los estados del DOM van por selector de
+   atributo/pseudo (:not(:disabled), :active) — coherencia con ese criterio.
+   Valores de la fila "Botón":
+   min-width 2.25rem (36px, literal de la tabla), padding-inline --space-2,
+   radio --radius-8, --font-size-small + --font-weight-medium, y color
+   --color-text (Estados: "Opción inactiva... sin fondo"; contraste
+   registrado en docs/tokens/contrast.md: text sobre surface-raised 8.31
+   claro / 11.57 oscuro ✅).
+   Resets del stylesheet UA del <button>, necesidad MECÁNICA (no pintan ningún
+   valor de la tabla; permiten que los fijados por la spec se vean; criterio
+   display:block de HexAvatar T2 y font-family de Button T6):
+   - border: none y background: transparent — la tabla no le da borde ni
+     fondo al botón y Estados fija "sin fondo" en la inactiva (Anatomía: la
+     separación es solo el gap SOBRE el fondo del grupo, que debe asomar;
+     transparent es keyword permitido por la regla 1 de DESIGN; mecanismo del
+     border: none de Button base).
+   - padding-block: 0 — la tabla solo fija padding-inline; el padding-block de
+     UA queda incontrolable y sobra: el botón se estira (align por defecto) a
+     la altura interna del grupo.
+   - font-family: var(--font-family) — los <button> no heredan la fuente del
+     body (estilo de UA); sin esto la fila "Botón" (--font-size-small/
+     --font-weight-medium, Poppins por --font-family) no resolvería en el
+     botón (idéntico a Button T6).
+   Transición: SOLO transform con --duration-fast/--ease-standard, literal de
+   la fila "Active (press)" de Estados (G-E; docs/DESIGN.md → Do/Don't prohíbe
+   transition: all). Declarada en la base para que también anime la vuelta del
+   press (mecanismo Button T6 / ThemeToggle T3). El hover no anima color: la
+   spec no lo declara. Sin cursor: pointer: ni la tabla ni Estados de ESTA
+   spec lo listan (a diferencia de Button; no se inventa alcance — ídem
+   ThemeToggle T3). */
+.option {
+  min-width: 2.25rem;
+  padding-block: 0;
+  padding-inline: var(--space-2);
+  border: none;
+  border-radius: var(--radius-8);
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+/* Hover (tabla, fila "Botón hover" + Estados "Opción inactiva hover": color
+   --color-accent-text). El guard :not([aria-pressed="true"]) implementa
+   textualmente la otra mitad de Estados — "Opción activa... sin cambio en
+   hover" — (mecanismo del :not(:disabled):hover de Button; así el hover no
+   depende del orden de las reglas). Contraste registrado en
+   docs/tokens/contrast.md: accent-text sobre surface-raised 5.47 claro /
+   10.60 oscuro ✅. */
+.option:not([aria-pressed="true"]):hover {
+  color: var(--color-accent-text);
+}
+
+/* Activo (tabla, fila "Botón activo (aria-pressed=true)" + Estados
+   "Opción activa"): fondo --gradient-accent y color --color-on-accent. REGLA
+   de texto sobre acento/gradiente: --color-on-accent siempre (regla dura 5 de
+   DESIGN y regla 2 de contrast.md; pares registrados: claro 5.87/6.96, oscuro
+   13.65/11.09 ✅ — un blanco literal sobre el dorado oscuro sería ilegible).
+   Acento en fondo PEQUEÑO, uso permitido por DESIGN → Lenguaje visual
+   ("gradiente: ... idioma activo del LanguageSwitcher"). No se necesita nada
+   extra para "sin cambio en hover": la regla de arriba excluye al activo.
+   Sin sombra ni borde extra en el activo: la tabla no los lista (--shadow-
+   control es solo del grupo). */
+.option[aria-pressed="true"] {
+  background: var(--gradient-accent);
+  color: var(--color-on-accent);
+}
+
+/* Focus-visible (tabla, fila "Focus-visible" + Estados; RF de la spec →
+   Accesibilidad "foco visible"): anillo ESTÁNDAR del kit, literal exacto de
+   Button/ThemeToggle (--focus-ring-width solid --color-focus-ring con
+   --focus-ring-offset; regla dura 7 de docs/DESIGN.md, solo :focus-visible).
+   Sin box-shadow de foco: la única sombra que lista la spec es
+   --shadow-control del grupo (criterio ThemeToggle T3; Button agrega
+   --shadow-accent-focus porque SU spec lo lista). */
+.option:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Active / press (Estados, fila "Active (press)"): translateY(1px) con la
+   transición declarada en la base. El 1px es literal textual de la propia
+   fila ("transform: translateY(1px)"), medida fija definida por la spec y
+   permitida (breakpoints.md; mismo literal aceptado en Button/ThemeToggle).
+   Aplica a ambos botones: Estados no restringe el press a la inactiva. */
+.option:active {
+  transform: translateY(1px);
 }
