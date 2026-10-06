@@ -14,7 +14,7 @@
 // size/fullWidth y unión de className (T5), estilos por tokens y cierre
 // expectNoA11yViolations (T6).
 
-import { render } from "@testing-library/react";
+import { render, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -107,6 +107,11 @@ describe("Button onClick and disabled (T2: RF-3)", () => {
 // y el nombre accesible desde el texto visible (spec → Accesibilidad), así
 // que alcanza getByRole("link", { name }); `href`/`target`/`rel`/`download`
 // son atributos observables del elemento devuelto. Sin data-testid.
+// Las queries se resolvieron con `within(<render>.container)`: los dos
+// renders del caso `download` conviven en el mismo `document.body`
+// (baseElement por defecto de RTL) con idéntico rol+nombre, y cada aserción
+// debe mirar su propio render. Las aserciones no cambian: mismas queries por
+// rol+nombre.
 //
 // `download` está tipado `boolean | string` en la rama link (spec → API): el
 // escenario verifica ambos valores — string llega con su valor; `true` llega
@@ -163,13 +168,17 @@ describe("Button link branch (T3: RF-2, RF-8, RF-9)", () => {
       </Button>,
     );
     expect(
-      stringValue.getByRole("link", { name: "Download CV" }),
+      within(stringValue.container).getByRole("link", { name: "Download CV" }),
     ).toHaveAttribute("download", "cv-2026.pdf");
 
     // RF-8 (valor booleano): `download` sin valor → atributo presente.
-    const boolValue = render(<Button href="/files/cv.pdf" download>Download CV</Button>);
-    expect(boolValue.getByRole("link", { name: "Download CV" })).toHaveAttribute(
-      "download",
+    const boolValue = render(
+      <Button href="/files/cv.pdf" download>
+        Download CV
+      </Button>,
     );
+    expect(
+      within(boolValue.container).getByRole("link", { name: "Download CV" }),
+    ).toHaveAttribute("download");
   });
 });
