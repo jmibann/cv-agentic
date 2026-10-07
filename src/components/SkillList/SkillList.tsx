@@ -8,13 +8,15 @@
 // la Anatomía es ilustrativa del `<li>` que renderiza Badge y NO se le pasa).
 // Con `skills=[]` devuelve `null` (RF-1 SI-clause; plan → Decisiones). La
 // `className` externa se UNE a la clase base del `<ul>` raíz (spec → API,
-// G-B/#99) ya en T1 (criterio Timeline/ResumeSection T1); el módulo nace acá
-// con la clase base vacía (criterio IconBox/LanguageSwitcher) y T2 le
-// conectará la tabla "Estilos y tokens" completa (flex wrap, gap
-// --space-2, list-style none, margen/padding 0; RF-5: cero `@media` propios).
+// G-B/#99) ya en T1 (criterio Timeline/ResumeSection T1). T2 hecha: el módulo
+// conecta la tabla "Estilos y tokens" completa (flex wrap, gap --space-2,
+// list-style none, margen/padding 0; RF-5: cero `@media` propios; RF-4:
+// restricción de superficie documentada en el módulo) y `index.ts` re-exporta
+// la superficie pública (SkillList y SkillListProps; `SkillListName` queda
+// interno, la API de la spec no lo exporta).
 // Keys: `skill-${index}-${value}` (RF-6: fórmula estable índice + valor,
-// documentada en el map; tolera duplicadas; el test de duplicadas sin warning
-// es de T2). Sin índice re-exportado todavía: `index.ts` llega con T2.
+// documentada en el map; tolera duplicadas; instalada en T1 y fijada
+// anti-regresión por el test de duplicadas sin warning de T2).
 
 import { Badge } from "../Badge";
 

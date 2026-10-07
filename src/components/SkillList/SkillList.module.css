@@ -1,14 +1,36 @@
 /* SkillList — specs/content/SkillList/spec.md → Estilos y tokens.
-   T1: la clase base del <ul> raíz nace VACÍA (criterio IconBox/
-   LanguageSwitcher/Timeline: el mecanismo de unión #99/G-B se conecta en el
-   componente desde T1; los estilos llegan con su tarea). T2 completará acá la
-   tabla de la spec — display: flex; flex-wrap: wrap; gap: var(--space-2);
-   list-style: none; margin: 0; padding: 0 — y cero @media propios (RF-5: el
-   wrap resuelve el responsive según el ancho disponible; un chip más ancho
-   que el contenedor desborda sin regla especial, decisión 15). Sin margen
-   externo: el padre separa con gap (docs/DESIGN.md → Do/Don't). El chip lo
+   T2 CUMPLE el diferido de T1 (la clase base nació vacía con criterio
+   IconBox/LanguageSwitcher/Timeline: el mecanismo de unión #99/G-B se conecta
+   en el componente desde T1; los estilos llegan con su tarea): el módulo
+   declara AHORA la fila Lista de la tabla textual de la spec, solo tokens y
+   cero literales — display: flex; flex-wrap: wrap; gap: var(--space-2);
+   list-style: none; margin: 0; padding: 0. Cero `@media` propios (RF-5): el
+   wrap resuelve el responsive según el ancho disponible; la spec cita la
+   decisión 15 — "un chip individual más ancho que el contenedor desborda sin
+   regla especial" (sin elipsis ni maxLength en el esquema; se constata con el
+   contenido real en QA F5) — y acá no se agrega ninguna regla para eso: no
+   inventar alcance.
+
+   Sin margen externo: el padre separa con gap (docs/DESIGN.md → Do/Don't);
+   `margin: 0` del <ul> es reset del UA, no margen del componente. El chip lo
    pinta Badge íntegramente: no hay clase de chip en este módulo (decisión 15;
-   la `.chip` de la Anatomía es ilustrativa del <li> que renderiza Badge). */
+   la `.chip` de la Anatomía es ilustrativa del <li> que renderiza Badge).
+
+   RF-4 (RESTRICCIÓN DE USO, verificable por el reviewer en el consumidor —
+   ResumePage, F4 — la pieza no detecta superficies): la lista va
+   DIRECTAMENTE sobre --color-surface (la card), nunca dentro de un
+   `Box variant="inner"`: el chip (fondo surface-muted de Badge) compartiría
+   fondo con el box interno y desaparecería (docs/DESIGN.md → Do/Don't: "Chips
+   sobre surface / no chips dentro de Box variant=\"inner\""). */
 .skillList {
-  /* Vacía en T1: ver encabezado. */
+  /* Tabla → Lista (RF-5): flex wrap con gap --space-2 entre chips; los
+     marcadores nativos se borran (el <ul> conserva su rol `list` implícito y
+     lleva nombre accesible obligatorio por aria-label/aria-labelledby; la
+     lista nunca se renderiza vacía: skills=[] no produce <ul>, RF-1). */
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
