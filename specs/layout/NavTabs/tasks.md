@@ -6,7 +6,7 @@
 - [x] **T2. Click: activación controlada y guard del activo.** RF-3 — df17ff0
   - Hecho cuando: click en inactivo → `onChange(id)` una vez; click en el activo → cero llamadas; tras click no hay re-gestión de foco propia (el nativo basta; inspección); verde tras `feat(NavTabs): T2`.
 
-- [ ] **T3. Teclado: ←/→ circular, Home/End, Espacio, single-item.** RF-4
+- [x] **T3. Teclado: ←/→ circular, Home/End, Espacio, single-item.** RF-4 — f9cdb20
   - Hecho cuando: con foco en el último, ArrowRight enfoca el primero y emite su `onChange` (y viceversa con ArrowLeft desde el primero → último); Home/End enfocan y emiten primero/último; con 1 item las flechas enfocan el propio tab y **no** emiten; Espacio hace `preventDefault()` y emite el `onChange` del tab enfocado (una sola llamada, sin doble activación); ↑/↓ sin efecto; verde tras `feat(NavTabs): T3`.
 
 - [ ] **T4. Estilos por tokens y cierre a11y.** RF-5, RF-6
