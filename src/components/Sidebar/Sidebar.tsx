@@ -12,8 +12,8 @@
 // T3 hecha: bloque de contactos (Anatomía `.additional`): contenedor
 // `id="sidebar-contacts"` montado siempre (RF-10: id alcanzable para el
 // disclosure; la lógica de colapso es T4), `Separator` condicional (RF-9: sin
-// contactos **y** sin `downloadCvUrl` no se renderiza; el CTA de `Button`
-// llega en T5 y la condición ya evalúa `profile.downloadCvUrl` según la spec)
+// contactos **y** sin `downloadCvUrl` no se renderiza; la condición evalúa
+// `profile.downloadCvUrl` según la spec — el CTA de T5 es hoy real)
 // y una fila `<li>` por contacto: `IconBox` del mapa tipo→ícono (spec → API;
 // decorativo por su RF-2), `Overhead` con el label traducido y el valor en
 // `<a>` (si `getContactHref` produce href — RF-5) o `<p>` (location, phone/
@@ -35,8 +35,16 @@
 // su `<svg>` (Icon RF-6); la rotación (`transform` + `--duration-base`) es
 // CSS: en jsdom solo se observa la clase.
 //
+// T5 hecha: CTA de descarga (RF-2; Anatomía) — `Button href={downloadCvUrl}
+// download icon="download" fullWidth` con el label `labels.downloadCv`,
+// renderizado SOLO si `profile.downloadCvUrl` existe, al final de
+// `.additional` después de la lista de contactos. Sin clases nuevas (el margen
+// `--sidebar-cta-gap` es T6; `fullWidth` del Button ya da el ancho) y sin
+// `target`/`rel`: es una descarga mismo-origen, no un externo de RF-6 (Button
+// omite esos atributos si no se pasan).
+//
 // Diferidos por tasks.md (API completa desde acá, spec → plan → Interfaz):
-// el CTA `Button` con `downloadCvUrl` es T5; el resto del módulo (grilla,
+// el resto del módulo (grilla,
 // `--color-heading`, ellipsis, estilo del botón Show/Hide y del `@media`
 // 1200 CSS-only 8=a que oculta la CornerTab y fuerza `.additional`, gap de
 // `.additional` con el tramo del Separator) es T6 — `Sidebar.module.css` nace
@@ -63,6 +71,7 @@ import { useState } from "react";
 import { Badge } from "../Badge";
 import { Box } from "../Box";
 import { BRAND_NAMES, BrandIcon } from "../BrandIcon";
+import { Button } from "../Button";
 import { CornerTab } from "../CornerTab";
 import { Icon } from "../Icon";
 import { IconBox } from "../IconBox";
@@ -89,7 +98,7 @@ export interface SidebarLabels {
   showContacts: string;
   /** Texto del botón disclosure expandido ("Hide Contacts") — lo usa T4. */
   hideContacts: string;
-  /** Texto del CTA de descarga ("Download CV") — lo usa T5. */
+  /** Texto del CTA de descarga ("Download CV") — lo usa el `Button` de T5. */
   downloadCv: string;
   /** Label traducido por tipo de contacto (lo usa T3). */
   contact: Record<ContactItem["type"], string>;
@@ -241,9 +250,9 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
       >
         {/* RF-9: sin contactos **y** sin `downloadCvUrl` no se renderiza el
             Separator (un `.additional` sin contenido no deja huérfano el
-            separador). El CTA de descarga llega en T5; la condición ya evalúa
-            `profile.downloadCvUrl` según la spec, así T5 solo agrega el
-            botón. */}
+            separador). La condición evalúa `profile.downloadCvUrl` según la
+            spec; desde T5 el CTA de descarga real acompaña esta regla (test
+            T3 "keeps the Separator…" sigue vigente con el botón montado). */}
         {(contact.length > 0 || profile.downloadCvUrl !== undefined) && <Separator />}
 
         {/* RF-9 (mitad `contact`; Tests 8): `contact=[]` → no se monta la
@@ -302,6 +311,25 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
               );
             })}
           </ul>
+        )}
+
+        {/* T5 (RF-2; Anatomía): CTA de descarga SOLO si existe
+            `profile.downloadCvUrl` (SI no existe, ENTONCES no se renderiza el
+            botón). Primitiva F2 exacta de la Anatomía: `Button href
+            download icon="download" fullWidth` — `download={true}` transmite
+            el atributo `download` (Button RF-8), `icon` es `Icon` sin `label`
+            → decorativo con su tone default `current` (Button.tsx T4/Icon
+            RF-4: sin gradiente, no requieren defs), y `fullWidth` da el ancho
+            (regla 13 del marco: el link mide el ancho del contenedor). El
+            texto viene de `labels.downloadCv` por props (RF-8/C3). Link de
+            descarga mismo-origen: NO es externo de RF-6 — sin `target`/`rel`
+            (Button los omite cuando no se pasan). Sin clase nueva acá: el
+            margen `--sidebar-cta-gap` lo aporta el `gap`/tramos del módulo en
+            T6 (encargo: ningún estilo observable en esta tarea). */}
+        {profile.downloadCvUrl !== undefined && (
+          <Button href={profile.downloadCvUrl} download icon="download" fullWidth>
+            {labels.downloadCv}
+          </Button>
         )}
       </div>
     </Box>
