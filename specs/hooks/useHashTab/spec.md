@@ -14,8 +14,8 @@ app (`src/lib/useHashTab.ts`) y lo usa **AppLayout**; NavTabs no lo conoce
 - RF-2: CUANDO el consumidor llama `setActiveId(id)`, ENTONCES EL SISTEMA actualiza el estado y llama `history.replaceState` (nunca `pushState`) con el hash nuevo, conservando `pathname` y `search`; SI `id` ya es el activo, no hace nada.
 - RF-3: CUANDO ocurre `hashchange` con un hash válido, ENTONCES EL SISTEMA actualiza el tab activo; SI el hash es inválido, lo ignora y mantiene el tab actual.
 - RF-4: CUANDO el hook se desmonta, ENTONCES EL SISTEMA quita el listener de `hashchange`.
-- RF-5: EL SISTEMA exige que ningún elemento del DOM tenga un `id` igual a un valor de `ids`.
-- RF-6: EL SISTEMA no usa router, no mueve scroll ni foco, y solo lee `location.hash` al montar y en `hashchange`.
+- RF-5: EL SISTEMA toma como precondición del consumidor que ningún elemento del DOM tenga un `id` igual a un valor de `ids`: el hook no la comprueba ni la reescribe en runtime. La verifica el test 9 de AppLayout y la inspección del reviewer.
+- RF-6: EL SISTEMA no usa router, no mueve scroll ni foco, y solo lee `location.hash` al montar y en `hashchange`. Verificación: inspección del código (el reviewer); no hay test de jsdom para estas cláusulas.
 
 ## API
 
@@ -28,6 +28,10 @@ export function useHashTab<T extends string>(
 
 - `ids`: tabs válidos (`["about", "resume"]`).
 - `defaultId`: tab si el hash no es válido o no existe (`"about"`).
+- Precondiciones del llamador, sin chequeo de runtime: `defaultId ∈ ids`; los
+  valores de `ids` no contienen espacios ni caracteres que requieran encoding
+  en la URL (el hook no codifica ni normaliza; es la invariante de formato que
+  NavTabs le atribuye en su spec).
 
 ## Comportamiento
 
@@ -53,7 +57,8 @@ Decisiones:
 
 **Ningún elemento puede tener `id="about"` ni `id="resume"`** (ni ningún id
 que coincida con un valor de `ids`): el navegador saltaría a él al cargar con
-ese hash. El panel es `main-panel`; los tabs, `tab-about` / `tab-resume`
+ese hash. Es precondición del consumidor (RF-5); el hook no la comprueba en
+runtime. El panel es `main-panel`; los tabs, `tab-about` / `tab-resume`
 (ver `specs/layout/NavTabs/spec.md`). AppLayout lo verifica en su test 9.
 
 ## Anatomía
@@ -90,7 +95,7 @@ semántica del tablist es de `NavTabs`.
 5. `setActiveId` con el id activo → no llama `replaceState`.
 6. Disparar `hashchange` tras cambiar `location.hash` a `#resume` → devuelve `"resume"`.
 7. `hashchange` con hash inválido → mantiene el valor anterior.
-8. Al desmontar, un `hashchange` posterior no provoca actualizaciones (listener removido).
+8. Al desmontar se quita el listener: con spy de `addEventListener`/`removeEventListener` sobre `window`, al montar se registra `hashchange` y al desmontar se quita el mismo handler; un `hashchange` posterior no provoca actualizaciones.
 9. `setActiveId` conserva `pathname` y `search`.
 
 ## No hacer

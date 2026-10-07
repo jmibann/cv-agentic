@@ -10,14 +10,14 @@ lugar que conecta **contenido** (`useCv`), **textos** (`useLocale`) y
 
 ## Requisitos (EARS)
 
-- RF-1: EL SISTEMA renderiza los landmarks `header`, `aside` y `main`, con un único `h1` visible por vez (el del panel activo).
-- RF-2: MIENTRAS no haya un hash que corresponda a un tab, EL SISTEMA activa `about`; SI `location.hash` es `#resume` antes de montar, ENTONCES arranca en Resume.
+- RF-1: EL SISTEMA renderiza los landmarks `banner`, `complementary` y `main` (roles de los elementos `<header>`/`<aside>`/`<main>`). El documento contiene dos `h1` (el del panel activo y el del panel inactivo bajo `hidden`); la unicidad "visible por vez" se verifica con `getAllByRole("heading", { level: 1 })` de longitud 1: RTL y axe excluyen el subárbol oculto.
+- RF-2: AL MONTAR, si el hash no corresponde a un tab, EL SISTEMA activa `about`; si `location.hash` es `#resume` antes de montar, arranca en Resume. Un hash inválido posterior mantiene el tab activo (lo gobierna `useHashTab` RF-3).
 - RF-3: CUANDO el usuario cambia de tab, ENTONCES EL SISTEMA renderiza la página correspondiente en el tabpanel, actualiza `aria-labelledby` y sincroniza la URL con `history.replaceState` sin agregar historial.
 - RF-4: CUANDO el usuario activa el skip link, ENTONCES EL SISTEMA mueve el foco al tabpanel sin modificar el hash de la URL.
 - RF-5: EL SISTEMA mantiene la lista de tabs siempre con los dos ids de `TAB_IDS`, en ese orden, de modo que `aria-labelledby` del tabpanel nunca apunte a un tab inexistente.
 - RF-6: EL SISTEMA monta `AccentGradientDefs` y `HexAvatarDefs` exactamente una vez en el documento.
-- RF-7: CUANDO cambia el idioma, ENTONCES EL SISTEMA re-renderiza tabs, títulos y contenido en el nuevo idioma sin recargar la página; CUANDO cambia el tema, fija `data-theme` en `<html>`.
-- RF-8: EL SISTEMA renderiza el panel inactivo dentro de `.printOnly` con el atributo `hidden` y lo muestra únicamente en `@media print`.
+- RF-7: EL SISTEMA se re-renderiza al cambiar el idioma (tabs, títulos y contenido, sin recargar) y presenta `data-theme` en `<html>` al cambiar el tema: ambas conductas las fijan los providers, que viven por encima de AppLayout; esta pieza no implementa nada del tema. El RF verifica el camino integrado (tests 5 y 6).
+- RF-8: EL SISTEMA monta cada página exactamente una vez: la activa en el tabpanel (`data-print-page={active}`) y la inactiva en un bloque hermano con `hidden`, fuera del tabpanel (`data-print-only` + `data-print-page={inactiva}`). Ambos bloques cuelgan de una raíz común `data-print-stack`. En `@media print` se apilan **siempre en orden About → Resume, con independencia del tab activo** (reglas en `src/styles/global.css`, ver "Impresión"). Verificación: estructura y unicidad de `h1` en jsdom (test 12); reglas de impresión por inspección del CSS y QA F5.
 
 ## Anatomía
 
@@ -26,6 +26,12 @@ Ver `foundations/layout.md` (estructura del documento y grilla por breakpoint).
 ```tsx
 // Constante del módulo: orden e ids fijos de los tabs (nunca vacía)
 const TAB_IDS = ["about", "resume"] as const;
+type TabId = (typeof TAB_IDS)[number];
+
+// Guard de estrechamiento (no exportado): frontera de tipos con NavTabs,
+// que fija onChange: (id: string) => void. Sin casts (regla de specs/README.md).
+const isTabId = (id: string): id is TabId =>
+  (TAB_IDS as readonly string[]).includes(id);
 
 // Dentro del componente
 const { t } = useLocale();
@@ -48,19 +54,21 @@ return (
 <>
   <AccentGradientDefs />
   <HexAvatarDefs />
-  <a className={styles.skipLink} href="#main-panel" onClick={focusPanel}>{t.skipToContent}</a>
+  <a className={styles.skipLink} data-print-hide href="#main-panel" onClick={focusPanel}>{t.skipToContent}</a>
   <div className={styles.container}>
     <ControlsBar />
     <div className={styles.grid}>
       <Sidebar className={styles.aside} profile={cv.profile} contact={cv.contact} social={cv.social} labels={sidebarLabels} />
       <main className={styles.main}>
         <Box variant="outer" as="section" className={styles.contentCard}>
-          <NavTabs items={tabs} activeId={active} onChange={setActive} panelId="main-panel" label={t.nav.label} />
-          <div ref={panelRef} role="tabpanel" id="main-panel" aria-labelledby={getTabId(active)} tabIndex={0} className={styles.panel}>
-            {active === "about" ? <AboutPage /> : <ResumePage />}
-          </div>
-          <div className={styles.printOnly} hidden>              {/* ver Impresión */}
-            {active === "about" ? <ResumePage /> : <AboutPage />}
+          <NavTabs items={tabs} activeId={active} onChange={(id) => { if (isTabId(id)) setActive(id); }} panelId="main-panel" label={t.nav.label} />
+          <div data-print-stack>                                 {/* raíz del stack de impresión; sin clase propia (los nombres de módulo se hashean y global.css no puede apuntarlos) */}
+            <div ref={panelRef} role="tabpanel" id="main-panel" aria-labelledby={getTabId(active)} tabIndex={0} data-print-page={active} className={styles.panel}>
+              {active === "about" ? <AboutPage /> : <ResumePage />}
+            </div>
+            <div data-print-only data-print-page={active === "about" ? "resume" : "about"} hidden>   {/* panel inactivo preparado para impresión; ver "Impresión" */}
+              {active === "about" ? <ResumePage /> : <AboutPage />}
+            </div>
           </div>
         </Box>
       </main>
@@ -80,6 +88,14 @@ return (
   y `panelRef.current?.focus()`. El `href="#main-panel"` queda como respaldo
   sin JS. Así el hash conserva `#about` / `#resume` y el link compartible no
   se pierde.
+- **Frontera de tipos con NavTabs:** NavTabs implementada fija
+  `onChange: (id: string) => void`; `setActive` exige `TabId`. El estrechamiento
+  es de AppLayout con el guard de módulo `isTabId` (no exportado): NavTabs no
+  se toca y no hay casts.
+- **Panel inactivo montado una sola vez:** no hay copias adicionales de las
+  páginas; los ids que generan (`about-services-title`,
+  `resume-education-title`, ítems de Timeline, etc.) nunca se duplican en el
+  documento (RF-8).
 
 ## API
 
@@ -88,6 +104,9 @@ export interface AppLayoutProps {
   className?: string;
 }
 ```
+
+`className` se aplica al `div.container` de la Anatomía (la raíz del componente
+es un fragment; el lugar de la unión es deliberado, no un accidente).
 
 Requiere `ThemeProvider` y `LocaleProvider` por encima (los monta `main.tsx`).
 
@@ -117,14 +136,17 @@ AppLayout solo decide cuál renderizar en el tabpanel según el tab activo
     (ver `specs/pages/*.md` → "Estilos y tokens").
 - **Skip link:** visualmente oculto hasta recibir foco; con foco aparece
   arriba a la izquierda con fondo `--color-surface`, texto `--color-accent-text`,
-  radio `--radius-8`, `--shadow-control`.
+  radio `--radius-8`, `--shadow-control` y `z-index: var(--z-skip)` (30: por
+  encima de `--z-controls` —el token es nuevo en `tokens.css`, decisión de
+  Clarificación F4—; el skip link enfocado debe ganar el apilamiento siempre,
+  y `--z-controls` documenta específicamente la capa de ControlsBar).
 - Foco del tabpanel: anillo estándar (`--focus-ring-*`) solo con `:focus-visible`.
 
 ## Estados
 
 | Estado | Efecto |
 |---|---|
-| Tab activo `about` / `resume` | el tabpanel renderiza AboutPage / ResumePage; el otro va a `.printOnly` |
+| Tab activo `about` / `resume` | el tabpanel renderiza AboutPage / ResumePage; la otra queda montada en el bloque hermano `hidden` (`data-print-only`) |
 | Skip link sin foco | visualmente oculto |
 | Skip link con foco | visible arriba a la izquierda |
 | Tabpanel con foco (teclado) | anillo estándar |
@@ -139,15 +161,39 @@ AppLayout solo decide cuál renderizar en el tabpanel según el tab activo
 
 ## Impresión
 
-- El panel inactivo se renderiza dentro de `.printOnly` con el atributo `hidden`
-  (fuera del árbol de accesibilidad y no visible en pantalla).
-- En `@media print`: `.printOnly[hidden] { display: block; }` y se aplican las
-  reglas de `foundations/layout.md` (ocultar controles, tabs, carrusel → lista, etc.).
+El contrato de impresión habla en `data-*`, no en clases de CSS Modules (los
+nombres de módulo se hashean y `global.css` no puede apuntarlos):
+
+- Cada página se monta **una sola vez** en el documento: la activa en el
+  tabpanel (`data-print-page={active}`) y la inactiva en el bloque hermano
+  (`data-print-only` + `data-print-page={inactiva}`, con `hidden`: fuera del
+  árbol de accesibilidad y no visible en pantalla). Sin ids duplicados.
+- Orden impreso **siempre About → Resume, con independencia del tab activo**:
+  en `@media print`, `[data-print-stack]` es `flex` en columna y el `order`
+  sale del `data-print-page` (`about: 0`, `resume: 1`).
+- El bloque inactivo se muestra en print: `[data-print-only] { display: block }`
+  (regla de autor: gana al `display: none` del atributo `hidden`).
+- Todos los `@media print` transversales viven en `src/styles/global.css`
+  (regla dura 3 de `docs/DESIGN.md`); la paleta de impresión ya la reasigna
+  `tokens/tokens.css`. Ninguna pieza F2/F3 se edita.
+- Los selectores de elemento/rol nativo para ocultar piezas ya implementadas
+  son **deliberados y forman parte del contrato**, no accidentes de
+  estructura: `header` (ControlsBar: único `<header>` del documento),
+  `[role="tablist"]` (NavTabs/CornerTab), `aside button` (Show Contacts /
+  Download CV de Sidebar). El skip link se oculta con `[data-print-hide]` en
+  su raíz. `TestimonialDialog` y `TestimonialCarousel` ya resuelven su
+  impresión en sus propios módulos (excepción documentada G-D-1).
+- La expansión forzada de contactos de Sidebar y el resto de la lista de
+  `foundations/layout.md` → "Impresión" las implementa el integrator en la
+  tarea de impresión de F4 y las verifica **QA F5** con la app servida
+  (decisión #91): F4 fija el contrato, F5 verifica el resultado real.
 
 ## Accesibilidad
 
 - Landmarks: `header` (ControlsBar), `aside` (Sidebar), `main`.
-- Un solo `h1` visible por vez (el del panel activo).
+- Un solo `h1` visible por vez: el documento tiene dos (activo + inactivo en
+  `hidden`); se verifica con `getAllByRole("heading", { level: 1 })` de
+  longitud 1 (RTL y axe excluyen el subárbol oculto).
 - Skip link apunta a `#main-panel`, es el primer elemento enfocable y mueve el foco al tabpanel sin cambiar el hash.
 - `AccentGradientDefs` y `HexAvatarDefs` montados **una sola vez**.
 - Al cambiar de idioma, `<html lang>` cambia (lo hace el provider) y todo el
@@ -155,7 +201,7 @@ AppLayout solo decide cuál renderizar en el tabpanel según el tab activo
 
 ## Tests esperados
 
-1. Renderiza los landmarks `banner`, `complementary` y `main`.
+1. Renderiza los landmarks `banner`, `complementary` y `main`, con `getAllByRole("banner")` de longitud 1 (unicidad delegada por ControlsBar RF-2; el `<header>` de ControlsBar es el único del documento).
 2. El tab inicial es `about` (sin hash) y el panel muestra el `h1` de About.
 3. Con `location.hash = "#resume"` antes de montar, arranca en Resume.
 4. Click en el tab Resume → el panel muestra el `h1` de Resume, `aria-labelledby` del panel = `tab-resume`, y `history.replaceState` fue llamado con `#resume`.
@@ -165,6 +211,8 @@ AppLayout solo decide cuál renderizar en el tabpanel según el tab activo
 8. El primer elemento enfocable es el skip link con `href="#main-panel"`; al activarlo, el foco pasa al tabpanel y `location.hash` **no** cambia.
 9. No hay ningún elemento con `id="about"` ni `id="resume"`.
 10. `expectNoA11yViolations` sin violaciones en About y en Resume, en ambos idiomas.
+11. El tablist contiene exactamente dos tabs en orden About→Resume y el `aria-labelledby` del tabpanel coincide con el `id` del tab activo, antes y después de cambiar de tab (RF-5).
+12. Con tab activo `about`: la página Resume está montada con `hidden` fuera del tabpanel (bloque `data-print-only`, `data-print-page="resume"`) y `getAllByRole("heading", { level: 1 })` es de longitud 1; simétrico con `resume` (RF-1 criterio, RF-8 capa DOM; las reglas `@media print` se verifican por inspección del CSS y en QA F5).
 
 ## No hacer
 
