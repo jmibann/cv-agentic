@@ -8,12 +8,16 @@
 // `testimonial.text` en `<p>` (RF-4; el clamp a 4 líneas es CSS, T3/RF-2) y
 // comilla `Icon name="quote" tone="gradient"` decorativa, hija directa del
 // article (sin `label` → `aria-hidden`, RF-4).
-// T2 difiere: `openLabel` y `onOpen` están en la API (spec → API, declarada
-// COMPLETA acá — precedente HexAvatar/Overhead/SectionTitle T1 con el diferido
-// marcado) pero NO se destructuran todavía: el botón estirado (único
-// enfocable, RF-1) llega en T2 con su `aria-label={openLabel}` y su
-// `onClick={() => onOpen(testimonial.id)}`. En T1 no hay botón ni `onClick` en
-// ningún nodo (spec → No hacer: el article no es clickeable).
+// T2 (RF-1): el botón estirado — `<button type="button" aria-label={openLabel}>`
+// como ÚLTIMO hijo del article (orden Anatomía), sin hijos textuales (el
+// recubrimiento `::after { inset: 0 }` es CSS y llega en T3; por eso el botón
+// aún NO lleva `className={styles.stretched}` — elección declarada: `.stretched`
+// nace con su módulo en T3) y con `onClick={() => onOpen(testimonial.id)}`.
+// Enter y Espacio: activación NATIVA del <button> (plan → Decisiones "Enter/
+// Espacio nativos": sin handlers de teclado propios ni preventDefault, criterio
+// NavTabs T2 de no duplicar el guard). El <article> sigue sin `onClick` ni
+// `tabIndex` (spec → No hacer / RF-1: la operabilidad es solo del botón, único
+// enfocable de la tarjeta).
 // T3 difiere (elección declarada): las clases internas del módulo
 // (`.header`/`.identity`/`.avatar`/`.excerpt`/`.quote`) y del Icon/HexAvatar
 // conectan en T3 (tabla "Estilos y tokens"); en T1 los `<div>` del
@@ -38,8 +42,8 @@ import styles from "./TestimonialCard.module.css";
 // API (spec → API, COMPLETA desde T1): `testimonial` llega por props (C2: la
 // pieza no importa contenido; el carrusel lo canaliza desde useCv());
 // `className` se transmite al Box raíz vía la unión de abajo (G-B);
-// `openLabel`/`onOpen` los consume el botón estirado de T2 (diferido declarado
-// en el encabezado: no se destructuran aún).
+// `openLabel` nombra al botón estirado (`aria-label`) y `onOpen` es su evento
+// (RF-1, conectados en T2: el botón es el único consumidor de ambos).
 export interface TestimonialCardProps {
   testimonial: Testimonial;
   /** "Read full testimonial from {author}", ya interpolado. */
@@ -51,6 +55,8 @@ export interface TestimonialCardProps {
 
 export function TestimonialCard({
   testimonial,
+  openLabel,
+  onOpen,
   className,
 }: TestimonialCardProps) {
   // RF-7: única derivación de la pieza — el id del nombre, fórmula fija sobre
@@ -98,6 +104,20 @@ export function TestimonialCard({
           `label` → `aria-hidden`, sin nombre accesible. La clase `.quote`
           (tamaño/posición absoluta) conecta en T3. */}
       <Icon name="quote" tone="gradient" />
+      {/* T2 · RF-1: botón estirado (Anatomía: ÚLTIMO hijo del article, sin
+          hijos textuales). `aria-label={openLabel}` lo nombra (único nombre
+          accesible del botón; la string ya llega interpolada, spec → API) y
+          `onClick` emite `onOpen(testimonial.id)` — un solo disparo: Enter y
+          Espacio activan este mismo click por vía NATIVA del <button> (sin
+          handlers de teclado: plan → Decisiones). SIN `className` en T2: la
+          clase `.stretched` (`::after { inset: 0 }`, cursor, reset) llega con
+          el módulo en T3; la operabilidad y el nombre ya son completos acá.
+          El article no lleva `onClick` ni `tabIndex` (No hacer / RF-1). */}
+      <button
+        type="button"
+        aria-label={openLabel}
+        onClick={() => onOpen(testimonial.id)}
+      />
     </Box>
   );
 }
