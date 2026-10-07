@@ -1,5 +1,5 @@
 # ResumeSection
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
