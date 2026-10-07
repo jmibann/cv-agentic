@@ -1,6 +1,6 @@
 # Tareas — TestimonialCarousel
 
-- [ ] **T1. Funciones puras de stops.** RF-3, RF-5 (base)
+- [x] **T1. Funciones puras de stops.** RF-3, RF-5 (base) — 33adec3 (tolerancia 1px INCLUSIVA ratificada por el reviewer, coherente con stop→n)
   - Hecho cuando: `getScrollStops.ts` exporta ambas funciones sin DOM; pasan los 4 casos exactos de spec → Tests (clamp+dedup `[0,300,600]/300→[0,300]`; `/600→[0,300,600]`; `[0,300]/0→[0]`; `getActiveStop` 140→0, 160→1, 150→0); verde tras `feat(TestimonialCarousel): T1`.
 
 - [ ] **T2. Región única con slides y dialog cableado.** RF-1, RF-6
