@@ -127,6 +127,38 @@ describe("TestimonialDialog conditional mount (T1: RF-1)", () => {
     expect(container).toBeEmptyDOMElement();
     expect(screen.queryByRole("dialog")).toBeNull();
   });
+
+  it("opens the dialog when testimonial appears on a permanent tree (null to value, consumer contract)", () => {
+    // RF-1 / revisión T1 ronda 1 (bloqueante): "SI recibe un valor no nulo,
+    // ENTONCES monta el <dialog> y lo abre con dialog.showModal()". El
+    // consumidor real (Carousel, spec → ciclo: Valor→valor no puede ocurrir
+    // con el padre real; el padre mantiene <TestimonialDialog> MONTADO y
+    // alterna `testimonial` null ↔ valor) — así que la apertura debe atarse a
+    // la APARICIÓN del dialog, no solo al mount del componente. Mismo árbol
+    // (rerender de RTL sobre el mismo fragmento: defs + dialog, estado
+    // conservado): null → sin dialog; valor → dialog nombrado y CON el
+    // atributo `open` (observable del showModal en el mock de F1; sin él,
+    // jsdom aplica el display:none UA del dialog cerrado y el getByRole de
+    // abajo lanza — el query es doblemente discriminante: role visible +
+    // atributo).
+    const onClose = vi.fn();
+    const { rerender } = render(
+      testimonialDialog({ testimonial: null, onClose }),
+    );
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+
+    rerender(testimonialDialog({ testimonial: TESTIMONIAL, onClose }));
+
+    // Se abre al aparecer: dialog nombrado por el autor + open post-showModal.
+    const dialog = screen.getByRole("dialog", { name: TESTIMONIAL.author });
+    expect(dialog).toHaveAttribute("open");
+
+    // Y abrir NO emite onClose (RF-2/RF-3: onClose solo sale del evento
+    // close; un guard mal puesto que disparara close() en la transición
+    // null→valor lo delataría acá).
+    expect(onClose).not.toHaveBeenCalled();
+  });
 });
 
 // --- T1 · RF-1/RF-4: dialog montado, abierto y nombrado por el autor -----------
