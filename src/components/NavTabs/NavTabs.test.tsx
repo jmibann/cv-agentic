@@ -1,4 +1,4 @@
-// Tests de T1 (specs/layout/NavTabs/tasks.md) — RF-1, RF-2, RF-7: un tablist
+// Tests de T1–T2 (specs/layout/NavTabs/tasks.md) — T1: RF-1, RF-2, RF-7: un tablist
 // nombrado (`getByRole("tablist", { name: LABEL })`) con
 // `aria-orientation="horizontal"` y un `role="tab"` por item en el orden
 // recibido (RF-1), cada tab con `id = getTabId(item.id)` y `aria-controls` al
@@ -8,9 +8,13 @@
 // CSS se inspecciona en T4); y RF-7: `items=[]` no renderiza nada (container
 // vacío, sin tablist: un tablist sin tabs es inválido para axe). Se testea
 // directo además `getTabId` exportada ("Hecho cuando" de T1; la consume
-// AppLayout para el `aria-labelledby` del panel — spec → API).
+// AppLayout para el `aria-labelledby` del panel — spec → API). T2: RF-3: click
+// en un tab inactivo → `onChange(id)` UNA vez; click en el activo → CERO
+// llamadas (guard; spec → Tests esperados 4 y 5). El foco tras click es nativo
+// del `<button>` (spec → Comportamiento, plan → Decisiones): NavTabs no
+// re-gestiona el foco, no hay assert de foco en click (inspección).
 //
-// Diferidos por tasks.md: click/`onChange` (T2: RF-3), teclado ←/→ circular,
+// Diferidos por tasks.md: teclado ←/→ circular,
 // Home/End y Espacio (T3: RF-4), `NavTabs.module.css` + `index.ts` + cierre
 // `expectNoA11yViolations` del archivo (T4: RF-5, RF-6) — criterio Separator
 // T1–T2 y CornerTab T1–T3, que agregaron el cierre en la última tarea. RF-6
@@ -35,15 +39,24 @@
 // Anatomía).
 //
 // Armazón: la pieza se renderiza SOLA (plan → Estrategia de tests): no
-// necesita providers (todo llega por props; C2: no consume useCv/useLocale) y
-// `onChange` es `vi.fn()` sin aserción de conteos en T1 (sin interacciones:
-// T2/T3). Sin `AccentGradientDefs` ni `HexAvatarDefs`: ni la pieza ni CornerTab
+// necesita providers (todo llega por props; C2: no consume useCv/useLocale),
+// `onChange` es `vi.fn()` y los renders de T1 quedan sin aserción de conteos
+// (sin interacciones); los casos de T2 pasan su spy propio por `overrides` de
+// `renderNavTabs` (agregado puro: el default del helper no cambia). Sin
+// `AccentGradientDefs` ni `HexAvatarDefs`: ni la pieza ni CornerTab
 // montan íconos de gradiente ni SVG (plan → Estrategia de tests).
 //
-// Rojo on-arrival legítimo: `NavTabs.tsx` aún no existe — "Failed to resolve
-// import ./NavTabs" (patrón aprobado en CornerTab T1 y ControlsBar T1).
+// Rojo on-arrival: el de T1 fue "Failed to resolve import ./NavTabs" (patrón
+// aprobado en CornerTab T1 y ControlsBar T1). El de T2 es real y por la razón
+// correcta: el click hoy no hace nada — `onChange` está tipado en la interfaz
+// (spec → API) pero SIN conectar (T1 fue solo markup, así declarado en sus
+// diferidos): el caso del inactivo falla por 0 llamadas esperadas 1. El caso
+// del ACTIVO nace verde (contaría cero por casualidad, no por el guard), por
+// eso FIJA primero que ese tab está activo (`aria-selected="true"`): guard
+// "no vacío", precedente LanguageSwitcher T2 (decisión 2=a).
 
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import { getTabId, NavTabs } from "./NavTabs";
@@ -69,7 +82,8 @@ const LABEL = "Sections";
 
 // Render de la pieza sola (plan → Estrategia de tests): props de la spec →
 // API con `activeId` en el primer item y `onChange` espía (sin asserts de
-// llamadas en T1: click es T2 y teclado T3).
+// llamadas en T1). T2 pasa su propio spy por `overrides` y lo asiértan los
+// casos de click; el teclado (T3) volverá a medir llamadas.
 function renderNavTabs(overrides: Partial<NavTabsProps> = {}) {
   const props: NavTabsProps = {
     items: TAB_ITEMS,
@@ -166,5 +180,52 @@ describe("NavTabs tablist, roving tabindex and empty state (T1: RF-1, RF-2, RF-7
     // Transmitida a la clase base de CornerTab (spec → API): la unión NO la
     // reemplaza (la unión en CornerTab ya la asierte su propio archivo).
     expect(root).toHaveClass(cornerTabBaseClass);
+  });
+});
+
+// --- T2 · Click: activación controlada y guard del activo (RF-3) ------------
+// spec → Tests esperados 4 y 5 / "Hecho cuando" de T2: click en inactivo →
+// `onChange(id)` una vez; click en el activo → cero llamadas. El spy se pasa
+// por `overrides` (el default `vi.fn()` de renderNavTabs queda intacto:
+// agregado puro). queries: `getByRole("tab", { name })` (rol + nombre
+// accesible, constitución T3). Sin assert de foco: tras click el foco queda
+// en el tab pulsado por vía NATIVA del `<button>` (spec → Comportamiento,
+// plan → Decisiones "foco propio solo en teclado"); NavTabs no re-gestiona el
+// foco en click — nada que asiértar en jsdom (inspección de la ausencia de
+// `.focus()` en el handler, T2). `onChange` del inactivo se espera con el id
+// del item ("resume"), no con el id DOM del tab (`getTabId` es solo de
+// elementos — spec → API).
+describe("NavTabs click activation and active-tab guard (T2: RF-3)", () => {
+  it("calls onChange once with the item id when an inactive tab is clicked", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    // activeId="about" (default del helper): "Resume" es el inactivo.
+    renderNavTabs({ onChange });
+
+    await user.click(screen.getByRole("tab", { name: "Resume" }));
+
+    // RF-3 (CUANDO): "click en un tab inactivo → invoca onChange(id) una
+    // vez" — call-count exacto sobre el spy (precedente LS T2).
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("resume");
+  });
+
+  it("does not call onChange when the already-active tab is clicked", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderNavTabs({ onChange });
+
+    // El guard (RF-3, SI-clause) solo aplica sobre el ACTIVO: se fija primero
+    // que About lo está (aria-selected="true"), para que el test no sea vacío
+    // — sin este assert contaría cero llamadas por casualidad, no por el
+    // guard (guard "no vacío", precedente LanguageSwitcher T2, decisión 2=a).
+    const activeTab = screen.getByRole("tab", { name: "About" });
+    expect(activeTab).toHaveAttribute("aria-selected", "true");
+
+    await user.click(activeTab);
+
+    // RF-3 (SI): "click en el tab activo → no lo invoca" (spec → Comportamiento:
+    // "Click en el tab ya activo: No llama onChange").
+    expect(onChange).not.toHaveBeenCalled();
   });
 });
