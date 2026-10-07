@@ -31,12 +31,21 @@ export default tseslint.config(
     // identifica componentes por mayúscula inicial y no tiene caso para hooks;
     // allowExportNames evita dividir los providers (alternativa descartada:
     // hooks en .ts aparte, viola la Anatomía).
+    // Extensión aprobada por el usuario 2026-10-06 (mecanismo #100): se agrega
+    // "getTabId" a allowExportNames por F3/NavTabs T1 (export puro junto al
+    // componente, mismo caso que BRAND_NAMES de #96).
     rules: {
       "react-refresh/only-export-components": [
         "error",
         {
           allowConstantExport: true,
-          allowExportNames: ["useTheme", "useLocale", "useCv", "BRAND_NAMES"],
+          allowExportNames: [
+            "useTheme",
+            "useLocale",
+            "useCv",
+            "BRAND_NAMES",
+            "getTabId",
+          ],
         },
       ],
     },
