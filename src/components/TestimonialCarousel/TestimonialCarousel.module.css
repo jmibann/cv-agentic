@@ -1,0 +1,15 @@
+/* TestimonialCarousel — specs/content/TestimonialCarousel/spec.md → Estilos y
+   tokens. El módulo nace en T2 SOLO con la clase base del <section> raíz,
+   VACÍA (criterio IconBox T2: la unión G-B de `className` se conecta desde la
+   primera tarea que renderiza el raíz; las reglas llegan después). */
+
+/* Clase base del <section> raíz (spec → API: "Se une a la clase base de la
+   `<section>` raíz (G-B)"). Vacía en T2: la tabla "Estilos y tokens" de la
+   spec (track grid+snap+overflow y scrollbar oculta, headroom
+   `padding-block: var(--testimonial-headroom) 2rem` — RF-7 —, slide
+   snap-align, paginación/bullet con --size-bullet/--gradient-accent y ::after
+   táctil, @media 768 y print) se implementa íntegra en T5 (RF-2, RF-7, RF-8),
+   junto con las clases .track/.slide/.pagination/.bullet que el DOM de T2
+   todavía no lleva. Cero valores literales acá: todo por tokens en T5. */
+.carousel {
+}
