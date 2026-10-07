@@ -61,8 +61,10 @@
 // `t-a`/`t-b`/`t-c`, personas y empresas inventadas), sin datos reales.
 
 import { render, screen, within } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
+import { afterEach, vi } from "vitest";
 
 import type { Testimonial } from "@data/cv.types.generated";
 
@@ -285,5 +287,216 @@ describe("TestimonialCarousel wires the single dialog through card open and clos
     // nodo salió del DOM (18=b: con `testimonial = null` no hay <dialog>).
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(container.querySelector("dialog")).toBeNull();
+  });
+});
+
+// ============================================================================
+// T3 — RF-3 / RF-5: bullets por stops con aria-current (spec → Tests esperados
+// 7 y 9, y la rama "≤1 stop → sin bullets" del 11; el caso 0-testimonios del
+// 11 ya lo cubre T2 arriba). Escenarios del "Hecho cuando" de T3: layout
+// mockeado [0,300,600] con maxScroll 300 → 2 bullets nombrados "Go to slide
+// 1"/"Go to slide 2" (regla stop→n de spec → Comportamiento), el del stop
+// activo inicial (scrollLeft 0) con aria-current="true"; fireEvent.scroll con
+// scrollLeft 300 → aria-current pasa al bullet 2 y el 1 queda sin atributo;
+// 1 stop o menos → sin bullets (1 testimonio; 2 testimonios con 2 por vista).
+//
+// Rojo on-arrival (decisión #101, declarado con la salida en el commit
+// `test(TestimonialCarousel): T3`): FALLAN los 2 primeros describes nuevos por
+// la razón correcta — la implementación de T2 no renderiza paginación:
+// "Unable to find role=button … Go to slide N" — y PASAN ya los 2 casos de
+// ausencia de bullets (rama ≤1 stop): la implementación vigente nunca dibujó
+// bullets, así que su valor es de regresión FUTURA (fijan que la paginación
+// aparece SOLO con >1 stop, no por el trivial "nunca hay bullets"). No es un
+// rojo artificial: el alcance discriminatorio de T3 (bullets existentes,
+// nombres por la regla stop→n, aria-current inicial y su móvil con scroll)
+// vive íntegro en los describes que fallan.
+//
+// MECANISMO DE MEDICIÓN ELEGIDO (la tarea deja elegir; se declara con su
+// justificación): jsdom 30 define `offsetLeft` como accessor-getter en
+// `HTMLElement.prototype` y `scrollWidth`/`clientWidth` en
+// `Element.prototype` (verificado en `node_modules/jsdom/lib/generated/idl`),
+// todos retornando 0 sin layout. Los spies de accessores se instalan en el
+// PROTOTIPO **antes** de `render`, con el offset indexado por la posición del
+// slide entre los hijos de su padre: el mount-effect que mide (RF-3) lee
+// valores ya mockeados en el primer commit, sin rerenders ni forceos.
+// Alternativa descartada: `Object.defineProperty` por instancia post-render +
+// rerender con nueva identidad de `testimonials` para re-disparar la
+// medición — dependería de un detalle de implementación del effect (sus deps),
+// duplicaría el armazón de defs en el rerender y dejaría la medición del mount
+// real sin exercised. Aquí el mecanismo no toca la API: mocks sobre
+// instancias/prototipo, sin `window` global accedido fuera de refs/efectos en
+// el componente. `scrollLeft` SÍ se fija por instancia con
+// `Object.defineProperty` en el momento del scroll (como sugiere spec → Tests
+// esperados): es lo único que cambia post-mount, y el handler lo lee vivo del
+// nodo (RF-5: el valor del frame, no del estado).
+//
+// rAF (RF-5, un cálculo por frame): stub SÍNCRONO (`callback(0)` en el acto),
+// una de las dos opciones que ofrece tasks.md (la otra, `vi.waitFor` con rAF
+// real, introduce timers de 16ms y updates fuera del flujo síncrono de act).
+// Con callback síncrono el update cae dentro del `fireEvent.scroll` (envuelto
+// en act) y el assert es inmediato y determinista. El stub no debilita el
+// contrato: la implementación gatea con flag pending (no asume que el id se
+// escribe antes del callback), y "un cálculo por frame" no tiene test propio
+// en la spec.
+//
+// Limpieza: `afterEach` local con `restoreAllMocks` + `unstubAllGlobals` (los
+// spies de prototipo viven en este archivo y filtrarían al test siguiente si
+// no se restauran). No afecta a los tests de T2: no registran mocks ni stubs.
+//
+// Justificación de queries (constitución T3): bullets por rol `button` +
+// nombre accesible LITERAL ("Go to slide 1"/"Go to slide 2" — el test no
+// recalcula `format` ni la regla stop→n: no ser tautológico; el conteo con
+// regex /Go to slide/ separa los bullets de los botones estirados de las
+// cards, que no coinciden). `aria-current` por atributo literal "true" (RF-5
+// lo fija con ese valor); ausencia = not.toHaveAttribute (la implementación
+// pasa `undefined`, no "false"). La estructura (div paginación hermano
+// del <ul> track dentro de la región única) por inspección DOM —Anatomía—,
+// sin clases de módulo hasta T5 (criterio T2). Sin `data-testid`: la API
+// expone roles y nombres.
+// ============================================================================
+
+// Helper de layout mockeado: offsets por índice del slide dentro de su padre
+// (el componente solo lee `offsetLeft` de los hijos del track; ningún otro
+// nodo del árbol lo consume) y `scrollWidth`/`clientWidth` constantes en el
+// prototipo (el track es el único lector de ambos en la pieza).
+const mockCarouselLayout = (
+  slideOffsets: readonly number[],
+  scrollWidth: number,
+  clientWidth: number,
+): void => {
+  vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(
+    function (this: HTMLElement): number {
+      const parent = this.parentElement;
+      if (parent === null) {
+        return 0;
+      }
+      const index = Array.from(parent.children).indexOf(this);
+      return slideOffsets[index] ?? 0;
+    },
+  );
+  vi.spyOn(Element.prototype, "scrollWidth", "get").mockReturnValue(
+    scrollWidth,
+  );
+  vi.spyOn(Element.prototype, "clientWidth", "get").mockReturnValue(clientWidth);
+};
+
+// rAF síncrono para el handler de scroll (flush inmediato dentro del fireEvent).
+const stubSyncRaf = (): void => {
+  vi.stubGlobal(
+    "requestAnimationFrame",
+    (callback: FrameRequestCallback): number => {
+      callback(0);
+      return 1;
+    },
+  );
+};
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
+// --- T3 · RF-3 (Tests 7): un bullet por stop, regla stop→n, activo inicial ---
+describe("TestimonialCarousel renders one bullet per reachable stop with the first aria-current (T3: RF-3, Tests 7)", () => {
+  it("renders two bullets named go to slide 1 and 2 with the first carrying aria-current true", () => {
+    // [0,300,600] con maxScroll = 900 − 600 = 300 → stops [0,300] (caso 1 de
+    // las puras, aplicado): 3 slides → 2 bullets. Regla stop→n (decisión 21):
+    // stop 0 → primer offset ≥ −1 → slide 1 → "Go to slide 1"; stop 300 (el
+    // 600 recortado deduplica contra el 300 nativo) → primer offset ≥ 299 →
+    // slide 2 → "Go to slide 2".
+    mockCarouselLayout([0, 300, 600], 900, 600);
+    render(carousel());
+
+    const bullet1 = screen.getByRole("button", { name: "Go to slide 1" });
+    const bullet2 = screen.getByRole("button", { name: "Go to slide 2" });
+    expect(
+      screen.getAllByRole("button", { name: /Go to slide/ }),
+    ).toHaveLength(2);
+
+    // RF-3 → decisión 21: bullet activo inicial una vez calculados los stops
+    // (mount, scrollLeft 0) → getActiveStop → el primero, con aria-current
+    // LITERAL "true"; el otro sin el atributo.
+    expect(bullet1).toHaveAttribute("aria-current", "true");
+    expect(bullet2).not.toHaveAttribute("aria-current");
+
+    // Anatomía (spec → Anatomía): div de paginación con exactamente los 2
+    // botones en orden, hermano del <ul> track y dentro de la región única
+    // (sin clases de módulo hasta T5: inspección DOM, criterio T2).
+    const pagination = bullet1.parentElement;
+    expect(pagination?.tagName).toBe("DIV");
+    expect(pagination?.children).toHaveLength(2);
+    expect(pagination?.children.item(1)).toBe(bullet2);
+    const region = screen.getByRole("region", { name: LABELS.carousel });
+    expect(pagination?.parentElement).toBe(region);
+    expect(pagination?.previousElementSibling?.tagName).toBe("UL");
+
+    // Los bullets no reemplazan slides: la región sigue con sus 3 groups.
+    expect(screen.getAllByRole("group")).toHaveLength(3);
+  });
+});
+
+// --- T3 · RF-5 (Tests 9): scroll con rAF mueve el aria-current ----------------
+describe("TestimonialCarousel moves aria-current to the bullet of the active stop on scroll (T3: RF-5, Tests 9)", () => {
+  it("moves aria-current from bullet 1 to bullet 2 when the track scrolls to the second stop", () => {
+    stubSyncRaf();
+    mockCarouselLayout([0, 300, 600], 900, 600);
+    render(carousel());
+
+    const region = screen.getByRole("region", { name: LABELS.carousel });
+    const track = region.querySelector("ul");
+    if (track === null) {
+      throw new Error("T3: la región del carrusel no contiene el <ul> track");
+    }
+
+    // Scroll real post-mount: `scrollLeft` se fija POR INSTANCIA
+    // (Object.defineProperty, como fija spec → Tests esperados) y el handler
+    // lo lee vivo del NODO en el callback rAF (RF-5).
+    Object.defineProperty(track, "scrollLeft", {
+      value: 300,
+      configurable: true,
+    });
+    fireEvent.scroll(track);
+
+    // getActiveStop([0,300], 300) → índice 1: el bullet 2 pasa a "true" y el
+    // 1 queda SIN atributo (aria-current={... : undefined} → sin attr).
+    const bullet1 = screen.getByRole("button", { name: "Go to slide 1" });
+    const bullet2 = screen.getByRole("button", { name: "Go to slide 2" });
+    expect(bullet2).toHaveAttribute("aria-current", "true");
+    expect(bullet1).not.toHaveAttribute("aria-current");
+  });
+});
+
+// --- T3 · RF-3 (Tests 11, rama ≤1 stop): sin bullets ---------------------------
+describe("TestimonialCarousel renders no bullets when there is one stop or fewer (T3: RF-3, Tests 11)", () => {
+  it("renders no bullets for a single testimonial but keeps the region and its card", () => {
+    // [0] con maxScroll = 600 − 600 = 0 → stops [0] → ≤1 stop → la paginación
+    // NO se renderiza (RF-3). No es la rama vacía (0 testimonios, ya cubierta
+    // por T2): la región y la card siguen ahí — la ausencia de bullets no
+    // puede lograrse con un "no render" trivial.
+    mockCarouselLayout([0], 600, 600);
+    render(carousel({ testimonials: [TESTIMONIAL_A] }));
+
+    expect(
+      screen.queryAllByRole("button", { name: /Go to slide/ }),
+    ).toHaveLength(0);
+    expect(screen.getByRole("group", { name: "1 of 1" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Read full testimonial from Ada Lovelace",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("renders no bullets for two testimonials displayed two per view", () => {
+    // [0,300] con maxScroll 0 (600 − 600): ambos offsets recortan a 0 y
+    // deduplican → 1 stop → sin bullets (spec → Comportamiento: "2 testimonios
+    // con 2 por vista"). El carrusel se renderiza completo: 2 slides.
+    mockCarouselLayout([0, 300], 600, 600);
+    render(carousel({ testimonials: [TESTIMONIAL_A, TESTIMONIAL_B] }));
+
+    expect(
+      screen.queryAllByRole("button", { name: /Go to slide/ }),
+    ).toHaveLength(0);
+    expect(screen.getAllByRole("group")).toHaveLength(2);
   });
 });
