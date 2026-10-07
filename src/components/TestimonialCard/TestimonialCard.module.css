@@ -1,21 +1,176 @@
 /* TestimonialCard.module.css — ajustes de la card sobre el Box inner
-   (specs/content/TestimonialCard/spec.md → "Estilos y tokens"). T1: el módulo
-   nace SOLO con `.card` declarada (vacía) para fijar la unión del raíz
-   (G-B: `[styles.card, className]` antes de llegar al Box); ninguna otra
-   clase existe todavía.
+   (specs/content/TestimonialCard/spec.md → "Estilos y tokens"). T3 declara la
+   tabla completa (RF-2, RF-5, RF-6) transcrita textual: cero colores literales
+   (regla dura 1 de docs/DESIGN.md), solo tokens semánticos + las medidas
+   internas fijas citadas de la tabla (`0.9375rem`, `0.75rem`, el `4` del clamp
+   — textual RF-2— y `2rem` de la comilla) + `0` y keywords (regla dura 2).
 
-   T3 declara acá (RF-2, RF-5, RF-6, todo por tokens):
-   - `.card`: position relative, flex column, --radius-16,
-     --testimonial-padding, height 100%, sin margin-top; hover con
-     --shadow-control y transición box-shadow --duration-base --ease-standard.
-   - `.header` (grid auto 1fr), `.identity`, `.name`, `.role`, `.avatar`
-     (margin-top calc(--testimonial-avatar-offset * -1)), `.excerpt` (clamp 4
-     líneas) y `.quote` (--icon-size: 2rem, absolute con
-     --testimonial-quote-inset-*).
-   - `@media print` propio (RF-2) y CERO @media de breakpoints (RF-6). */
+   Responsive SOLO por tokens (RF-6): CERO `@media` de breakpoints en el
+   módulo — padding (16px < 580 → 30/30/24 ≥ 580, --testimonial-padding),
+   subida del avatar (40px → 60px, --testimonial-avatar-offset) y posición de
+   la comilla (--testimonial-quote-inset-*) escalan en tokens/tokens.css. El
+   ÚNICO `@media` del archivo es el bloque `print` propio de la pieza (RF-2 /
+   decisión 17 y G-D-1). Sin `margin-top` en la card: el headroom del avatar
+   que sobresale lo reserva el contenedor con --testimonial-headroom (RF-3;
+   ver spec → "Espacio para el avatar").
 
-/* Unión del raíz con la variante `inner` del Box (las propiedades de la
-   card se conectan en T3; el selector debe existir para que la unión
-   resuelva una clase real). */
+   Composición del raíz (criterio ServiceCard, con una diferencia declarada):
+   el Box une su variante `inner` con [`.card`, className externa] — pero acá
+   las propiedades NO son disjuntas: la tabla de la spec fija en `.card` el
+   radio y el padding propios de la card (`--radius-16`,
+   `--testimonial-padding`), que difieren del default del Box (`inner` trae
+   --radius-box-inner: 14px base y --box-inner-padding: 20px). Empate de
+   especificidad (clases simples): rige el orden en la hoja —
+   TestimonialCard.tsx importa Box (→ Box.module.css) antes que su propio
+   módulo, así que `.card` se emite después de `.inner` y gana. El resto de
+   `.inner` (fondo --color-surface-muted; decisión 17: la superficie es Box
+   inner, no una card a mano) coexiste intacto. */
+
+/* Tabla → Card (base < 580px): `position: relative` ancla el `::after` de
+   `.stretched` (patrón stretched-link) y la comilla absoluta; flex columna
+   apila header/extracto/botón; `height: 100%` iguala alturas en la fila del
+   carrusel (el carrusel fija la fila; RF-3: el headroom NO se reserva acá).
+   Transición de propiedad CONCRETA sobre box-shadow (G-E en plan; regla dura
+   Do/Don't: nada de `transition: all`); --duration-base colapsa a 0.01ms con
+   prefers-reduced-motion en tokens.css. Sin `margin-top` (RF-3). */
 .card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-16);
+  padding: var(--testimonial-padding);
+  height: 100%;
+  transition: box-shadow var(--duration-base) var(--ease-standard);
+}
+
+/* Estados → Hover (RF-5): sombra --shadow-control sobre la raíz de la card
+   (el `::after` del botón no necesita estado hover aparte, plan → Decisiones).
+   En impresión la sombra YA la resuelve el token (--shadow-control: none en
+   tokens.css → @media print): la card NO la redeclara (RF-2). Verificación:
+   inspección + QA F5 (#101; hover no existe en jsdom). */
+.card:hover {
+  box-shadow: var(--shadow-control);
+}
+
+/* Tabla → Encabezado: grilla `auto 1fr` — avatar en la columna 1, identity en
+   la 2, SIN márgenes negativos de layout (la subida del avatar es solo la de
+   `.avatar`). `align-items: end` alinea el pie del hexágono con la última
+   línea del bloque. `column-gap: 0.9375rem` (15px) y `margin-bottom: 0.75rem`
+   (12px) son fijos citados de la tabla (medidas internas del componente,
+   regla dura 2 de docs/DESIGN.md; no escalan por breakpoint). */
+.header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.9375rem;
+  align-items: end;
+  margin-bottom: 0.75rem;
+}
+
+/* Tabla → bloque identity (<div> con h3 + p de rol): la tabla NO le asigna
+   ninguna propiedad (el apilamiento vertical lo da el flujo de bloques); la
+   clase existe para cumplir el markup de spec → Anatomía y que la unión
+   `styles.identity` resuelva una clase real en el módulo. */
+.identity {
+}
+
+/* Tabla → Avatar (RF-4, HexAvatar; clase unida al `wrap` — el elemento raíz
+   al que llega `className` según la API de la primitiva): la subida del
+   avatar que sobresale por encima de la card. 40px < 580 → 60px ≥ 580, solo
+   por el token --testimonial-avatar-offset (2.5rem → 3.75rem); el calc(… *
+   -1) es el literal de la tabla. La protrusión real (offset − padding-top) y
+   su headroom son del contenedor (RF-3, inspección). */
+.avatar {
+  margin-top: calc(var(--testimonial-avatar-offset) * -1);
+}
+
+/* Tabla → Nombre (h3, RF-7): tamaño --font-size-h3 (16px → 18px ≥ 580, por
+   token) y margen de párrafo del UA borrado (el espaciado interno lo gobiernan
+   el grid y el flujo de identity). */
+.name {
+  font-size: var(--font-size-h3);
+  margin: 0;
+}
+
+/* Tabla → Rol: muted text-muted (par aprobado en docs/tokens/contrast.md) y
+   sin margen propio. */
+.role {
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Tabla → Extracto (RF-2): recorte a 4 líneas EN PANTALLA con la receta
+   -webkit-* textual de la tabla (el `4` es textual RF-2). jsdom no computa
+   clamp: la verificación es inspección de esta regla + QA F5 (#101). El
+   contenido es el `testimonial.text` completo (RF-4); `margin: 0` borra el
+   margen de párrafo del UA. */
+.excerpt {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* Tabla → Comilla (RF-4, decorativa): `--icon-size: 2rem` fijado EN LA PROPIA
+   clase unida al <svg> (Icon RF-6: la variable está registrada con
+   inherits:false en tokens.css — un contenedor no la alcanza; criterio
+   ServiceCard `.glyph`); posición absoluta respecto de `.card` arriba-derecha
+   con insets por token (0.7/1.2rem < 580 → 1.5/1.875rem ≥ 580). */
+.quote {
+  --icon-size: 2rem;
+  position: absolute;
+  top: var(--testimonial-quote-inset-block);
+  right: var(--testimonial-quote-inset-inline);
+}
+
+/* Tabla → Botón estirado (RF-1, patrón stretched-link): reset del <button>
+   (`position: static; background: none; border: 0`) + `cursor: pointer`.
+   `static` es deliberado: su propio box queda en la última fila del flex (sin
+   contenido, no aporta alto) y el `::after` —única superficie pintada— se
+   ancla en `.card` (`position: relative`), cubriendo la tarjeta entera sin
+   capturar nada por encima. */
+.stretched {
+  position: static;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* Cobrimiento stretched-link (literal de la tabla): capa transparente sobre
+   toda la card; `border-radius: inherit` sigue el radio de `.card` sin
+   duplicar el token. */
+.stretched::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Estados → Focus-visible del botón (RF-5): anillo estándar del kit (regla
+   dura 7 de docs/DESIGN.md: --focus-ring-width/--color-focus-ring/
+   --focus-ring-offset, solo :focus-visible) SOBRE EL `::after` (tabla
+   literal): el anillo traza el perímetro de la card, no el box vacío del
+   botón. Verificación: inspección + QA F5 (jsdom no computa pseudo-clases). */
+.stretched:focus-visible::after {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Impresión propia de la pieza (RF-2 / decisión 17 y G-D-1; el ÚNICO @media
+   del módulo — RF-6 veda los de breakpoint): en el carrusel impreso con
+   testimonios apilados el extracto muestra el TEXTO COMPLETO (receta textual
+   de spec → Impresión: display block, clamp sin límite, overflow visible) y
+   el botón estirado se oculta (no hay diálogo que abrir en papel). La sombra
+   NO se redeclara: tokens.css → @media print ya resuelve --shadow-control a
+   none y `.card` solo la pinta en hover. */
+@media print {
+  .excerpt {
+    display: block;
+    -webkit-line-clamp: unset;
+    overflow: visible;
+  }
+
+  .stretched {
+    display: none;
+  }
 }
