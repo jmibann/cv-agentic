@@ -211,7 +211,13 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
     // RF-9 (mitad `social`; Tests 8): sin entrada, sin `<ul>` — una lista
     // nombrada vacía no se monta. La identidad y el landmark siguen ahí.
     expect(screen.queryByRole("list", { name: LABELS.social })).toBeNull();
-    expect(screen.queryAllByRole("link")).toHaveLength(0);
+    // Fix T3 aprobado por el usuario: la aserción global de links de T2
+    // sobreasertaba (era cierta solo porque los contactos aún no existían);
+    // con T3 los links de contacto existen por spec (Test 4). El contrato de
+    // este caso (Test 8 / RF-9 mitad `social`) es "sin links DE REDES": se
+    // acota a las marcas del fixture SOCIAL sin debilitarlo.
+    expect(screen.queryByRole("link", { name: "GitHub" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "LinkedIn" })).toBeNull();
     expect(screen.getByRole("complementary", { name: LABELS.region })).toBeInTheDocument();
     expect(screen.getByText(PROFILE.name)).toBeInTheDocument();
   });
