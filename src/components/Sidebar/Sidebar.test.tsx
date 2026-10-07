@@ -54,6 +54,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+// T3: armazón de las defs del gradiente que resuelve el glyph de los IconBox
+// de contactos (patrón IconBox.test.tsx/SectionTitle.test.tsx; en la app las
+// monta AppLayout una sola vez). Import puro: no toca lo anterior.
+import { AccentGradientDefs } from "../Icon";
+
 import { Sidebar } from "./Sidebar";
 import type { SidebarLabels, SidebarProps } from "./Sidebar";
 
@@ -209,5 +214,248 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
     expect(screen.queryAllByRole("link")).toHaveLength(0);
     expect(screen.getByRole("complementary", { name: LABELS.region })).toBeInTheDocument();
     expect(screen.getByText(PROFILE.name)).toBeInTheDocument();
+  });
+});
+
+// ============================================================================
+// Tests de T3 (specs/layout/Sidebar/tasks.md) — RF-5 (uso de `getContactHref`
+// en el render), RF-6 (contactos: `mailto:`/`tel:` sin target; whatsapp y
+// `href` explícito de sitio externos con target/rel), RF-9 (lista de contactos
+// y `Separator`) — Tests esperados #4 y la mitad `contact` del #8.
+//
+// Escenarios (spec → Tests esperados):
+// - #4: un ítem por contacto con su label traducido (Overhead); email/phone/
+//   whatsapp son links con el `href` derivado por `getContactHref` (valores
+//   literales del Test 7); location NO es link; `mailto:`/`tel:` **sin**
+//   `target`/`rel`; whatsapp y un `href` explícito de sitio con
+//   `target="_blank"` + `rel="noopener noreferrer"` (RF-6, decisión 10, D6).
+//   El `title` con el valor completo (spec → Estilos y tokens, tabla
+//   Contactos: "el valor completo va en `title`") es comportamiento DOM
+//   observable y se aserta acá, no en T6.
+// - #8 (mitad `contact` + RF-9): `contact=[]` no renderiza la lista de
+//   contactos; sin contactos **y** sin `downloadCvUrl` tampoco el `Separator`;
+//   con `downloadCvUrl` (el CTA llega en T5) el Separator se mantiene.
+// - extra: phone cuyo valor no conserva dígitos → texto, no link (RF-5: "el
+//   resultado es `undefined` y el valor se muestra como texto"): edge
+//   observable en el render que la derivación pura (test 7) no cubre.
+//
+// Justificación de las queries (constitución T3): los links de contacto por
+// rol `link` + nombre accesible = valor visible (el Overhead es hermano del
+// link en el DOM, no contenido suyo, así que no entra en el nombre). Los
+// labels por texto exacto (Overhead RF-4: las mayúsculas son solo visuales;
+// el DOM conserva "Email"/"WhatsApp"). El `IconBox` de cada fila es
+// decorativo (su RF-2: `aria-hidden="true"`) → sin rol ni nombre posible y la
+// API no define testid: selección **estructural justificada**, mismo criterio
+// de IconBox T1 y SectionTitle T4 — primer hijo del `li` = `<span
+// aria-hidden>` conteniendo el `<svg>` con `stroke="url(#accent-gradient)"`
+// (el `<svg>` defs del armazón no lleva `stroke` y la query está acotada al
+// `li`). El mapeo exacto tipo→glifo (mail/phone/message-circle/map-pin) lo
+// ancla en compile el tipo exhaustivo `Record<ContactItem["type"], IconName>`
+// (criterio ICON_MAP de Icon) + inspección del reviewer: en jsdom distinguir
+// paths específicos sería acoplarse a internals de lucide. El `Separator` (un
+// `<div aria-hidden>` sin nombre) se verifica por selección estructural
+// acotada: `#sidebar-contacts > div[aria-hidden="true"]` — es el ÚNICO div
+// aria-hidden directo del bloque (la lista es `ul` y los IconBox son `span`
+// anidados en los `li`); criterio declarado, sin testid.
+//
+// Armazón: helper `renderSidebarWithDefs` propio de T3 (no se toca
+// `renderSidebar` de T2, P4/T2) que monta `AccentGradientDefs` junto a la
+// pieza. Fixtures: `CONTACT_FULL` calcado de `src/content/cv.en.json` (D4:
+// persona ficticia) y `PROFILE_WITH_CV` con `downloadCvUrl` de placeholder
+// ficticio (rama CV de RF-9).
+//
+// Rojo on-arrival: contra el estado T2 no existe el bloque `.additional` ni
+// los links/valores de contactos — los 8 casos fallen por falta de
+// implementación (la variante `contact=[]` sin CV falla además por el
+// contenedor `#sidebar-contacts` ausente, no por la lista).
+
+// Contactos de T3: los cuatro tipos con los valores de `cv.en.json` (D4).
+const CONTACT_FULL: readonly ContactItem[] = [
+  { id: "email", type: "email", value: "alex@example.com" },
+  { id: "phone", type: "phone", value: "+54 11 5555-0100" },
+  { id: "whatsapp", type: "whatsapp", value: "+54 9 11 5555-0100" },
+  { id: "location", type: "location", value: "Buenos Aires, Argentina" },
+];
+
+// Profile con `downloadCvUrl` (rama CV de RF-9; el botón CTA en sí es T5).
+const PROFILE_WITH_CV: Profile = {
+  ...PROFILE,
+  downloadCvUrl: "/cv/alex-rivera-cv.pdf",
+};
+
+// Selector estructural del Separator dentro del bloque (criterio arriba).
+const SEPARATOR_IN_ADDITIONAL = '#sidebar-contacts > div[aria-hidden="true"]';
+
+// Render de T3 con las defs del gradiente (armazón, patrón IconBox T1).
+function renderSidebarWithDefs(overrides: Partial<SidebarProps> = {}) {
+  const props: SidebarProps = {
+    profile: PROFILE,
+    contact: CONTACT_FULL,
+    social: SOCIAL,
+    labels: LABELS,
+    ...overrides,
+  };
+  return render(
+    <>
+      <AccentGradientDefs />
+      <Sidebar {...props} />
+    </>,
+  );
+}
+
+describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6, RF-9)", () => {
+  it("renders one contact list item per entry with its translated label and IconBox glyph", () => {
+    const { container } = renderSidebarWithDefs();
+
+    const region = screen.getByRole("complementary", { name: LABELS.region });
+
+    // Anatomía: el bloque `.additional` existe con el id del disclosure
+    // (RF-10). En T3 se monta siempre; la lógica de colapso llega en T4.
+    expect(container.querySelector("#sidebar-contacts")).not.toBeNull();
+
+    // Dos listas en el landmark: redes (nombrada, T2) y contactos (Anatomía:
+    // `ul.contacts`, sin nombre propio; por eso se la cuenta, no se la
+    // consulta por nombre). Una fila por contacto recibido.
+    const lists = within(region).getAllByRole("list");
+    expect(lists).toHaveLength(2);
+    expect(within(region).getByRole("list", { name: LABELS.social })).toBeInTheDocument();
+
+    for (const item of CONTACT_FULL) {
+      // Label traducido por tipo, recibido por props (RF-8): Overhead =
+      // `<span>` con el texto tal cual (su RF-4).
+      const label = screen.getByText(LABELS.contact[item.type]);
+      expect(label.tagName).toBe("SPAN");
+
+      // Fila (Anatomía): el `li` que contiene el label; vive en una `ul`.
+      const row = label.closest("li");
+      if (row === null) {
+        throw new Error(
+          `expected the "${LABELS.contact[item.type]}" label to be inside a list item`,
+        );
+      }
+      expect(row.parentElement?.tagName).toBe("UL");
+
+      // IconBox (Anatomía: primer hijo del `li`, decorativo): criterio
+      // estructural justificado en el encabezado — span aria-hidden cuyo
+      // glyph trae el trazo del gradiente.
+      const iconBox = row.firstElementChild;
+      expect(iconBox?.tagName).toBe("SPAN");
+      expect(iconBox).toHaveAttribute("aria-hidden", "true");
+      expect(iconBox?.querySelector('svg[stroke="url(#accent-gradient)"]')).not.toBeNull();
+    }
+
+    // RF-9 (a contrario): con contactos hay Separator entre la info base y
+    // la lista (Anatomía: Separator + `ul.contacts` en `.additional`).
+    expect(container.querySelectorAll(SEPARATOR_IN_ADDITIONAL)).toHaveLength(1);
+  });
+
+  it("renders email and phone as mailto/tel links without target or rel", () => {
+    renderSidebarWithDefs();
+
+    // RF-5 (uso) + Tests 4: `href` derivado por `getContactHref` (valores
+    // literales del Test 7). RF-6 + D6: `mailto:`/`tel:` se abren SIN
+    // `target` ni `rel`.
+    const email = screen.getByRole("link", { name: "alex@example.com" });
+    expect(email).toHaveAttribute("href", "mailto:alex@example.com");
+    expect(email).not.toHaveAttribute("target");
+    expect(email).not.toHaveAttribute("rel");
+
+    const phone = screen.getByRole("link", { name: "+54 11 5555-0100" });
+    expect(phone).toHaveAttribute("href", "tel:+541155550100");
+    expect(phone).not.toHaveAttribute("target");
+    expect(phone).not.toHaveAttribute("rel");
+
+    // Tabla Contactos (spec → Estilos y tokens): valor completo en `title`.
+    expect(email).toHaveAttribute("title", "alex@example.com");
+    expect(phone).toHaveAttribute("title", "+54 11 5555-0100");
+  });
+
+  it("opens the derived whatsapp link in a new tab with noopener noreferrer", () => {
+    renderSidebarWithDefs();
+
+    // RF-6 (decisión 10): el whatsapp derivado es `https://wa.me/…` → link
+    // externo con target/rel (Tests 4).
+    const whatsapp = screen.getByRole("link", { name: "+54 9 11 5555-0100" });
+    expect(whatsapp).toHaveAttribute("href", "https://wa.me/5491155550100");
+    expect(whatsapp).toHaveAttribute("target", "_blank");
+    expect(whatsapp).toHaveAttribute("rel", "noopener noreferrer");
+    expect(whatsapp).toHaveAttribute("title", "+54 9 11 5555-0100");
+  });
+
+  it("opens a contact with an explicit site href as an external link too", () => {
+    // Tests 4: "un `href` explícito de sitio" — el explícito prioriza sobre
+    // la derivación (tabla API, Test 7) y siendo http(s) es externo (RF-6).
+    renderSidebarWithDefs({
+      contact: [
+        {
+          id: "site",
+          type: "location",
+          value: "alexrivera.dev",
+          href: "https://alexrivera.dev",
+        },
+      ],
+    });
+
+    const site = screen.getByRole("link", { name: "alexrivera.dev" });
+    expect(site).toHaveAttribute("href", "https://alexrivera.dev");
+    expect(site).toHaveAttribute("target", "_blank");
+    expect(site).toHaveAttribute("rel", "noopener noreferrer");
+    expect(site).toHaveAttribute("title", "alexrivera.dev");
+  });
+
+  it("renders location as plain text, not a link", () => {
+    renderSidebarWithDefs();
+
+    // RF-5/RF-6 + Tests 4: location → sin link (`getContactHref` devuelve
+    // `undefined`); el valor se muestra como texto con su `title`.
+    expect(screen.queryByRole("link", { name: "Buenos Aires, Argentina" })).toBeNull();
+    const value = screen.getByText("Buenos Aires, Argentina");
+    expect(value.tagName).toBe("P");
+    expect(value).toHaveAttribute("title", "Buenos Aires, Argentina");
+  });
+
+  it("shows a phone value without digits as plain text", () => {
+    // extra: RF-5 "SI tras la limpieza `phone` o `whatsapp` no conserva
+    // dígitos, ENTONCES el resultado es `undefined` y el valor se muestra
+    // como texto". La derivación la fija el Test 7 de `getContactHref`; acá
+    // se verifica la rama de render (texto, no link) — edge evidente que la
+    // lista de tests no discriminaba en el componente.
+    renderSidebarWithDefs({
+      contact: [{ id: "phone-bad", type: "phone", value: "N/D" }],
+    });
+
+    expect(screen.queryByRole("link", { name: "N/D" })).toBeNull();
+    const value = screen.getByText("N/D");
+    expect(value.tagName).toBe("P");
+    expect(value).toHaveAttribute("title", "N/D");
+  });
+
+  it("renders no contacts list and no Separator when contact is empty and there is no downloadCvUrl", () => {
+    const { container } = renderSidebarWithDefs({ contact: [] });
+
+    // RF-9 + Tests 8: sin contactos → sin lista (queda solo la de redes),
+    // sin labels; sin contactos **y** sin `downloadCvUrl` → sin Separator.
+    // El contenedor `#sidebar-contacts` se monta igual en T3 (T4 lo vuelve
+    // colapsable; RF-10).
+    const region = screen.getByRole("complementary", { name: LABELS.region });
+    expect(within(region).getAllByRole("list")).toHaveLength(1);
+    for (const contactLabel of Object.values(LABELS.contact)) {
+      expect(screen.queryByText(contactLabel)).toBeNull();
+    }
+    expect(container.querySelectorAll(SEPARATOR_IN_ADDITIONAL)).toHaveLength(0);
+    expect(container.querySelector("#sidebar-contacts")).not.toBeNull();
+  });
+
+  it("keeps the Separator when contact is empty but downloadCvUrl exists", () => {
+    // RF-9 omite el Separator solo sin contactos **y** sin CV; con CV el
+    // Separator se mantiene (el CTA que lo acompaña llega en T5).
+    const { container } = renderSidebarWithDefs({
+      contact: [],
+      profile: PROFILE_WITH_CV,
+    });
+
+    const region = screen.getByRole("complementary", { name: LABELS.region });
+    expect(within(region).getAllByRole("list")).toHaveLength(1);
+    expect(container.querySelectorAll(SEPARATOR_IN_ADDITIONAL)).toHaveLength(1);
   });
 });
