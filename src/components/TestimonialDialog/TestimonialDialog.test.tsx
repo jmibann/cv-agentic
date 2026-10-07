@@ -1,6 +1,8 @@
-// Tests de T1 y T2 (specs/content/TestimonialDialog/tasks.md) — RF-1, RF-4 y el
-// tramo de RF-2 que toca T1 (Close → close → evento `close` → onClose una vez;
-// Tests esperados 1, 2, 3 —parcial— y 7 de la spec).
+// Tests de T1, T2 y el cierre de T3 (specs/content/TestimonialDialog/tasks.md)
+// — RF-1, RF-4 y el tramo de RF-2 que toca T1 (Close → close → evento `close`
+// → onClose una vez; Tests esperados 1, 2, 3 —parcial— y 7 de la spec). T3
+// agrega SOLO el cierre `expectNoA11yViolations` (Tests esperados 8; RF-5/RF-6
+// se verifican por inspección del módulo + QA F5, como fija su "Hecho cuando").
 //
 // Alcance T1 (tasks → Hecho cuando): `testimonial=null` → container vacío y
 // sin dialog en el DOM (RF-1, decisión 18=b); con valor → dialog abierto por
@@ -12,15 +14,37 @@
 // invoca `onClose` exactamente una vez VÍA el evento `close` (no directa: el
 // assert de `open` ausente prueba que pasó por `dialog.close()`; RF-2/Test 3).
 //
-// Diferidos declarados (tasks.md): T2 conecta el resto del ciclo (evento
-// `close` sintético de Esc, backdrop/padding, cleanup con null desde el
-// padre); T3 agrega el módulo CSS (clases `.dialog`/`.close`/`.layout`/
-// `.aside`/`.body`/`.quote`: NINGUNA aserción de T1 fija clases del módulo —
-// el módulo nace en T3, tasks lo asigna ahí —), el `index.ts` y el cierre
-// `expectNoA11yViolations` de Tests esperados 8 como último describe del
-// archivo (constitución T4; patrón TestimonialCard/ServiceCard: llega con la
-// última tarea, no se adelanta). Las queries de T1 asertan solo estructura
-// DOM (tags, orden, relaciones de padre) y atributos accesibles.
+// Diferidos (tasks.md) — estado tras T3: T2 conectó el resto del ciclo
+// (evento `close` sintético de Esc, backdrop/padding, cleanup con null desde
+// el padre) y T3 CUMPLIÓ los suyos: crea el módulo CSS y conecta las clases
+// de Anatomía (`.dialog`/`.close`/`.layout`/`.aside`/`.body`/`.quote`), crea
+// el `index.ts` y agrega el cierre `expectNoA11yViolations` de Tests
+// esperados 8 como último describe del archivo (constitución T4; patrón
+// TestimonialCard/ServiceCard: llega con la última tarea, no se adelanta).
+// NINGUNA aserción de T1/T2 fija clases del módulo (queries por rol, texto,
+// atributos accesibles y estructura DOM — tags, orden, relaciones de padre —,
+// como se declaró al escribir T1): la conexión de clases de T3 NO cambia el
+// DOM observable que T1/T2 asertan (cardinalidad de hijos, orden y atributos
+// intactos), así que esos tests quedan verdes sin tocarlos (constitución T2).
+// Única deuda restante (nativa de navegador; spec → ciclo, Accesibilidad y
+// RF-4/RF-5/RF-6: "verifica en QA F5"): top layer real y `::backdrop`
+// pintado, click-backdrop real, foco inicial en Close y retorno de foco al
+// disparador, entrada `@starting-style`, dos columnas ≥580 / comilla oculta
+// <580, scroll interno de `.layout` con contenido largo y no-impresión —
+// inspección del módulo + QA F5 (#101; jsdom no computa CSS ni foco modal).
+
+// Verde on-arrival T3 (decisión #101, criterio exacto Box T4 / TestimonialCard
+// T3, declarado en el commit `test(TestimonialDialog): T3`): el único
+// escenario nuevo es el cierre axe con el dialog abierto. Llega VERDE contra
+// la implementación de T1/T2 porque el markup ya era accesible (dialog
+// nombrado por `aria-labelledby` al h2 del autor, botón Close nombrado por
+// `aria-label`, avatar `alt=""` y comilla/x `aria-hidden` decorativas) y T3
+// agrega solo CSS que jsdom no computa (módulo, `::backdrop`,
+// `@starting-style`, los dos `@media`): no hay nada discriminate-testable en
+// jsdom para el alcance de T3 — la verificación real es la INSPECCIÓN del
+// módulo (su "Hecho cuando" la fija: las 9 filas de la tabla, los dos únicos
+// `@media` 580/print, cero otros) + QA F5. El valor del cierre es la
+// regresión futura sobre la pieza completa.
 //
 // Rojo on-arrival (decisión #101, criterio exacto TestimonialCard T1): este
 // commit `test(TestimonialDialog): T1` es rojo por "Failed to resolve import"
@@ -90,6 +114,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import type { Testimonial } from "@data/cv.types.generated";
+
+import { expectNoA11yViolations } from "../../test/a11y";
 
 import { HexAvatarDefs } from "../HexAvatar";
 import { AccentGradientDefs } from "../Icon";
@@ -543,5 +569,50 @@ describe("TestimonialDialog parent-driven close and reopen cycle (T2: RF-3)", ()
     // 1 sola llamada tras reabrir (Close → close() → close → onClose; sin
     // duplicados del ciclo anterior).
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+// --- T3 · Cierre: expectNoA11yViolations con el dialog abierto (Test 8) ----------
+// ============================================================================
+// CIERRE de accesibilidad (constitución T4; spec → Tests esperados 8:
+// "expectNoA11yViolations sin violaciones con el dialog abierto (armazón defs
+// montado)"). ÚLTIMO describe del archivo (patrón TestimonialCard/ServiceCard/
+// HexAvatar: llega con la última tarea).
+//
+// VERDE on-arrival #101 (declaración completa en el encabezado del archivo):
+// el markup ya era accesible desde T1/T2 y T3 conecta solo clases de un módulo
+// CSS que jsdom no computa; el cierre no discrimina el estado de la
+// implementación de T3 — su valor es la regresión futura sobre la pieza
+// completa y la verificación real de RF-5/RF-6 es inspección + QA F5.
+//
+// Fixture: dialog abierto completo (`testimonialDialog()`: armazones
+// `HexAvatarDefs` + `AccentGradientDefs` — contrato de las primitivas para el
+// recorte hexagonal y el gradiente de la comilla—, testimonial fixture y
+// `closeLabel` "Close"). El anclaje fija QUÉ se audita (criterio
+// TestimonialCard T3/ServiceCard: sin assert de anclaje el cierre no
+// distingue la rama): rol `dialog` con el nombre del autor, atributo `open`
+// (observable del showModal en el mock de F1), h2 con el id literal y botón
+// Close nombrado — el dialog CERRADO no se audita porque no se monta (RF-1:
+// con null no hay dialog en el DOM; Test 1, ya cubierto en T1).
+// ============================================================================
+describe("TestimonialDialog accessibility audit with the dialog open (T3: cierre, Tests esperados 8)", () => {
+  it("has no accessibility violations with the full open dialog", async () => {
+    const { container } = render(testimonialDialog());
+
+    // Anclaje de la auditoría: dialog abierto completo (roles y nombres que
+    // la pieza expone; ver describe T1 para el detalle de cada assert).
+    const dialog = screen.getByRole("dialog", { name: TESTIMONIAL.author });
+    expect(dialog).toHaveAttribute("open");
+    expect(
+      within(dialog).getByRole("heading", {
+        level: 2,
+        name: TESTIMONIAL.author,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("button", { name: CLOSE_LABEL }),
+    ).toBeInTheDocument();
+
+    await expectNoA11yViolations(container);
   });
 });
