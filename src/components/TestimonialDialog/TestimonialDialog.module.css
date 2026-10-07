@@ -1,8 +1,11 @@
 /* TestimonialDialog.module.css — specs/content/TestimonialDialog/spec.md →
    "Estilos y tokens" (T3; RF-5, RF-6). Transcripción COMPLETA de la tabla de
-   9 filas: Dialog, Backdrop, Entrada, Layout, Close, Comilla, Avatar (sin
-   clase propia: la primitiva HexAvatar se usa DIRECTA — fila "Avatar": "no se
-   reimplementa"; ninguna otra clase le corresponde en esta pieza), Scroll del
+   10 filas: Dialog, Backdrop, Entrada, Layout, Rol (fila añadida por decisión
+   del usuario 2026-10-07 sobre el spec aprobado — commit `4f206ef`: cubre el
+   `<p class="role">` de la Anatomía, misma convención que el rol de
+   TestimonialCard; aplicada como micro-fix posterior a T3), Close, Comilla,
+   Avatar (sin clase propia: la primitiva HexAvatar se usa DIRECTA — fila
+   "Avatar": "no se reimplementa"; ninguna otra clase le corresponde), Scroll del
    fondo (fila "Scroll del fondo": `html:has(dialog[open]) { overflow: hidden }`
    YA vive en src/styles/global.css desde F1 — verificado en T3 (línea 41 de
    ese archivo): alcanza, no se duplica acá, RF-5) e Impresión (fila
@@ -131,15 +134,31 @@
   flex-direction: column;
 }
 
-/* Anatomía — columna 2 ≥580 (debajo del aside en la base): h2 + p de rol + p
-   de texto COMPLETO. La tabla NO le asigna NINGUNA propiedad: el apilamiento
-   vertical lo da el flujo de bloques (los márgenes del h2 los borra la base
-   tipográfica global de src/styles/global.css; los <p> conservan su margen
-   de párrafo UA — la tabla no define tipografía ni espaciado del cuerpo del
-   dialog y el excedente de altura lo resuelve el scroll de `.layout`). La
-   clase existe para cumplir el markup de spec → Anatomía (criterio exacto
-   del `.identity` vacío de TestimonialCard). */
+/* Anatomía — columna 2 ≥580 (debajo del aside en la base): h2 + p de rol
+   (clase `.role`, abajo) + p de texto COMPLETO. La tabla NO le asigna
+   ninguna propiedad: el apilamiento vertical lo da el flujo de bloques (los
+   márgenes del h2 los borra la base tipográfica global de
+   src/styles/global.css; el p de texto conserva su margen de párrafo UA — la
+   tabla no define tipografía para el texto del cuerpo del dialog y el
+   excedente de altura lo resuelve el scroll de `.layout`). La clase existe
+   para cumplir el markup de spec → Anatomía (criterio exacto del `.identity`
+   vacío de TestimonialCard). */
 .body {
+}
+
+/* Fila "Rol" (decisión del usuario 2026-10-07, aplicada como micro-fix tras
+   T3 — Cambio de spec aprobado en `4f206ef`): `color:
+   var(--color-text-muted); margin: 0;` LITERAL de la tabla, para el
+   `<p class="role">` de la Anatomía (la clase de la muestra HTML por fin
+   tiene fila propia; misma convención que `.role` de TestimonialCard: muted
+   text-muted y margen de párrafo del UA borrado — el `margin: 0` es `0`,
+   siempre permitido). Contraste: par `text-muted` sobre `surface` (el fondo
+   del dialog es --color-surface, fila "Dialog") = 5.02 claro / 6.01 oscuro,
+   AA registrado en docs/tokens/contrast.md; NUNCA va sobre --color-bg
+   (regla 1 de ese documento; acá no aplica: vive dentro del dialog). */
+.role {
+  color: var(--color-text-muted);
+  margin: 0;
 }
 
 /* Fila "Close" (RF-5; spec → Estados): absolute top/right --space-4 sobre el

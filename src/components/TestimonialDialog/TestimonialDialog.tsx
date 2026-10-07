@@ -41,10 +41,12 @@
 // por `close()` → evento `close` → `handleClose` (No hacer).
 //
 // T3 (tasks.md) creó el módulo CSS y conectó las clases de Anatomía
-// (`.dialog`, `.close`, `.layout`, `.aside`, `.body`, `.quote` — esta vía la
-// prop `className` de Icon, única forma de fijar `--icon-size` en el propio
-// glifo; el HexAvatar va DIRECTO y el <p> de rol sin clase: la tabla de esta
-// pieza no les asigna fila, ver comentarios en el JSX) y creó el `index.ts` y
+// (`.dialog`, `.close`, `.layout`, `.aside`, `.body`, `.role`, `.quote` —
+// esta vía la prop `className` de Icon, única forma de fijar `--icon-size`
+// en el propio glifo; el HexAvatar va DIRECTO: la tabla no le asigna clase
+// en esta pieza; `.role` cubre el <p> del rol desde la fila "Rol" añadida
+// por decisión del usuario 2026-10-07 — spec `4f206ef` —, aplicada como
+// micro-fix tras T3) y creó el `index.ts` y
 // el cierre `expectNoA11yViolations` del test. En T1 el DOM nació SIN clases
 // de módulo (los tests de T1/T2 no asertan ninguna: estructura y roles; la
 // conexión de T3 no cambia el DOM observable). El id del título es literal de
@@ -258,14 +260,15 @@ export function TestimonialDialog({
           {/* Nombre accesible del dialog (RF-4): h2 con el id literal de
               Anatomía; niveles según spec (dialog usa h2; la card, h3). */}
           <h2 id={TITLE_ID}>{testimonial.author}</h2>
-          {/* Rol y texto COMPLETO (RF-4). Sin clase propia: la tabla
-              "Estilos y tokens" de ESTA pieza no define ninguna fila para el
-              rol del dialog (el muted/offset es de la card; la muestra HTML
-              de Anatomía `class="role"` no tiene estilo asignado y no se
-              inventan propiedades — nota reportada al cerrar T3); el
-              espaciado lo da el flujo de bloques (margen de párrafo UA) y el
-              excedente de altura lo scrollea `.layout`. */}
-          <p>{testimonial.role}</p>
+          {/* Rol y texto COMPLETO (RF-4). El <p> de rol lleva `.role` —
+              muted --color-text-muted + `margin: 0`, literal de la fila
+              "Rol" de la tabla (decisión del usuario 2026-10-07,
+              commit de spec `4f206ef`; misma convención que la card; par
+              AA text-muted/surface en docs/tokens/contrast.md). El <p> de
+              texto SIN clase: la tabla no la define; su espaciado lo da el
+              margen de párrafo UA y el excedente de altura lo scrollea
+              `.layout`. */}
+          <p className={styles.role}>{testimonial.role}</p>
           <p>{testimonial.text}</p>
         </div>
       </div>
