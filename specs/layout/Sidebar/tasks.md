@@ -1,9 +1,9 @@
 # Tareas — Sidebar
 
-- [x] **T1. `getContactHref` (pura).** RF-5 — e0cc73a
+- [x] **T1. `getContactHref` (pura).** RF-5 — e0cc73a · deuda #102: cuerpo del `feat` con acento ("explícito"); no enmendable, registrado en revisión completa r1
   - Hecho cuando: `src/components/Sidebar/getContactHref.ts` exporta la función sin React; pasan sus tests con la tabla exacta de spec → API (explícito prioriza; `mailto`; `tel:+5411…` con `+` solo inicial y sin otros no-dígitos; tel sin dígitos → `undefined`; `wa.me` solo dígitos sin `+`; location → `undefined`); verde tras `feat(Sidebar): T1`.
 
-- [x] **T2. Estructura base: aside, identidad y redes.** RF-1, RF-6 (redes), RF-8 — 9d0a77d
+- [x] **T2. Estructura base: aside, identidad y redes.** RF-1, RF-6 (redes), RF-8 — 9d0a77d · deuda #102: subject del `feat` en español ("T2 · estructura…"); no enmendable, registrado en revisión completa r1
   - Hecho cuando: `getByRole("complementary", { name: labels.region })`; avatar `<img>` con `alt` de `profile.avatar.alt` **sin** atributos `width`/`height` (RF: decisión 9); nombre `<p>`; `Badge` con headline; `ul` de redes nombrada con un `li` por entrada: `<a aria-label={marca}>` externo con `target="_blank"` + `rel="noopener noreferrer"` y `BrandIcon`; la pieza no importa `useCv`/`useLocale` (inspección); verde tras `feat(Sidebar): T2`.
 
 - [x] **T3. Contactos: IconBox + Overhead + links derivados.** RF-5 (uso), RF-6 (mailto/tel sin target), RF-9 — 872b122 (fix de sobreaserción T2 aprobado por el usuario: `4ff4424`; menores a vigilar en T6: `#sidebar-contacts` vacío sin spacing fantasma, ellipsis/`--color-heading`)
@@ -15,5 +15,5 @@
 - [x] **T5. Download CV.** RF-2 — d2a9829
   - Hecho cuando: con `profile.downloadCvUrl` existe `getByRole("link", { name: labels.downloadCv })` con ese `href` y atributo `download` (`Button href… download icon="download" fullWidth`); sin URL no existe; verde tras `feat(Sidebar): T5`.
 
-- [x] **T6. Estilos por tokens, responsive CSS-only y cierre a11y.** RF-7, RF-10 — 1a2136e (F5 verificar: edge colapso de márgenes `contact=[]`+CTA; separaciones `--space-2/4` resueltas con tokens; F8 avatar sigue abierto)
+- [x] **T6. Estilos por tokens, responsive CSS-only y cierre a11y.** RF-7, RF-10 — 1a2136e (F5 verificar: edge colapso de márgenes `contact=[]`+CTA; separaciones `--space-2/4` resueltas con tokens; F8 avatar sigue abierto; `ul` flex sin `role="list"` → VoiceOver/Safari en QA F5; nota r1: los dos `@media` (768 layout + 1200 xl) son los que manda la spec — "único media" en este renglón se leía "único de comportamiento xl")
   - Hecho cuando: el módulo declara grilla `< md`/`md–lg`, columna xl con avatar sobresaliente (`margin-top: calc(var(--size-avatar-sidebar) * -0.71)`, fórmula compartida con `foundations/layout.md`), `--sidebar-*` tokens, redes/links con hover/foco (`--color-accent-text`, subrayado en contacto, anillo), transiciones por tokens, `@media (min-width: 1200px)` único media (layout: oculta CornerTab, fuerza `.additional`, sin literales), tramo del Separator sin acumular el `gap` de `.additional` (mecanismo documentado en comentario; Separator RF-4), cero `@media print` (RF-10: lo cubren estilos compartidos, inspección); el archivo termina con `expectNoA11yViolations` (colapsado y expandido, con `AccentGradientDefs` de armazón); `index.ts` re-exporta `Sidebar`, tipos y `getContactHref`; lint + typecheck + test verdes tras `feat(Sidebar): T6`.
