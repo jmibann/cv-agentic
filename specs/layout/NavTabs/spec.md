@@ -1,5 +1,5 @@
 # NavTabs
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
