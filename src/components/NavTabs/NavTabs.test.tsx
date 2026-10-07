@@ -431,8 +431,8 @@ describe("NavTabs keyboard roving and Space activation (T3: RF-4)", () => {
     expect(focusedTab).toHaveFocus();
 
     // RF-4: "↑/↓ no mueven el foco (tablist horizontal)" y "las demás teclas
-    // quedan al comportamiento nativo sin efecto adicional" → no se
-    // preventDeFEaultean (no se inventa más; plan → Decisiones: ↑/↓ ignoradas).
+    // quedan al comportamiento nativo sin efecto adicional" → no se les hace
+    // preventDefault (no se inventa más; plan → Decisiones: ↑/↓ ignoradas).
     await user.keyboard("{ArrowUp}");
     expect(focusedTab).toHaveFocus();
     expect(onChange).not.toHaveBeenCalled();
