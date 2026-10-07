@@ -449,6 +449,33 @@ describe("NavTabs keyboard roving and Space activation (T3: RF-4)", () => {
   });
 });
 
+// --- T4 · Test esperado 11: ningún botón de menú (RF-6) -----------------------
+// Hallazgo único de la revisión completa de la pieza (ronda 1): la lista de
+// "Tests esperados" de la spec incluye el #11 — "No existe ningún botón de
+// menú (`queryByRole("button", { name: /menu|menú/i })` es null)" — y no
+// estaba en el archivo (RF-6 y spec → No hacer: sin hamburguesa ni drawer en
+// ningún breakpoint; P3: el RF sí tiene contrapartida en Tests esperados, así
+// que el test se agrega acá, en T4, que cubre RF-6). Render con los items
+// normales (about/resume): la pieza solo produce la CornerTab con su tablist
+// y un `button role="tab"` por item (T1), nunca un botón de menú.
+// #101 VERDE on-arrival DECLARADO: RF-6 ya lo garantiza en cualquier render
+// actual — no hay nada implementado que este `it` discrimine (nacería rojo
+// solo con una regresión que reintrodujera un botón "Menu", exactamente el
+// escenario que la spec → No hacer prohíbe; valor: fijar el negativo de RF-6
+// contra regresiones, mismo criterio que los verdes declarados de T3).
+// Criterio de la fase: el cierre axe queda al final del archivo; este describe
+// va antes. Ningún assert previo fue tocado (adición pura).
+describe("NavTabs renders no menu button (T4: RF-6)", () => {
+  it("has no button named like a menu with the regular items", () => {
+    renderNavTabs();
+
+    // spec → Tests esperados 11, literal: `queryByRole("button", { name:
+    // /menu|menú/i })` es null (los tabs son `role="tab"`, no botones de
+    // menú; el raíz CornerTab es un div sin controles propios).
+    expect(screen.queryByRole("button", { name: /menu|menú/i })).toBeNull();
+  });
+});
+
 // --- T4 · Cierre a11y con armazón tabpanel (RF-5, RF-6) ----------------------
 // spec → Tests esperados 12 y "Hecho cuando" de T4: el archivo termina con
 // `expectNoA11yViolations` "renderizado junto a un tabpanel con el id
