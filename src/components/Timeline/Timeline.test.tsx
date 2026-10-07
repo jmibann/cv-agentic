@@ -286,6 +286,182 @@ describe("Timeline className joining (T1: spec → API, G-B)", () => {
   });
 });
 
+// --- Fixtures de T2 -----------------------------------------------------------
+// Entradas NUEVAS (las de T1 no sirven acá: hacen falta rangos "YYYY-MM" y un
+// `end: null` con `start` "YYYY" para los textos formateados y el presente).
+// Personas e instituciones ficticias (constitución D4).
+const T2_RANGE: TimelineEntry = {
+  id: "ms-ai",
+  title: "M.Sc. in Applied Intelligence",
+  organization: "Riverton Technical Institute",
+  start: "2019-03",
+  end: "2021-11",
+  description: "Machine learning track.",
+};
+
+const T2_OPEN: TimelineEntry = {
+  id: "lead-fe",
+  title: "Lead Frontend Developer",
+  organization: "Example Digital Studio",
+  // Rama end:null (RF-3) con start "YYYY" → texto "2015 — Actualidad".
+  start: "2015",
+  end: null,
+  description: "Design systems and accessibility work.",
+};
+
+const T2_YEARS: TimelineEntry = {
+  id: "doc-course",
+  title: "Doctoral Coursework",
+  organization: "Lakeside Graduate School",
+  start: "2012",
+  end: "2014",
+  description: "Evening programme.",
+};
+
+// Render aislado de T2: UNA entrada con la API completa; `locale` y
+// `presentLabel` (props tipadas sin conectar en T1) se conectan acá (RF-3/4).
+const timelineT2 = ({
+  entry,
+  locale = "en",
+  presentLabel = "Present",
+}: {
+  entry: TimelineEntry;
+  locale?: Locale;
+  presentLabel?: string;
+}) => (
+  <Timeline
+    entries={[entry]}
+    locale={locale}
+    presentLabel={presentLabel}
+    idPrefix="edu"
+  />
+);
+
+// Query estructural JUSTIFICADA (plan → Estrategia de tests, test 6): `<time>`
+// no tiene rol ARIA, así que no existe query por rol para los extremos del
+// período; `querySelectorAll("time")` dentro del `article` (sí obtenido por
+// rol + nombre accesible, T3 de la constitución) es la única alternativa y el
+// plan del componente la admite explícitamente. `noUncheckedIndexedAccess`
+// obliga a verificar cada extremo con throw de invariante (precedente T1: sin
+// `!` ni `as`).
+const periodTimes = (article: HTMLElement): HTMLTimeElement[] =>
+  Array.from(article.querySelectorAll("time"));
+
+const requireTime = (time: HTMLTimeElement | undefined): HTMLTimeElement => {
+  if (time === undefined) {
+    throw new Error(
+      "el período debe envolver cada fecha en <time dateTime> (RF-4)",
+    );
+  }
+  return time;
+};
+
+// --- T2 · RF-3, RF-4: período con <time> por extremo --------------------------
+// "Hecho cuando" de T2 (tasks.md): rango → DOS `<time>` con `dateTime` igual a
+// cada VALOR CRUDO del dato y texto formateado por `formatPeriodEndpoint`
+// según `locale` (en/es; spec → Tests esperados 5 y 6); `end: null` → UN
+// `<time>` + `presentLabel` como TEXTO (RF-3; Accesibilidad: "Present es
+// texto"); separador fijo `" — "` del contrato de `foundations/i18n.md`,
+// visible en el `textContent` del `<p>`. La parte "sin strings compuestas
+// parseadas" (RF-4) se verifica por INSPECCIÓN del `Timeline.tsx` (#101):
+// importa `formatPeriodEndpoint` y nunca `formatPeriod` ni `Intl`; no es
+// discriminate-testable desde el DOM y no se agrega test artificial.
+describe("Timeline period with time per endpoint (T2: RF-3, RF-4)", () => {
+  it("renders two time elements with raw datetime, en-formatted text and the fixed separator", () => {
+    render(timelineT2({ entry: T2_RANGE }));
+
+    const article = screen.getByRole("article", { name: T2_RANGE.title });
+    const times = periodTimes(article);
+    if (times.length !== 2) {
+      throw new Error(
+        `un rango debe renderizar exactamente dos <time> (RF-4, Tests esperados 6); se encontraron ${times.length}`,
+      );
+    }
+    const start = requireTime(times[0]);
+    const end = requireTime(times[1]);
+
+    // RF-4: `dateTime` = valor CRUDO del dato (no el texto formateado).
+    expect(start).toHaveAttribute("datetime", "2019-03");
+    expect(end).toHaveAttribute("datetime", "2021-11");
+    // Test 5: texto de cada extremo formateado con `formatPeriodEndpoint`
+    // para `locale="en"`.
+    expect(start.textContent).toBe("Mar 2019");
+    expect(end.textContent).toBe("Nov 2021");
+
+    // El separador `" — "` va ENTRE los dos `<time>` (Anatomía): es un nodo de
+    // texto del `<p>` (sin rol), se verifica por su textContent completo.
+    const period = start.parentElement;
+    if (period === null) {
+      throw new Error("cada <time> debe vivir en el <p class=period> (Anatomía)");
+    }
+    expect(period.tagName).toBe("P");
+    expect(period.textContent).toBe("Mar 2019 — Nov 2021");
+  });
+
+  it("formats both endpoints for the es locale (spec → Tests esperados 5)", () => {
+    render(
+      timelineT2({ entry: T2_RANGE, locale: "es", presentLabel: "Actualidad" }),
+    );
+
+    const article = screen.getByRole("article", { name: T2_RANGE.title });
+    const times = periodTimes(article);
+    if (times.length !== 2) {
+      throw new Error(
+        `un rango debe renderizar exactamente dos <time> (RF-4, Tests esperados 6); se encontraron ${times.length}`,
+      );
+    }
+    const start = requireTime(times[0]);
+    const end = requireTime(times[1]);
+
+    // El `locale` SOLO cambia el texto formateado; `dateTime` sigue crudo.
+    expect(start).toHaveAttribute("datetime", "2019-03");
+    expect(start.textContent).toBe("mar 2019");
+    expect(end.textContent).toBe("nov 2021");
+    expect(start.parentElement?.textContent).toBe("mar 2019 — nov 2021");
+  });
+
+  it("renders a single time and the present label as plain text when end is null (RF-3, spec → Tests esperados 4 y 6)", () => {
+    render(
+      timelineT2({ entry: T2_OPEN, locale: "es", presentLabel: "Actualidad" }),
+    );
+
+    const article = screen.getByRole("article", { name: T2_OPEN.title });
+    const times = periodTimes(article);
+    // Un solo `<time>`: el presente NO se envuelve en `<time>` (RF-3;
+    // Accesibilidad: "Present es texto").
+    expect(times).toHaveLength(1);
+    const start = requireTime(times[0]);
+
+    expect(start).toHaveAttribute("datetime", "2015");
+    expect(start.textContent).toBe("2015");
+    // "Actualidad" queda como texto del `<p>` (el único `<time>` solo
+    // contiene "2015", así el resto del texto es necesariamente fuera de él).
+    expect(start.parentElement?.textContent).toBe("2015 — Actualidad");
+  });
+
+  it("keeps bare YYYY values unchanged in datetime and text (RF-4)", () => {
+    render(timelineT2({ entry: T2_YEARS }));
+
+    const article = screen.getByRole("article", { name: T2_YEARS.title });
+    const times = periodTimes(article);
+    if (times.length !== 2) {
+      throw new Error(
+        `un rango debe renderizar exactamente dos <time> (RF-4, Tests esperados 6); se encontraron ${times.length}`,
+      );
+    }
+    const start = requireTime(times[0]);
+    const end = requireTime(times[1]);
+
+    // "YYYY" sin mes: `formatPeriodEndpoint` lo devuelve tal cual (RF-8 de
+    // foundations/i18n.md): dateTime Y texto son el año.
+    expect(start).toHaveAttribute("datetime", "2012");
+    expect(start.textContent).toBe("2012");
+    expect(end).toHaveAttribute("datetime", "2014");
+    expect(end.textContent).toBe("2014");
+    expect(start.parentElement?.textContent).toBe("2012 — 2014");
+  });
+});
+
 // El cierre `expectNoA11yViolations` del archivo (constitución T4) se agrega
 // en `test(Timeline): T3` con la cobertura de RF-6/RF-7 (tasks.md;
 // precedente LanguageSwitcher/ThemeToggle). Acá termina T1 a propósito.
