@@ -2,7 +2,9 @@
 // (specs/content/TestimonialDialog/spec.md). T1: montaje condicional con
 // contenido (RF-1, RF-4): `testimonial === null` → `return null` (decisión
 // 18=b: no hay `<dialog>` en el DOM); con valor monta el dialog y lo abre con
-// `dialog.showModal()` en el effect de mount (efecto observable en jsdom como
+// `dialog.showModal()` en un effect atado a la PRESENCIA del nodo (dep
+// booleana `testimonial !== null`: revive en la transición null→valor del
+// consumidor permanente —reparo T1 ronda 1—; efecto observable en jsdom como
 // atributo `open` vía el mock de src/test/setup.ts; el top layer real es del
 // navegador — QA F5). Anatomía literal (spec → Anatomía): botón Close primero
 // (`type="button"`, `aria-label={closeLabel}`, `<Icon name="x" />`
@@ -18,8 +20,9 @@
 // `testimonial === null` no debe invocar `onClose`).
 //
 // Diferidos declarados (tasks.md): T2 conecta el resto del ciclo (cleanup del
-// mount-effect con `dialog.close()` si `dialog.open` para el valor→null desde
-// el padre, y la detección de backdrop real vs franja de padding en click —
+// effect de apertura —este de abajo, el mismo effect, no otro— con
+// `dialog.close()` si `dialog.open` para el valor→null desde el padre y el
+// desmontaje, y la detección de backdrop real vs franja de padding en click —
 // RF-3); T3 crea el módulo CSS y conecta las clases de Anatomía (`.dialog`,
 // `.close`, `.layout`, `.aside`, `.body`, `.quote`) — en T1 el DOM nace SIN
 // clases de módulo: los tests de T1 no asertan ninguna (elección declarada al
@@ -72,14 +75,25 @@ export function TestimonialDialog({
     latestRef.current = testimonial;
   });
 
-  // RF-1: effect de MOUNT (deps []): con valor, el dialog recién montado se
-  // abre con showModal(). Sin guard `dialogRef.current` el query puede ser
-  // null en el primer commit cuando el componente nació con null (return
-  // null: no hay dialog); la cadena opcional lo deja en no-op. El cleanup
-  // (close si open, valor→null desde el padre) es de T2.
+  // RF-1: el dialog se abre cuando el NODO APARECE, no solo en el mount del
+  // componente. La dep es la presencia (booleana): el consumidor real
+  // (Carousel) mantiene esta pieza montada de forma permanente y alterna
+  // `testimonial` null ↔ valor, así que con deps [] el effect no revivía en
+  // la transición null→valor y el dialog quedaba sin `open` (reparo T1
+  // ronda 1). Con `open === false` el nodo no existe (return null): no-op. Al
+  // pasar a true —ya sea en el mount directo con valor (el effect de mount
+  // corre siempre) o en un rerender null→valor— el `<dialog>` recién
+  // adjunto se abre con showModal(). El CLEANUP de valor→null/desmontaje
+  // (`dialog.close()` si `dialog.open`, con el guard del ref para no emitir
+  // onClose) sigue diferido a T2: ahí se extiende ESTE mismo effect, y la
+  // dep booleana garantiza que el cleanup disparará también en la
+  // transición valor→null, no solo al desmontar.
+  const open = testimonial !== null;
   useEffect(() => {
-    dialogRef.current?.showModal();
-  }, []);
+    if (open) {
+      dialogRef.current?.showModal();
+    }
+  }, [open]);
 
   // RF-2: ÚNICO call site de onClose. Disparado por el evento `close` del
   // dialog — nativo en botón Close/backdrop (vía close()) y en Esc (el
