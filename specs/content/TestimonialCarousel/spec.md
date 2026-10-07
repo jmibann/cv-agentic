@@ -11,7 +11,7 @@ librerías (reemplaza Swiper) y **sin autoplay**.
 
 - RF-1: CUANDO `testimonials` contiene elementos, ENTONCES EL SISTEMA renderiza **la única `<section>` de la región** (decisión 20: el carrusel es dueño de la section; AboutPage **no** lo envuelve en otra) con `aria-roledescription="carousel"`, nombrada por `labelledBy` (si se pasa) o `aria-label=labels.carousel`, con un slide por testimonio; SI `testimonials` está vacío, ENTONCES no renderiza nada.
 - RF-2: EL SISTEMA desplaza el track con `overflow-x` y `scroll-snap-type` nativos (sin librerías), y no implementa autoplay, loop ni flechas prev/next. **Tampoco navegación por flechas de teclado** (decisión 21): Tab entre botones + scroll nativo/swipe.
-- RF-3: EL SISTEMA renderiza un bullet por cada posición alcanzable (`getScrollStops`), no uno por testimonio, recalculándolos al montar; SI hay un stop o menos, ENTONCES no renderiza bullets. El recálculo en resize (via `ResizeObserver`, mock global no-op) **no tiene test unitario: se verifica en QA F5** (decisión 21). El bullet activo inicial, una vez calculados los stops (mount, `scrollLeft = 0`), es el del stop de `getActiveStop` → el primero.
+- RF-3: EL SISTEMA renderiza un bullet por cada posición alcanzable (`getScrollStops`), no uno por testimonio, recalculándolos al montar **y cada vez que cambia el tamaño del track (instancia un `ResizeObserver` sobre el track que re-mide los stops; cableado real, no solo teórico)**; SI hay un stop o menos, ENTONCES no renderiza bullets. El recálculo por resize **no tiene test unitario** (mock global `ResizeObserver` es no-op; decisión 21: la decisión elimina el test, no el comportamiento — su validación es QA F5). El bullet activo inicial, una vez calculados los stops (mount, `scrollLeft = 0`), es el del stop de `getActiveStop` → el primero.
 - RF-4: CUANDO el usuario pulsa un bullet, ENTONCES EL SISTEMA llama `track.scrollTo` con el `left` de ese stop, usando `behavior: "smooth"` solo si `prefers-reduced-motion` es `no-preference` (lectura por `window.matchMedia` en el click; no requiere reaccionar en vivo). Verificación: test de `scrollTo` con `behavior` según el mock de `matchMedia` (setup F1: `matches` configurable).
 - RF-5: EL SISTEMA marca `aria-current="true"` en el bullet activo según `getActiveStop(stops, scrollLeft)`, recalculado en el evento `scroll` con un cálculo por frame. **Sin región `aria-live`** (decisión 21): el cambio de slide no se anuncia; no hay autoplay.
 - RF-6: EL SISTEMA mantiene un único `TestimonialDialog`: `onOpen(id)` de la card fija el estado seleccionado y `onClose` lo limpia (con `testimonial` derivado del `selectedId`; nunca valor→valor sin `null` intermedio, ver ciclo en `TestimonialDialog.md`).
@@ -22,12 +22,12 @@ librerías (reemplaza Swiper) y **sin autoplay**.
 
 ```html
 <section aria-roledescription="carousel" aria-label="Testimonials">
-  <ul class="track">                                 <!-- overflow-x: auto + scroll-snap -->
-    <li role="group" aria-roledescription="slide" aria-label="1 of 3" class="slide">
+  <div class="track">                                  <!-- overflow-x: auto + scroll-snap -->
+    <div role="group" aria-roledescription="slide" aria-label="1 of 3" class="slide">
       <TestimonialCard … />
-    </li>
+    </div>
     …
-  </ul>
+  </div>
   <div class="pagination">                          <!-- bullets -->
     <button aria-label="Go to slide 1" aria-current="true"></button>
     <button aria-label="Go to slide 2"></button>
@@ -41,6 +41,17 @@ La `<section>` del carrusel **es** la región nombrada (decisión 20): AboutPage
 renderiza el `SectionTitle` y el carrusel hermanos en el tabpanel, sin envolver
 en otra `<section>`; cuando hay h2 visible encima se pasa `labelledBy` con el id
 del h2 (en lugar de `aria-label`).
+
+**Cambio de accesibilidad (decisión del usuario 2026-10-07, opción A):** el track
+y los slides son `<div>`, no `<ul>/<li>`. `li[role="group"]` viola
+`aria-allowed-role` de axe (el rol `group` no está permitido en `li`) y arrastra
+la regla `list`; el patrón APG de carrusel usa contenedores `<div role="group">`.
+El Test 12 (`expectNoA11yViolations` sobre el track completo **cerrado**) es
+inviable con `ul/li`, así que la spec adopta divs para keep axe intacto (sin
+desactivar reglas). Consecuencia en tests de T2/T3 aprobados: sus aserciones
+estructurales `tagName "UL"/"LI"` se actualizan a `div`+`role="group"` **como
+parte de este mismo Cambio** (decisión explícita del usuario; no es debilitar —
+el contrato observable, "un `group` por testimonio con nombre n of N", no cambia).
 
 ## API
 
@@ -117,7 +128,8 @@ limpia (ver la máquina de estados en `TestimonialDialog.md`).
 
 | Parte | Valor |
 |---|---|
-| Track | `display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: var(--layout-gap); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; padding-block: var(--testimonial-headroom) 2rem; list-style: none; margin: 0; scrollbar-width: none;` (≥ md: 2 columnas visibles) |
+| Track | `position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: var(--layout-gap); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; padding-block: var(--testimonial-headroom) 2rem; margin: 0; scrollbar-width: none;` (≥ md: 2 columnas visibles). `position: relative` es **necesidad mecánica** del contrato "`slideOffsets` relativo al track": hace del track el `offsetParent` de las slides para que `offsetLeft` midan bien (criterio HexAvatar T2 / dialog-flex; no es un valor de diseño, va con comentario). Ya no hay `list-style` (el track es `div`, Cambio de accesibilidad) |
+| Slide | `div class="slide"` (hijo directo del track): `scroll-snap-align: start;` (Comportamiento → Scroll) + `min-width: 0` (mecánico: un item de grid sin él se hincha a `min-content` y rompe columna/medición; con comentario) |
 | Headroom del track | **Único lugar** que reserva espacio para el avatar de TestimonialCard: `padding-top: var(--testimonial-headroom)` (protrusión del avatar + 0.5rem de sombra; 32px < 580 → 38px). `padding-bottom: 2rem` (fijo) para que no se recorte la sombra de hover de la card. Motivo: `overflow-x: auto` también recorta el eje vertical. La card no lleva `margin-top` |
 | Scrollbar | Oculta (`scrollbar-width: none` + `::-webkit-scrollbar { display: none }`): la navegación visible son los bullets |
 | Paginación | `display: flex; justify-content: center; gap: 0.625rem; margin-top: var(--space-4);` |
