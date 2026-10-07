@@ -1,4 +1,4 @@
-// Tests de T1 (specs/content/TestimonialDialog/tasks.md) — RF-1, RF-4 y el
+// Tests de T1 y T2 (specs/content/TestimonialDialog/tasks.md) — RF-1, RF-4 y el
 // tramo de RF-2 que toca T1 (Close → close → evento `close` → onClose una vez;
 // Tests esperados 1, 2, 3 —parcial— y 7 de la spec).
 //
@@ -28,6 +28,34 @@
 // discriminar antes del `feat`: todo el archivo falla en la resolución del
 // módulo. No es un rojo artificial: la importación del componente bajo prueba
 // es legítima y el rojo desaparece solo con la implementación.
+//
+// Rojo on-arrival T2 (decisión #101, declarado con la salida en el commit
+// `test(TestimonialDialog): T2`): de los 6 escenarios nuevos FALLAN contra el
+// código de T1 dos, por la razón correcta — backdrop real (no existe handler
+// de click sobre el dialog: `onClose` 0 llamadas y `open` intacto) y cierre
+// iniciado por el padre (no existe cleanup del effect de apertura: el spy de
+// `close` sobre la instancia ve 0 llamadas) — y PASAN ya con T1 cuatro, porque
+// documentan contratos que la implementación vigente cumple: el evento `close`
+// sintético (handleClose existe desde T1 y es el único call site), la franja
+// de padding y el click en el layout (hoy no hay handler que pueda cerrar de
+// más) y la reapertura sin duplicados (un handler por prop de React). Su valor
+// es de regresión futura: fijan el ciclo completo de RF-2/RF-3 sobre el handler
+// de click y el cleanup que T2 agrega, y discriminan el ORDEN del guard del
+// ref (ver el describe de cierre por el padre).
+//
+// Justificación T2 (constitución T3): sin roles nuevos — los clicks de
+// backdrop/padding se disparan con `MouseEvent` nativo (clientX/clientY,
+// `bubbles: true`) sobre el propio dialog o sobre el layout (el `target` lo fija
+// el nodo del dispatch: es exactamente el criterio de decisión 19, "target ===
+// dialog y punto dentro/fuera del bounding rect", y `userEvent` no modela el
+// ::backdrop). El rect se spy-mockea sobre la instancia con un `DOMRect` real de
+// jsdom (10,10,490,390 → left/top 10, right 500, bottom 400): sin layout,
+// `getBoundingClientRect` devuelve todo ceros y el criterio sería indecidible
+// (patrón de medición mockeada del plan de Carousel, acá sobre el rect; sin
+// `as`: DOMRect existe en el env jsdom, medido). El "cleanup llamó close()" del
+// "Hecho cuando" no tiene superficie accesible observable (el nodo ya está
+// desprendido por return null): se spy-mockea `close` sobre la instancia, que
+// conserva la implementación del mock de F1 (spy por defecto no reemplaza).
 //
 // Justificación de queries (constitución T3): dialog por
 // `getByRole("dialog", { name: author })` (Test 2). Funciona con el mock de
@@ -336,5 +364,175 @@ describe("TestimonialDialog close button emits through the close event (T1: RF-2
     // → onClose (spec → No hacer: el botón no llama onClose directo).
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(dialog).not.toHaveAttribute("open");
+  });
+});
+
+// --- T2 · RF-2: evento `close` sintético — camino Esc (Tests esperados 4) -------
+describe("TestimonialDialog native close event emits onClose once (T2: RF-2)", () => {
+  it("calls onClose exactly once when a synthetic close event fires (Esc path)", () => {
+    // Tabla → ciclo (RF-2): el Esc nativo NO llama `close()`; el navegador
+    // cierra y DISPARA el evento `close`. Se simula ese disparo sobre el
+    // dialog abierto con dispatch directo (el atributo `open` queda puesto a
+    // propósito: quitarlo es trabajo del navegador —jsdom no lo implementa—,
+    // no de la pieza; el botón Close ya probó el camino close() en T1). Que
+    // React entregue el evento al prop `onClose` está garantizado por el
+    // propio T1: `close` es evento no-delegated (listener directo en el
+    // elemento), y el mock de F1 lo despachaba ya sobre el elemento.
+    const onClose = vi.fn();
+    render(testimonialDialog({ onClose }));
+    const dialog = screen.getByRole<HTMLDialogElement>("dialog", {
+      name: TESTIMONIAL.author,
+    });
+
+    dialog.dispatchEvent(new Event("close"));
+
+    // Test 4 / "Hecho cuando": onClose EXACTAMENTE una vez (handleClose es el
+    // único call site; un guard mal que lo saltara o un doble wiring daría 2).
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+// --- T2 · RF-3: backdrop real vs franja de padding vs contenido (Test 5) --------
+// Rect finito del dialog para los clicks de decisión 19: jsdom no hace layout y
+// `getBoundingClientRect` devolvería todo ceros (criterio indecidible). Spy sobre
+// la instancia con DOMRect real de jsdom (medido: existe en el entorno):
+// (x=10, y=10, w=490, h=390) → left/top 10, right/bottom 500/400. Dentro:
+// padding (15,15) y contenido (250,200); fuera: backdrop (5,5). Patrón de
+// medición mockeada del plan (strategy de tests de Carousel: Object.defineProperty
+// /mock de rects y offsets; acá sobre getBoundingClientRect, sin tocar setup.ts).
+const mockDialogRect = (dialog: HTMLDialogElement) =>
+  vi
+    .spyOn(dialog, "getBoundingClientRect")
+    .mockReturnValue(new DOMRect(10, 10, 490, 390));
+
+// Click con coords sobre el nodo que fija el `target` (justificación en el
+// encabezado): MouseEvent nativo burbujeante, como el click real del navegador.
+const clickAt = (el: Element | null | undefined, clientX: number, clientY: number) => {
+  el?.dispatchEvent(new MouseEvent("click", { clientX, clientY, bubbles: true }));
+};
+
+describe("TestimonialDialog backdrop closes, padding and content do not (T2: RF-3)", () => {
+  it("closes via close() when the click targets the dialog outside its rect (real backdrop)", () => {
+    const onClose = vi.fn();
+    render(testimonialDialog({ onClose }));
+    const dialog = screen.getByRole<HTMLDialogElement>("dialog", {
+      name: TESTIMONIAL.author,
+    });
+    mockDialogRect(dialog);
+
+    // (5,5): target === dialog y punto FUERA del rect (10..500 × 10..400) →
+    // ::backdrop real (decisión 19) → `dialog.close()` (tabla → ciclo: el
+    // backdrop NO llama onClose directo).
+    clickAt(dialog, 5, 5);
+
+    // Observable: onClose EXACTAMENTE una vez vía el evento `close` del mock
+    // (si el handler llamara onClose directo, `open` quedaría; si llamara
+    // ambos, serían 2 llamadas) y el atributo `open` ausente.
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(dialog).not.toHaveAttribute("open");
+  });
+
+  it("keeps the dialog open when the click targets the dialog inside its rect (padding strip)", () => {
+    const onClose = vi.fn();
+    render(testimonialDialog({ onClose }));
+    const dialog = screen.getByRole<HTMLDialogElement>("dialog", {
+      name: TESTIMONIAL.author,
+    });
+    mockDialogRect(dialog);
+
+    // (15,15): target === dialog PERO dentro del rect = franja de padding →
+    // NO cierra (RF-3 / decisión 19: el cierre por click exige AMBAS
+    // condiciones). Con el rect todo-ceros de jsdom sin mock este caso sería
+    // indecidible — de ahí el spy.
+    clickAt(dialog, 15, 15);
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(dialog).toHaveAttribute("open");
+  });
+
+  it("keeps the dialog open when the click bubbles up from the layout content", () => {
+    const onClose = vi.fn();
+    render(testimonialDialog({ onClose }));
+    const dialog = screen.getByRole<HTMLDialogElement>("dialog", {
+      name: TESTIMONIAL.author,
+    });
+    mockDialogRect(dialog);
+
+    // Anatomía (dialog > [button, div.layout]; la clase `.layout` llega en
+    // T3 — selección estructural, mismo criterio de T1): el click desde el
+    // layout burbujea hasta el handler del dialog con target ≠ dialog → el
+    // guard de target corta el cierre (Tests esperados 5: "click dentro del
+    // contenido no cierra"; coords dentro del rect, como un click real).
+    const layout = dialog.lastElementChild;
+    expect(layout?.tagName).toBe("DIV");
+    clickAt(layout, 250, 200);
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(dialog).toHaveAttribute("open");
+  });
+});
+
+// --- T2 · RF-3: cierre iniciado por el padre y ciclo null↔valor (Tests 5–6) -----
+describe("TestimonialDialog parent-driven close and reopen cycle (T2: RF-3)", () => {
+  it("cleanup calls dialog.close() without emitting onClose when the parent sets testimonial to null", () => {
+    // Test 6 / "Hecho cuando": valor→null con el dialog abierto. El cleanup
+    // del effect de apertura (dep [open]) corre con el nodo YA desprendido
+    // (return null: React suelta `dialogRef` en la fase de mutación, antes
+    // del cleanup passive), por eso la implementación debe capturar
+    // `const el = dialogRef.current` en el CUERPO del effect (guía del
+    // review de T1). Se espía `close` sobre la instancia para observar la
+    // llamada en el nodo ya fuera del DOM (sin superficie accesible para eso:
+    // justificación de selección directa, constitución T3; el spy conserva la
+    // implementación original del mock de F1).
+    const onClose = vi.fn();
+    const { rerender } = render(testimonialDialog({ onClose }));
+    const dialog = screen.getByRole<HTMLDialogElement>("dialog", {
+      name: TESTIMONIAL.author,
+    });
+    const closeSpy = vi.spyOn(dialog, "close");
+
+    rerender(testimonialDialog({ testimonial: null, onClose }));
+
+    // El cleanup llamó close()…
+    expect(closeSpy).toHaveBeenCalledTimes(1);
+    // …18=b: sin dialog en el DOM tras el valor→null…
+    expect(screen.queryByRole("dialog")).toBeNull();
+    // …y el cierre iniciado por el padre NO emite onClose (tabla → ciclo: "el
+    // ref ya es null"). ORDEN del guard, discriminante: la sincronización del
+    // ref `latest` debe correr ANTES del cleanup de apertura — useLayoutEffect
+    // (fase de layout, síncrona en el commit) y NO useEffect: en el flush
+    // passive los destroy corren todos antes que los create, así que con
+    // useEffect el evento `close` disparado por el cleanup aún leería el ref
+    // con el valor viejo y onClose se emitiría de más.
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it("survives value null value without duplicated listeners: one onClose after reopening", async () => {
+    // "Hecho cuando": valor→null→valor sin listeners duplicados — un click
+    // Close tras reabrir emite onClose UNA sola vez en total (mismo spy en el
+    // mismo árbol: los ciclos de cleanup/montaje del effect [open] no dejan
+    // handlers hueros ni cierres de más).
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const { rerender } = render(testimonialDialog({ onClose }));
+    expect(screen.getByRole("dialog", { name: TESTIMONIAL.author })).toHaveAttribute("open");
+
+    // Cierre del padre: sin emisión (cubre de paso el orden del guard en el
+    // primer tramo del ciclo).
+    rerender(testimonialDialog({ testimonial: null, onClose }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Reapertura: el nodo aparece de nuevo y el effect lo abre (T1) con el
+    // guard del ref fresco (latest ya es el valor otra vez).
+    rerender(testimonialDialog({ testimonial: TESTIMONIAL, onClose }));
+    const dialog = screen.getByRole("dialog", { name: TESTIMONIAL.author });
+    expect(dialog).toHaveAttribute("open");
+
+    await user.click(within(dialog).getByRole("button", { name: CLOSE_LABEL }));
+
+    // 1 sola llamada tras reabrir (Close → close() → close → onClose; sin
+    // duplicados del ciclo anterior).
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
