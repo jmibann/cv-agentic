@@ -3,7 +3,7 @@
 - [x] **T1. Estructura: Box article, header con HexAvatar y extracto.** RF-4, RF-7 — 7dcea95 (T2: pre-aprobado retiro de los negativos pre-T2 del describe 5 — ver nota de delegación)
   - Hecho cuando: `getByRole("article", { name: author })` con `<h3 id="testimonial-${testimonial.id}-name">` (fórmula fija; el article se nombra por él), `<p class=role>`, extracto con `testimonial.text`; `HexAvatar` con `alt=""` (armazón `HexAvatarDefs` + `AccentGradientDefs`); comilla `Icon quote tone="gradient"` decorativa sin nombre accesible; todavía **sin** botón ni `onClick` en ningún nodo (el botón es T2); verde tras `feat(TestimonialCard): T1`.
 
-- [ ] **T2. Botón estirado y `onOpen`.** RF-1
+- [x] **T2. Botón estirado y `onOpen`.** RF-1 — 4d7c442 (ajuste pre-aprobado de negativos pre-T2 en `6e47f62`; fix de token `{Space}`→" " intra-tarea en `48767a7`, precedente NavTabs usa `" "`)
   - Hecho cuando: `getByRole("button", { name: openLabel })` como único elemento enfocable del article (assert: es el único `tabIndex` >= 0 / único button del subtree); click, Enter y Espacio invocan `onOpen(testimonial.id)` exactamente una vez; el botón es `<button type="button">` con `::after` (inspección DOM: sin hijos textuales) y se muestra siempre (RF-1); `<article>` sin `onClick`/`tabIndex` (inspección); verde tras `feat(TestimonialCard): T2`.
 
 - [ ] **T3. Estilos por tokens, clamp, print propio y cierre a11y.** RF-2, RF-5, RF-6
