@@ -16,10 +16,13 @@
 // (Foundation T12) según `locale` — Timeline no reimplementa formateos ni
 // parsea strings compuestas (RF-4, plan → Funciones puras); `end === null`
 // termina el período en `presentLabel` como texto (RF-3, no `<time>`).
-// Diferido T3 (RF-6/RF-7): los estilos por tokens de la tabla "Estilos y
-// tokens" (el módulo ya declara SOLO la fila Período, que nace con el `<p>`
-// de esta tarea), las clases internas `.item/.title/.organization/.description`
-// y el `index.ts`.
+// T3 hecha (RF-6, RF-7): el módulo declara la tabla "Estilos y tokens"
+// completa (lista, ítem con línea `border-left`, punto `::before` centrado,
+// `:last-child` sin línea, título con estilo de h4 y shift por token,
+// organización, período, descripción; cero `@media` propios: la sangría escala
+// por --timeline-indent y la impresión es del estilo compartido, G-D) y estas
+// clases se conectan en el markup de la Anatomía (`.item/.title/
+// .organization/.period/.description`). `index.ts` re-exporta la pieza.
 
 import type { Locale, TimelineEntry } from "@data/cv.types.generated";
 
@@ -75,22 +78,32 @@ export function Timeline({
         return (
           // key: `entry.id` es identificador estable garantizado por el
           // esquema (required); lista estática, sin reordenamiento propio.
-          <li key={entry.id}>
+          // T3 (Anatomía): la clase `.item` lleva la línea (`border-left`),
+          // la sangría (--timeline-indent, RF-7) y el punto decorativo
+          // (`::before`, RF-6); el corte del último ítem es posicional en el
+          // módulo (`:last-child`, RF-6: un `end: null` en el medio NO pierde
+          // su línea).
+          <li key={entry.id} className={styles.item}>
             {/* spec → Accesibilidad: cada ítem es un <article> nombrado por
                 su título (aria-labelledby → id del h3). */}
             <article aria-labelledby={titleId}>
               {/* RF-2: nivel fijo <h3> (sin prop que lo cambie; "No hacer":
-                  nunca h5). T1 pinta el texto; el estilo de h4
-                  (--font-size-h4) y la clase `.title` del módulo llegan en
-                  T3 junto con los estilos por tokens. */}
-              <h3 id={titleId}>{entry.title}</h3>
+                  nunca h5). T3 conecta la clase `.title`: PINTA como h4
+                  (--font-size-h4, peso medium) y sube el texto
+                  --timeline-title-shift para calibrar el punto (tabla
+                  "Estilos y tokens" → Título). */}
+              <h3 id={titleId} className={styles.title}>
+                {entry.title}
+              </h3>
               {/* RF-2 "si existen" — adaptación al tipo generado:
                   organization/description son REQUIRED en
                   data/cv.schema.json (string minLength 1), así que la
                   existencia observable es el valor no vacío; con valor vacío
-                  no se pinta el párrafo (cero <p> huecos). La clase
-                  `.organization` del módulo se conecta en T3. */}
-              {entry.organization ? <p>{entry.organization}</p> : null}
+                  no se pinta el párrafo (cero <p> huecos). T3 conecta la clase
+                  `.organization` (--color-heading, peso regular, margen 0). */}
+              {entry.organization ? (
+                <p className={styles.organization}>{entry.organization}</p>
+              ) : null}
               {/* T2 (RF-3/RF-4): período con <time dateTime> por extremo
                   (spec → Anatomía y Accesibilidad). Cada extremo se formatea
                   SOLO con formatPeriodEndpoint (Foundation T12): nada de
@@ -99,9 +112,9 @@ export function Timeline({
                   ("YYYY"/"YYYY-MM"); el separador fijo " — " del contrato de
                   foundations/i18n.md va ENTRE los dos <time> y, con
                   end === null, ANTES del presentLabel — que es TEXTO, no
-                  <time> (RF-3). La clase .period nace acá con la fila
-                  Período de la tabla "Estilos y tokens" (T2 es el dueño del
-                  <p>; el resto del módulo y las otras clases internas, T3). */}
+                   <time> (RF-3). La clase .period (fila Período de la tabla
+                   "Estilos y tokens": --color-text-muted, margen 0) nació acá
+                   con T2, su dueño; el resto del módulo llegó en T3. */}
               <p className={styles.period}>
                 <time dateTime={entry.start}>
                   {formatPeriodEndpoint(entry.start, locale)}
@@ -115,7 +128,11 @@ export function Timeline({
                   </time>
                 )}
               </p>
-              {entry.description ? <p>{entry.description}</p> : null}
+              {/* RF-2 "si existen", mismo criterio que organization; T3
+                  conecta la clase `.description` (margin --space-1 0 0). */}
+              {entry.description ? (
+                <p className={styles.description}>{entry.description}</p>
+              ) : null}
             </article>
           </li>
         );

@@ -1,41 +1,108 @@
 /* Timeline — módulo de estilos (specs/content/Timeline/spec.md → "Estilos y
-   tokens"). T1: el módulo nace SOLO con la clase base del raíz `<ol>`,
-   VACÍA: existe para conectar la unión de `className` del consumidor
-   (G-B/#99), que necesita un selector base exportable por CSS Modules
-   (criterio IconBox/LanguageSwitcher: la clase base nace con la unión, los
-   estilos llegan en la tarea que los declara).
+   tokens"). T3 completa TODOS los diferidos de T1/T2 con la tabla textual de
+   la spec, solo tokens: la lista (fila Lista), el ítem con línea (Ítem), el
+   punto decorativo `::before` (Punto), el corte posicional del último ítem
+   (:last-child de Ítem → fila Último ítem, RF-6), el título con estilo de h4
+   (Título), la Organización y la Descripción. La fila Período ya vivía acá
+   desde T2 (dueño: T2, decisión documentada en su momento).
 
-   Diferido T3 (RF-6/RF-7, tabla "Estilos y tokens" de la spec): la lista
-   (`list-style: none; margin: 0; padding` con calc de --size-timeline-dot +
-   --timeline-dot-ring), el ítem (`position: relative`, `border-left` con
-   --timeline-line-width/--color-track, padding con --timeline-indent), el
-   punto `::before` centrado sobre la línea (--size-timeline-dot,
-   --timeline-dot-ring, --color-accent, --timeline-dot-top), el `:last-child`
-   sin línea (`border-left-color: transparent; padding-bottom: 0`), el título
-   (--font-size-h4 + top calc(--timeline-title-shift * -1)) y las clases
-   internas .item/.title/.organization/.description. Cero @media propios
-   (RF-7: la sangría escala por el token --timeline-indent; la impresión es
-   del estilo compartido, G-D).
+   Cero `@media` propios (RF-7): la sangría escala por el token
+   --timeline-indent (30px < 580 → 40px ≥ 580, resuelto en tokens.css); el
+   `break-inside: avoid` del ítem en impresión lo fija el estilo compartido
+   de foundations/layout.md → Impresión (G-D, F4). Los valores que cambian de
+   tamaño nunca se copian acá: solo `var(--*)` y `calc()` de tokens.
 
-   T2 (decisión documentada): el módulo declara YA la fila Período de la
-   tabla (`color: var(--color-text-muted); margin: 0;` — valores textuales
-   de la spec, sin inventar nada), porque el <p class="period"> nace en T2
-   y `styles.period` debe existir para cumplir la Anatomía (`<p class=
-   "period">` con clase real). La fila Período no aparece en el "Hecho
-   cuando" de T3 (que reclama lista/ítem/punto/:last-child/título), así que
-   T2 es su dueño en la cobertura del plan; T3 no la repite, solo completa
-   el resto. */
+   Decoración sin semántica (RF-6, spec → Accesibilidad): línea = `border-left`
+   del ítem, punto = pseudo-elemento `::before` (sin `content` textual, nada
+   entra al árbol de accesibilidad). `transparent` en el `:last-child` es la
+   palabra clave permitida por la regla dura 1 de docs/DESIGN.md (no es un
+   color literal). */
 
+/* Tabla → Lista. `list-style: none` elimina los marcadores nativos: el
+   `role="list"` EXPLÍCITO del <ol> (RF-1) protege la semántica ante el quirk
+   de Safari/VoiceOver con esa propiedad. El padding-left deja lugar para que
+   el punto y su halo (box-shadow --timeline-dot-ring) no se corten: mitad del
+   punto + el halo. */
 .timeline {
-  /* Vacía a propósito en T1: T3 la completa (y declara ítem/punto/
-     :last-child según la tabla de la spec, solo con tokens). */
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 calc(var(--size-timeline-dot) / 2 + var(--timeline-dot-ring));
 }
 
-/* Tabla "Estilos y tokens" → Período (nace en T2 con su <p>): texto muted
-   sobre la card (contraste: --color-text-muted nunca directo sobre
-   --color-bg, docs/tokens/contrast.md) y margen 0 (el espaciado interno
-   del ítem es del bloque, no de párrafos con margen de usuario). */
+/* Tabla → Ítem. `position: relative` ancla el punto. La línea vertical es el
+   `border-left` (decorativo): grosor --timeline-line-width, color
+   --color-track (en tema oscuro = --color-border, para que se vea sobre la
+   card: grey-200 oscuro es más oscuro que la surface; nota de la spec →
+   "Estilos y tokens"). Sangría --timeline-indent (escala sin @media, RF-7) y
+   separación inferior --space-6 entre ítems. */
+.item {
+  position: relative;
+  border-left: var(--timeline-line-width) solid var(--color-track);
+  padding: 0 0 var(--space-6) var(--timeline-indent);
+}
+
+/* Tabla → Último ítem (RF-6): corte POSICIONAL por `:last-child` del <ol>, no
+   por contenido — un ítem con `end: null` en el medio conserva su línea. La
+   palabra clave `transparent` borra el color del borde (permitida por la
+   regla dura 1 de DESIGN.md); `padding-bottom: 0` evita el gap final. */
+.item:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+
+/* Tabla → Punto (`::before`): pseudo-elemento decorativo sobre la línea.
+   Centrado horizontal: la mitad del punto MÁS la mitad del grosor de la línea
+   hacia la izquierda (`left: calc((dot + line-width) / -2)`). `top` alinea
+   con la primera línea del título, que sube --timeline-title-shift (acople
+   documentado en tokens.css, decisión 13). El halo es la box-shadow difusa
+   --timeline-dot-ring en --color-track (mismo criterio de visibilidad en
+   oscuro que la línea). */
+.item::before {
+  content: "";
+  width: var(--size-timeline-dot);
+  height: var(--size-timeline-dot);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 0 var(--timeline-dot-ring) var(--color-track);
+  position: absolute;
+  top: var(--timeline-dot-top);
+  left: calc((var(--size-timeline-dot) + var(--timeline-line-width)) / -2);
+}
+
+/* Tabla → Título: <h3> de nivel fijo (spec → "No hacer": nunca h5) PINTADO
+   con estilo de h4 (--font-size-h4, peso medium; plan → Decisiones: sin
+   SectionTitle). El `top` negativo sube el texto para que el punto
+   (--timeline-dot-top) calibre con su primera línea; el desplazamiento usa
+   el token --timeline-title-shift (decisión 13, agregado por el usuario en
+   tokens.css), no el literal -0.3125rem. */
+.title {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+  position: relative;
+  top: calc(var(--timeline-title-shift) * -1);
+}
+
+/* Tabla → Organización: texto de encabezado, peso regular (el destaque del
+   ítem es el título), margen 0 (el espaciado interno lo gobierna la
+   descripción). */
+.organization {
+  color: var(--color-heading);
+  font-weight: var(--font-weight-regular);
+  margin: 0;
+}
+
+/* Tabla → Período (nace en T2 con su <p>): texto muted sobre la card
+   (contraste: --color-text-muted nunca directo sobre --color-bg,
+   docs/tokens/contrast.md) y margen 0 (el espaciado interno del ítem es del
+   bloque, no de párrafos con margen de usuario). */
 .period {
   color: var(--color-text-muted);
   margin: 0;
+}
+
+/* Tabla → Descripción: despega del bloque superior un --space-1; sin margen
+   lateral (la sangría del ítem ya la fija --timeline-indent). */
+.description {
+  margin: var(--space-1) 0 0;
 }
