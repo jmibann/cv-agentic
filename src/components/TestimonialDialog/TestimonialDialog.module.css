@@ -1,0 +1,234 @@
+/* TestimonialDialog.module.css — specs/content/TestimonialDialog/spec.md →
+   "Estilos y tokens" (T3; RF-5, RF-6). Transcripción COMPLETA de la tabla de
+   9 filas: Dialog, Backdrop, Entrada, Layout, Close, Comilla, Avatar (sin
+   clase propia: la primitiva HexAvatar se usa DIRECTA — fila "Avatar": "no se
+   reimplementa"; ninguna otra clase le corresponde en esta pieza), Scroll del
+   fondo (fila "Scroll del fondo": `html:has(dialog[open]) { overflow: hidden }`
+   YA vive en src/styles/global.css desde F1 — verificado en T3 (línea 41 de
+   ese archivo): alcanza, no se duplica acá, RF-5) e Impresión (fila
+   "Impresión": @media print display: none PROPIO del módulo, G-D-1 /
+   decisión 19).
+
+   Cero colores literales (regla dura 1 de docs/DESIGN.md): solo tokens
+   semánticos + las medidas FIJAS citadas textualmente de la tabla (`40rem` y
+   el `2rem` de la fila Dialog, `100vw`/`100dvh` y `0`/`0.96`/`1` de la fila
+   Entrada) + `0` y keywords — docs/tokens/breakpoints.md permite literales de
+   medidas fijas "si su spec las define" (criterio aprobado en HexAvatar /
+   ThemeToggle / TestimonialCard).
+
+   Los ÚNICOS DOS @media del módulo son (min-width: 580px) — el de layout: RF-6
+   fija DOS COLUMNAS ≥580, la base es UNA columna con la comilla oculta — y
+   print (RF-5: el dialog no se imprime). Cero otros (inspección; "Hecho
+   cuando" T3). Dentro del @media 580 NO hay ninguna medida: solo
+   grid-template-columns y display (cambios de layout/visibilidad, lo único
+   permitido ahí). Sin @media (prefers-reduced-motion) propio (tabla → Entrada,
+   decisión 19): --duration-base ya colapsa a 0.01ms en tokens/tokens.css. Sin
+   margen externo (docs/DESIGN.md → Do/Don't) y sin centrado declarado: el
+   centrado del dialog modal en el top layer es NATIVO de la UA
+   (position/inset/margin: auto del <dialog>); la tabla no lista margin ni
+   posicionamiento para el dialog, así que no se declara nada (no inventar).
+   Verificación de la tabla: INSPECCIÓN de este archivo + QA F5 (jsdom no
+   computa CSS: backdrop, entrada, grid, scroll interno, pseudo-estados y
+   print no son testeables en unit — spec → RF-5/RF-6 y decisión #101). */
+
+/* Fila "Dialog" (literal de la tabla): background --color-surface, color
+   --color-text, border: 0 (reset del borde UA), radio --radius-20, padding
+   --box-padding, ancho min(40rem, calc(100vw - 2rem)), alto máx
+   calc(100dvh - 2rem) y sombra --shadow-dialog — RF-6: los máximos van por
+   min()/calc() SOBRE EL VIEWPORT, sin medidas nuevas por breakpoint (spec →
+   No hacer).
+   `display: flex; flex-direction: column` es NECESIDAD MECÁNICA de la fila
+   "Layout" + decisión 19 (RF-6: "SI el contenido excede la altura máxima,
+   `.layout` scrollea"): con el dialog en su display: block default de la UA,
+   un hijo de altura auto NUNCA se limita al max-height del dialog (el
+   desborde lo scrollearía el propio dialog por su overflow UA y el
+   overflow-y: auto de `.layout` jamás activaría). Como flex-column, con
+   `.layout` en min-height: 0 (abajo), la caja de `.layout` queda acotada al
+   content box del dialog y scrollea ELLA; con contenido corto el dialog sigue
+   midiendo lo justo (sin barra). No contradice ningún valor de la tabla
+   (criterio del display:block mecánico aceptado en HexAvatar T2 / del
+   inline-flex centrador de ThemeToggle). */
+.dialog {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 0;
+  border-radius: var(--radius-20);
+  padding: var(--box-padding);
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  box-shadow: var(--shadow-dialog);
+
+  /* Fila "Entrada" (decisión 19) — estado FINAL en la base: opacity: 1 y
+     transform: scale(1) (los →1 de la fila; sin @media propio de salida).
+     La transición se declara ACÁ, sobre el estado final, con PROPIEDADES
+     CONCRETAS (opacity/transform, nunca `all`: docs/DESIGN.md → Do/Don't):
+     es el MECANISMO ESTÁNDAR de @starting-style como único activador —
+     el dialog nace SIN open (display: none por la UA), showModal() lo abre,
+     el navegador lo renderiza por primera vez y interpola desde
+     @starting-style (bloque abajo) hacia este estado final. SALIDA SIN
+     ANIMACIÓN: al cerrar no hay bloque @starting-style que cubra la
+     transición de vuelta ni `transition-behavior: allow-discrete` en el
+     módulo, así que el display: none de la UA se aplica de inmediato y
+     opacity/transform no alcanzan a animar — cierre instantáneo, literal
+     del "Hecho cuando" de T3. Reducción de movimiento: --duration-base/
+     --ease-standard (0.3s ease-in-out; 0.01ms con prefers-reduced-motion en
+     tokens.css). Verificación: inspección + QA F5. */
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
+}
+
+/* Fila "Backdrop" (RF-5): --color-overlay (rgb con alpha del token semántico;
+   claro/oscuro los resuelve tokens.css). El ::backdrop real y su pintura son
+   de la UA/navegador: jsdom no lo modela — verificación por INSPECCIÓN de
+   esta regla + QA F5. */
+.dialog::backdrop {
+  background: var(--color-overlay);
+}
+
+/* Fila "Entrada" — ARRANQUE con @starting-style como ÚNICO mecanismo
+   (decisión 19): `opacity 0→1` y `transform: scale(0.96)→1` (literales `0`,
+   `0.96` y `1` de la fila). El selector coincide con el estado que dispara
+   la aparición (el atributo open es el que le devuelve display: block en el
+   momento del showModal(); la UA cierra el dialog sacando el atributo). */
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Fila "Layout": grid, `gap: var(--space-6)` (token) y `overflow-y: auto`
+   (scroll interno, decisión 19 / RF-6). El `auto 1fr` de columnas de la
+   propia fila entra RECÉN en el @media 580, porque RF-6/Responsive fijan la
+   base en UNA columna (sin grid-template-columns el grid implícito apila
+   aside sobre body en una columna). `min-height: 0` es necesidad MECÁNICA
+   del scroll: un flex-item sin él se agranda hasta su min-content (el texto
+   completo) y nunca scrollea; `0` está permitido en cualquier contexto (no
+   es una medida nueva). */
+.layout {
+  display: grid;
+  gap: var(--space-6);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Anatomía — columna 1 ≥580 (y franja superior en la base de 1 columna):
+   avatar ARRIBA y comilla DEBAJO (tabla → Comilla: "debajo del avatar";
+   orden DOM fijado en T1). La tabla no le asigna propiedades, pero el `wrap`
+   de HexAvatar es inline-block y el <svg> de Icon también
+   (Icon.module.css .icon): dejados en flujo inline quedarían LADO A LADO,
+   contradiciendo la Anatomía. `display: flex; flex-direction: column` es la
+   necesidad MECÁNICA del apilamiento que la Anatomía fija (criterio HexAvatar
+   T2 / ThemeToggle: no contradice valor alguno de la tabla). Sin gap: la
+   tabla no define separación avatar→comilla (no inventar). */
+.aside {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Anatomía — columna 2 ≥580 (debajo del aside en la base): h2 + p de rol + p
+   de texto COMPLETO. La tabla NO le asigna NINGUNA propiedad: el apilamiento
+   vertical lo da el flujo de bloques (los márgenes del h2 los borra la base
+   tipográfica global de src/styles/global.css; los <p> conservan su margen
+   de párrafo UA — la tabla no define tipografía ni espaciado del cuerpo del
+   dialog y el excedente de altura lo resuelve el scroll de `.layout`). La
+   clase existe para cumplir el markup de spec → Anatomía (criterio exacto
+   del `.identity` vacío de TestimonialCard). */
+.body {
+}
+
+/* Fila "Close" (RF-5; spec → Estados): absolute top/right --space-4 sobre el
+   dialog (su caja, posicionada por la UA), cuadrado --size-control (fila
+   literal), radio --radius-12, fondo --color-surface-muted, color
+   --color-text. `display: inline-flex` + align/justify center: necesidad
+   MECÁNICA de centrar el glifo en la caja cuadrada solo-ícono (criterio
+   exacto de ThemeToggle: sin flex el <svg> inline no se centra en la caja de
+   2.5rem). `border: 0`: reset del borde UA del <button> — la tabla fija un
+   tinte plano (fondo surface-muted con radio 12) y no lista borde para el
+   close; sin el reset el borde nativo asoma por dentro del radio (mismo
+   reset que la fila "Dialog" declara explícitamente para el dialog; no
+   contradice ningún valor listado). Sin cursor: pointer: ni la tabla ni
+   Estados lo listan (criterio ThemeToggle/Button: no se inventa alcance).
+   El ícono `x` sale con el tamaño default --size-icon vía la clase .icon de
+   Icon: SIN --icon-size propio y SIN clase en el ícono (fila "Close").
+   Verificación de pseudo-estados: inspección + QA F5 (jsdom no los computa). */
+.close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size-control);
+  height: var(--size-control);
+  border: 0;
+  border-radius: var(--radius-12);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  /* G-E (Estados → Close hover): transición de la propiedad CONCRETA color
+     (el glifo la hereda: Icon tone="current" usa currentColor de lucide). */
+  transition: color var(--duration-base) var(--ease-standard);
+}
+
+/* Estados → Close hover: --color-text → --color-accent-text (literal de la
+   tabla de Estados). Par registrado en docs/tokens/contrast.md:
+   accent-text sobre surface-muted = 5.47 (claro) / 13.00 (oscuro) ✅ AA. */
+.close:hover {
+  color: var(--color-accent-text);
+}
+
+/* Estados → Close focus-visible: anillo ESTÁNDAR del kit (regla dura 7 de
+   docs/DESIGN.md y regla 5 de docs/tokens/contrast.md: --focus-ring-width/
+   --color-focus-ring/--focus-ring-offset, solo :focus-visible; sin sombra de
+   foco extra: la tabla no la lista). */
+.close:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Fila "Comilla" (RF-4/RF-6, decorativa aria-hidden — la pintura de la clase
+   no entra en el árbol accesible): `--icon-size: 2rem` EN LA PROPIA clase
+   unida al <svg> vía la prop className de Icon (misma convención que
+   TestimonialCard .quote: la @property de tokens.css es inherits: false, un
+   contenedor no la alcanza; criterio ServiceCard .glyph). OCULTA < 580 (RF-6
+   / Responsive / criterio textual del "Hecho cuando": "comilla oculta <
+   580"): display: none en la base, visible en el ÚNICO @media de layout.
+   El `2rem` es literal textual de la fila (medida fija definida por la
+   spec). */
+.quote {
+  --icon-size: 2rem;
+  display: none;
+}
+
+/* RF-6 — ÚNICO @media de breakpoint del módulo (sm = 580,
+   docs/tokens/breakpoints.md): DOS COLUMNAS (avatar + comilla | texto) con
+   el grid `auto 1fr` de la fila "Layout" y la comilla visible (fila
+   "Comilla"). Cero medidas acá: grid-template-columns y display son cambios
+   de LAYOUT/VISIBILIDAD, lo permitido dentro de un @media de componente
+   (regla dura 4 de docs/DESIGN.md). */
+@media (min-width: 580px) {
+  .layout {
+    grid-template-columns: auto 1fr;
+  }
+
+  .quote {
+    display: block;
+  }
+}
+
+/* Fila "Impresión" (RF-5 / G-D-1, decisión 19): el dialog NO se imprime,
+   `display: none` sobre el raíz de la pieza (`.dialog`, el <dialog> de
+   Anatomía), en el módulo de la pieza — no en global. Único otro @media del
+   archivo. Supera el display: flex de la base por orden de hoja (misma
+   especificidad de clase simple; dentro del mismo módulo el de adelante
+   gana). */
+@media print {
+  .dialog {
+    display: none;
+  }
+}

@@ -40,14 +40,23 @@
 // el contenido NO cierran (RF-3); ninguno llama `onClose` directo: todos pasan
 // por `close()` → evento `close` → `handleClose` (No hacer).
 //
-// Diferidos declarados (tasks.md): T3 crea el módulo CSS y conecta las clases de Anatomía (`.dialog`,
-// `.close`, `.layout`, `.aside`, `.body`, `.quote`) — en T1 el DOM nace SIN
-// clases de módulo: los tests de T1 no asertan ninguna (elección declarada al
-// orchestrator: tasks asigna el módulo a T3, criterio TestimonialCard donde
-// las internas conectaban en la tarea de estilos) —, el `@media print`, la
-// entrada con `@starting-style` y el cierre `expectNoA11yViolations` e
-// `index.ts`. El id del título es literal de Anatomía (no derivado del
-// `testimonial.id` como en la card: el dialog muestra UN testimonio a la vez).
+// T3 (tasks.md) creó el módulo CSS y conectó las clases de Anatomía
+// (`.dialog`, `.close`, `.layout`, `.aside`, `.body`, `.quote` — esta vía la
+// prop `className` de Icon, única forma de fijar `--icon-size` en el propio
+// glifo; el HexAvatar va DIRECTO y el <p> de rol sin clase: la tabla de esta
+// pieza no les asigna fila, ver comentarios en el JSX) y creó el `index.ts` y
+// el cierre `expectNoA11yViolations` del test. En T1 el DOM nació SIN clases
+// de módulo (los tests de T1/T2 no asertan ninguna: estructura y roles; la
+// conexión de T3 no cambia el DOM observable). El id del título es literal de
+// Anatomía (no derivado del `testimonial.id` como en la card: el dialog
+// muestra UN testimonio a la vez).
+//
+// Diferido restante (ÚNICO, declarado por la spec): foco inicial en el botón
+// Close al abrir y retorno de foco al disparador al cerrar, top layer y
+// ::backdrop reales — NATIVOS del navegador, verificación en QA F5 (jsdom no
+// los implementa; RF-4 y tabla → Ciclo). Las medidas de la tabla (grid,
+// scroll interno, entrada @starting-style, 580/print) se verifican por
+// INSPECCIÓN del módulo + QA F5 (#101).
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 import type { MouseEvent } from "react";
@@ -56,6 +65,8 @@ import type { Testimonial } from "@data/cv.types.generated";
 
 import { HexAvatar } from "../HexAvatar";
 import { Icon } from "../Icon";
+
+import styles from "./TestimonialDialog.module.css";
 
 // Id fijo de spec → Anatomía (`aria-labelledby="testimonial-dialog-title"` y
 // el mismo id en el `<h2>`). Constante del módulo (no prop): el contrato la
@@ -189,19 +200,28 @@ export function TestimonialDialog({
     // Anatomía literal: dialog nombrado por el h2 del autor (RF-4; aria-
     // labelledby → TITLE_ID). `onClick` implementa el backdrop real de
     // RF-3/decisión 19 (handleDialogClick; el padding y el contenido no
-    // cierran). Clase `.dialog`: T3 (módulo).
+    // cierran). `.dialog` (T3): la tabla completa de la fila "Dialog" + la
+    // entrada con @starting-style; el centrado y el top layer son NATIVOS de
+    // la UA del dialog modal (la tabla no lista margin/position: no se
+    // declara nada).
     <dialog
       ref={dialogRef}
+      className={styles.dialog}
       aria-labelledby={TITLE_ID}
       onClose={handleClose}
       onClick={handleDialogClick}
     >
-      {/* Botón Close (Anatomía: PRIMER hijo del dialog; `.close` con
-          posición absolute: T3). `onClick` SOLO llama `dialog.close()`
-          (RF-2 / No hacer): el cierre despacha el evento `close`, y es ahí
-          —y no acá— donde se invoca `onClose`. */}
+      {/* Botón Close (Anatomía: PRIMER hijo del dialog; `.close` —T3—:
+          absolute top/right --space-4, cuadrado --size-control, radio
+          --radius-12, fondo --color-surface-muted, color --color-text con
+          hover --color-accent-text y anillo focus-visible estándar; el
+          centrado del glifo y el reset de borde del <button> son necesidades
+          mecánicas documentadas en el módulo). `onClick` SOLO llama
+          `dialog.close()` (RF-2 / No hacer): el cierre despacha el evento
+          `close`, y es ahí —y no acá— donde se invoca `onClose`. */}
       <button
         type="button"
+        className={styles.close}
         aria-label={closeLabel}
         onClick={() => {
           dialogRef.current?.close();
@@ -212,25 +232,39 @@ export function TestimonialDialog({
             `--size-icon` sin clase propia (tabla → Close). */}
         <Icon name="x" />
       </button>
-      {/* Layout (Anatomía; `.layout` grid auto|1fr, gap y overflow-y: T3) >
-          aside (`.aside`: columna 1, oculta la comilla < 580 en T3) + body
+      {/* Layout (Anatomía; `.layout` —T3—: grid con `gap: var(--space-6)`,
+          `auto 1fr` SOLO ≥580 (RF-6: base = una columna) y scroll interno
+          `overflow-y: auto` + `min-height: 0` (decisión 19; la limitación de
+          altura viene del max-height del dialog, fila "Dialog") >
+          aside (`.aside`: columna 1; apila avatar sobre comilla) + body
           (`.body`: columna 2). */}
-      <div>
-        <div>
+      <div className={styles.layout}>
+        <div className={styles.aside}>
           {/* Avatar hexagonal: la primitiva, no se reimplementa (RF-4 / No
-              hacer); `alt` default "" → decorativa (el nombre está al lado). */}
+              hacer); `alt` default "" → decorativa (el nombre está al lado).
+              Sin `className`: la tabla → "Avatar" no le asigna clase propia
+              en esta pieza (a diferencia de la card, con su offset). */}
           <HexAvatar src={testimonial.avatar.src} />
           {/* Comilla gradient (tabla → Comilla; debajo del avatar, orden de
-              Anatomía): sin `label` → aria-hidden; `--icon-size: 2rem` por
-              la clase `.quote` en T3 (misma convención que TestimonialCard;
-              defs del gradiente: AppLayout en la app, armazón en tests). */}
-          <Icon name="quote" tone="gradient" />
+              Anatomía): sin `label` → aria-hidden; `--icon-size: 2rem` por la
+              clase `.quote` unida al propio <svg> vía `className` (Icon RF-6:
+              @property inherits:false; misma convención que TestimonialCard;
+              defs del gradiente: AppLayout en la app, armazón en tests).
+              Oculta < 580 (RF-6): display: none base, visible en el único
+              @media de layout del módulo. */}
+          <Icon name="quote" tone="gradient" className={styles.quote} />
         </div>
-        <div>
+        <div className={styles.body}>
           {/* Nombre accesible del dialog (RF-4): h2 con el id literal de
               Anatomía; niveles según spec (dialog usa h2; la card, h3). */}
           <h2 id={TITLE_ID}>{testimonial.author}</h2>
-          {/* Rol y texto COMPLETO (RF-4; `.role` muted y márgenes: T3). */}
+          {/* Rol y texto COMPLETO (RF-4). Sin clase propia: la tabla
+              "Estilos y tokens" de ESTA pieza no define ninguna fila para el
+              rol del dialog (el muted/offset es de la card; la muestra HTML
+              de Anatomía `class="role"` no tiene estilo asignado y no se
+              inventan propiedades — nota reportada al cerrar T3); el
+              espaciado lo da el flujo de bloques (margen de párrafo UA) y el
+              excedente de altura lo scrollea `.layout`. */}
           <p>{testimonial.role}</p>
           <p>{testimonial.text}</p>
         </div>
