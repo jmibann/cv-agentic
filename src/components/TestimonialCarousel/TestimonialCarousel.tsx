@@ -32,12 +32,20 @@
 // 21 → QA F5) se conecta en T5 junto con los estilos; la dep `testimonials`
 // del effect de medición ya re-mide si el set de slides cambia sin desmontar
 // (p. ej. al cambiar de idioma).
-// T4 conecta el `scrollTo` con `behavior` según `prefers-reduced-motion` en
-// el click del bullet (RF-4; los bullets aún no tienen onClick). T5 conecta
-// además: estilos por tokens (track/slide/pagination/bullet, headroom,
-// print) sobre ESTE DOM con clases (la estructura y los roles NO cambian:
-// criterio TestimonialCard T3), el cierre `expectNoA11yViolations` y
-// `index.ts`.
+// T4 (RF-4): el click de un bullet llama a `track.scrollTo` con el `left` de
+// ese stop y `behavior: "smooth"` solo si
+// `window.matchMedia("(prefers-reduced-motion: no-preference)").matches`,
+// LEÍDO EN EL CLICK (decisión 21 / plan → Decisiones): sin estado vivo ni
+// listener de `change` (la spec no exige reaccionar en vivo al cambio de la
+// preferencia del sistema). Único acceso al `window` global de la pieza
+// (medición y scroll leen del trackRef y del nodo); en jsdom lo sirve el mock
+// del setup F1 (`matches=false` → "auto"; el caso "smooth" stub local del
+// test). Un `scrollTo` por click (ternaria de behavior, no dos llamadas) y
+// sin guard de bullet activo: RF-4 dice "un bullet" sin excepción, ir al stop
+// vigente es válido. T5 conecta: estilos por tokens (track/slide/pagination/
+// bullet, headroom, print) sobre ESTE DOM con clases (la estructura y los
+// roles NO cambian: criterio TestimonialCard T3), el cierre
+// `expectNoA11yViolations` e `index.ts`.
 // Decisiones 21 documentadas (spec → RF-2/RF-5): SIN flechas prev/next ni de
 // teclado (Tab entre los botones de las cards + scroll nativo/swipe), sin
 // autoplay, sin loop y sin región `aria-live` (el cambio de slide no se
@@ -138,9 +146,10 @@ export function TestimonialCarousel({
   const framePendingRef = useRef(false);
   const frameIdRef = useRef<number | null>(null);
 
-  // RF-3: medir offsets y calcular stops. Sin `window` global: todo desde
-  // `trackRef` (los tests fijan el layout mockeando los accessores de
-  // prototipo/instancia, spec → Tests esperados).
+  // RF-3: medir offsets y calcular stops. Para medir, todo desde `trackRef`
+  // (el único `window` global de la pieza es `matchMedia` en el click de T4,
+  // RF-4); los tests fijan el layout mockeando los accessores de
+  // prototipo/instancia, spec → Tests esperados.
   const measure = useCallback((): void => {
     const track = trackRef.current;
     if (track === null) {
@@ -204,6 +213,27 @@ export function TestimonialCarousel({
     // Con callback síncrono (mocks de test) el flag ya volvió a false: no
     // queda ningún frame pendiente que cancelar (el id devuelto ya se ejecutó).
     frameIdRef.current = framePendingRef.current ? frameId : null;
+  };
+
+  // RF-4 (T4): click de bullet → `track.scrollTo` al stop, UNA llamada por
+  // click. El `behavior` se decide LEYENDO `window.matchMedia` EN EL CLICK
+  // (decisión 21 / plan → Decisiones): sin estado vivo, sin listener de
+  // `change` — la spec no exige reaccionar en vivo al cambio de preferencia.
+  // Sin guard de bullet activo: RF-4 dice "un bullet" sin excepción, ir al
+  // stop vigente es un caso válido de "un click, una llamada". El track se lee
+  // vivo del ref (mismo criterio del scroll de RF-5: el nodo, no el estado).
+  const handleBulletClick = (stop: number): void => {
+    const track = trackRef.current;
+    if (track === null) {
+      return;
+    }
+    track.scrollTo({
+      left: stop,
+      behavior: window.matchMedia("(prefers-reduced-motion: no-preference)")
+        .matches
+        ? "smooth"
+        : "auto",
+    });
   };
 
   // RF-1 (SI vacío): sin testimonios no hay región, ni track ni dialog.
@@ -283,8 +313,8 @@ export function TestimonialCarousel({
         // SOLO en el activo según `getActiveStop` (los demás, SIN atributo:
         // `undefined`, no "false"). Las clases `.pagination`/`.bullet` y el
         // área táctil `::after` conectan en T5 (criterio T2: DOM con roles y
-        // nombres, sin clases). El click con `scrollTo`/`behavior` es T4
-        // (RF-4): los bullets aún no tienen onClick.
+        // nombres, sin clases). `onClick` → `handleBulletClick(stop)` (T4,
+        // RF-4): scrollTo al stop con behavior leído en el click.
         <div>
           {layout.stops.map((stop, index) => (
             <button
@@ -292,6 +322,7 @@ export function TestimonialCarousel({
               // `getScrollStops`, T1): el número del stop es clave única.
               key={stop}
               type="button"
+              onClick={() => handleBulletClick(stop)}
               aria-label={format(labels.goToSlide, {
                 n: bulletNumber(stop, layout.slideOffsets),
               })}
