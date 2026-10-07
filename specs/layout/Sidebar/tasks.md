@@ -12,7 +12,7 @@
 - [x] **T4. Disclosure con CornerTab.** RF-3, RF-4 — 87301ec (T6 verificar: `--icon-size` del chevron si el estilo lo pide; `@media` 1200 debe pisar `.additionalCollapsed`; cuerpo de `c0b99c3` con acentos = deuda #102)
   - Hecho cuando: `CornerTab size="sm"` montada con `<button aria-expanded="false" aria-controls="sidebar-contacts">` + texto `showContacts` + chevron `Icon name="chevron-down"` decorativo; click → `aria-expanded="true"`, texto `hideContacts` y `.additional` pasa de la **clase** de colapso a visible (la visibilidad ≥ xl la da el `@media` del módulo, inspección — en jsdom el estado es por clase); segundo click revierte; el colapso no usa `style` inline (inspección: decisión RF-10); verde tras `feat(Sidebar): T4`.
 
-- [ ] **T5. Download CV.** RF-2
+- [x] **T5. Download CV.** RF-2 — d2a9829
   - Hecho cuando: con `profile.downloadCvUrl` existe `getByRole("link", { name: labels.downloadCv })` con ese `href` y atributo `download` (`Button href… download icon="download" fullWidth`); sin URL no existe; verde tras `feat(Sidebar): T5`.
 
 - [ ] **T6. Estilos por tokens, responsive CSS-only y cierre a11y.** RF-7, RF-10
