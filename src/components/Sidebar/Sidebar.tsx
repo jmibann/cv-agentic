@@ -9,18 +9,30 @@
 // `social`): `social=[]` → no se monta el `ul` (una lista nombrada vacía no
 // renderiza).
 //
-// Diferidos por tasks.md (API completa desde acá, spec → plan → Interfaz):
-// `contact` NO se destructura hasta T3 (contactos: IconBox/Overhead/links
-// derivados con getContactHref); el disclosure en `CornerTab` es T4 (usa
-// `labels.showContacts`/`hideContacts`); el CTA `Button` con `downloadCvUrl`
-// es T5; el `Separator` y el contenedor `.additional` `id="sidebar-contacts"`
-// llegan con T3/T4 (RF-9 completo y RF-10). RF-8 (C2): la pieza no importa
-// `useCv()` ni `useLocale()` — todos los datos y textos entran por props.
+// T3 hecha: bloque de contactos (Anatomía `.additional`): contenedor
+// `id="sidebar-contacts"` montado siempre (RF-10: id alcanzable para el
+// disclosure; la lógica de colapso es T4), `Separator` condicional (RF-9: sin
+// contactos **y** sin `downloadCvUrl` no se renderiza; el CTA de `Button`
+// llega en T5 y la condición ya evalúa `profile.downloadCvUrl` según la spec)
+// y una fila `<li>` por contacto: `IconBox` del mapa tipo→ícono (spec → API;
+// decorativo por su RF-2), `Overhead` con el label traducido y el valor en
+// `<a>` (si `getContactHref` produce href — RF-5) o `<p>` (location, phone/
+// whatsapp sin dígitos: "se muestra como texto"), siempre con `title` = valor
+// completo (tabla Contactos). RF-6/decisión 10/D6: `target`/`rel` SOLO en
+// links externos (criterio abajo, en `external`).
 //
-// Clases de la Anatomía (`baseInfo`/`avatar`/`identity`/`name`/`social`): las
-// conecta T6 junto con `Sidebar.module.css` (tasks.md → T2/T6: en T2 no hay
-// estilos ni clases propias observables por tests; jsdom no computa CSS,
-// #101). Por eso acá los contenedores se renderizan sin `className`.
+// Diferidos por tasks.md (API completa desde acá, spec → plan → Interfaz):
+// el disclosure en `CornerTab` es T4 (usa `labels.showContacts`/
+// `hideContacts`); el CTA `Button` con `downloadCvUrl` es T5; los estilos del
+// módulo (grilla, `--color-heading`, ellipsis, colapso por clase, `@media`
+// 1200) son T6. RF-8 (C2): la pieza no importa `useCv()` ni `useLocale()` —
+// todos los datos y textos entran por props.
+//
+// Clases de la Anatomía (`baseInfo`/`avatar`/`identity`/`name`/`social`/
+// `additional`/`contacts`): las conecta T6 junto con `Sidebar.module.css`
+// (tasks.md → T2/T3/T6: en estructura no hay estilos ni clases propias
+// observables por tests; jsdom no computa CSS, #101). Por eso acá los
+// contenedores se renderizan sin `className`.
 //
 // Marca de las redes (plan → Decisiones; spec → Accesibilidad): `BRAND_NAMES`
 // de BrandIcon es el registro `Record<SocialNetwork, string>` (network →
@@ -33,8 +45,15 @@
 import { Badge } from "../Badge";
 import { Box } from "../Box";
 import { BRAND_NAMES, BrandIcon } from "../BrandIcon";
+import { IconBox } from "../IconBox";
+import { Overhead } from "../Overhead";
+import { Separator } from "../Separator";
+
+import type { IconName } from "../Icon";
 
 import type { ContactItem, Profile, SocialLink } from "@data/cv.types.generated";
+
+import { getContactHref } from "./getContactHref";
 
 // API exacta de spec → API. `SidebarLabels`: textos de interfaz ya
 // traducidos (C3: los produce LocaleProvider/AppLayout; la pieza no consume
@@ -58,7 +77,7 @@ export interface SidebarLabels {
 // orden de `contact`/`social` de entrada es el orden de render (CvData).
 export interface SidebarProps {
   profile: Profile;
-  /** Contactos en el orden de `src/content/cv.*.json` — se renderizan en T3. */
+  /** Contactos en el orden de `src/content/cv.*.json` (render T3). */
   contact: readonly ContactItem[];
   social: readonly SocialLink[];
   labels: SidebarLabels;
@@ -66,10 +85,24 @@ export interface SidebarProps {
   className?: string;
 }
 
-export function Sidebar({ profile, social, labels, className }: SidebarProps) {
-  // `contact` queda fuera de la destructuración hasta T3 (nada lo consume
-  // todavía; la interfaz ya es la de la spec — criterio F2 de destructuración
-  // parcial con comentario L1).
+// Mapa tipo→ícono del `IconBox` de cada contacto (spec → API, plan → Funciones
+// puras y algoritmo): constante local sin exportar (la API pública es Sidebar
+// + tipos + `getContactHref`). El tipo `Record<ContactItem["type"], IconName>`
+// es exhaustivo: si `data/cv.schema.json` agrega un `ContactType` sin entrada
+// acá, `tsc` falla (mismo criterio que `ICON_MAP` de Icon).
+const CONTACT_ICONS: Record<ContactItem["type"], IconName> = {
+  email: "mail",
+  phone: "phone",
+  whatsapp: "message-circle",
+  location: "map-pin",
+};
+
+// Contenedor del disclosure (plan → Interfaz; RF-10): id fijo, coincidente con
+// el `aria-controls` del botón (T4) y con el selector de `foundations/layout.md`
+// → Impresión. Constante local: no es parte de la API pública.
+const CONTACTS_CONTAINER_ID = "sidebar-contacts";
+
+export function Sidebar({ profile, contact, social, labels, className }: SidebarProps) {
   return (
     // RF-1 + spec → Accesibilidad: landmark `<aside>` nombrado con
     // `labels.region` (por props, no hardcodeado — C3). `variant="outer"` es
@@ -120,6 +153,78 @@ export function Sidebar({ profile, social, labels, className }: SidebarProps) {
                 </a>
               </li>
             ))}
+          </ul>
+        )}
+      </div>
+
+      {/* .additional (Anatomía): Separator + lista de contactos (+ CTA, T5).
+          T3: el contenedor se monta siempre — la lógica de colapso
+          (CornerTab/disclosure) es T4 y las clases/estilos del módulo son T6
+          (por eso acá no hay `className`: jsdom no computa CSS, #101). El id
+          es alcanzable para el `aria-controls` y para print (RF-10). */}
+      <div id={CONTACTS_CONTAINER_ID}>
+        {/* RF-9: sin contactos **y** sin `downloadCvUrl` no se renderiza el
+            Separator (un `.additional` sin contenido no deja huérfano el
+            separador). El CTA de descarga llega en T5; la condición ya evalúa
+            `profile.downloadCvUrl` según la spec, así T5 solo agrega el
+            botón. */}
+        {(contact.length > 0 || profile.downloadCvUrl !== undefined) && <Separator />}
+
+        {/* RF-9 (mitad `contact`; Tests 8): `contact=[]` → no se monta la
+            lista. Orden de render = orden recibido (CvData). */}
+        {contact.length > 0 && (
+          <ul>
+            {contact.map((item) => {
+              // RF-5: href explícito con prioridad, o derivado por tipo
+              // (`getContactHref`, función pura testeada en T1). `undefined`
+              // (location, phone/whatsapp sin dígitos) → texto plano.
+              const href = getContactHref(item);
+
+              // Criterio de externidad (RF-6, decisión 10; plan →
+              // Decisiones: "por tipo/campo explícito, no heurística de
+              // dominio"): es externo un contacto con `href` explícito que
+              // sea URL http(s) (p. ej. sitio web) y, entre los derivados,
+              // SOLO whatsapp — `getContactHref` produce para él siempre
+              // `https://wa.me/…`; los derivados email/phone son
+              // `mailto:`/`tel:`, que se abren sin `target` ni `rel` (RF-6).
+              // Links externos siempre con `rel="noopener noreferrer"` (D6).
+              const external =
+                item.href !== undefined ? /^https?:/i.test(item.href) : item.type === "whatsapp";
+
+              return (
+                // Key: `item.id` (identificador estable del esquema, únicos
+                // por entrada — mismo criterio que redes).
+                <li key={item.id}>
+                  {/* Anatomía: IconBox (decorativo por su RF-2: el
+                      significado lo da el texto acompañante) y bloque de
+                      texto Overhead + valor. */}
+                  <IconBox icon={CONTACT_ICONS[item.type]} />
+                  <div>
+                    {/* Label traducido por tipo, recibido por props (RF-8;
+                        spec → Accesibilidad: label y valor en el mismo `li`). */}
+                    <Overhead>{labels.contact[item.type]}</Overhead>
+
+                    {/* Valor completo en `title` (tabla Contactos; el
+                        ellipsis lo aplica el módulo en T6). Con href → `<a>`;
+                        `target`/`rel` solo si es externo (undefined omite el
+                        atributo en el DOM). Sin href → `<p>` (RF-5: "el
+                        valor se muestra como texto"). */}
+                    {href !== undefined ? (
+                      <a
+                        href={href}
+                        title={item.value}
+                        target={external ? "_blank" : undefined}
+                        rel={external ? "noopener noreferrer" : undefined}
+                      >
+                        {item.value}
+                      </a>
+                    ) : (
+                      <p title={item.value}>{item.value}</p>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
