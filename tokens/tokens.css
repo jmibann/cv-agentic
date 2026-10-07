@@ -230,6 +230,7 @@
   --z-raised: 1;     /* CornerTab sobre el contenido del Box */
   --z-sticky: 10;    /* sidebar sticky */
   --z-controls: 20;  /* ControlsBar */
+  --z-skip: 30;
   --z-below: -1;     /* decoración detrás de su propio elemento (brillo del Button) */
   /* <dialog> usa top layer: no necesita z-index */
 
