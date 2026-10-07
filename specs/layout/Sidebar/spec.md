@@ -1,5 +1,5 @@
 # Sidebar
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
