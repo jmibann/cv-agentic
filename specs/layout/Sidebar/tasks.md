@@ -1,6 +1,6 @@
 # Tareas — Sidebar
 
-- [ ] **T1. `getContactHref` (pura).** RF-5
+- [x] **T1. `getContactHref` (pura).** RF-5 — e0cc73a
   - Hecho cuando: `src/components/Sidebar/getContactHref.ts` exporta la función sin React; pasan sus tests con la tabla exacta de spec → API (explícito prioriza; `mailto`; `tel:+5411…` con `+` solo inicial y sin otros no-dígitos; tel sin dígitos → `undefined`; `wa.me` solo dígitos sin `+`; location → `undefined`); verde tras `feat(Sidebar): T1`.
 
 - [ ] **T2. Estructura base: aside, identidad y redes.** RF-1, RF-6 (redes), RF-8
