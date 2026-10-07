@@ -1,4 +1,6 @@
-// Tests de T1 (specs/content/ResumeSection/tasks.md) — RF-1, RF-2, RF-3, RF-5.
+// Tests de T1 y T2 (specs/content/ResumeSection/tasks.md). T1 — RF-1, RF-2,
+// RF-3, RF-5. T2 — RF-4 (columna flex del módulo, por inspección) y cierre
+// a11y del archivo (Tests esperados 6, constitución T4).
 // "Hecho cuando" de T1: `getByRole("region", { name: title })` (nombre vía
 // `aria-labelledby="resume-${id}-title"`); la región contiene `heading` nivel 2
 // con el título y su `IconBox` decorativo y un `list` con `listitem` × n; el
@@ -7,15 +9,18 @@
 // título (Tests esperados 5; RF-3) y el `timelineIdPrefix` recibido llega al
 // Timeline (ids de ítems con la fórmula `${prefix}-${entry.id}-title`).
 //
-// Diferidos (declarados, criterio Timeline/LanguageSwitcher/ThemeToggle):
-// - El cierre `expectNoA11yViolations` del archivo (Tests esperados 6,
-//   constitución T4) lo AGREGA T2 como último `test` commit de la pieza
-//   (tasks.md T2: "el archivo termina con expectNoA11yViolations"); verde
-//   on-arrival esperado bajo #101 (el markup ya es accesible desde T1).
-// - Los estilos del módulo (columna flex, RF-4) son de T2 por inspección
-//   (#101: jsdom no carga hojas de estilo); el módulo nace en T1 con la clase
-//   base vacía para dar a la unión de `className` una base real (criterio
-//   IconBox/LanguageSwitcher/Timeline T1).
+// Diferidos: ninguno — T2 cumple los dos declarados en T1: agrega el cierre
+// `expectNoA11yViolations` del archivo (Tests esperados 6, constitución T4)
+// y completa el módulo con la columna flex (RF-4).
+// #101 VERDE ON-ARRIVAL DECLARADO: el cierre audita markup que ya era
+// accesible desde T1 (región nombrada por su h2, jerarquía h2→h3, IconBox
+// aria-hidden) y nada del alcance de T2 es discriminate-testable en jsdom
+// (las hojas de estilo no se cargan; fabricar rojo leyendo el CSS como texto
+// está descartado). El cierre cubre regresión futura; la verificación real
+// de RF-4 es la inspección del reviewer: `.resumeSection` declara SOLO
+// `display: flex; flex-direction: column;` — sin gap ni margen extra (el
+// `margin-bottom` del h2 de SectionTitle es el único espacio) y cero `@media`
+// propios (la disposición en columnas la decide ResumePage).
 //
 // Justificación de queries (constitución T3): región nombrada
 // (`getByRole("region", { name })`, Tests 1), `heading` por nivel + nombre
@@ -46,6 +51,10 @@ import { AccentGradientDefs } from "../Icon";
 
 import { ResumeSection } from "./ResumeSection";
 import type { ResumeSectionProps } from "./ResumeSection";
+
+// T2: helper de cierre a11y (constitución T4); import puro, no toca lo
+// anterior (precedente Timeline T3 / Overhead T3).
+import { expectNoA11yViolations } from "../../test/a11y";
 
 // El test importa el módulo solo para fijar el nombre real de la clase base
 // (`resumeSection`) del <section> raíz y asierte la coexistencia con la clase
@@ -316,8 +325,12 @@ describe("ResumeSection id derivation (T1: RF-3, spec → Tests esperados 5)", (
 // sin contrapartida en "Tests esperados"; el "Hecho cuando" de T2 no la
 // reclama (declara el módulo flex, el cierre a11y e index.ts), así que se
 // conecta y se testa en T1 (criterio Timeline/NavTabs/ControlsBar/
-// ThemeToggle/LanguageSwitcher T1). Patrón #99: `styles.name ?? "name"` +
-// `toHaveClass(c)` (prohibidos `!` y `as`).
+// ThemeToggle/LanguageSwitcher T1). La unión es el mecanismo canónico en la
+// implementación (array + filtro de undefined + join, base primero, #99); el
+// patrón #99 del ASSERT de test (`styles.name ?? "name"` + `toHaveClass(c)`,
+// prohibidos `!` y `as`) es otra cosa: el `??` es solo el fallback de tipos
+// bajo `noUncheckedIndexedAccess`, no parte de la unión (fix menor de la
+// revisión de T1).
 describe("ResumeSection className joining (T1: spec → API, G-B)", () => {
   it("joins an external className to the base class on the root section", () => {
     const consumerClass = "resume-panel";
@@ -330,5 +343,26 @@ describe("ResumeSection className joining (T1: spec → API, G-B)", () => {
     const region = screen.getByRole("region", { name: TITLE });
     expect(region).toHaveClass(baseClass);
     expect(region).toHaveClass(consumerClass);
+  });
+});
+
+// ============================================================================
+// T2 · cierre a11y (Tests esperados 6, constitución T4): axe sobre la sección
+// completa — <section> nombrada por su h2 con IconBox decorativo en gradiente
+// y el Timeline real con las dos entradas del fixture (rango + end:null,
+// ambas ramas del período). #101 VERDE ON-ARRIVAL DECLARADO (encabezado): el
+// markup ya era accesible desde T1 y el módulo de T2 no se carga en jsdom.
+// UNA sola rama decisionada: con `entries=[]` la pieza renderiza `null`
+// (RF-1) y auditar un container vacío no aporta cobertura axe; los Tests
+// esperados 6 apuntan a la sección renderizada, no al caso vacío. Armazón
+// `AccentGradientDefs` (encabezado): el IconBox de SectionTitle usa Icon
+// `tone="gradient"` y necesita las defs compartidas.
+// ============================================================================
+
+describe("ResumeSection accessibility audit (T2: spec → Tests esperados 6)", () => {
+  it("has no accessibility violations with the full section (title and timeline)", async () => {
+    const { container } = render(resumeSection());
+
+    await expectNoA11yViolations(container);
   });
 });
