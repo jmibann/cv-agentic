@@ -1,0 +1,59 @@
+/* Sidebar — specs/layout/Sidebar/spec.md → Estilos y tokens / Responsive.
+   El módulo NACE en T4 (specs/layout/Sidebar/tasks.md) solo con las clases
+   mínimas del disclosure: el colapso de `.additional` por clase (RF-3;
+   RF-10: nunca `style` inline — los estilos compartidos de impresión de
+   foundations/layout.md deben poder forzar la expansión) y la rotación del
+   chevron (RF-4). TODO lo demás queda diferido a T6 (tasks.md): grilla
+   `auto 1fr` < md y `md–lg`, columna xl con avatar sobresaliente
+   (`margin-top: calc(var(--size-avatar-sidebar) * -0.71)`), clases de la
+   Anatomía (`baseInfo`/`avatar`/`identity`/`name`/`social`/`additional`/
+   `contacts`), redes/links con hover/foco (`--color-accent-text`, subrayado,
+   anillo `--focus-ring-*`), estilo del botón Show/Hide (sin fondo,
+   `--color-accent-text`, `--font-size-body`), `gap` de `.additional` con el
+   tramo del Separator (excepción acumulativa, Separator RF-4) y el ÚNICO
+   `@media (min-width: 1200px)` del módulo que en ≥ xl oculta la CornerTab y
+   fuerza `display: block` en `.additional` (decisión CSS-only 8=a — hoy
+   `.additionalCollapsed` aplica en todos los anchos por eso).
+   Cero colores literales (regla 1 de docs/DESIGN.md): este archivo no declara
+   ningún color. Cero `@media print` propio (RF-10: lo cubren los estilos
+   compartidos). Transiciones de PROPIEDADES concretas con tokens
+   `--duration-*`/`--ease-*` (regla 2 y Do/Don't de docs/DESIGN.md; `never
+   transition: all`); `--duration-base` colapsa a 0.01ms bajo
+   prefers-reduced-motion en tokens.css (foundations/movimiento). Sin margen
+   externo (docs/DESIGN.md → Do/Don't): el espaciado del bloque lo fija T6 con
+   el `gap` del padre. La rotación de 180° del chevron ("rota el chevron
+   180°", RF-4/Estados) es una medida FIJA definida literalmente por la spec
+   que no cambia por breakpoint: permitida por docs/tokens/breakpoints.md
+   ("las medidas fijas pueden ser literales si su spec las define", mismo
+   criterio de CornerTab `.sm`). */
+
+/* Colapso del bloque de contactos (T4; spec → Responsive, Colapsable < xl:
+   "`.additional` oculto con una clase del módulo (`display: none`, nunca
+   `style` inline)"). La clase se aplica SOLO cuando `expanded === false`
+   (ternaria en el TSX); en ≥ xl el @media 1200 de T6 fuerza
+   `display: block` sobre el bloque cualquiera sea esta clase (el mecanismo
+   exacto — orden de regla o selector del media — lo resuelve T6; decisión
+   8=a: el botón queda oculto y el bloque siempre visible, sin render
+   condicional por ancho). */
+.additionalCollapsed {
+  display: none;
+}
+
+/* Chevron del disclosure (T4, RF-4; spec → Responsive, Colapsable: "el
+   chevron rota 180° cuando está expandido (`transform`, `--duration-base`)").
+   Clase base unida al `<svg>` del Icon (la unión la aplica Icon en su raíz,
+   su RF-6): siempre presente para que la transición anime también el cierre
+   (criterio LanguageSwitcher: "declarada en la base para que también anime la
+   vuelta"). `--ease-standard` acompaña al `--duration-base` del texto de la
+   spec por el canon de la fase (ThemeToggle/LanguageSwitcher/NavTabs: todo
+   transition de propiedad concreta lleva par duration+ease, ambos tokens; la
+   spec no fija otra curva). */
+.chevron {
+  transition: transform var(--duration-base) var(--ease-standard);
+}
+
+/* Estado expandido (T4, RF-4; inspección T6/QA F5: jsdom no computa
+   transformaciones, #101). */
+.chevronRotated {
+  transform: rotate(180deg);
+}
