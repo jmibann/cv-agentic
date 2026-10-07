@@ -3,7 +3,7 @@
 - [x] **T1. Hook con estado inicial por hash.** RF-1 — 7e0f45c (APROBADA: tests 1–3 literales, `parseHash` no exportado, setter mínimo sin comportamiento RF-2, spy de `replaceState` mide solo al hook; RF-6 inspección OK; 398/37 verdes)
   - Hecho cuando: `useHashTab.test.ts` cubre tests 1–3 de la spec (sin hash → `defaultId`; `#resume` antes de montar → `"resume"`; `#foo` → `defaultId` y spy de `replaceState` **no** llamado); `useHashTab.ts` existe con la firma de spec → API y `parseHash` de módulo no exportado; verde tras `feat(useHashTab): T1`.
 
-- [ ] **T2. `setActiveId` con replaceState sin tocar el activo.** RF-2
+- [x] **T2. `setActiveId` con replaceState sin tocar el activo.** RF-2 — ab13f31 (APROBADA; menor para T3: mover la restauración de URL base del cuerpo del test 9 al `afterEach` del describe; el handler de `hashchange` DEBE mantener `activeRef` al día o el corte RF-2 se desincroniza)
   - Hecho cuando: tests 4, 5 y 9 de la spec: `setActiveId("resume")` → estado `"resume"` + `replaceState` con URL que termina en `#resume` (y `pushState` spy: nunca llamado); repetir el id activo → cero llamadas a `replaceState`; con `pathname`/`search` no vacíos el argumento URL conserva ambos (solo cambia el hash); verde tras `feat(useHashTab): T2`.
 
 - [ ] **T3. `hashchange` y desmontaje con listener estable.** RF-3, RF-4
