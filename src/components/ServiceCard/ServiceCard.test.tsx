@@ -1,15 +1,24 @@
-// Tests de T1 (specs/content/ServiceCard/tasks.md) — RF-1, RF-2, RF-3
-// (Tests esperados 1-4 de la spec): el <article> se nombra por su h3 vía
+// Tests de T1 y T2 (specs/content/ServiceCard/tasks.md) — T1: RF-1, RF-2,
+// RF-3 (Tests esperados 1-4 de la spec); T2: escenario DOM de `.glyph`
+// (RF-2, conexión de la clase) y cierre a11y (Tests esperados 5). T1: el
+// <article> se nombra por su h3 vía
 // `aria-labelledby="service-${service.id}-title"` (fórmula fija, RF-3); el
 // título es un `heading` nivel 3 (SectionTitle real, sin wrapper) y la
 // descripción un <p>; el ícono es el glyph de `service.icon` con
 // `stroke="url(#accent-gradient)"` (armazón `AccentGradientDefs`) e hijo
 // DIRECTO del article (RF-2, decisión 16: sin <span> wrapper — inspección DOM).
 //
-// Diferidos a T2 según tasks.md: el módulo mobile-first (RF-4/RF-5, por
-// inspección), la clase `.glyph { --icon-size: var(--size-service-icon); }`
-// (RF-2), cero pseudo-estados (RF-6, inspección), el cierre
-// `expectNoA11yViolations` (Tests esperados 5) e `index.ts`.
+// Diferidos a T2 según tasks.md → gestionados por este commit
+// `test(ServiceCard): T2`: se AGREGA la aserción DOM de la clase `.glyph` en
+// el svg (coexistiendo con la base `.icon` de Icon y la clase `lucide-*`; el
+// scenario fija la CONEXIÓN de la clase, no el valor CSS de `--icon-size`,
+// que queda por inspección del módulo). Siguen por INSPECCIÓN (jsdom no
+// computa, plan → Estrategia de tests): la base columna centrada y el único
+// `@media (min-width: 580px)` fila (RF-4/RF-5), el valor de `.glyph` (RF-2),
+// cero pseudo-estados (RF-6) y cero `@media print`. El cierre
+// `expectNoA11yViolations` (Tests esperados 5) se AGREGA acá como último
+// describe del archivo; `ServiceCard.module.css` e `index.ts` llegan en el
+// `feat(ServiceCard): T2`.
 //
 // Reparto T1/T2 del ícono (elección declarada): en T1 el `Icon` se renderiza
 // SIN `className={styles.glyph}` —el módulo nace en T2, que declara `.glyph`, y
@@ -31,8 +40,16 @@
 // #99 (`styles.name ?? "name"` + `toHaveClass`; prohibidos `!` y `as`),
 // precedente SkillList.test importando `Badge.module.css`.
 //
-// Rojo on-arrival (P4): falta la implementación —los imports `./ServiceCard`
-// (componente y tipo) no resuelven.
+// Rojo on-arrival (P4; mixto declarado, criterio #101): el scenario `.glyph`
+// de T2 pone rojo porque `./ServiceCard.module.css` (nace en el `feat` de T2)
+// todavía no resuelve y el `Icon` aún no recibe la clase —el fallo es por
+// falta de implementación de T2, no del test (el rojo alcanza a TODO el
+// archivo por el import del módulo inexistente; los tests de T1 se re-verden
+// con el feat sin haber sido tocados). El cierre `expectNoA11yViolations` es
+// VERDE on-arrival (#101 declarado): el markup ya era accesible desde T1 y T2
+// no toca la estructura; su valor es la regresión futura (p. ej. perder el
+// `aria-labelledby` o volver decorativo un glyph con nombre lo capturaría
+// axe).
 //
 // Datos ficticios (constitución D4): fixture de servicio inventada, textos de
 // ejemplo del propio spec (Anatomía), sin datos reales.
@@ -41,6 +58,8 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import type { Service } from "@data/cv.types.generated";
+
+import { expectNoA11yViolations } from "../../test/a11y";
 
 import { AccentGradientDefs } from "../Icon";
 
@@ -51,6 +70,14 @@ import type { ServiceCardProps } from "./ServiceCard";
 // (spec → API), y el test importa el módulo de Box para fijar el nombre real
 // resuelto (`inner`) y asierte la coexistencia con la clase del consumidor.
 import boxStyles from "../Box/Box.module.css";
+
+// Clases de módulo para el scenario `.glyph` de T2 (patrón #99: el nombre real
+// resuelto se fija importando los módulos, con fallback solo de tipos; el
+// propio nace en el `feat(ServiceCard): T2` — motivo del rojo, encabezado):
+// `styles.glyph` es la clase que ServiceCard pasa al Icon; `iconStyles.icon`
+// es la base de Icon que debe COEXISTIR con ella (Icon RF-6/T5).
+import iconStyles from "../Icon/Icon.module.css";
+import styles from "./ServiceCard.module.css";
 
 // --- Fixture ------------------------------------------------------------------
 // `Service` del esquema: id "web-apps", icon "code" (ServiceIcon válido; plan →
@@ -183,5 +210,69 @@ describe("ServiceCard className forwarding (T1: spec → API, G-B)", () => {
     const article = screen.getByRole("article", { name: SERVICE.title });
     expect(article).toHaveClass(innerClass);
     expect(article).toHaveClass(consumerClass);
+  });
+});
+
+// --- T2 · RF-2: la clase `.glyph` conectada al svg (decisión 16) ----------------
+// Escenario de T2: fija en el DOM la CONEXIÓN de la clase de módulo `.glyph`
+// sobre el propio <svg> (la Anatomía la pasa directo al Icon, sin wrapper),
+// coexistiendo con la base `.icon` de Icon (unión base-first del propio Icon,
+// RF-6/T5) y la clase `lucide-*` de T1. NO aserta el VALOR CSS de
+// `--icon-size` (jsdom no computa: la fila Ícono de la tabla se verifica por
+// inspección del módulo; spec RF-4/plan → Estrategia de tests).
+describe("ServiceCard glyph size class (T2: RF-2, conexión DOM de .glyph)", () => {
+  it("applies the module glyph class on the svg alongside Icon's base icon class", () => {
+    // #99: nombres reales resueltos leyendo los módulos (fallback solo de
+    // tipos; prohibidos `!` y `as`).
+    const glyphClass = styles.glyph ?? "glyph";
+    const iconBaseClass = iconStyles.icon ?? "icon";
+
+    render(serviceCard());
+
+    const article = screen.getByRole("article", { name: SERVICE.title });
+    const glyph = article.querySelector('svg[stroke="url(#accent-gradient)"]');
+    expect(glyph).not.toBeNull();
+
+    // `.glyph` va en el glifo mismo (RF-2: "la variable no se hereda, se fija
+    // en la clase del propio ícono"; spec → No hacer: no en un contenedor).
+    expect(glyph).toHaveClass(glyphClass);
+    // Coexistencia con la base de Icon y la clase de lucide: la unión del
+    // Icon no la reemplaza (Icon RF-6), y el glyph sigue identificado
+    // (T1: `lucide-code`).
+    expect(glyph).toHaveClass(iconBaseClass);
+    expect(glyph).toHaveClass("lucide-code");
+  });
+});
+
+// ============================================================================
+// CIERRE de accesibilidad (T2; constitución T4, Tests esperados 5; la última
+// entrada del archivo).
+//
+// VERDE on-arrival #101 (declarado arriba, en el encabezado): el markup ya era
+// accesible desde T1 — article nombrada por `aria-labelledby` al h3, glyph
+// decorativo (`aria-hidden`), texto plano — y T2 no toca la estructura. El
+// valor del cierre es la REGRESIÓN futura sobre la card completa.
+//
+// Fixture: la card normal (`SERVICE`, armazón `AccentGradientDefs` por el
+// `tone="gradient"`; contrato de Icon).
+// ============================================================================
+describe("ServiceCard accessibility audit (T2: cierre, spec → Tests esperados 5)", () => {
+  it("has no accessibility violations with the full card", async () => {
+    const { container } = render(serviceCard());
+
+    // Fija lo auditado (criterio SkillList/ControlsBar: sin assert de anclaje
+    // el cierre no distingue qué rama recorre): la card completa — article
+    // nombrada, heading nivel 3 con el título, descripción y glyph
+    // decorativo con defs montadas.
+    const article = screen.getByRole("article", { name: SERVICE.title });
+    expect(
+      within(article).getByRole("heading", { level: 3, name: SERVICE.title }),
+    ).toBeInTheDocument();
+    expect(within(article).getByText(SERVICE.description)).toBeInTheDocument();
+    expect(
+      article.querySelector('svg[stroke="url(#accent-gradient)"]'),
+    ).not.toBeNull();
+
+    await expectNoA11yViolations(container);
   });
 });
