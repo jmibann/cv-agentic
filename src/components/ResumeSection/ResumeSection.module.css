@@ -1,0 +1,15 @@
+/* ResumeSection — módulo de estilos (specs/content/ResumeSection/spec.md →
+   "Estilos y tokens"). Nace en T1 con la clase base del <section> raíz
+   VACÍA, única razón: dar una base real a la unión de `className` (G-B/#99;
+   criterio IconBox/LanguageSwitcher/Timeline: el módulo nace con la clase
+   base y los estilos llegan después).
+
+   T2 conecta acá la tabla de la spec (RF-4): `display: flex;
+   flex-direction: column;` sin gap ni margen extra entre título y Timeline
+   (spec → "No hacer": alcanza el `margin-bottom` del SectionTitle) y CERO
+   `@media` propios (la disposición en columnas lado a lado ≥ md la decide
+   ResumePage, no esta pieza). Verificación por inspección: jsdom no carga
+   hojas de estilo (#101). */
+
+.resumeSection {
+}
