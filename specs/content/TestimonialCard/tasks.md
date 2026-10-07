@@ -1,6 +1,6 @@
 # Tareas — TestimonialCard
 
-- [ ] **T1. Estructura: Box article, header con HexAvatar y extracto.** RF-4, RF-7
+- [x] **T1. Estructura: Box article, header con HexAvatar y extracto.** RF-4, RF-7 — 7dcea95 (T2: pre-aprobado retiro de los negativos pre-T2 del describe 5 — ver nota de delegación)
   - Hecho cuando: `getByRole("article", { name: author })` con `<h3 id="testimonial-${testimonial.id}-name">` (fórmula fija; el article se nombra por él), `<p class=role>`, extracto con `testimonial.text`; `HexAvatar` con `alt=""` (armazón `HexAvatarDefs` + `AccentGradientDefs`); comilla `Icon quote tone="gradient"` decorativa sin nombre accesible; todavía **sin** botón ni `onClick` en ningún nodo (el botón es T2); verde tras `feat(TestimonialCard): T1`.
 
 - [ ] **T2. Botón estirado y `onOpen`.** RF-1
