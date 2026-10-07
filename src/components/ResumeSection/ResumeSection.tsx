@@ -11,8 +11,10 @@
 // La `className` externa se UNE a la clase base del `<section>` raíz ya en T1
 // (spec → API, G-B): ningún "Hecho cuando" de T2 la reclama (criterio
 // Timeline/NavTabs/ControlsBar/ThemeToggle/LanguageSwitcher T1); el módulo
-// nace acá con la clase base vacía (criterio IconBox/LanguageSwitcher/Timeline)
-// y T2 le conecta la columna flex de spec → "Estilos y tokens" (RF-4).
+// nació con la clase base vacía (criterio IconBox/LanguageSwitcher/Timeline)
+// y T2 le conectó la columna flex de spec → "Estilos y tokens" (RF-4: sin
+// gap ni margen extra, cero `@media`, por inspección). Con T2 la pieza está
+// completa y `index.ts` re-exporta `ResumeSection` y su tipo.
 
 import type { Locale, TimelineEntry } from "@data/cv.types.generated";
 
