@@ -1,5 +1,5 @@
 # TestimonialDialog
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
