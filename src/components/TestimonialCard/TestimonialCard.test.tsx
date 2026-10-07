@@ -60,7 +60,10 @@
 // `queryAllByRole` de los demás roles interactivos + inspección estructural del
 // subtree (`querySelectorAll` de tabulables nativos). Activación con
 // `userEvent`: `user.click` y `user.tab()` + `user.keyboard("{Enter}")` /
-// `{"{Space}"}` sobre el botón enfocado (teclado real, no `focus()` +
+// `user.keyboard(" ")` (carácter literal; ver bloque "ERROR DE AUTORÍA" del
+// describe de activación: `{Space}` no existe en el keyboardMap de user-event
+// v14 y no genera el evento del navegador) sobre el botón enfocado (teclado
+// real, no `focus()` +
 // `click()` programáticos; precedente NavTabs T3 / LanguageSwitcher T2), spy
 // `vi.fn()` inyectado por `overrides` del helper con RENDER NUEVO por caso (sin
 // acumular llamadas entre teclas) y call-count exacto 1 (precedente NavTabs
@@ -321,10 +324,21 @@ describe("TestimonialCard stretched button is the only focusable (T2: RF-1)", ()
 // lo exige y NavTabs T2 fija el criterio de no duplicar el guard). user-event
 // v14 despacha el click nativo también por teclado (Enter en keydown, Espacio
 // en keyup sin defaultPrevented), así que el call-count EXACTO 1 descarta
-// doble emisión (manual + nativa). Foco colocado con `user.tab()` (el botón es
-// el único tabulable del documento, aserción de arriba; anclaje `toHaveFocus`
-// para que el caso no sea vacío, precedente NavTabs T3). Spy + render NUEVO
-// por caso: sin acumulación de llamadas entre teclas.
+// doble emisión (manual + nativa).
+// ERROR DE AUTORÍA corregido en un commit `test` separado (previo al `feat`;
+// ningún assert cambia, ningún test de T1 se toca): el token `{Space}` NO es
+// válido en el keyboardMap de user-event v14 —parseKeyDef lo resuelve por
+// `def.key === descriptor` y la entrada es `{key: " ", code: "Space"}`—, así
+// que generaba `key="Space"`/`code="Unknown"` (eventos que ningún navegador
+// emite) y `keyupBehavior[" "]` nunca disparaba el click: 0 llamadas a `onOpen`
+// con una implementación FIEL a la spec (addicionales verificados con probes
+// de node sobre el propio user-event instalado). El carácter literal `" "` sí
+// produce el keystroke real `key=" "`, `code="Space"` → click exactamente 1 —
+// precedente NavTabs T3 (líneas 387/416: `user.keyboard(" ")`).
+// Foco colocado con `user.tab()` (el botón es el único tabulable del
+// documento, aserción de arriba; anclaje `toHaveFocus` para que el caso no sea
+// vacío, precedente NavTabs T3). Spy + render NUEVO por caso: sin acumulación
+// de llamadas entre teclas.
 describe("TestimonialCard button activation (T2: RF-1)", () => {
   it("calls onOpen once with the testimonial id when the button is clicked", async () => {
     const user = userEvent.setup();
@@ -362,7 +376,10 @@ describe("TestimonialCard button activation (T2: RF-1)", () => {
     await user.tab();
     expect(screen.getByRole("button", { name: OPEN_LABEL })).toHaveFocus();
 
-    await user.keyboard("{Space}");
+    // Carácter literal " ": key=" ", code="Space" (el keystroke real del
+    // navegador; ver bloque ERROR DE AUTORÍA del describe — `{Space}` no existe
+    // en el keyboardMap de user-event v14).
+    await user.keyboard(" ");
 
     // Tests esperados 4: Espacio → onOpen una vez (click nativo en keyup; sin
     // handler propio que duplique la emisión).
