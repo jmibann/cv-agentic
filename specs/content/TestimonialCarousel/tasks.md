@@ -3,7 +3,7 @@
 - [x] **T1. Funciones puras de stops.** RF-3, RF-5 (base) — 33adec3 (tolerancia 1px INCLUSIVA ratificada por el reviewer, coherente con stop→n)
   - Hecho cuando: `getScrollStops.ts` exporta ambas funciones sin DOM; pasan los 4 casos exactos de spec → Tests (clamp+dedup `[0,300,600]/300→[0,300]`; `/600→[0,300,600]`; `[0,300]/0→[0]`; `getActiveStop` 140→0, 160→1, 150→0); verde tras `feat(TestimonialCarousel): T1`.
 
-- [ ] **T2. Región única con slides y dialog cableado.** RF-1, RF-6
+- [x] **T2. Región única con slides y dialog cableado.** RF-1, RF-6 — a16dc9d (menor→T5: sumar el test `// extra:` de la unión `className` G-B en el próximo commit `test` de la pieza)
   - Hecho cuando: `getByRole("region", { name })` sobre la `<section>` raíz con `aria-roledescription="carousel"` (nombre por `labelledBy`, con armazón `<h2 id>`, o `aria-label={labels.carousel}`); un `group` por testimonio con `aria-roledescription="slide"` y nombre "n of N" (1-based, `total = length`; `format` de i18n); `testimonials=[]` → `container` vacío; click en el botón de una card → `TestimonialDialog` abierto con ese autor; cerrar → desaparece y el estado vuelve a null (RF-6; armazones defs); sin segunda `<section>` anidada (inspección DOM raíz, decisión 20); verde tras `feat(TestimonialCarousel): T2`.
 
 - [ ] **T3. Bullets por stops con aria-current.** RF-3, RF-5
