@@ -607,6 +607,8 @@ describe("Sidebar contacts disclosure with CornerTab (T4: RF-3, RF-4)", () => {
     // posibles: selección estructural justificada (criterio BrandIcon/T2 de
     // esta pieza). La rotación (transform + --duration-base en la clase del
     // módulo) NO se asiértan acá: jsdom no computa CSS (#101), inspección T6.
+    renderSidebarWithDefs();
+
     const button = screen.getByRole("button", { name: LABELS.showContacts });
     const chevron = button.querySelector("svg");
     expect(chevron).toBeInTheDocument();
