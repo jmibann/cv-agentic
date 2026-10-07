@@ -32,17 +32,24 @@
 // `not.toHaveAttribute`) verifican que exactamente UNO de los dos atributos
 // queda en el DOM (RF-2: siempre uno, nunca ambos).
 //
-// Diferidos a T2 (tasks.md): los estilos wrap/gap del módulo (inspección), el
-// test de duplicadas sin warning (RF-6, Tests 5; la fórmula de key
-// `skill-${index}-${value}` ya queda en la implementación desde T1 para no
-// retocarla), el cierre `expectNoA11yViolations` del archivo (constitución T4)
-// y `index.ts`. Acá no hay íconos ni gradientes: no hacen falta las defs
-// compartidas (`AccentGradientDefs`/`HexAvatarDefs`).
+// T2 (tasks.md): se agregan acá el test de duplicadas sin warning de React
+// (RF-6, Tests esperados 5; spy de `console.error`, táctica declarada en el
+// describe) y el cierre `expectNoA11yViolations` del archivo (constitución T4).
+// La fórmula de key `skill-${index}-${value}` ya estaba en la implementación
+// desde T1 (para no retocarla), así que ambos escenarios nacen VERDE
+// on-arrival y se declara (decisión #101; argumento en los comentarios de cada
+// describe). Los estilos wrap/gap del módulo (RF-5) y la restricción de
+// superficie (RF-4) se verifican por INSPECCIÓN (jsdom no computa estilos;
+// leer el CSS como texto sería un rojo artificial descartado en #101).
+// `index.ts` llega con el `feat` de T2. Acá no hay íconos ni gradientes: no
+// hacen falta las defs compartidas (`AccentGradientDefs`/`HexAvatarDefs`).
 //
 // Datos ficticios (constitución D4): fixture de skills inventada.
 
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+import { expectNoA11yViolations } from "../../test/a11y";
 
 import { SkillList } from "./SkillList";
 import type { SkillListProps } from "./SkillList";
@@ -167,5 +174,104 @@ describe("SkillList className joining (T1: spec → API, G-B)", () => {
     // La clase externa COEXISTE con la base del módulo en el único raíz.
     expect(list).toHaveClass(skillListClass);
     expect(list).toHaveClass(consumerClass);
+  });
+});
+
+// --- T2 · RF-6: skills duplicadas sin warning de React (Tests esperados 5) ----
+// Táctica del spy (declarada): `vi.spyOn(console, "error")` con
+// `mockImplementation` vacía CAPTURA toda la salida de error del render y la
+// enmascara; luego se filtran los mensajes por regex de warning de keys de
+// React (en dev el duplicate-key sale por console.error con "Encountered two
+// children with the same key"; se cubren también las variantes textuales
+// "unique key"/"duplicate" por si el formato difiere) y se aserta que la lista
+// filtrada es vacía — NO que `console.error` no se haya llamado nunca, porque
+// ruido no relacionado (ajeno a la pieza) no debería debilitar este test; la
+// RF-6 habla SOLO del warning de keys. Se restaura el spy antes de assertionar
+// para no dejar comportamiento mockeado si el assert falla (el afterEach de
+// setup.ts no hace restore: no hay `restoreMocks` en la config de Vitest).
+//
+// VERDE on-arrival #101 (declarado en el commit `test`): con la key por `value`
+// sola dos skills iguales colisionarían y el render emitiría el warning (rojo
+// posible); pero T1 ya instaló la fórmula `skill-${index}-${value}` (RF-6),
+// que para `["React","React","TypeScript"]` produce keys distintas
+// (`skill-0-React`, `skill-1-React`, `skill-2-TypeScript`) → con la
+// implementación correcta ningún escenario de esta tarea lo pone rojo. El
+// scenario queda como FIJADO ANTI-REGRESIÓN de la fórmula (si alguien vuelve la
+// key a `value` o a `index` mal formado con duplicadas, el warning aparece y
+// este test lo caza; con `index` solo no emite warning pero viola la fórmula
+// documentada — eso lo cierra la inspección del reviewer, RF-6/plan).
+describe("SkillList duplicate skills (T2: RF-6, spec → Tests esperados 5)", () => {
+  it("renders duplicated skills without a React duplicate-key warning", () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {
+        // captura sin imprimir: el spy recolecta; nada se loguea en la salida
+      });
+
+    const skillsWithDuplicates: readonly string[] = [
+      "React",
+      "React",
+      "TypeScript",
+    ];
+
+    try {
+      render(<SkillList label={LABEL} skills={skillsWithDuplicates} />);
+
+      // Tests esperados 5 / "Hecho cuando": render completo, 3 items, orden de
+      // los datos con el duplicado tal cual llega (RF-1: map sin dedupe).
+      const list = screen.getByRole("list", { name: LABEL });
+      const listitems = within(list).getAllByRole("listitem");
+      expect(listitems).toHaveLength(3);
+      expect(listitems.map((listitem) => listitem.textContent)).toEqual(
+        skillsWithDuplicates,
+      );
+
+      // Sin warning de keys: NINGÚN mensaje registrado contiene las variantes
+      // del duplicate-key/unique-key de React. `console.error` recibe
+      // `(data?: any, ...args: any[])`; se stringifica cada argumento y se une
+      // por mensaje (el formato de React pasa el texto como primer arg).
+      const keyWarnings = consoleErrorSpy.mock.calls
+        .map((callArguments) =>
+          callArguments.map((argument) => String(argument)).join(" "),
+        )
+        .filter((message) => /same key|unique key|duplicate/i.test(message));
+      expect(keyWarnings).toEqual([]);
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
+  });
+});
+
+// ============================================================================
+// CIERRE de accesibilidad (T2; constitución T4, Tests esperados 7; la última
+// entrada del archivo).
+//
+// VERDE on-arrival #101 (declarado en el commit `test`, criterio Timeline T3 /
+// ControlsBar T2): el markup ya era accesible desde T1 — `<ul>` SIEMPRE con
+// nombre (`aria-label` o `aria-labelledby`, asertado en T1) e hijos `li` del
+// Badge con texto — y T2 no toca el TSX: agrega el CSS del módulo (no se
+// computa en jsdom) y `index.ts`. No hay forma de escribir con este alcance un
+// rojo que no sea artificial. El valor del cierre es la REGRESIÓN futura sobre
+// la lista completa (p. ej. perder el nombre accesible o anidar mal el `<li>`
+// la capturaría axe). RF-4 (superficie) y RF-5 (wrap/gap/cero `@media`) se
+// verifican por INSPECCIÓN del módulo y del consumidor (ResumePage, F4).
+//
+// Fixture: la lista normal (`SKILLS`, variante `label`); sin defs SVG: la pieza
+// no monta `Icon tone="gradient"` ni HexAvatar (el `Badge as="li"` pinta solo
+// texto).
+// ============================================================================
+describe("SkillList accessibility audit (T2: cierre, spec → Tests esperados 7)", () => {
+  it("has no accessibility violations with the full chip list", async () => {
+    const { container } = render(<SkillList label={LABEL} skills={SKILLS} />);
+
+    // Fija lo auditado (criterio ControlsBar T2: sin assert de anclaje el
+    // cierre no distingue qué rama recorre): la lista nombrada con sus 3
+    // chips Badge.
+    const list = screen.getByRole("list", { name: LABEL });
+    expect(within(list).getAllByRole("listitem")).toHaveLength(
+      SKILLS.length,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
