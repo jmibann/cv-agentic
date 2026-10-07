@@ -5,16 +5,13 @@
 // `${idPrefix}-${entry.id}-title` (RF-5); muestra `organization` y
 // `description` si existen; `entries=[]` → `container` vacío.
 //
-// Diferidos (esta tarea NO los testa; tasks.md los asigna):
-// - T2 (RF-3/RF-4): el `<p class="period">` con `<time>` por extremo y
-//   `presentLabel`. En T1 NO se renderiza un `<p>` de período vacío: su
-//   contenido nace entero en T2 (`formatPeriodEndpoint` de Foundation T12) y
-//   un `<p>` hueco hoy obligaría a tocar asserts de T1 mañana (los commits
-//   test(Tn) solo agregan). Declarado también en `Timeline.tsx`.
-// - T3 (RF-6/RF-7 + constitución T4): los estilos por tokens del módulo, las
-//   clases internas y el cierre `expectNoA11yViolations` del archivo
-//   (precedente exacto LanguageSwitcher/ThemeToggle: el cierre nace en el
-//   último commit `test` de la pieza).
+// Diferidos: ninguno — T3 AGREGA el cierre `expectNoA11yViolations` del
+// archivo al final (RF-6/RF-7 + constitución T4), verde on-arrival declarado
+// bajo #101 (los estilos del módulo y las clases internas van por inspección:
+// jsdom no carga hojas de estilo; el fixture de período de T2 ya no depende de
+// ningún `<p>` hueco diferido). Precedente exacto LanguageSwitcher/ThemeToggle:
+// el cierre nace en el último commit `test` de la pieza. Los asserts de T1/T2
+// no se tocan: este commit solo agrega líneas de test.
 //
 // Adaptación al tipo generado (RF-2, "si existen"): `organization` y
 // `description` son REQUIRED en `data/cv.schema.json` (string minLength 1 →
@@ -50,6 +47,10 @@ import type { Locale, TimelineEntry } from "@data/cv.types.generated";
 
 import { Timeline } from "./Timeline";
 import type { TimelineProps } from "./Timeline";
+
+// T3: helper de cierre a11y (constitución T4); import puro, no toca lo anterior
+// (precedente Overhead T3).
+import { expectNoA11yViolations } from "../../test/a11y";
 
 // El test importa el módulo solo para fijar el nombre real de la clase base
 // (`timeline`) del raíz y asierte la coexistencia con la clase del
@@ -118,7 +119,7 @@ describe("Timeline list structure (T1: RF-1)", () => {
   it("renders an ol with an explicit role=list and one listitem per entry", () => {
     render(timeline());
 
-    // RF-1: `<ol role="list">` — el `role` EXPLÍCITO se asiértá como
+    // RF-1: `<ol role="list">` — el `role` EXPLÍCITO se aserta como
     // atributo (protege la semántica ante el quirk de `list-style: none` en
     // Safari/VoiceOver; no basta el rol implícito del <ol>). Un `listitem`
     // por entrada.
@@ -462,6 +463,50 @@ describe("Timeline period with time per endpoint (T2: RF-3, RF-4)", () => {
   });
 });
 
-// El cierre `expectNoA11yViolations` del archivo (constitución T4) se agrega
-// en `test(Timeline): T3` con la cobertura de RF-6/RF-7 (tasks.md;
-// precedente LanguageSwitcher/ThemeToggle). Acá termina T1 a propósito.
+// ============================================================================
+// Tests de T3 (specs/content/Timeline/tasks.md) — cierre a11y de la pieza
+// (spec → Tests esperados 9; constitución T4: el archivo termina con este
+// caso) y covering check de RF-6/RF-7.
+//
+// #101 VERDE ON-ARRIVAL DECLARADO (encargo de T3; criterio Sidebar T6 /
+// NavTabs T4): T3 agrega al módulo la tabla "Estilos y tokens" completa (lista,
+// ítem, punto `::before`, `:last-child`, título, organización, descripción),
+// las clases de la Anatomía en el TSX y `index.ts` — nada de eso es
+// discriminate-testable en jsdom: las hojas de estilo no se cargan y fabricar
+// un rojo leyendo el CSS como texto está explícitamente descartado (#101). El
+// markup ya era accesible desde T1/T2 (roles, nombres, ids y `aria-*`
+// asertados allí); el valor de este cierre es la regresión futura sobre la
+// lista completa. Se inspeccionan (reviewer + QA F5): lista con
+// `list-style: none` + `margin: 0` + padding-left calc(--size-timeline-dot / 2
+// + --timeline-dot-ring); ítem con `position: relative`, `border-left` con
+// --timeline-line-width/--color-track y padding con --timeline-indent/--space-6
+// (RF-7: sangría por token, cero `@media` propios); punto `::before` centrado
+// sobre la línea (left calc, top --timeline-dot-top, --size-timeline-dot,
+// --timeline-dot-ring, --color-accent, halo --color-track); `:last-child` con
+// `border-left-color: transparent` + `padding-bottom: 0` (RF-6: corte
+// posicional, no por contenido); título con --font-size-h4 y
+// top calc(--timeline-title-shift * -1).
+//
+// Fixture: DOS entradas — un rango (`T2_RANGE`) y un `end: null` (`T2_OPEN`) —
+// que cubren ambas ramas del período en la lista completa. Sin defs SVG: la
+// pieza no monta Icon `tone="gradient"` ni HexAvatar (plan → Estrategia:
+// render aislado con props fixture).
+// ============================================================================
+
+describe("Timeline accessibility audit (T3: spec → Tests esperados 9)", () => {
+  it("has no accessibility violations with the full timeline (range and open end)", async () => {
+    // Constitución T4: axe sobre el componente completo — <ol role="list"> con
+    // <li><article aria-labelledby> por entrada, <time> por extremo y
+    // presentLabel como texto (el último ítem, sin línea por :last-child).
+    const { container } = render(
+      <Timeline
+        entries={[T2_RANGE, T2_OPEN]}
+        locale={LOCALE}
+        presentLabel={PRESENT_LABEL}
+        idPrefix="edu"
+      />,
+    );
+
+    await expectNoA11yViolations(container);
+  });
+});
