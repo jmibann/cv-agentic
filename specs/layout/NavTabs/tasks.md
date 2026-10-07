@@ -3,7 +3,7 @@
 - [x] **T1. Tablist con tabs, roving y vacío.** RF-1, RF-2, RF-7 — 1dcab72 (config `0df3855`: `getTabId` en `allowExportNames`, extensión #100 aprobada por el usuario 2026-10-06)
   - Hecho cuando: `getByRole("tablist", { name: label })` con `aria-orientation="horizontal"` y un `tab` por item en orden (`getByRole("tab", { name })`), `id=getTabId(item.id)`, `aria-controls=panelId` en todos, `aria-selected`/`tabIndex` (activo 0, resto -1); `items=[]` → `container` vacío; `getTabId("about") === "tab-about"`; verde tras `feat(NavTabs): T1`.
 
-- [ ] **T2. Click: activación controlada y guard del activo.** RF-3
+- [x] **T2. Click: activación controlada y guard del activo.** RF-3 — df17ff0
   - Hecho cuando: click en inactivo → `onChange(id)` una vez; click en el activo → cero llamadas; tras click no hay re-gestión de foco propia (el nativo basta; inspección); verde tras `feat(NavTabs): T2`.
 
 - [ ] **T3. Teclado: ←/→ circular, Home/End, Espacio, single-item.** RF-4
