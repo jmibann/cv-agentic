@@ -1,0 +1,76 @@
+/* ServiceCard — módulo de estilos (specs/content/ServiceCard/spec.md → "Estilos
+   y tokens"). T2 completa el diferido de T1: el módulo nace declarando la
+   tabla textual completa, mobile-first (RF-4), solo tokens/textual keywords y
+   `0`. Composición del raíz (inspección, criterio IconBox/CornerTab aplicado
+   donde aplica): el Box raíz ya une SU variante (`inner`) con la `className`
+   que recibe; ServiceCard pasa esa `className` ya compuesta como
+   `[.card, className externa]` (unión base-first canónica, mismo mecanismo
+   #99/G-B de Box/Icon/SkillList), de modo que el <article> queda
+   `inner …card… consumer`. No hay conflicto de especificidad: `.inner` aporta
+   fondo/radio/padding y `.card` layout/altura — propiedades disjuntas (el
+   orden en el atributo `class` no dirime, criterio Box.tsx; acá no se
+   pisan).
+
+   Fila Contenedor (base, RF-4): columna con ícono arriba y texto centrado,
+   gap --space-4, `height: 100%` para igualar alturas en la misma fila de la
+   grilla (RF-5; la cantidad de columnas — 1 base, 2 en ≥lg — la arma
+   AboutPage, no esta pieza). El ÚNICO @media del módulo es
+   `(min-width: 580px)` (sm) y cambia solo layout (dirección, alineación,
+   text-align): ningún valor de tamaño acompaña el cambio — el `580px` dentro
+   de la query es el literal del breakpoint aprobado en
+   docs/tokens/breakpoints.md (los @media no aceptan custom properties), no
+   una medida del cuerpo de la regla.
+
+   Fila Ícono (RF-2, decisión 16): `.glyph` fija `--icon-size` sobre el propio
+   <svg> (la variable está registrada en tokens.css con inherits:false:
+   ponerla en un contenedor no llega al glifo — Icon RF-6; spec → No hacer:
+   cero prop `size`, cero wrapper). El `flex-shrink: 0` ya lo trae Icon.
+
+   Título: font-size y margen inferiores los aporta SectionTitle (RF-1/RF-5
+   suyos, decisión 16): la pieza no los declara ni los duplica.
+
+   Cero pseudo-estados, cero transiciones, cero `box-shadow` (RF-6: no es
+   interactiva; la sombra de card la trae Box `outer`, `.inner` no la tiene y
+   la pieza no agrega nada). Cero `@media print`: el `break-inside: avoid` lo
+   fija el estilo compartido de foundations/layout.md → Impresión (RF-5, G-D).
+   Cero margen externo: el padre separa con gap (docs/DESIGN.md → Do/Don't). */
+
+/* Tabla → Contenedor (base < 580px): flex vertical centrado. `display: flex`
+   habilita las direcciones; el gap separa glifo y bloque de texto sin
+   márgenes propios. */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  height: 100%;
+}
+
+/* Tabla → Descripción (cuerpo; `margin: 0`): el <p> hereda la tipografía de
+   cuerpo de src/styles/global.css; acá solo se le borra el margen de párrafo
+   del UA (el espaciado interno lo gobierna el gap del contenedor y el margen
+   del título que fija SectionTitle). La Anatomía no le asigna clase al <p> —
+   se alcanza con selector descendiente scoped a `.card` (precedente Sidebar:
+   `.contacts p`); un `p` pelado en un CSS Module no se hash y filtraría al
+   resto de la app. */
+.card p {
+  margin: 0;
+}
+
+/* RF-4 (≥ 580px, sm): el ícono pasa a la izquierda del texto. SOLO layout:
+   dirección, alineación de ítems y de texto; el gap sigue siendo --space-4 y
+   ningún tamaño cambia acá (docs/tokens/breakpoints.md). */
+@media (min-width: 580px) {
+  .card {
+    flex-direction: row;
+    align-items: flex-start;
+    text-align: start;
+  }
+}
+
+/* Tabla → Ícono (RF-2): 2.5rem vía el token --size-service-icon, fijado en la
+   clase del propio glifo (no en el contenedor: la variable no hereda). */
+.glyph {
+  --icon-size: var(--size-service-icon);
+}
