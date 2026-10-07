@@ -3,7 +3,7 @@
 - [x] **T1. `getContactHref` (pura).** RF-5 — e0cc73a
   - Hecho cuando: `src/components/Sidebar/getContactHref.ts` exporta la función sin React; pasan sus tests con la tabla exacta de spec → API (explícito prioriza; `mailto`; `tel:+5411…` con `+` solo inicial y sin otros no-dígitos; tel sin dígitos → `undefined`; `wa.me` solo dígitos sin `+`; location → `undefined`); verde tras `feat(Sidebar): T1`.
 
-- [ ] **T2. Estructura base: aside, identidad y redes.** RF-1, RF-6 (redes), RF-8
+- [x] **T2. Estructura base: aside, identidad y redes.** RF-1, RF-6 (redes), RF-8 — 9d0a77d
   - Hecho cuando: `getByRole("complementary", { name: labels.region })`; avatar `<img>` con `alt` de `profile.avatar.alt` **sin** atributos `width`/`height` (RF: decisión 9); nombre `<p>`; `Badge` con headline; `ul` de redes nombrada con un `li` por entrada: `<a aria-label={marca}>` externo con `target="_blank"` + `rel="noopener noreferrer"` y `BrandIcon`; la pieza no importa `useCv`/`useLocale` (inspección); verde tras `feat(Sidebar): T2`.
 
 - [ ] **T3. Contactos: IconBox + Overhead + links derivados.** RF-5 (uso), RF-6 (mailto/tel sin target), RF-9
