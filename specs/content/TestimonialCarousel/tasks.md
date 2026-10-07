@@ -9,7 +9,7 @@
 - [x] **T3. Bullets por stops con aria-current.** RF-3, RF-5 — 9473173 (menor #102: "patrón" con tilde en cuerpo `b398b43`; **para T5: el track necesita `position: relative` para que `offsetLeft` sea relativo al track (offsetParent) — necesidad mecánica del contrato de la spec, documentarla en el módulo**)
   - Hecho cuando: con layout mockeado [0,300,600]/max 300 → **2** bullets con nombres "Go to slide 1"/"Go to slide 2" (regla stop→n de spec → Comportamiento); el del stop activo (scrollLeft 0) con `aria-current="true"`; `fireEvent.scroll` con scrollLeft 300 → aria-current pasa al bullet 2 (rAF: flush con `vi.waitFor`/mock de raf); 1 stop o menos → sin bullets (1 testimonio y 2-con-2-por-vista); 0 testimonios ya cúbrela T2; verde tras `feat(TestimonialCarousel): T3`.
 
-- [ ] **T4. Click de bullet → scrollTo con behavior.** RF-4
+- [x] **T4. Click de bullet → scrollTo con behavior.** RF-4 — 73309c4 (T5 OBLIGA: suma el extra-test de unión `className` G-B pendiente de T2, el `position: relative` del track, clases `.pagination/.bullet/.track/.slide`, cierre axe e `index.ts`)
   - Hecho cuando: click bullet 2 → `track.scrollTo({ left: 300, behavior: "auto" })` (mock de `scrollTo` + matchMedia default `matches=false`); con `matchMedia` stubeado a `matches=true` → `behavior: "smooth"`; un click, una llamada; verde tras `feat(TestimonialCarousel): T4`.
 
 - [ ] **T5. Estilos por tokens, print y cierre a11y.** RF-2, RF-7, RF-8
