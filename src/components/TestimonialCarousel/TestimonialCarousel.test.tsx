@@ -500,3 +500,133 @@ describe("TestimonialCarousel renders no bullets when there is one stop or fewer
     expect(screen.getAllByRole("group")).toHaveLength(2);
   });
 });
+
+// ============================================================================
+// T4 — RF-4 (spec → Tests esperados 8): click de bullet → `track.scrollTo` con
+// el `left` del stop y `behavior` según `prefers-reduced-motion` LEIDO EN EL
+// CLICK (decisión 21 / plan → Decisiones: sin estado vivo; el setup F1 fija
+// `matches=false` → "auto"; el caso "smooth" stubea `matchMedia` local).
+// Escenarios del "Hecho cuando" de T4:
+//   1. layout [0,300,600]/max 300 (stops [0,300], T3) + mock de `scrollTo` en
+//      la instancia del track → click bullet 2 → `scrollTo` con
+//      { left: 300, behavior: "auto" }, UNA llamada (matchMedia default del
+//      setup: matches=false).
+//   2. `matchMedia` stubeado a { matches: true } → { left: 300,
+//      behavior: "smooth" }.
+//   3. // extra: click en el bullet ACTIVO (1, `aria-current="true"` al medir
+//      con scrollLeft 0) → también UNA llamada, al propio stop
+//      { left: 0, behavior: "auto" }. Motivo del extra: RF-4 dice "un bullet"
+//      sin excepción para el activo (spec → RF-4/Comportamiento no fija guard:
+//      ir al stop vigente es válido) y el "Hecho cuando" exige "un click, una
+//      llamada"; el caso 8 de Tests esperados solo lista el bullet 2. No se
+//      inventa ni guard en código ni aserción de cero llamadas: es la
+//      aplicación literal de RF-4 sobre el bullet activo.
+//
+// Rojo on-arrival (decisión #101, declarado con la salida en el commit
+// `test(TestimonialCarousel): T4`): los 3 casos fallan por la razón correcta —
+// la implementación de T3 renderiza bullets SIN onClick (comentario del `.tsx`
+// de T3: "el click con scrollTo/behavior es T4") — `scrollTo` recibe 0 llamadas:
+// "expected \"scrollTo\" to be called 1 time, but got 0 times". No es rojo
+// artificial: el hecho observable discriminado (el onClick conectado con el
+// behavior correcto) es exactamente el alcance de T4.
+//
+// `scrollTo` se mockea POR INSTANCIA post-render (`Object.defineProperty` en
+// el <ul> track, configurable: true): el handler lo lee VIVO del nodo vía
+// trackRef (mismo criterio del `scrollLeft` en T3 — la instancia mockeada es la
+// que el handler usa, no hace falta rerender). Alternativa descartada: espiar
+// `Element.prototype.scrollTo` — funcionaría, pero observaría TODOS los
+// elementos del archivo (dialog/cards incluidos) en vez del contrato "el track".
+//
+// matchMedia: el caso "auto" usa el mock del setup F1 sin tocarlo (Map nuevo
+// por test, `matches=false`; el afterEach global lo descarta). El caso "smooth"
+// usa `vi.stubGlobal("matchMedia", ...)` LOCAL (plan → Decisiones: "el caso
+// smooth con stub local del test"), acotado al propio caso: el `afterEach` de
+// este archivo ya llama `vi.unstubAllGlobals()` (desde T3), así que el stub no
+// filtra a ningún otro test del archivo ni de la suite. Alternativa descartada:
+// `simulateMediaChange` del setup (precedente ThemeProvider) — es legítimo,
+// pero exige llamar `window.matchMedia` antes de simular (el Map es perezoso)
+// y el componente solo lo llama en el click: el stub es el camino que el plan
+// fijó textualmente.
+//
+// Justificación de queries (constitución T3): bullets por rol `button` +
+// nombre accesible LITERAL ("Go to slide 1"/"Go to slide 2", criterio T3); el
+// track por inspección DOM de la región (`region.querySelector("ul")`,
+// criterio T3 scroll — sin clases de módulo hasta T5). Click con userEvent
+// (real, y no invoca `scrollTo` por su cuenta: la única llamada sale del
+// handler). `aria-current="true"` del bullet 1 se re-verifica en el caso 3 como
+// precondition leída (escenario "bullet activo"), no como assert de T3. Sin
+// `data-testid`.
+// ============================================================================
+describe("TestimonialCarousel bullet click scrolls the track to its stop with behavior read at click time (T4: RF-4, Tests 8)", () => {
+  // Fixture compartido: layout medido con 2 stops ([0,300,600]/maxScroll 300,
+  // el mismo de T3) + spy de `scrollTo` fijado en la INSTANCIA del track
+  // post-render. Devuelve el spy (el <ul> se re-encuentra por DOM si hace
+  // falta); el stub de matchMedia se aplica en el propio caso, no acá.
+  const renderWithTrackScrollSpy = () => {
+    mockCarouselLayout([0, 300, 600], 900, 600);
+    render(carousel());
+
+    const region = screen.getByRole("region", { name: LABELS.carousel });
+    const track = region.querySelector("ul");
+    if (track === null) {
+      throw new Error("T4: la región del carrusel no contiene el <ul> track");
+    }
+    const scrollTo = vi.fn();
+    Object.defineProperty(track, "scrollTo", {
+      value: scrollTo,
+      configurable: true,
+    });
+    return { scrollTo };
+  };
+
+  it("calls scrollTo once with the second stop left and behavior auto when matchMedia defaults to matches false", async () => {
+    const user = userEvent.setup();
+    const { scrollTo } = renderWithTrackScrollSpy();
+
+    // "Hecho cuando" 1: click bullet 2 → stop 300 (segundo de [0,300]).
+    // matchMedia = mock del setup (matches=false, no hay preferencia de
+    // movimiento reducido) → behavior "auto" (RF-4).
+    await user.click(screen.getByRole("button", { name: "Go to slide 2" }));
+
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    expect(scrollTo).toHaveBeenCalledWith({ left: 300, behavior: "auto" });
+  });
+
+  it("calls scrollTo with behavior smooth when matchMedia reports no-preference matching", async () => {
+    // Stub LOCAL acotado a este caso: `prefers-reduced-motion: no-preference`
+    // matchea → "smooth". Lo restaura el afterEach del archivo
+    // (vi.unstubAllGlobals). Se stubea antes del click; como el componente lo
+    // lee EN el click (sin estado vivo), el orden render/stub es irrelevante
+    // por contrato, pero se fixa acá para que el stub cubra todo el caso.
+    vi.stubGlobal("matchMedia", () => ({ matches: true }));
+    const user = userEvent.setup();
+    const { scrollTo } = renderWithTrackScrollSpy();
+
+    await user.click(screen.getByRole("button", { name: "Go to slide 2" }));
+
+    // "Hecho cuando" 2: mismo stop, behavior "smooth"; sigue siendo UNA
+    // llamada por click (un solo scrollTo con ternaria de behavior).
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    expect(scrollTo).toHaveBeenCalledWith({ left: 300, behavior: "smooth" });
+  });
+
+  // extra: ver encabezado — RF-4 "un bullet" sin excepción para el activo;
+  // el caso 8 de Tests esperados solo lista el bullet 2.
+  it("calls scrollTo once to the current stop when clicking the already active bullet", async () => {
+    const user = userEvent.setup();
+    const { scrollTo } = renderWithTrackScrollSpy();
+
+    // Precondition leída: con scrollLeft 0 medido al mount, el bullet 1 es el
+    // activo (T3/decisión 21) — el escenario "click en el bullet activo".
+    const bullet1 = screen.getByRole("button", { name: "Go to slide 1" });
+    expect(bullet1).toHaveAttribute("aria-current", "true");
+
+    await user.click(bullet1);
+
+    // "Hecho cuando" "un click, una llamada" aplicado al bullet activo: sin
+    // guard, scrollTo al propio stop 0 con behavior "auto" (matchMedia del
+    // setup). Exactamente UNA llamada: ni cero (guard inventado) ni dos.
+    expect(scrollTo).toHaveBeenCalledTimes(1);
+    expect(scrollTo).toHaveBeenCalledWith({ left: 0, behavior: "auto" });
+  });
+});
