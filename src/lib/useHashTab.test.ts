@@ -7,7 +7,7 @@
 // tests; `setHash` lo deja determinista dentro del archivo.
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, renderHook } from "@testing-library/react";
+import { act, fireEvent, renderHook } from "@testing-library/react";
 
 import { useHashTab } from "./useHashTab";
 
@@ -53,6 +53,10 @@ describe("useHashTab setActiveId", () => {
     // Red de seguridad: si un test falla antes de sus mockRestore(), el spy
     // no puede quedar instalado y contaminar las llamadas del test siguiente.
     vi.restoreAllMocks();
+    // Reparación menor de T2 (movido desde el cuerpo del test 9): devuelve la
+    // URL base. El afterEach global solo limpia el hash, no el pathname, y
+    // setHash() (T1) usa el pathname vigente.
+    window.history.replaceState(null, "", "/");
   });
 
   it("setActiveId('resume') sets the state and calls replaceState with a URL ending in #resume, never pushState", () => {
@@ -106,8 +110,78 @@ describe("useHashTab setActiveId", () => {
     expect(window.location.search).toBe(search);
     expect(window.location.hash).toBe("#resume");
     replaceState.mockRestore();
-    // Devuelve la URL base: el afterEach global solo limpia el hash, no el
-    // pathname, y setHash() (T1) usa el pathname vigente.
-    window.history.replaceState(null, "", "/");
+  });
+});
+
+// Tests 6, 7 y 8 de la spec (T3, RF-3 y RF-4): el listener de hashchange
+// actualiza el tab con hash válido, ignora el inválido y se quita al desmontar
+// con la misma referencia de handler. Disparo del evento: fireEvent(window,
+// new HashChangeEvent("hashchange")) tras fijar el hash (estrategia del plan;
+// replaceState real no dispara el evento por sí solo).
+describe("useHashTab hashchange listener", () => {
+  afterEach(() => {
+    // Red de seguridad (mismo criterio que en T2): si un test falla antes de
+    // sus mockRestore(), los spies de window no pueden quedar instalados.
+    vi.restoreAllMocks();
+  });
+
+  it("updates the active tab on hashchange with a valid hash", () => {
+    setHash("");
+    const { result } = renderHook(() => useHashTab(IDS, DEFAULT_ID));
+    expect(result.current[0]).toBe("about");
+    act(() => {
+      setHash("#resume");
+      fireEvent(window, new HashChangeEvent("hashchange"));
+    });
+    // RF-3: hashchange con hash válido actualiza el tab activo.
+    expect(result.current[0]).toBe("resume");
+  });
+
+  it("keeps the previous value on hashchange with an invalid hash", () => {
+    setHash("");
+    const { result } = renderHook(() => useHashTab(IDS, DEFAULT_ID));
+    // Precondition: a valid hashchange moves the tab to "resume".
+    act(() => {
+      setHash("#resume");
+      fireEvent(window, new HashChangeEvent("hashchange"));
+    });
+    expect(result.current[0]).toBe("resume");
+    act(() => {
+      setHash("#foo");
+      fireEvent(window, new HashChangeEvent("hashchange"));
+    });
+    // RF-3: hash inválido → se ignora; queda el tab actual (el del último
+    // hashchange válido, no el valor de montaje ni defaultId).
+    expect(result.current[0]).toBe("resume");
+  });
+
+  it("registers hashchange on mount, removes the same handler on unmount and stops updating after unmount", () => {
+    setHash("");
+    const addEventListener = vi.spyOn(window, "addEventListener");
+    const removeEventListener = vi.spyOn(window, "removeEventListener");
+    const { result, unmount } = renderHook(() => useHashTab(IDS, DEFAULT_ID));
+
+    // RF-4: al montar se registra "hashchange". La referencia capturada acá es
+    // el discriminante de la identidad (plan: cleanup con la MISMA referencia;
+    // alternativa descartada: AbortController, que no hace observable
+    // removeEventListener).
+    const registration = addEventListener.mock.calls.find(
+      (call) => call[0] === "hashchange",
+    );
+    expect(registration).toBeDefined();
+    const handler = registration?.[1] ?? null;
+    expect(handler).not.toBeNull();
+
+    unmount();
+    expect(removeEventListener).toHaveBeenCalledWith("hashchange", handler);
+
+    // hashchange post-desmontaje: sin actualizaciones observables.
+    act(() => {
+      setHash("#resume");
+      fireEvent(window, new HashChangeEvent("hashchange"));
+    });
+    expect(result.current[0]).toBe("about");
+    addEventListener.mockRestore();
+    removeEventListener.mockRestore();
   });
 });
