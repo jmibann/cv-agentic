@@ -1,6 +1,6 @@
 # Tareas — TestimonialDialog
 
-- [ ] **T1. Montaje condicional con contenido.** RF-1, RF-4
+- [x] **T1. Montaje condicional con contenido.** RF-1, RF-4 — 9b95b41 (r1 RECHAZADO: effect `[]` no abría en null→valor → r2 APROBADO con dep `[open]`; menor #102: un acento en `e957ab3` citando el fixture; **para T2: capturar `const el = dialogRef.current` en el cuerpo del effect — React desprende el ref antes del cleanup en valor→null**)
   - Hecho cuando: `testimonial=null` → `container` vacío y `queryByRole("dialog")` null; con valor → `getByRole("dialog", { name: author })` (`aria-labelledby` al `<h2>` con el autor), muestra `role` y texto completo (`testimonial.text`), `HexAvatar` `alt=""` y comilla gradient (armazón defs montado); mount-effect invocó `showModal` (assert del mock: atributo `open` presente); botón Close presente con `aria-label={closeLabel}`; verde tras `feat(TestimonialDialog): T1`.
 
 - [ ] **T2. Ciclo de cierre completo.** RF-2, RF-3
