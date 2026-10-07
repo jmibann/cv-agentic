@@ -1,5 +1,5 @@
 # TestimonialCard
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
