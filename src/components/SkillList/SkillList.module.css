@@ -1,0 +1,14 @@
+/* SkillList — specs/content/SkillList/spec.md → Estilos y tokens.
+   T1: la clase base del <ul> raíz nace VACÍA (criterio IconBox/
+   LanguageSwitcher/Timeline: el mecanismo de unión #99/G-B se conecta en el
+   componente desde T1; los estilos llegan con su tarea). T2 completará acá la
+   tabla de la spec — display: flex; flex-wrap: wrap; gap: var(--space-2);
+   list-style: none; margin: 0; padding: 0 — y cero @media propios (RF-5: el
+   wrap resuelve el responsive según el ancho disponible; un chip más ancho
+   que el contenedor desborda sin regla especial, decisión 15). Sin margen
+   externo: el padre separa con gap (docs/DESIGN.md → Do/Don't). El chip lo
+   pinta Badge íntegramente: no hay clase de chip en este módulo (decisión 15;
+   la `.chip` de la Anatomía es ilustrativa del <li> que renderiza Badge). */
+.skillList {
+  /* Vacía en T1: ver encabezado. */
+}
