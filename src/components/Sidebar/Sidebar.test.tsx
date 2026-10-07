@@ -67,6 +67,11 @@ import { AccentGradientDefs } from "../Icon";
 // puro.
 import cornerTabStyles from "../CornerTab/CornerTab.module.css";
 
+// T5: clase `fullWidth` del módulo de Button (la Anatomía exige
+// `Button … fullWidth`; criterio #99/patrón NavTabs T4: import del módulo del
+// hijo). Import puro: no toca lo anterior.
+import buttonStyles from "../Button/Button.module.css";
+
 // T4: clases del módulo propio (nace en T4 con el colapso por clase; criterio
 // #99 `styles.name ?? "name"`, patrón CornerTab/NavTabs/Button). Import puro.
 import styles from "./Sidebar.module.css";
@@ -613,5 +618,90 @@ describe("Sidebar contacts disclosure with CornerTab (T4: RF-3, RF-4)", () => {
     const chevron = button.querySelector("svg");
     expect(chevron).toBeInTheDocument();
     expect(chevron).toHaveAttribute("aria-hidden", "true");
+  });
+});
+
+// ============================================================================
+// Tests de T5 (specs/layout/Sidebar/tasks.md) — RF-2: CTA "Download CV".
+// Escenarios (spec → Tests esperados #6):
+// - Con `profile.downloadCvUrl`: existe `getByRole("link", { name:
+//   labels.downloadCv })` con ESE `href` y el atributo `download` presente
+//   ("Hecho cuando"). La Anatomía lo fija como `Button href… download
+//   icon="download" fullWidth` DENTRO de `.additional`, después de la lista de
+//   contactos: se asertan también la clase `fullWidth` del módulo de Button
+//   (criterio #99, patrón CornerTab T4/NavTabs — es parte de la Anatomía
+//   exigida, no un estilo "por si acaso") y el glyph decorativo del `icon`
+//   (mismo criterio que el svg de T4/BrandIcon: aria-hidden, sin rol posible).
+// - Sin `downloadCvUrl`: `queryByRole("link", { name })` → null y el resto del
+//   bloque queda intacto (link de contacto + Separator de T3). Nota del review
+//   de T3: la condición RF-9 (`contact=[]` + CV → Separator) ya la cubre
+//   "keeps the Separator when contact is empty but downloadCvUrl exists"; con
+//   el CTA real ese caso sigue en verde sin tocarlo, así que no se duplica.
+//
+// `toHaveAttribute("download")`: Button transmite `download={true}` y React lo
+// renderiza como atributo vacío; la PRESENCIA es lo que pide RF-2.
+//
+// Posición dentro de `.additional`: selección estructural justificada —
+// `closest("#sidebar-contacts")` (el id es contrato público: RF-10, criterio
+// CONTACTS_ID de T4) + `previousElementSibling` = la `ul` de contactos (la
+// Anatomía manda el CTA después de la lista; con el fixture completo el orden
+// de hijos es Separator, ul, CTA).
+//
+// Tone del icono (declaración pedida por el encargo): Button renderiza su
+// `icon` con `<Icon name={icon} />` SIN `tone` (Button.tsx T4) → el default
+// del Icon es `"current"` (Icon.tsx), sin gradiente: el CTA NO necesita
+// `AccentGradientDefs`. Se reutiliza igual `renderSidebarWithDefs` porque el
+// fixture trae contactos con `IconBox` tone gradient (criterio T3).
+//
+// Rojo on-arrival: el caso 1 falla por `getByRole("link", { name:
+// LABELS.downloadCv })` — el CTA no existe todavía (falta la implementación de
+// T5). El caso 2 es guard de regresión de RF-2 y pasa también en verde final.
+// ============================================================================
+
+// Clase fullWidth del Button (criterio #99; patrón Button.test.tsx T5).
+const ctaFullWidthClass = buttonStyles.fullWidth ?? "fullWidth";
+
+describe("Sidebar Download CV call-to-action (T5: RF-2)", () => {
+  it("renders the Download CV link with its exact href and download attribute after the contacts", () => {
+    renderSidebarWithDefs({ profile: PROFILE_WITH_CV });
+
+    // Tests 6 + "Hecho cuando": link con el nombre del label por props
+    // (RF-8: el texto lo aporta `labels.downloadCv`, no está hardcodeado).
+    const link = screen.getByRole("link", { name: LABELS.downloadCv });
+    expect(link.tagName).toBe("A");
+
+    // El `href` EXACTO de `profile.downloadCvUrl` (mismo literal del fixture
+    // `PROFILE_WITH_CV` de T3: `/cv/alex-rivera-cv.pdf`).
+    expect(link).toHaveAttribute("href", "/cv/alex-rivera-cv.pdf");
+
+    // RF-2: con atributo `download`.
+    expect(link).toHaveAttribute("download");
+
+    // Anatomía: `fullWidth` de la primitiva Button (su clase del módulo).
+    expect(link).toHaveClass(ctaFullWidthClass);
+
+    // Anatomía: `icon="download"` → Icon decorativo dentro del link (svg
+    // aria-hidden; sin query por rol posible — criterio T2/T4 de la pieza).
+    const glyph = link.querySelector("svg");
+    expect(glyph).toBeInTheDocument();
+    expect(glyph).toHaveAttribute("aria-hidden", "true");
+
+    // Anatomía: vive dentro de `.additional`, después de la lista de
+    // contactos (justificación en el encabezado).
+    expect(link.closest("#sidebar-contacts")).not.toBeNull();
+    expect(link.previousElementSibling?.tagName).toBe("UL");
+  });
+
+  it("renders no Download CV link when downloadCvUrl is absent and keeps the rest intact", () => {
+    const { container } = renderSidebarWithDefs();
+
+    // RF-2 (SI no existe, ENTONCES no renderiza el botón): el fixture base
+    // `PROFILE` de T2 no trae `downloadCvUrl`.
+    expect(screen.queryByRole("link", { name: LABELS.downloadCv })).toBeNull();
+
+    // El resto de `.additional` queda intacto (T3 sigue vigente: lista de
+    // contactos con sus links y Separator).
+    expect(screen.getByRole("link", { name: "alex@example.com" })).toBeInTheDocument();
+    expect(container.querySelectorAll(SEPARATOR_IN_ADDITIONAL)).toHaveLength(1);
   });
 });
