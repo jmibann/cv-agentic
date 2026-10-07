@@ -2,8 +2,8 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
-los hashes de los commits relevantes. Última actualización: **2026-10-06**
-(cierre de F2; poda #98 de las entradas de decisión 2026-10-04/05).
+los hashes de los commits relevantes. Última actualización: **2026-10-07**
+(cierre de F3; poda #98 de §VII/§VIII y de la entrada #102).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
 `docs/memory.md` · decisiones #1–#98 → `docs/README.md` · QA de F5 →
@@ -45,16 +45,19 @@ de la entrada); el detalle queda en git.
 | F5 | QA visual completa (4 viewports × 2 temas × 2 idiomas); informe en `docs/qa-report.md` (#85) | F5 |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
+| Seguimientos F3 (acumulados de piezas, registro fino en los `tasks.md` de cada pieza) | `cursor: pointer` en controles/bullet (no listado; ×2+NavTabs) · `.card`/`.inner` de TestimonialCard dirimido por orden de hoja (hardening `.card.card` opcional) · nativos del `<dialog>` (top layer, foco inicial/retorno, backdrop real) · pseudo-estados/animaciones sin computar en jsdom · no-BFC del `h1` junto a `.float` y orden tras skip-link y banner único → verificación en **AppLayout F4** · superficies RF-4 SkillList / RF-6 Badge / RF-4 Overhead / RF-5 IconBox / RF-4 Separator (gap) → consumidores **F3/F4** ya anotados · redondeo "9 filas"→10 en encabezado de `TestimonialDialog.test.tsx` · nota kit: `contrast.md` regla 6 no enumera ServiceCard (opcional) | QA F5 y revisión de consumidores en F4 |
 
 ## Entradas
 
-### 2026-10-06 · Decisión #102 — L2: subject inglés, cuerpo español sin acentos (en curso F3; no es puerta F)
+### §X · 2026-10-07 — Cierre de F3
 
-- Qué: ante la deuda de forma acumulada (ThemeToggle T3, LanguageSwitcher T1–T3: cuerpos en español con subjects en inglés), el usuario fija la lectura de L2: el **subject** Conventional va en inglés; el **cuerpo** en **español sin acentos** (canon de facto desde F1). *Descartado:* exigir cuerpos en inglés. No se enmienda historia. El encargo de delegación transmite la regla; `AGENTS.md`/constitución no se tocan (el usuario no lo pidió).
-- Checks: n/a (decisión de proceso; repo verde al registrar: lint ✓ · typecheck ✓ · test 257/24 ✓).
-- Decisiones: **#102** → registro (`docs/README.md`) + `docs/memory.md`.
-- Commits: cierre LanguageSwitcher (spec `implementada` + docs de estado, el de esta entrada).
-- Abre: nada; cierra: las deudas L2 de forma de ThemeToggle T3 y LanguageSwitcher (quedan en historia tal cual).
+- Qué: **F3 Compuestos cerrada (12/12)**: ThemeToggle, LanguageSwitcher, ControlsBar, NavTabs, Sidebar, Timeline, ResumeSection, SkillList, ServiceCard, TestimonialCard, TestimonialDialog y TestimonialCarousel con spec `Estado: implementada`. Por pieza: Clarificación→Plan/Tareas de fase (aprobados `bdfa58c` tras la ronda de hallazgos G-A…G-E/1–21), revisión por tarea + revisión completa + `build` ✅. Hitos de proceso: **Foundation T12** (Cambio `formatPeriodEndpoint` + `controls.lightMode`), extensión **#100** a `"getTabId"` (aprobada por el usuario, `0df3855`), ajustes de aserción entre tareas **con aprobación explícita** (Sidebar `4ff4424`; Carousel T5 `b6efae7`), **Cambio de accesibilidad opción A** (Test 12 inviable con `li[role=group]` por `aria-allowed-role`+`list` de axe → modelo div de slides; cerrado en verde **sin** desactivar reglas ni tocar `src/test/`), 2 puertas de pieza RECHAZADAS r1→APROBADAS r2 (NavTabs: Test esperado #11 caído del reparto; TestimonialDialog T1: effect de presencia con dep `[open]`), y regla nueva **#102** (L2: subject EN, cuerpo ES sin acentos). Lecciones fijadas: cross-check 1:1 de "Tests esperados" antes de dictar revisión completa; sin archivos scratch (no hay `rm` en allowlists).
+- Checks: lint ✓ · typecheck ✓ · test **395/36** ✓ · build ✓ por pieza y al cerrar (spec final `6b871e1`).
+- Decisiones: #99/#100 (ext. "getTabId")/#101 (ext. commit único `test` sin `feat`: ThemeToggle T2)/**#102** → registro. Ninguna regla nueva además de #102.
+- Commits: specs `implementada` ×12 `35083ef` `3da32b9` `ddfd1f7` `d63d1b1` `82017f1` `3b457f3` `ef78c22` `bf26962` `0388366` `3ce10df` `37711dc` `6b871e1`; Cambio Carousel `d535895`; T12 `29b063f`.
+- Abre: fila "Seguimientos F3" en **Abiertos**; cierra: nada propio (F8 y F5 siguen; deudas F1/F2 permanecen según sus filas).
+
+### 2026-10-06 · Decisión #102 — L2: subject inglés, cuerpo español sin acentos · #102 · `git show 3da32b9:docs/diagnostics.md`
 
 ### §IX · 2026-10-06 — Cierre de F2
 
@@ -93,34 +96,9 @@ de la entrada); el detalle queda en git.
 
 ### 2026-10-05 — Regla de mantenimiento del log · #98 · `git show 4730d8d:docs/diagnostics.md`
 
-### §VIII · 2026-10-03 — Cierre de F1
+### 2026-10-03 · §VIII — Cierre de F1 · — · `git show 1865d86:docs/diagnostics.md`
 
-- **F1 (pieza `foundation/Foundation`) cerrada**: T6–T11 aprobadas por tarea;
-  la revisión completa salió **RECHAZADA** por un `describe` en español (L2) →
-  reparo **T8b** → **APROBADO**. QA visual en navegador **APROBADO** (app
-  servida por el usuario: anti-flash oscuro, RF-3 en vivo, `theme-color`,
-  es/en, Poppins autohosteada, 375/1440 sin overflow).
-- Checks de cierre: lint ✓ · typecheck ✓ · test 53/53 ✓ · validate:content ✓ ·
-  build ✓ (sin diff post-build).
-- Decisiones: **#97** (`ucs2length` de ajv aceptado en el bundle).
-- Commits: feats T6–T11 `15a9592` `884bb2f` `14aec22` `59efc8d` `faae4c2`
-  `79b7133`; reparo T8b `ae59762`; spec `implementada` `e4bcb9d`; cierre
-  `1865d86`.
-- Pendientes: deudas menores de F1 (arriba); F8 y F5 siguen abiertos.
-
-### §VII · 2026-10-03 — F1 hasta T5
-
-- T1–T5 (+ reparos T2b, T3b, T5b) aprobadas. Deuda L1 detectada en T4
-  (comentarios en inglés en `src/test/`) → **T3b** la reparó; criterio
-  unificado en `docs/memory.md` (español también en `src/test/**`; títulos de
-  tests e identificadores en inglés).
-- Bloqueante en T5 → Cambio aprobado: `react-refresh/only-export-components`
-  vs. la API spíada (provider + hook en el mismo `.tsx`).
-- Decisiones: **#96** (`allowExportNames: ["useTheme", "useLocale", "useCv"]`
-  en `eslint.config.js`; descartado mover los hooks a `.ts`).
-- Commits: `c259db2` (T4→L1) `17b0409` (T3b) `48bd323` (T5b) `bcb4605`
-  (feat T5) `4adab35` (registro).
-- Pendientes: cierra la deuda L1 de T4/T3.
+### 2026-10-03 · §VII — F1 hasta T5 · #96 · `git show dd7b35b:docs/diagnostics.md`
 
 ### 2026-10-02 · Post-auditoría hallazgos 1–3 y decisión #95 · #95 · `git show dd7b35b:docs/diagnostics.md` (§VI)
 
