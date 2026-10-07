@@ -1,4 +1,4 @@
-// Tests de T1–T3 (specs/layout/NavTabs/tasks.md) — T1: RF-1, RF-2, RF-7: un tablist
+// Tests de T1–T4 (specs/layout/NavTabs/tasks.md) — T1: RF-1, RF-2, RF-7: un tablist
 // nombrado (`getByRole("tablist", { name: LABEL })`) con
 // `aria-orientation="horizontal"` y un `role="tab"` por item en el orden
 // recibido (RF-1), cada tab con `id = getTabId(item.id)` y `aria-controls` al
@@ -14,12 +14,14 @@
 // del `<button>` (spec → Comportamiento, plan → Decisiones): NavTabs no
 // re-gestiona el foco, no hay assert de foco en click (inspección).
 //
-// Diferidos por tasks.md: `NavTabs.module.css` + `index.ts` + cierre
-// `expectNoA11yViolations` del archivo (T4: RF-5, RF-6) — criterio Separator
-// T1–T2 y CornerTab T1–T3, que agregaron el cierre en la última tarea. RF-6
-// (visible en todos los breakpoints, sin hamburguesa) no es verificable en
+// Diferidos por tasks.md: ya no hay — `NavTabs.module.css`, `index.ts` y el
+// cierre `expectNoA11yViolations` llegaron con esta tarea T4 (RF-5, RF-6;
+// criterio Separator T1–T2 y CornerTab T1–T3, que agregaron el cierre en la
+// última tarea). Los visuales de RF-5 (color/opacidad/subrayado) y de RF-6
+// (visible en todos los breakpoints, sin hamburguesa) no son verificables en
 // jsdom por tests: inspección del CSS y QA F5 (#101). Los escenarios de
-// teclado de T3 (RF-4) viven en su describe al final del archivo.
+// teclado de T3 (RF-4) viven en su describe final; el cierre axe de T4 va
+// todavía más abajo, al cierre del archivo (constitución T4).
 //
 // extra (P3, con su motivo): el caso de `className` (G-B) — la API de la spec
 // lo exige ("Se une al raíz de la pieza — se transmite a la clase base de
@@ -61,6 +63,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import { getTabId, NavTabs } from "./NavTabs";
 import type { NavTabItem, NavTabsProps } from "./NavTabs";
+
+// T4: helper de cierre a11y (constitución T4). Import puro: no toca los casos
+// de T1–T3 (precedente CornerTab T4).
+import { expectNoA11yViolations } from "../../test/a11y";
 
 // El extra de la unión G-B asierte coexistencia con la clase base del raíz,
 // que es la de CornerTab (spec → API: la className "se transmite a la clase
@@ -440,5 +446,58 @@ describe("NavTabs keyboard roving and Space activation (T3: RF-4)", () => {
     await user.keyboard("{ArrowDown}");
     expect(focusedTab).toHaveFocus();
     expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+// --- T4 · Cierre a11y con armazón tabpanel (RF-5, RF-6) ----------------------
+// spec → Tests esperados 12 y "Hecho cuando" de T4: el archivo termina con
+// `expectNoA11yViolations` "renderizado junto a un tabpanel con el id
+// correcto" (spec → Accesibilidad). El armazón NO es decorativo: sin él el
+// `aria-controls={panelId}` de todos los tabs (RF-2) apunta a un id inexistente
+// y axe lo reporta (`aria-valid-attr-value`); en el escenario real el panel lo
+// renderiza AppLayout (RF-2: "la existencia y el contenido de ese panel son
+// responsabilidad de AppLayout"), acá se replica el patrón de spec → Anatomía:
+// `div role="tabpanel"` con `id={panelId}`, `aria-labelledby={getTabId(
+// activeId)}` — el contrato exacto que consume AppLayout vía `getTabId`
+// exportada (spec → API)— y `tabIndex={0}` (spec → Accesibilidad: el panel
+// empieza con texto, no con un control). Sin proveedores (la pieza es
+// controlled: todo por props; plan → Estrategia de tests) y sin
+// `AccentGradientDefs`/`HexAvatarDefs`: ni la pieza ni CornerTab montan
+// gradientes ni SVG (plan → Estrategia de tests).
+// La rama `items=[]` no va en este cierre: no renderiza nada (RF-7, ya
+// asierteado en T1 con `toBeEmptyDOMElement`) — no hay DOM que auditar
+// ("Hecho cuando" de T4: "con `items=[]` no aplica render").
+// #101 VERDE on-arrival DECLARADO (encargo de T4; criterio CornerTab T4): el
+// markup ya era accesible desde T1 (roles, nombres, ids, `aria-*` y roving
+// asierteados allí) y T4 no agrega nada discriminate-testable en jsdom: el
+// módulo CSS (RF-5: color de acento/opacidad 0.8/subrayado hover; RF-6: cero
+// `@media` propios, visibilidad en todos los breakpoints) no lo carga jsdom —
+// inspección del CSS + QA F5 — y el `index.ts` no es observable por tests.
+// Fabricar un rojo leyendo el CSS como texto está explícitamente descartado
+// (#101); el valor del cierre es la regresión futura sobre el patrón completo
+// tablist+tabpanel.
+describe("NavTabs accessibility audit with tabpanel scaffold (T4: RF-5, RF-6)", () => {
+  it("has no accessibility violations rendering the tablist together with its controlled tabpanel", async () => {
+    const { container } = render(
+      <>
+        <NavTabs
+          items={TAB_ITEMS}
+          activeId="about"
+          onChange={vi.fn()}
+          panelId={PANEL_ID}
+          label={LABEL}
+        />
+        <div
+          role="tabpanel"
+          id={PANEL_ID}
+          aria-labelledby={getTabId("about")}
+          tabIndex={0}
+        >
+          Panel content.
+        </div>
+      </>,
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
