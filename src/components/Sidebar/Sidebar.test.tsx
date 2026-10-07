@@ -52,12 +52,24 @@
 // existe aún (patrón aprobado en NavTabs/CornerTab/ControlsBar T1).
 
 import { render, screen, within } from "@testing-library/react";
+// T4: interacción del disclosure (click / segundo click), mismo criterio que
+// NavTabs/ControlsBar. Import puro: no toca lo anterior.
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 // T3: armazón de las defs del gradiente que resuelve el glyph de los IconBox
 // de contactos (patrón IconBox.test.tsx/SectionTitle.test.tsx; en la app las
 // monta AppLayout una sola vez). Import puro: no toca lo anterior.
 import { AccentGradientDefs } from "../Icon";
+
+// T4: clases del módulo de CornerTab para fijar que el botón vive en una tab
+// `size="sm"` (criterio NavTabs T4: import del módulo del hijo + #99). Import
+// puro.
+import cornerTabStyles from "../CornerTab/CornerTab.module.css";
+
+// T4: clases del módulo propio (nace en T4 con el colapso por clase; criterio
+// #99 `styles.name ?? "name"`, patrón CornerTab/NavTabs/Button). Import puro.
+import styles from "./Sidebar.module.css";
 
 import { Sidebar } from "./Sidebar";
 import type { SidebarLabels, SidebarProps } from "./Sidebar";
@@ -463,5 +475,141 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
     const region = screen.getByRole("complementary", { name: LABELS.region });
     expect(within(region).getAllByRole("list")).toHaveLength(1);
     expect(container.querySelectorAll(SEPARATOR_IN_ADDITIONAL)).toHaveLength(1);
+  });
+});
+
+// ============================================================================
+// Tests de T4 (specs/layout/Sidebar/tasks.md) — RF-3 (disclosure < xl: botón
+// con `aria-expanded` + `aria-controls`, colapso por CLASE del módulo) y RF-4
+// (texto alterna showContacts/hideContacts; chevron decorativo con clase de
+// rotación). Tests esperados #5 (estado inicial, click → expandido,
+// `aria-controls` apunta a un elemento existente) más la reversión al segundo
+// click ("Hecho cuando" de la tarea) y la decoración del chevron (RF-4:
+// `Icon name="chevron-down"` sin `label` → `aria-hidden`, spec → Accesibilidad:
+// patrón disclosure).
+//
+// Colapso en jsdom = por clase (spec → plan → Decisión CSS-only 8=a; RF-10):
+// la visibilidad ≥ xl la da el `@media (min-width: 1200px)` del módulo y NO es
+// testeable acá (jsdom no aplica @media — nota de spec → Tests esperados;
+// inspección en T6). El aserto "el colapso no usa `style` inline" se fija por
+// el atributo `style` ausente en `#sidebar-contacts` (observable en el DOM;
+// la prohibición general `style={{}}` es además inspección del reviewer).
+// Criterio #99 para las clases (`styles.name ?? "name"`, prohibidos `!` y
+// `as string`, patrón CornerTab/NavTabs).
+//
+// No se asierta la ROTACIÓN del chevron (transform/--duration-base: valores
+// computados, jsdom no carga hojas de estilos — #101; inspección T6), solo su
+// presencia decorativa dentro del botón. La rotación 180° es texto de spec
+// (Estados/Colapsable) y el reviewer la verifica en T6.
+//
+// Orden DOM (spec → Anatomía, verificable en jsdom aunque sea "clase" de
+// layout): la CornerTab va PRIMERA en el DOM dentro del `<aside>` (pegada a la
+// esquina superior derecha por su propia base absoluta). Selección
+// estructural justificada: el `<div>` de CornerTab no tiene rol ni nombre
+// accesible (su RF-6), así que se lo toma vía `button.parentElement` y se lo
+// compara con `region.firstElementChild`; las clases `sm`/base se asertan con
+// el criterio #99 (patrón NavTabs T4 con `cornerTabBaseClass`).
+//
+// Rojo on-arrival: el botón disclosure no existe todavía (falta
+// `getByRole("button", …)`) y `./Sidebar.module.css` no resuelve (el módulo
+// nace en T4 con la clase de colapso) — falla también todo el archivo por el
+// import, patrón de rojo por inexistencia ya aprobado en T1.
+// ============================================================================
+
+// Clase de colapso de `.additional` (clase del módulo; RF-3/RF-10: nunca
+// `style` inline) y clases de CornerTab para la tab `size="sm"` (criterio #99).
+const collapsedClass = styles.additionalCollapsed ?? "additionalCollapsed";
+const cornerTabBaseClass = cornerTabStyles.cornerTab ?? "cornerTab";
+const cornerTabSmClass = cornerTabStyles.sm ?? "sm";
+
+// Id del contenedor del disclosure (literal de spec → RF-10 y Anatomía; mismo
+// criterio del selector `SEPARATOR_IN_ADDITIONAL` de T3: el id es contrato
+// público de la pieza, se aserta literal, no importado del TSX).
+const CONTACTS_ID = "sidebar-contacts";
+
+describe("Sidebar contacts disclosure with CornerTab (T4: RF-3, RF-4)", () => {
+  it("mounts the sm CornerTab button collapsed, wired to the contacts block, before the identity", () => {
+    const { container } = renderSidebarWithDefs();
+
+    // Tests 5 + RF-3/RF-4: botón disclosure presente con estado inicial
+    // colapsado. `type="button"`: no es un submit (patrón ThemeToggle/
+    // LanguageSwitcher). El nombre accesible es el texto `showContacts` del
+    // fixture (por props, no hardcodeado — RF-8).
+    const button = screen.getByRole("button", { name: LABELS.showContacts });
+    expect(button).toHaveAttribute("type", "button");
+    expect(button).toHaveAttribute("aria-expanded", "false");
+    expect(button).toHaveAttribute("aria-controls", CONTACTS_ID);
+
+    // Tests 5: `aria-controls` apunta a un elemento EXISTENTE (el div de T3,
+    // montado siempre — RF-10 id alcanzable).
+    const contacts = container.querySelector(`#${CONTACTS_ID}`);
+    expect(contacts).not.toBeNull();
+
+    // "Hecho cuando" T4: en jsdom el estado colapsado es por CLASE del módulo
+    // (la visibilidad ≥ xl la da el @media — inspección T6) y nunca por
+    // `style` inline (RF-10: los estilos compartidos de impresión deben poder
+    // forzar la expansión).
+    expect(contacts).toHaveClass(collapsedClass);
+    expect(contacts).not.toHaveAttribute("style");
+
+    // Anatomía: el botón vive en una CornerTab `size="sm"` (su base + variante
+    // sm; selección estructural justificada en el encabezado) y la tab va
+    // PRIMERA en el DOM del landmark.
+    const tab = button.parentElement;
+    expect(tab).not.toBeNull();
+    expect(tab).toHaveClass(cornerTabBaseClass);
+    expect(tab).toHaveClass(cornerTabSmClass);
+    const region = screen.getByRole("complementary", { name: LABELS.region });
+    expect(region.firstElementChild).toBe(tab);
+  });
+
+  it("expands on click: aria-expanded true, hideContacts text and the collapsed class removed", async () => {
+    const user = userEvent.setup();
+    const { container } = renderSidebarWithDefs();
+
+    await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
+
+    // RF-4: alterna el texto (el nombre accesible pasa a `hideContacts`; el de
+    // colapsado ya no existe — un solo botón).
+    const button = screen.getByRole("button", { name: LABELS.hideContacts });
+    expect(screen.queryByRole("button", { name: LABELS.showContacts })).toBeNull();
+
+    // RF-3/Tests 5: `aria-expanded` pasa a "true".
+    expect(button).toHaveAttribute("aria-expanded", "true");
+
+    // "Hecho cuando": `.additional` pasa de la clase de colapso a visible (en
+    // jsdom: sin la clase; sigue sin `style` inline).
+    const contacts = container.querySelector(`#${CONTACTS_ID}`);
+    expect(contacts).not.toBeNull();
+    expect(contacts).not.toHaveClass(collapsedClass);
+    expect(contacts).not.toHaveAttribute("style");
+  });
+
+  it("reverts on the second click: collapsed class, aria-expanded false and showContacts text", async () => {
+    const user = userEvent.setup();
+    const { container } = renderSidebarWithDefs();
+
+    await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
+    await user.click(screen.getByRole("button", { name: LABELS.hideContacts }));
+
+    // "Hecho cuando" T4: el segundo click reviere todo (estado, texto y clase).
+    const button = screen.getByRole("button", { name: LABELS.showContacts });
+    expect(button).toHaveAttribute("aria-expanded", "false");
+
+    const contacts = container.querySelector(`#${CONTACTS_ID}`);
+    expect(contacts).not.toBeNull();
+    expect(contacts).toHaveClass(collapsedClass);
+  });
+
+  it("renders the chevron inside the button as a decorative aria-hidden icon", () => {
+    // RF-4: chevron = `Icon name="chevron-down"` sin `label` → decorativo
+    // (Icon RF-3: `aria-hidden="true"`). El svg no tiene rol ni nombre
+    // posibles: selección estructural justificada (criterio BrandIcon/T2 de
+    // esta pieza). La rotación (transform + --duration-base en la clase del
+    // módulo) NO se asiértan acá: jsdom no computa CSS (#101), inspección T6.
+    const button = screen.getByRole("button", { name: LABELS.showContacts });
+    const chevron = button.querySelector("svg");
+    expect(chevron).toBeInTheDocument();
+    expect(chevron).toHaveAttribute("aria-hidden", "true");
   });
 });
