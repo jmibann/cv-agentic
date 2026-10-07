@@ -1,6 +1,6 @@
 # Tareas — SkillList
 
-- [ ] **T1. Lista nombrada de chips con Badge.** RF-1, RF-2, RF-3
+- [x] **T1. Lista nombrada de chips con Badge.** RF-1, RF-2, RF-3 — 4b821d0 (T2 NO duplica el test de unión `className`: ya escrito en T1 como extra; borrar antes del cierre el untracked `scratch-types-check.ts`)
   - Hecho cuando: con `label`, `getByRole("list", { name: label })`; con `labelledBy` (armazón `<h2 id>`), el nombre sale del heading; un `listitem` por skill en orden, cada uno con la clase base de Badge (`#99`) y **sin** `className` extra de SkillList (inspección: `.chip` ilustrativo); `skills=[]` → `container` vacío; los dos casos `// @ts-expect-error` (ambos props / ninguno) typecheckean como esperado; verde tras `feat(SkillList): T1`.
 
 - [ ] **T2. Estilos, keys duplicadas y cierre a11y.** RF-5, RF-6 (+RF-4 inspección de uso)
