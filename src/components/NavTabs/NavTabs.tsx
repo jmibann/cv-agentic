@@ -20,11 +20,25 @@
 // SI-clause, spec → Comportamiento). Sin re-gestión de foco propia: el foco
 // queda en el `<button>` pulsado por vía NATIVA (plan → Decisiones: el
 // `.focus()` propio existe solo para el teclado de T3).
-// Diferidos: T3 conecta el teclado (RF-4: ←/→ circular con vuelta,
-// Home/End, ambos enfocan y emiten; Espacio `preventDefault` + activación
-// manual por el mismo camino del click — plan → Decisiones; Enter queda al
-// click nativo; ↑/↓ ignoradas: tablist horizontal; 1 item → enfoca el propio
-// sin emitir). T4 agrega `NavTabs.module.css` (tabla "Estilos y tokens":
+// T3 hecha: teclado (RF-4, post-Clarificación 6). `onKeyDown` EN CADA tab
+// (criterio del builder: el `index` del `map` queda en el cierre del handler,
+// y se evita tener que tipar el `event.target` de un handler en el tablist
+// sin cast — prohibido; el plan ya fija "ref a los botones + `.focus()`":
+// array de callback refs `tabRefs` indexado por posición, sin
+// `document.getElementById`). Flechas ←/→ con vuelta `(i±1+n)%n` y Home/End →
+// 0/n-1: `focusAndActivate(destIndex)` enfoca el destino y emite `onChange`
+// SOLO si destino≠activo (activación automática; con ids únicos — invariante
+// del consumidor — el guard por índice equivale al guard por id del click de
+// T2). 1 item: el destino es el propio tab → no emite (RF-4, SI-clause).
+// Espacio: `preventDefault()` en keydown — cancela el click nativo del
+// `<button>` (HTML: se activa en keyup si el keydown no se canceló; plan →
+// Decisión "Espacio") — y activación MANUAL por el mismo camino → emisión
+// única y sin scroll de página. Enter: sin handler propio (click nativo →
+// guard T2). ↑/↓ y demás teclas: ignoradas SIN `preventDefault` (RF-4: "sin
+// efecto adicional"; plan → Decisiones: no se inventa más). Defensivo del
+// plan (invariante violada, sin RF): `activeId` fuera de `items` → el
+// `findIndex` da -1 → el teclado enfoca pero no emite nunca.
+// Diferidos: T4 agrega `NavTabs.module.css` (tabla "Estilos y tokens":
 // tablist flex con `--nav-tab-gap`, tab sin fondo ni borde, inactivo 80%,
 // hover 100% + subrayado, activo `--color-accent-text`, anillo de foco,
 // transiciones; RF-5/RF-6; cero `@media` propios, `@media print` es del
@@ -33,8 +47,10 @@
 // Invariantes del consumidor (spec → Requisitos, no validadas acá — decisión
 // 5 del plan): `activeId` coincide siempre con un `item.id` (useHashTab) y
 // los `item.id` no traen espacios ni caracteres problemáticos; NavTabs no
-// valida ni hace fallback (el guard defensivo de `-1` del findIndex entra en
-// T3, cuando exista el roving por teclado).
+// valida ni hace fallback (el guard defensivo de `-1` del findIndex quedó
+// conectado en T3: `activeId` ausente → el teclado enfoca pero nunca emite).
+
+import { useRef } from "react";
 
 import { CornerTab } from "../CornerTab";
 
@@ -52,9 +68,11 @@ export interface NavTabsProps {
   /** Tab activo (controlado: la sincronización con la URL es de useHashTab en AppLayout). */
   activeId: string;
   /**
-   * Emite el `id` del tab activado. Conectado por click en T2 (RF-3, con
-   * guard del activo); el teclado lo emitirá en T3 (RF-4). La interfaz ya
-   * estaba completa desde T1 (spec → API).
+   * Emite el `id` del tab activado. Conectado por click (T2, RF-3, guard del
+   * activo) y por teclado (T3, RF-4: flechas/Home/End con activación
+   * automática y Espacio con activación manual única; ambos pasan por el
+   * guard destino≠activo). La interfaz ya estaba completa desde T1
+   * (spec → API).
    */
   onChange: (id: string) => void;
   /** Id del tabpanel único (su existencia y contenido son de AppLayout — RF-2). */
@@ -81,11 +99,38 @@ export function NavTabs({
   label,
   className,
 }: NavTabsProps) {
+  // T3 (RF-4; plan → Decisiones 6 "foco propio, activación del padre"): refs a
+  // los botones para el `.focus()` del teclado, array indexado por posición
+  // llenado por callback refs (cuerpo en bloque: no devuelve valor — React 19).
+  // El click (T2) no las usa: ahí el foco es nativo del `<button>`.
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
   // RF-7 (T1): items vacío → no renderiza NADA (ni la CornerTab: un tablist
   // sin tabs es inválido para axe; spec → Estados/Tests 10).
   if (items.length === 0) {
     return null;
   }
+
+  // T3 (RF-4): mueve el foco al tab destino y emite `onChange` SOLO si el
+  // destino no es el activo (activación automática: lo visual cambia con el
+  // re-render controlado del padre). Guard por índice: con ids únicos
+  // (invariante del consumidor) equivale a la comparación por id del click
+  // (T2); el caso 1-item cae acá: destino === activo → no emite (RF-4,
+  // SI-clause). Defensivo del plan (invariante violada, sin RF): `activeId`
+  // fuera de `items` → `findIndex` da -1 → enfoca pero no emite nunca.
+  // `noUncheckedIndexedAccess`: lecturas indexadas protegidas por nullish.
+  const focusAndActivate = (destIndex: number) => {
+    const destItem = items[destIndex];
+    const destTab = tabRefs.current[destIndex];
+    if (!destItem || !destTab) {
+      return;
+    }
+    destTab.focus();
+    const activeIndex = items.findIndex((item) => item.id === activeId);
+    if (activeIndex !== -1 && destIndex !== activeIndex) {
+      onChange(destItem.id);
+    }
+  };
 
   // spec → Anatomía, literal: CornerTab size="md" placement="float" > div
   // role="tablist" > button role="tab" por item. Tamaño y placement NO son
@@ -99,11 +144,11 @@ export function NavTabs({
           aria-orientation horizontal (las flechas ←/→ son de T3; ↑/↓ no
           mueven el foco). */}
       <div role="tablist" aria-label={label} aria-orientation="horizontal">
-        {items.map((item) => {
+        {items.map((item, index) => {
           // RF-1 (roving tabindex): solo el tab activo es tabulable (0); el
           // resto -1. `aria-selected` distingue el activo para tecnologías
           // de asistencia (RF-5, su parte testeable). Click conectado (T2,
-          // RF-3); teclado (T3, RF-4) no se conecta todavía.
+          // RF-3) y teclado conectado (T3, RF-4).
           const isActive = item.id === activeId;
 
           return (
@@ -111,6 +156,9 @@ export function NavTabs({
               key={item.id}
               type="button"
               role="tab"
+              ref={(element) => {
+                tabRefs.current[index] = element;
+              }}
               id={getTabId(item.id)}
               aria-selected={isActive}
               // RF-2 (T1): TODOS los tabs controlan el mismo panel único
@@ -131,6 +179,37 @@ export function NavTabs({
                 if (item.id !== activeId) {
                   onChange(item.id);
                 }
+              }}
+              onKeyDown={(event) => {
+                // T3 (RF-4). Espacio: `preventDefault()` en keydown cancela
+                // el click nativo del `<button>` (HTML: se activa en keyup si
+                // el keydown no se canceló — plan → Decisión "Espacio") y la
+                // activación es MANUAL por el mismo camino que el click →
+                // emisión única (sin el preventDefault serían dos) y sin
+                // scroll de página.
+                if (event.code === "Space") {
+                  event.preventDefault();
+                  focusAndActivate(index);
+                  return;
+                }
+                // Flechas ←/→ con vuelta circular `(i±1+n)%n` y Home/End →
+                // primero/último; enfocan y emiten con guard destino≠activo
+                // (n > 0: `items=[]` devolvió null arriba; spec →
+                // Comportamiento).
+                const count = items.length;
+                if (event.key === "ArrowRight") {
+                  focusAndActivate((index + 1) % count);
+                } else if (event.key === "ArrowLeft") {
+                  focusAndActivate((index - 1 + count) % count);
+                } else if (event.key === "Home") {
+                  focusAndActivate(0);
+                } else if (event.key === "End") {
+                  focusAndActivate(count - 1);
+                }
+                // Enter: sin handler propio → click nativo del `<button>`
+                // (pasa por el guard de T2; spec → Comportamiento). ↑/↓ y las
+                // demás teclas: SIN efecto adicional y SIN preventDefault
+                // (RF-4: tablist horizontal; plan → Decisiones: ignoradas).
               }}
             >
               {item.label}
