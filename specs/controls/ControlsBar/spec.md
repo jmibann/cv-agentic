@@ -1,5 +1,5 @@
 # ControlsBar
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
