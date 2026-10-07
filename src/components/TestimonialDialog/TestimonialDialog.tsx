@@ -19,11 +19,28 @@
 // prop desde un ref (tabla → ciclo: el cierre iniciado por el padre con
 // `testimonial === null` no debe invocar `onClose`).
 //
-// Diferidos declarados (tasks.md): T2 conecta el resto del ciclo (cleanup del
-// effect de apertura —este de abajo, el mismo effect, no otro— con
-// `dialog.close()` si `dialog.open` para el valor→null desde el padre y el
-// desmontaje, y la detección de backdrop real vs franja de padding en click —
-// RF-3); T3 crea el módulo CSS y conecta las clases de Anatomía (`.dialog`,
+// T2 (tasks.md) conecta el resto del ciclo sobre ESTE archivo, sin cambiar la
+// API: (a) el cleanup del effect de apertura (el mismo effect de arriba, dep
+// `[open]`) cierra con `dialog.close()` si `dialog.open` en valor→null desde
+// el padre y en el desmontaje — captura `const el = dialogRef.current` en el
+// CUERPO del effect porque React desprende el ref en la fase de mutación,
+// antes del cleanup; (b) el guard emisor exige que la sincronización del
+// `latest` ya sea null ANTES de ese cleanup (spec → tabla: "el ref ya es
+// null"), así que el sync pasa de `useEffect` a `useLayoutEffect`: el create
+// de la fase de layout corre en el commit y el destroy de los effects passive
+// en el flush posterior — con useEffect, la sync viviría el MISMO flush y los
+// destroy correrían antes que sus creates (matiz medido en esta pila, en
+// comentario del sync y en el test: sobre el nodo desprendido el evento no
+// alcanza al handler por un detalle interno de React 19; la invariant de la
+// tabla se cumple igual); (c) `handleDialogClick` implementa el backdrop
+// real de decisión 19 sobre el `<dialog>`:
+// cierra SOLO si `target === dialog` Y el punto cae fuera del
+// `getBoundingClientRect()` del dialog — la franja de padding del dialog
+// (target === dialog, punto dentro del rect) y los clicks que burbujean desde
+// el contenido NO cierran (RF-3); ninguno llama `onClose` directo: todos pasan
+// por `close()` → evento `close` → `handleClose` (No hacer).
+//
+// Diferidos declarados (tasks.md): T3 crea el módulo CSS y conecta las clases de Anatomía (`.dialog`,
 // `.close`, `.layout`, `.aside`, `.body`, `.quote`) — en T1 el DOM nace SIN
 // clases de módulo: los tests de T1 no asertan ninguna (elección declarada al
 // orchestrator: tasks asigna el módulo a T3, criterio TestimonialCard donde
@@ -32,7 +49,8 @@
 // `index.ts`. El id del título es literal de Anatomía (no derivado del
 // `testimonial.id` como en la card: el dialog muestra UN testimonio a la vez).
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
+import type { MouseEvent } from "react";
 
 import type { Testimonial } from "@data/cv.types.generated";
 
@@ -71,7 +89,24 @@ export function TestimonialDialog({
   // que el handler montado nunca lea un valor obsoleto.
   const latestRef = useRef<Testimonial | null>(testimonial);
 
-  useEffect(() => {
+  // T2 — ORDEN del guard (razonamiento completo; el mismo matiz se declara en
+  // el test del cierre por el padre). La spec → tabla fija que en valor→null
+  // el `close` disparado por el cleanup "no llama onClose (el ref ya es
+  // null)": la sincronización debe completarse ANTES de ese cleanup. Con
+  // `useEffect` (deps ausentes) la sync viviría en el MISMO flush passive que
+  // el cleanup de apertura, y React corre TODOS los destroy antes que los
+  // creates: al despacharse `close()` el ref aún traería el valor viejo. La
+  // fase de layout (useLayoutEffect, create síncrono en el commit) corre antes
+  // del flush passive: el ref ya es null cuando el cleanup cierra. Matiz
+  // MEDIDO en esta pila (React 19 + jsdom): el assert del test queda verde
+  // incluso con useEffect, porque React borra la instancia interna del nodo
+  // retirado en la fase de mutación y el `close` despachado sobre el nodo
+  // desprendido ni llega al handler — detalle interno de eventos de React, no
+  // contrato de la spec; el useLayoutEffect cumple la invariant POR SI MISMA
+  // (si ese detalle cambiara, el guard sigue siendo correcto). Que el evento
+  // llega al handler mientras el nodo está montado está probado en el test
+  // "synthetic close event (Esc path)".
+  useLayoutEffect(() => {
     latestRef.current = testimonial;
   });
 
@@ -83,16 +118,30 @@ export function TestimonialDialog({
   // ronda 1). Con `open === false` el nodo no existe (return null): no-op. Al
   // pasar a true —ya sea en el mount directo con valor (el effect de mount
   // corre siempre) o en un rerender null→valor— el `<dialog>` recién
-  // adjunto se abre con showModal(). El CLEANUP de valor→null/desmontaje
-  // (`dialog.close()` si `dialog.open`, con el guard del ref para no emitir
-  // onClose) sigue diferido a T2: ahí se extiende ESTE mismo effect, y la
-  // dep booleana garantiza que el cleanup disparará también en la
-  // transición valor→null, no solo al desmontar.
+  // adjunto se abre con showModal().
   const open = testimonial !== null;
   useEffect(() => {
-    if (open) {
-      dialogRef.current?.showModal();
+    if (!open) {
+      return;
     }
+    // T2 / guía del review de T1: el nodo se CAPTURA en el cuerpo del effect.
+    // En valor→null React desprende `dialogRef` en la fase de mutación (el
+    // elemento se retira del DOM), antes del cleanup passive: leer
+    // `dialogRef.current` en el cleanup daría null y `close()` no correría.
+    const el = dialogRef.current;
+    el?.showModal();
+    return () => {
+      // RF-3 / tabla → ciclo: cierre INICIADO POR EL PADRE (valor→null) o
+      // desmontaje: `dialog.close()` solo si sigue abierto (si el usuario
+      // cerró antes por botón, backdrop o Esc, `el.open` ya es false y no hay
+      // un segundo `close()`). El `close` resultante NO emite `onClose`: el
+      // guard de `handleClose` ya ve el ref en null — la sync de layout corrió
+      // antes de este cleanup (comentario del useLayoutEffect; en esta pila
+      // el nodo desprendido ni entrega el evento al handler, matiz medido).
+      if (el && el.open) {
+        el.close();
+      }
+    };
   }, [open]);
 
   // RF-2: ÚNICO call site de onClose. Disparado por el evento `close` del
@@ -105,6 +154,31 @@ export function TestimonialDialog({
     }
   };
 
+  // RF-3 / decisión 19 (backdrop real vs franja de padding): el click solo
+  // cierra si su `target` es el propio `<dialog>` —los clicks del contenido
+  // burbujean con target ≠ dialog y el guard corta antes de mirar coords—
+  // Y el punto cae FUERA del bounding rect del dialog (donde está el
+  // ::backdrop). Dentro del rect, aunque el target sea el dialog (franja de
+  // `padding` del elemento), NO cierra. Como en el resto del ciclo, el cierre
+  // pasa por `dialog.close()` — nunca `onClose` directo (No hacer): la
+  // emisión la hace el evento `close` en `handleClose`. La detección vive en
+  // el handler (evento con DOM; plan → Funciones puras: no se extrae a pura).
+  const handleDialogClick = (event: MouseEvent<HTMLDialogElement>) => {
+    const el = dialogRef.current;
+    if (!el || event.target !== el) {
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    if (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    ) {
+      el.close();
+    }
+  };
+
   // RF-1 (decisión 18=b): cerrado = no montado. Los hooks de arriba corren
   // siempre (reglas de hooks: el retorno condicional va después).
   if (!testimonial) {
@@ -113,8 +187,15 @@ export function TestimonialDialog({
 
   return (
     // Anatomía literal: dialog nombrado por el h2 del autor (RF-4; aria-
-    // labelledby → TITLE_ID). Clase `.dialog`: T3 (módulo).
-    <dialog ref={dialogRef} aria-labelledby={TITLE_ID} onClose={handleClose}>
+    // labelledby → TITLE_ID). `onClick` implementa el backdrop real de
+    // RF-3/decisión 19 (handleDialogClick; el padding y el contenido no
+    // cierran). Clase `.dialog`: T3 (módulo).
+    <dialog
+      ref={dialogRef}
+      aria-labelledby={TITLE_ID}
+      onClose={handleClose}
+      onClick={handleDialogClick}
+    >
       {/* Botón Close (Anatomía: PRIMER hijo del dialog; `.close` con
           posición absolute: T3). `onClick` SOLO llama `dialog.close()`
           (RF-2 / No hacer): el cierre despacha el evento `close`, y es ahí
