@@ -40,8 +40,11 @@
 // de padding y el click en el layout (hoy no hay handler que pueda cerrar de
 // más) y la reapertura sin duplicados (un handler por prop de React). Su valor
 // es de regresión futura: fijan el ciclo completo de RF-2/RF-3 sobre el handler
-// de click y el cleanup que T2 agrega, y discriminan el ORDEN del guard del
-// ref (ver el describe de cierre por el padre).
+// de click y el cleanup que T2 agrega. El ORDEN del guard del ref
+// (useLayoutEffect antes del cleanup de apertura) lo fija la IMPLEMENTACIÓN
+// por invariant de la spec → ciclo; medido en esta tarea, ese assert no
+// discrimina contra la variante useEffect (detalle: ver el describe de cierre
+// por el padre, matiz declarado).
 //
 // Justificación T2 (constitución T3): sin roles nuevos — los clicks de
 // backdrop/padding se disparan con `MouseEvent` nativo (clientX/clientY,
@@ -498,12 +501,18 @@ describe("TestimonialDialog parent-driven close and reopen cycle (T2: RF-3)", ()
     // …18=b: sin dialog en el DOM tras el valor→null…
     expect(screen.queryByRole("dialog")).toBeNull();
     // …y el cierre iniciado por el padre NO emite onClose (tabla → ciclo: "el
-    // ref ya es null"). ORDEN del guard, discriminante: la sincronización del
-    // ref `latest` debe correr ANTES del cleanup de apertura — useLayoutEffect
-    // (fase de layout, síncrona en el commit) y NO useEffect: en el flush
-    // passive los destroy corren todos antes que los create, así que con
-    // useEffect el evento `close` disparado por el cleanup aún leería el ref
-    // con el valor viejo y onClose se emitiría de más.
+    // ref ya es null"). ORDEN del guard: la sincronización del ref `latest` se
+    // fija como useLayoutEffect — la fase de layout (create) corre en el
+    // commit, ANTES del cleanup passive — para que al dispararse `close()` el
+    // ref ya sea null. Matiz medido en esta tarea (no debilita nada; lo
+    // reporta al reviewer): el assert NO discrimina hoy contra la variante
+    // useEffect (verde también con el sync en passive) porque React 19 borra
+    // la instancia interna del nodo retirado en la fase de mutación y el
+    // evento `close` despachado sobre el nodo desprendido no llega al handler;
+    // la invariant de la tabla queda garantizada por el orden de fases
+    // independientemente de ese detalle interno de React (prueba directa de
+    // que el evento SÍ llega al handler mientras el nodo está montado: el
+    // describe Esc sintético de T2).
     expect(onClose).not.toHaveBeenCalled();
   });
 
