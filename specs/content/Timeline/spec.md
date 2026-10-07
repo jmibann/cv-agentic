@@ -1,5 +1,5 @@
 # Timeline
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
