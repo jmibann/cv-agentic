@@ -1,5 +1,5 @@
 # SkillList
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
