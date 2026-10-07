@@ -6,7 +6,7 @@
 - [x] **T2. Estructura base: aside, identidad y redes.** RF-1, RF-6 (redes), RF-8 — 9d0a77d
   - Hecho cuando: `getByRole("complementary", { name: labels.region })`; avatar `<img>` con `alt` de `profile.avatar.alt` **sin** atributos `width`/`height` (RF: decisión 9); nombre `<p>`; `Badge` con headline; `ul` de redes nombrada con un `li` por entrada: `<a aria-label={marca}>` externo con `target="_blank"` + `rel="noopener noreferrer"` y `BrandIcon`; la pieza no importa `useCv`/`useLocale` (inspección); verde tras `feat(Sidebar): T2`.
 
-- [ ] **T3. Contactos: IconBox + Overhead + links derivados.** RF-5 (uso), RF-6 (mailto/tel sin target), RF-9
+- [x] **T3. Contactos: IconBox + Overhead + links derivados.** RF-5 (uso), RF-6 (mailto/tel sin target), RF-9 — 872b122 (fix de sobreaserción T2 aprobado por el usuario: `4ff4424`; menores a vigilar en T6: `#sidebar-contacts` vacío sin spacing fantasma, ellipsis/`--color-heading`)
   - Hecho cuando: un `<li>` por contacto con `IconBox` del mapa (mail/phone/message-circle/map-pin), `Overhead` con el label traducido y el valor (`--color-heading`, ellipsis + `title`); email/phone links **sin** `target`/`rel`; whatsapp y `href` explícitos de sitio con target externo (test de atributos); location como texto plano sin link; `contact`/`social` vacíos no renderizan sus listas y sin contactos **y** sin CV no hay `Separator` (RF-9); verde tras `feat(Sidebar): T3`.
 
 - [ ] **T4. Disclosure con CornerTab.** RF-3, RF-4
