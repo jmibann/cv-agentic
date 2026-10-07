@@ -78,6 +78,7 @@ del desmontaje); se verifica en QA F5.
 | Backdrop | `::backdrop { background: var(--color-overlay); }` |
 | Entrada | `opacity` 0→1 y `transform: scale(0.96)`→1 en `--duration-base var(--ease-standard)` **solo de entrada** (decisión 19: sin animación de salida), con `@starting-style` como único mecanismo; la reducción queda en los tokens de duración (sin `@media (prefers-reduced-motion)` propio) |
 | Layout | Grid `auto 1fr`, `gap: var(--space-6)`; `overflow-y: auto` (scroll interno si el texto excede la altura máxima — RF-6/decisión 19) |
+| Rol | `color: var(--color-text-muted); margin: 0;` (decisión del usuario 2026-10-07: completa la fila que faltaba para el `<p class="role">` de la Anatomía, misma convención que el rol de TestimonialCard; par 5.02/6.01 sobre `surface` registrado en `docs/tokens/contrast.md`) |
 | Close | `position: absolute; top: var(--space-4); right: var(--space-4);` botón `--size-control` cuadrado, radio `--radius-12`, fondo `--color-surface-muted`, color `--color-text`; ícono `Icon name="x"` con tamaño default (`--size-icon`, sin `--icon-size` propio) |
 | Comilla | `Icon name="quote" tone="gradient"` con `.quote { --icon-size: 2rem; }` (misma convención que TestimonialCard), en la columna aside **debajo del avatar** (anatomía); oculta < 580px (RF-6) |
 | Avatar | `HexAvatar` (misma primitiva que TestimonialCard; no se reimplementa) |
