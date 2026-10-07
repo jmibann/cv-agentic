@@ -6,7 +6,7 @@
 - [x] **T2. Región única con slides y dialog cableado.** RF-1, RF-6 — a16dc9d (menor→T5: sumar el test `// extra:` de la unión `className` G-B en el próximo commit `test` de la pieza)
   - Hecho cuando: `getByRole("region", { name })` sobre la `<section>` raíz con `aria-roledescription="carousel"` (nombre por `labelledBy`, con armazón `<h2 id>`, o `aria-label={labels.carousel}`); un `group` por testimonio con `aria-roledescription="slide"` y nombre "n of N" (1-based, `total = length`; `format` de i18n); `testimonials=[]` → `container` vacío; click en el botón de una card → `TestimonialDialog` abierto con ese autor; cerrar → desaparece y el estado vuelve a null (RF-6; armazones defs); sin segunda `<section>` anidada (inspección DOM raíz, decisión 20); verde tras `feat(TestimonialCarousel): T2`.
 
-- [ ] **T3. Bullets por stops con aria-current.** RF-3, RF-5
+- [x] **T3. Bullets por stops con aria-current.** RF-3, RF-5 — 9473173 (menor #102: "patrón" con tilde en cuerpo `b398b43`; **para T5: el track necesita `position: relative` para que `offsetLeft` sea relativo al track (offsetParent) — necesidad mecánica del contrato de la spec, documentarla en el módulo**)
   - Hecho cuando: con layout mockeado [0,300,600]/max 300 → **2** bullets con nombres "Go to slide 1"/"Go to slide 2" (regla stop→n de spec → Comportamiento); el del stop activo (scrollLeft 0) con `aria-current="true"`; `fireEvent.scroll` con scrollLeft 300 → aria-current pasa al bullet 2 (rAF: flush con `vi.waitFor`/mock de raf); 1 stop o menos → sin bullets (1 testimonio y 2-con-2-por-vista); 0 testimonios ya cúbrela T2; verde tras `feat(TestimonialCarousel): T3`.
 
 - [ ] **T4. Click de bullet → scrollTo con behavior.** RF-4
