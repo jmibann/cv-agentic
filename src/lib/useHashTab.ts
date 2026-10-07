@@ -1,10 +1,10 @@
 // Hook que sincroniza el tab activo con el hash de la URL
 // (specs/hooks/useHashTab/spec.md). Lo usa AppLayout; NavTabs no lo conoce.
 //
-// T1: estado inicial desde location.hash (RF-1). El comportamiento completo de
-// setActiveId (RF-2) y el listener de hashchange (RF-3/RF-4) llegan en T2/T3.
+// T1: estado inicial desde location.hash (RF-1). T2: setActiveId con
+// replaceState (RF-2). El listener de hashchange (RF-3/RF-4) llega en T3.
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 /**
  * Helper puro de módulo, NO exportado (plan): quita el `#` y devuelve el id de
@@ -35,11 +35,25 @@ export function useHashTab<T extends string>(
     parseHash(window.location.hash, ids, defaultId),
   );
 
-  // Mínimo para T1: solo actualiza el estado. En T2 se agrega el corte por id
-  // ya activo y el history.replaceState (RF-2).
-  const setActiveId = useCallback((id: T): void => {
-    setActive(id);
-  }, []);
+  // Espejo del state (plan, sin effect extra): permite el corte "id ya activo"
+  // fuera del updater de setActive, para no producir efectos dentro de él.
+  const activeRef = useRef(activeId);
+
+  // RF-2: actualiza el estado y llama history.replaceState (nunca pushState)
+  // con una URL relativa "#" + id, que conserva pathname y search gratis.
+  // El listener de hashchange (T3) también debe mantener activeRef al día.
+  const setActiveId = useCallback(
+    (id: T): void => {
+      if (id === activeRef.current) {
+        // Id ya activo: ni estado ni replaceState (comportamiento tabla spec).
+        return;
+      }
+      activeRef.current = id;
+      setActive(id);
+      window.history.replaceState(null, "", "#" + id);
+    },
+    [],
+  );
 
   return [activeId, setActiveId];
 }
