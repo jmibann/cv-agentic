@@ -183,10 +183,12 @@ describe("Timeline entry fields (T1: RF-2)", () => {
     render(timeline());
 
     // spec → Tests esperados 3 (parte sin período, que es de T2): el texto
-    // de organización y descripción vive DENTRO del article de su ítem.
-    const [firstItem, secondItem] = screen.getAllByRole("listitem");
-
-    const firstArticle = within(firstItem).getByRole("article");
+    // de organización y descripción vive DENTRO del article de su ítem. El
+    // article se busca por rol + nombre accesible (aria-labelledby → título):
+    // así el nombre del article también queda cubierto acá.
+    const firstArticle = screen.getByRole("article", {
+      name: ENTRY_CS.title,
+    });
     expect(
       within(firstArticle).getByText(ENTRY_CS.organization),
     ).toBeInTheDocument();
@@ -194,7 +196,9 @@ describe("Timeline entry fields (T1: RF-2)", () => {
       within(firstArticle).getByText(ENTRY_CS.description),
     ).toBeInTheDocument();
 
-    const secondArticle = within(secondItem).getByRole("article");
+    const secondArticle = screen.getByRole("article", {
+      name: ENTRY_WAS.title,
+    });
     expect(
       within(secondArticle).getByText(ENTRY_WAS.organization),
     ).toBeInTheDocument();
@@ -210,8 +214,9 @@ describe("Timeline entry fields (T1: RF-2)", () => {
     // el fixture "sin org/description" usa valores vacíos; el componente no
     // pinta párrafos huecos. Query estructural justificada (T3): no hay
     // query por rol para la ausencia de <p> vacíos.
-    const [, , bareItem] = screen.getAllByRole("listitem");
-    const bareArticle = within(bareItem).getByRole("article");
+    const bareArticle = screen.getByRole("article", {
+      name: ENTRY_BARE.title,
+    });
     expect(bareArticle.querySelector("p:empty")).toBeNull();
     expect(
       within(bareArticle).getByRole("heading", {
