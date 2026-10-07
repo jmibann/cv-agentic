@@ -1,6 +1,6 @@
 # Tareas — useHashTab
 
-- [ ] **T1. Hook con estado inicial por hash.** RF-1
+- [x] **T1. Hook con estado inicial por hash.** RF-1 — 7e0f45c (APROBADA: tests 1–3 literales, `parseHash` no exportado, setter mínimo sin comportamiento RF-2, spy de `replaceState` mide solo al hook; RF-6 inspección OK; 398/37 verdes)
   - Hecho cuando: `useHashTab.test.ts` cubre tests 1–3 de la spec (sin hash → `defaultId`; `#resume` antes de montar → `"resume"`; `#foo` → `defaultId` y spy de `replaceState` **no** llamado); `useHashTab.ts` existe con la firma de spec → API y `parseHash` de módulo no exportado; verde tras `feat(useHashTab): T1`.
 
 - [ ] **T2. `setActiveId` con replaceState sin tocar el activo.** RF-2
