@@ -1,6 +1,6 @@
 # Tareas — Timeline
 
-- [ ] **T1. Estructura: `<ol role="list">` por entrada.** RF-1, RF-2, RF-5
+- [x] **T1. Estructura: `<ol role=\"list\">` por entrada.** RF-1, RF-2, RF-5 — 581ffb0 (menores para r-completa: `<li>` sin clase `item` → T3; rama truthy org/desc con fixture `""` imposible post-validación)
   - Hecho cuando: `getByRole("list")` con un `listitem` por entrada en orden; cada `<article aria-labelledby>` apunta a su `<h3>` con id `${idPrefix}-${entry.id}-title` y heading nivel 3 con el título; muestra `organization` y `description` si existen; `entries=[]` → `container` vacío; verde tras `feat(Timeline): T1`.
 
 - [ ] **T2. Período con `<time>` por extremo (requiere Foundation T12).** RF-3, RF-4
