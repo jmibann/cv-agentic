@@ -38,12 +38,29 @@
 // efecto adicional"; plan → Decisiones: no se inventa más). Defensivo del
 // plan (invariante violada, sin RF): `activeId` fuera de `items` → el
 // `findIndex` da -1 → el teclado enfoca pero no emite nunca.
-// Diferidos: T4 agrega `NavTabs.module.css` (tabla "Estilos y tokens":
-// tablist flex con `--nav-tab-gap`, tab sin fondo ni borde, inactivo 80%,
-// hover 100% + subrayado, activo `--color-accent-text`, anillo de foco,
-// transiciones; RF-5/RF-6; cero `@media` propios, `@media print` es del
-// estilo compartido — G-D), el `index.ts` (re-exporta `NavTabs`, `getTabId`
-// y tipos) y el cierre `expectNoA11yViolations` del archivo de tests.
+// T4 hecha (cierre de la pieza): `NavTabs.module.css` aplica la tabla
+// "Estilos y tokens" — `.tablist` (flex + `align-items: center` +
+// `--nav-tab-gap`) y `.tab` (tipografía `--font-size-nav`/
+// `--font-weight-medium`, `--color-text`, `padding-block: var(--space-2)`,
+// `white-space: nowrap`, `cursor: pointer`, sin fondo ni borde), inactivo
+// 80% + subrayado 2px transparente con offset 0.375rem, hover inactivo 100%
+// + `text-decoration-color: currentColor`, activo `--color-accent-text` sin
+// subrayado y sin cambio en hover (el `:hover` rige solo en
+// `:not([aria-selected="true"])`, criterio LanguageSwitcher T3), anillo
+// `:focus-visible` estándar +
+// `--radius-8` y transiciones `color`/`opacity`/`text-decoration-color` con
+// `--duration-base var(--ease-standard)` (plan → Decisiones). Las dos
+// clases se conectan acá: `styles.tablist` en el div y `styles.tab` en cada
+// button — la `className` externa del consumidor NO se mezcla en los tabs
+// (vive solo en el raíz, G-B; los estados activos/inactivo/hover los fija
+// el módulo por selector de atributo `aria-selected`, sin clases de
+// variante). Cero `@media` propios (RF-6: gap/altura/padding/tamaño de
+// texto escalan en tokens.css; ningún `@media print` — G-D—): la
+// verificación de los visuales es por inspección del CSS + QA F5 (jsdom
+// no computa estilos, #101) y el cierre `expectNoA11yViolations` con
+// armazón tabpanel quedó en el commit `test(NavTabs): T4`). El `index.ts`
+// re-exporta `NavTabs`, `getTabId` y tipos (nota de cierre de pieza;
+// plan → Archivos).
 // Invariantes del consumidor (spec → Requisitos, no validadas acá — decisión
 // 5 del plan): `activeId` coincide siempre con un `item.id` (useHashTab) y
 // los `item.id` no traen espacios ni caracteres problemáticos; NavTabs no
@@ -53,6 +70,8 @@
 import { useRef } from "react";
 
 import { CornerTab } from "../CornerTab";
+
+import styles from "./NavTabs.module.css";
 
 // API exacta de spec → API. `NavTabItem` se exporta: el plan manda
 // `index.ts` (T4) re-exportando los tipos de la spec.
@@ -135,15 +154,28 @@ export function NavTabs({
   // spec → Anatomía, literal: CornerTab size="md" placement="float" > div
   // role="tablist" > button role="tab" por item. Tamaño y placement NO son
   // props expuestas (plan → Interfaz: fijos md/float); la CornerTab UNE su
-  // clase base con la `className` externa (G-B, spec → API). El módulo de
-  // estilos de la pieza llega en T4 (tablist y tabs); por eso acá no hay
-  // `className` propia del tablist ni de los tabs.
+  // clase base con la `className` externa (G-B, spec → API). T4 conecta las
+  // clases del módulo: `styles.tablist` en el div (fila "tablist" de la
+  // tabla) y `styles.tab` en cada botón (fila "tab"; los estados por
+  // selector `aria-selected`, sin variantes de clase y sin mezclar la
+  // externa en los tabs). Bajo `noUncheckedIndexedAccess` `styles.x` es
+  // `string | undefined`: la clase existe en runtime (CSS Modules resuelve
+  // el módulo) y el tipo lo acepta `className` (prop opcional sin
+  // exactOptionalPropertyTypes); criterio de la fase: el join con filtro se
+  // usa donde hay varias clases que unir (CornerTab/ControlsBar), acá cada
+  // elemento lleva UNA sola clase propia.
   return (
     <CornerTab size="md" placement="float" className={className}>
       {/* RF-1 + spec → Accesibilidad: tablist nombrado con `label` y
           aria-orientation horizontal (las flechas ←/→ son de T3; ↑/↓ no
-          mueven el foco). */}
-      <div role="tablist" aria-label={label} aria-orientation="horizontal">
+          mueven el foco). T4: fila "tablist" de la tabla (flex,
+          align-items center, gap --nav-tab-gap). */}
+      <div
+        role="tablist"
+        aria-label={label}
+        aria-orientation="horizontal"
+        className={styles.tablist}
+      >
         {items.map((item, index) => {
           // RF-1 (roving tabindex): solo el tab activo es tabulable (0); el
           // resto -1. `aria-selected` distingue el activo para tecnologías
@@ -156,6 +188,9 @@ export function NavTabs({
               key={item.id}
               type="button"
               role="tab"
+              // T4: fila "tab" de la tabla + estados por [aria-selected]
+              // (RF-5); una sola clase propia, sin externa (G-B).
+              className={styles.tab}
               ref={(element) => {
                 tabRefs.current[index] = element;
               }}

@@ -1,0 +1,136 @@
+/* NavTabs — specs/layout/NavTabs/spec.md → Estilos y tokens (T4; RF-5, RF-6).
+   Dos clases: `.tablist` (fila "tablist" de la tabla) y `.tab` (filas "tab",
+   "tab inactivo", "tab inactivo hover", "tab activo", "Focus-visible" y
+   "Transición"), aplicadas desde el tsx sobre el div del tablist y cada
+   button role="tab". Cero colores literales (regla 1 de docs/DESIGN.md; los
+   únicos keywords usados: transparent y currentColor, permitidos por esa
+   misma regla). Cero @media propios (RF-6): el gap (--nav-tab-gap 24px →
+   40px ≥992), la altura de la solapa (--size-nav-tab-height 48px → 60px
+   ≥992), el padding horizontal (--corner-tab-padding-inline) y el tamaño de
+   texto (--font-size-nav 14px → 16px ≥992) escalan en tokens.css
+   (docs/tokens/breakpoints.md: toda medida que cambia por breakpoint es
+   token; las medidas de referencia de spec → Estilos quedan resueltas por
+   ese escalamiento, no por @media del módulo). Cero @media print (G-D): en
+   impresión la ocultan los estilos compartidos (spec → RF-6; verificación
+   por inspección del CSS + QA F5 — jsdom no computa estilos, #101—. Los
+   estados visuales completos — inactivo 80%, hover con subrayado, activo en
+   acento —: inspección; `aria-selected` se verifica por test desde T1
+   (RF-5).) Sin margen externo (docs/DESIGN.md → Do/Don't): el espacio entre
+   tabs es el `gap` del padre (.tablist) y el padding horizontal vive en la
+   CornerTab contenedora (spec → Anatomía); la tabla del tab solo fija
+   `padding-block: var(--space-2)`. Literales de medida permitidos (fijos,
+   definidos textualmente por la tabla de la spec; criterio aprobado en
+   Separator T2 / CornerTab T4 / LanguageSwitcher T3): `2px` del grosor del
+   subrayado (fila "tab inactivo": "underline 2px") y `0.375rem` del offset
+   (misma fila: "text-underline-offset: 0.375rem"); los `0` de resets son
+   permitidos por breakpoints.md. */
+
+/* Fila "tablist" de la tabla (literal): display: flex; align-items: center;
+   gap: var(--nav-tab-gap). El gap es el token responsive de la pieza
+   (tokens.css → medidas internas de NavTabs: 1.5rem → 2.5rem ≥992; la
+   cabecera). La CornerTab contenedora ya centra en vertical por su "Layout
+   interno", pero la tabla fija align-items también en el tablist: se
+   replica literalmente (necesidad declarada por la spec, no invento). */
+.tablist {
+  display: flex;
+  align-items: center;
+  gap: var(--nav-tab-gap);
+}
+
+/* Fila "tab" de la tabla: sin fondo ni borde; font-size --font-size-nav,
+   font-weight --font-weight-medium, color --color-text, padding-block
+   --space-2, white-space: nowrap, cursor: pointer. El cursor: pointer lo fija
+   la fila de la spec literal (suma al acumulado F5 "cursor: pointer en
+   controles" registrado en docs/memory.md para la QA visual).
+   Resets de stylesheet UA del <button> (necesidad MECÁNICA, criterio
+   LanguageSwitcher T3 / Button T6: permiten que los valores de la tabla se
+   vean; `border: none` y `background: transparent` implementan el "Sin fondo
+   ni borde" literal de la fila, con el mismo mecanismo de LS/Button):
+   - padding-inline: 0 — la tabla solo fija padding-block; la herencia UA
+     inflaría la separación entre ítems que la spec asigna AL gap del tablist
+     ("separación entre ítems 40px" ≥lg = --nav-tab-gap; 24px <lg) y el
+     padding horizontal de la solapa; 0 es permitido (breakpoints.md).
+   - font-family: var(--font-family) — los <button> no heredan la fuente del
+     body; sin esto la fila (--font-size-nav/--font-weight-medium, Poppins)
+     no resolvería en el tab (idéntico a LS T3/Button T6).
+   Contraste base: --color-text sobre la solapa (--color-surface-raised) 8.31
+   claro / 11.57 oscuro ✅ (docs/tokens/contrast.md; con la opacidad del
+   inactivo, abajo).
+   Transición (fila "Transición"; plan → Decisiones fija duration/easing
+   G-E): SOLO color, opacity y text-decoration-color, declarada en la base
+   para que anime también la vuelta del hover (propiedades concretas, nunca
+   transition: all — DESIGN → Do/Don't). */
+.tab {
+  border: none;
+  background: transparent;
+  padding-block: var(--space-2);
+  padding-inline: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-nav);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--duration-base) var(--ease-standard),
+    opacity var(--duration-base) var(--ease-standard),
+    text-decoration-color var(--duration-base) var(--ease-standard);
+}
+
+/* Fila "tab inactivo" (selector de atributo, no clase de variante: el
+   estado único que el componente ya expone en el DOM es aria-selected;
+   criterio LanguageSwitcher T3 con [aria-pressed]): opacity: 0.8 y el
+   subrayado preparado pero invisible (color transparent) con offset, para
+   que el hover solo cambie text-decoration-color (fila "tab inactivo
+   hover"). `0.8`, `2px` y `0.375rem` son los literales textuales de la
+   fila (cabecera; spec → RF-5 "80%" y "subrayado de 2px"). Contraste del
+   inactivo REGISTRADO en docs/tokens/contrast.md → "Pares derivados
+   (opacidad)": --color-text al 80% sobre surface-raised = 4.92 claro /
+   7.96 oscuro ✅ AA (umbral 4.5:1 de WCAG 1.4.3). */
+.tab:not([aria-selected="true"]) {
+  opacity: 0.8;
+  text-decoration: underline 2px transparent;
+  text-underline-offset: 0.375rem;
+}
+
+/* Filas "tab inactivo hover" (Estados: "100% + subrayado 2px"): opacity: 1
+   y currentColor en el subrayado (keyword permitido; "aparece el
+   subrayado" — hereda el color del texto, por eso funciona igual en ambos
+   temas, spec → nota bajo la tabla: el hover NO usa --color-heading porque
+   en claro es idéntico a --color-text y el cambio no se vería). El guard
+   :not(...) hace textualmente la mitad "sin cambio en hover" del activo
+   (fila "tab activo"; mecanismo del :not([aria-pressed=true]):hover
+   aprobado en LanguageSwitcher T3): el activo nunca coincide con esta
+   regla, sin depender del orden de las hojas. */
+.tab:not([aria-selected="true"]):hover {
+  opacity: 1;
+  text-decoration-color: currentColor;
+}
+
+/* Fila "tab activo ([aria-selected=true])" + Estados ("--color-accent-text,
+   100%, sin subrayado"): la opacidad vuelve a 1 (el 0.8 vive en la regla
+   :not, que el activo no coincide; se reafirma opacity: 1 por literalidad
+   con la fila, que lo lista) y el color es --color-accent-text (regla 1 de
+   DESIGN → "Sólido: ... tab activo de NavTabs"; Do/Don't: texto de acento
+   SIEMPRE --color-accent-text, nunca --color-accent) con contraste
+   5.47 claro / 10.60 oscuro sobre surface-raised ✅ (contrast.md). "Sin
+   subrayado": el text-decoration underline se declara SOLO en la regla
+   :not([aria-selected="true"]) (arriba), así que el activo nunca lo recibe;
+   no hace falta ninguna declaración extra (criterio LS T3 "sin cambio en
+   hover": la regla de arriba excluye al activo). */
+.tab[aria-selected="true"] {
+  opacity: 1;
+  color: var(--color-accent-text);
+}
+
+/* Fila "Focus-visible": anillo ESTÁNDAR del kit (literal exacto de la regla
+   dura 7 de docs/DESIGN.md y regla 5 de docs/tokens/contrast.md; solo
+   :focus-visible) con el radio de la misma fila para que el outline siga
+   la forma. RF-6: la navegación está visible y foco-able en todos los
+   breakpoints (sin hamburguesa/drawer/overlay — spec → No hacer—): ningún
+   @media de este módulo altera el tablist ni sus tabs. */
+.tab:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-8);
+}
