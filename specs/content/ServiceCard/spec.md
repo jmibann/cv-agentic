@@ -1,5 +1,5 @@
 # ServiceCard
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
