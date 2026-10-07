@@ -9,7 +9,7 @@
 - [x] **T3. Contactos: IconBox + Overhead + links derivados.** RF-5 (uso), RF-6 (mailto/tel sin target), RF-9 — 872b122 (fix de sobreaserción T2 aprobado por el usuario: `4ff4424`; menores a vigilar en T6: `#sidebar-contacts` vacío sin spacing fantasma, ellipsis/`--color-heading`)
   - Hecho cuando: un `<li>` por contacto con `IconBox` del mapa (mail/phone/message-circle/map-pin), `Overhead` con el label traducido y el valor (`--color-heading`, ellipsis + `title`); email/phone links **sin** `target`/`rel`; whatsapp y `href` explícitos de sitio con target externo (test de atributos); location como texto plano sin link; `contact`/`social` vacíos no renderizan sus listas y sin contactos **y** sin CV no hay `Separator` (RF-9); verde tras `feat(Sidebar): T3`.
 
-- [ ] **T4. Disclosure con CornerTab.** RF-3, RF-4
+- [x] **T4. Disclosure con CornerTab.** RF-3, RF-4 — 87301ec (T6 verificar: `--icon-size` del chevron si el estilo lo pide; `@media` 1200 debe pisar `.additionalCollapsed`; cuerpo de `c0b99c3` con acentos = deuda #102)
   - Hecho cuando: `CornerTab size="sm"` montada con `<button aria-expanded="false" aria-controls="sidebar-contacts">` + texto `showContacts` + chevron `Icon name="chevron-down"` decorativo; click → `aria-expanded="true"`, texto `hideContacts` y `.additional` pasa de la **clase** de colapso a visible (la visibilidad ≥ xl la da el `@media` del módulo, inspección — en jsdom el estado es por clase); segundo click revierte; el colapso no usa `style` inline (inspección: decisión RF-10); verde tras `feat(Sidebar): T4`.
 
 - [ ] **T5. Download CV.** RF-2
