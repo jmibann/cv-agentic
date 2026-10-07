@@ -15,9 +15,27 @@
    (--font-size-h4 + top calc(--timeline-title-shift * -1)) y las clases
    internas .item/.title/.organization/.description. Cero @media propios
    (RF-7: la sangría escala por el token --timeline-indent; la impresión es
-   del estilo compartido, G-D). */
+   del estilo compartido, G-D).
+
+   T2 (decisión documentada): el módulo declara YA la fila Período de la
+   tabla (`color: var(--color-text-muted); margin: 0;` — valores textuales
+   de la spec, sin inventar nada), porque el <p class="period"> nace en T2
+   y `styles.period` debe existir para cumplir la Anatomía (`<p class=
+   "period">` con clase real). La fila Período no aparece en el "Hecho
+   cuando" de T3 (que reclama lista/ítem/punto/:last-child/título), así que
+   T2 es su dueño en la cobertura del plan; T3 no la repite, solo completa
+   el resto. */
 
 .timeline {
   /* Vacía a propósito en T1: T3 la completa (y declara ítem/punto/
      :last-child según la tabla de la spec, solo con tokens). */
+}
+
+/* Tabla "Estilos y tokens" → Período (nace en T2 con su <p>): texto muted
+   sobre la card (contraste: --color-text-muted nunca directo sobre
+   --color-bg, docs/tokens/contrast.md) y margen 0 (el espaciado interno
+   del ítem es del bloque, no de párrafos con margen de usuario). */
+.period {
+  color: var(--color-text-muted);
+  margin: 0;
 }

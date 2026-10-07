@@ -11,24 +11,24 @@
 // (spec → API, G-B/#99) ya en T1: ningún "Hecho cuando" de T2/T3 la reclama
 // (criterio NavTabs/ControlsBar/ThemeToggle/LanguageSwitcher T1); el módulo
 // nace acá con la clase base vacía (criterio IconBox/LanguageSwitcher).
-// Diferido T2 (RF-3/RF-4): el `<p class="period">` con los `<time>` por
-// extremo NO se renderiza en T1 — su contenido (`formatPeriodEndpoint` de
-// Foundation T12, `locale`, `presentLabel`) nace entero en T2; pintar un `<p>`
-// vacío hoy obligaría a modificar asserts de T1 al agregarlo (los commits
-// test(Tn) solo agregan). `locale` y `presentLabel` forman parte de la API
-// tipada desde T1 (spec → API) pero el componente aún no las destructura
-// (noUnusedParameters).
+// T2 hecha (RF-3, RF-4): el `<p class="period">` con `<time dateTime>` por
+// extremo; el texto de cada extremo lo produce `formatPeriodEndpoint`
+// (Foundation T12) según `locale` — Timeline no reimplementa formateos ni
+// parsea strings compuestas (RF-4, plan → Funciones puras); `end === null`
+// termina el período en `presentLabel` como texto (RF-3, no `<time>`).
 // Diferido T3 (RF-6/RF-7): los estilos por tokens de la tabla "Estilos y
-// tokens", las clases internas `.item/.title/.organization/.description` y el
-// `index.ts`.
+// tokens" (el módulo ya declara SOLO la fila Período, que nace con el `<p>`
+// de esta tarea), las clases internas `.item/.title/.organization/.description`
+// y el `index.ts`.
 
 import type { Locale, TimelineEntry } from "@data/cv.types.generated";
+
+import { formatPeriodEndpoint } from "../../i18n/formatPeriod";
 
 import styles from "./Timeline.module.css";
 
 // API (spec → API) completa desde T1. `locale` y `presentLabel` se conectan
-// en T2 (período con `<time>` por extremo y "Present"); en T1 viajan tipadas
-// sin destructurar en el componente.
+// en T2: formateo por extremo del período y texto "Present" (RF-3/RF-4).
 export interface TimelineProps {
   entries: readonly TimelineEntry[];
   locale: Locale;
@@ -40,7 +40,13 @@ export interface TimelineProps {
   className?: string;
 }
 
-export function Timeline({ entries, idPrefix, className }: TimelineProps) {
+export function Timeline({
+  entries,
+  locale,
+  presentLabel,
+  idPrefix,
+  className,
+}: TimelineProps) {
   // RF-1 (SI-clause): sin entradas no se renderiza nada — ni el `<ol>`: una
   // lista vacía no aporta semántica (plan → Decisiones).
   if (entries.length === 0) {
@@ -85,9 +91,30 @@ export function Timeline({ entries, idPrefix, className }: TimelineProps) {
                   no se pinta el párrafo (cero <p> huecos). La clase
                   `.organization` del módulo se conecta en T3. */}
               {entry.organization ? <p>{entry.organization}</p> : null}
-              {/* T2 (RF-3/RF-4): acá entra el <p class="period"> con los
-                  <time> por extremo (o presentLabel si end === null). En T1
-                  no se renderiza (declarado en el encabezado). */}
+              {/* T2 (RF-3/RF-4): período con <time dateTime> por extremo
+                  (spec → Anatomía y Accesibilidad). Cada extremo se formatea
+                  SOLO con formatPeriodEndpoint (Foundation T12): nada de
+                  strings compuestas parseadas ni de reimplementar Intl
+                  (RF-4). dateTime conserva el valor CRUDO del dato
+                  ("YYYY"/"YYYY-MM"); el separador fijo " — " del contrato de
+                  foundations/i18n.md va ENTRE los dos <time> y, con
+                  end === null, ANTES del presentLabel — que es TEXTO, no
+                  <time> (RF-3). La clase .period nace acá con la fila
+                  Período de la tabla "Estilos y tokens" (T2 es el dueño del
+                  <p>; el resto del módulo y las otras clases internas, T3). */}
+              <p className={styles.period}>
+                <time dateTime={entry.start}>
+                  {formatPeriodEndpoint(entry.start, locale)}
+                </time>
+                {" — "}
+                {entry.end === null ? (
+                  presentLabel
+                ) : (
+                  <time dateTime={entry.end}>
+                    {formatPeriodEndpoint(entry.end, locale)}
+                  </time>
+                )}
+              </p>
               {entry.description ? <p>{entry.description}</p> : null}
             </article>
           </li>
