@@ -15,9 +15,12 @@
 // la CornerTab —, así que va aquí y no se deja huérfana la API de la spec
 // (criterio ControlsBar/ThemeToggle/LanguageSwitcher T1; su test
 // correspondiente está marcado `// extra` en el archivo de tests).
-// Diferidos: T2 conecta `onChange` por click (RF-3: una llamada en inactivo,
-// cero en el activo; el foco tras click es nativo del `<button>`, sin
-// re-gestión propia). T3 conecta el teclado (RF-4: ←/→ circular con vuelta,
+// T2 hecha: `onChange` conectado por click (RF-3): click en un tab inactivo →
+// UNA llamada con el `id` del item; click en el activo → cero (guard de la
+// SI-clause, spec → Comportamiento). Sin re-gestión de foco propia: el foco
+// queda en el `<button>` pulsado por vía NATIVA (plan → Decisiones: el
+// `.focus()` propio existe solo para el teclado de T3).
+// Diferidos: T3 conecta el teclado (RF-4: ←/→ circular con vuelta,
 // Home/End, ambos enfocan y emiten; Espacio `preventDefault` + activación
 // manual por el mismo camino del click — plan → Decisiones; Enter queda al
 // click nativo; ↑/↓ ignoradas: tablist horizontal; 1 item → enfoca el propio
@@ -49,11 +52,9 @@ export interface NavTabsProps {
   /** Tab activo (controlado: la sincronización con la URL es de useHashTab en AppLayout). */
   activeId: string;
   /**
-   * Emite el `id` del tab activado. Interfaz completa desde T1 (spec → API)
-   * pero TODAVÍA SIN CONECTAR: el click entra en T2 (RF-3) y el teclado en
-   * T3 (RF-4); no se destruye para no dejar una variable muerta
-   * (`noUnusedLocals`; precedente CornerTab T1, que tampoco destruía sus
-   * diferidas).
+   * Emite el `id` del tab activado. Conectado por click en T2 (RF-3, con
+   * guard del activo); el teclado lo emitirá en T3 (RF-4). La interfaz ya
+   * estaba completa desde T1 (spec → API).
    */
   onChange: (id: string) => void;
   /** Id del tabpanel único (su existencia y contenido son de AppLayout — RF-2). */
@@ -75,6 +76,7 @@ export const getTabId = (id: string): string => `tab-${id}`;
 export function NavTabs({
   items,
   activeId,
+  onChange,
   panelId,
   label,
   className,
@@ -100,8 +102,8 @@ export function NavTabs({
         {items.map((item) => {
           // RF-1 (roving tabindex): solo el tab activo es tabulable (0); el
           // resto -1. `aria-selected` distingue el activo para tecnologías
-          // de asistencia (RF-5, su parte testeable). Click (T2, RF-3) y
-          // teclado (T3, RF-4) no se conectan todavía.
+          // de asistencia (RF-5, su parte testeable). Click conectado (T2,
+          // RF-3); teclado (T3, RF-4) no se conecta todavía.
           const isActive = item.id === activeId;
 
           return (
@@ -115,6 +117,21 @@ export function NavTabs({
               // (`panelId`); no se montan paneles ocultos (spec → No hacer).
               aria-controls={panelId}
               tabIndex={isActive ? 0 : -1}
+              onClick={() => {
+                // RF-3 (T2; precedente LanguageSwitcher, decisión 2=a):
+                // click en un tab inactivo → `onChange(item.id)` UNA vez
+                // (el id del ITEM, no `getTabId`: la API emite ids de
+                // datos). Guard de la SI-clause: click en el ACTIVO → no
+                // invoca. Sin `focus()` ni re-gestión propia acá: el foco
+                // queda en el `<button>` pulsado por vía nativa (spec →
+                // Comportamiento; el `.focus()` explícito es solo del
+                // teclado, plan → Decisiones, T3). Lo visual (aria-selected
+                // y contenido) cambia cuando el padre re-renderiza: la
+                // pieza es controlada.
+                if (item.id !== activeId) {
+                  onChange(item.id);
+                }
+              }}
             >
               {item.label}
             </button>
