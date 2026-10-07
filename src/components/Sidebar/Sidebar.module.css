@@ -1,40 +1,70 @@
-/* Sidebar — specs/layout/Sidebar/spec.md → Estilos y tokens / Responsive.
-   El módulo NACE en T4 (specs/layout/Sidebar/tasks.md) solo con las clases
-   mínimas del disclosure: el colapso de `.additional` por clase (RF-3;
-   RF-10: nunca `style` inline — los estilos compartidos de impresión de
-   foundations/layout.md deben poder forzar la expansión) y la rotación del
-   chevron (RF-4). TODO lo demás queda diferido a T6 (tasks.md): grilla
-   `auto 1fr` < md y `md–lg`, columna xl con avatar sobresaliente
-   (`margin-top: calc(var(--size-avatar-sidebar) * -0.71)`), clases de la
-   Anatomía (`baseInfo`/`avatar`/`identity`/`name`/`social`/`additional`/
-   `contacts`), redes/links con hover/foco (`--color-accent-text`, subrayado,
-   anillo `--focus-ring-*`), estilo del botón Show/Hide (sin fondo,
-   `--color-accent-text`, `--font-size-body`), `gap` de `.additional` con el
-   tramo del Separator (excepción acumulativa, Separator RF-4) y el ÚNICO
-   `@media (min-width: 1200px)` del módulo que en ≥ xl oculta la CornerTab y
-   fuerza `display: block` en `.additional` (decisión CSS-only 8=a — hoy
-   `.additionalCollapsed` aplica en todos los anchos por eso).
-   Cero colores literales (regla 1 de docs/DESIGN.md): este archivo no declara
-   ningún color. Cero `@media print` propio (RF-10: lo cubren los estilos
-   compartidos). Transiciones de PROPIEDADES concretas con tokens
-   `--duration-*`/`--ease-*` (regla 2 y Do/Don't de docs/DESIGN.md; `never
-   transition: all`); `--duration-base` colapsa a 0.01ms bajo
-   prefers-reduced-motion en tokens.css (foundations/movimiento). Sin margen
-   externo (docs/DESIGN.md → Do/Don't): el espaciado del bloque lo fija T6 con
-   el `gap` del padre. La rotación de 180° del chevron ("rota el chevron
-   180°", RF-4/Estados) es una medida FIJA definida literalmente por la spec
-   que no cambia por breakpoint: permitida por docs/tokens/breakpoints.md
-   ("las medidas fijas pueden ser literales si su spec las define", mismo
-   criterio de CornerTab `.sm`). */
+/* Sidebar — specs/layout/Sidebar/spec.md → Estilos y tokens / Responsive /
+   Estados. Nació en T4 con las clases mínimas del disclosure; T6 conecta el
+   módulo completo (RF-7, RF-10 y el cierre de RF-3 por CSS): grilla `auto
+   1fr` base (< md y md–lg, filas de la tabla Responsive — el avatar y la
+   tipografía escalan SOLO por tokens: --size-avatar-sidebar 7.5rem→9rem→
+   11.25rem, --font-size-name, --size-avatar-border, --radius-avatar-sidebar,
+   --size-social-icon, --sidebar-name-gap, --sidebar-cta-gap,
+   --font-size-contact-value, todos de tokens/tokens.css), columna vertical
+   centrada en xl con el avatar sobresaliente, redes/links con hover/foco, y
+   el `@media (min-width: 1200px)` — el ÚNICO media de comportamiento xl del
+   módulo (decisión 8=a: oculta la CornerTab del disclosure y fuerza visible
+   `.additional`) más el `@media (min-width: 768px)` de la grilla de
+   contactos (2 columnas expandidas en md–lg; 1 columna < md y xl), que es
+   cambio puro de layout. Dentro de ambos `@media` solo hay keywords de
+   layout, tokens, `calc()` de tokens y `0` (docs/tokens/breakpoints.md →
+   Reglas; los tracks `1fr`/`minmax(0, 1fr)` son el ejemplo canónico de ese
+   documento). Cero `@media print` propio (RF-10): la expansión forzada y la
+   ocultación del botón en impresión son de los estilos compartidos (G-D,
+   foundations/layout.md → Impresión), que alcanzan este bloque por su id
+   `#sidebar-contacts` y por la clase de colapso — por eso el colapso es por
+   CLASE y nunca `style` inline. Cero colores literales (regla 1 de
+   docs/DESIGN.md): el módulo no declara ningún color fuera de tokens
+   semánticos; los pares usados están registrados en docs/tokens/contrast.md
+   (redes `text-muted` sobre surface 5.02/6.01 y su hover/foco
+   `accent-text` sobre surface 5.87/12.06 — sección "Íconos informativos";
+   contactos e identidad `heading` sobre surface 8.92/16.11; botón
+   Show/Hide `accent-text` sobre `surface-raised` de la CornerTab 5.47/10.60
+   — mismo par ya auditado en NavTabs T4). Transiciones de PROPIEDADES
+   concretas con `--duration-base`/`--ease-standard` (Do/Don't de DESIGN:
+   nunca `transition: all`); `--duration-base` colapsa a 0.01ms bajo
+   prefers-reduced-motion en tokens.css. Literales del módulo: SOLO los que
+   la spec fija textualmente y se citan en cada regla (180° del chevron —
+   RF-4—, la fórmula `-0.71` del avatar, compartida con
+   foundations/layout.md, y los `0` de resets/posicionamiento permitidos por
+   breakpoints.md); toda medida que cambia por breakpoint es token (la del
+   avatar del xl escala vía --size-avatar-sidebar, no hay literal de
+   tamaño). Sin margen externo en el raíz (Do/Don't): ni `.baseInfo` ni
+   `.additional` declaran margen; ver "pila sin acumulación" abajo. */
+
+/* Pila de `.additional` SIN acumulación en el tramo del Separator
+   (decisión 11 + Separator RF-4; plan → Decisiones: "el mecanismo exacto lo
+   elige el builder y lo documenta"). Mecanismo elegido: el contenedor NO usa
+   `gap` ni márgenes propios — es un div de flujo normal (block, sin regla
+   base con `display`) y el espacio entre sus hijos lo aporta SOLO el margen
+   propio de cada hijo: el `Separator` trae su `margin-block:
+   var(--separator-gap)` de su propio módulo (así el tramo línea↔contactos lo
+   da solo el separador, sin suma del contenedor) y el CTA trae su
+   `margin-top: var(--sidebar-cta-gap)` (fila "Download CV" de la tabla, vía
+   la clase `.cta` unida al raíz del Button). El contenedor no suma nada en
+   ningún tramo. Verificación `#sidebar-contacts` VACÍO (nota de T3): sin
+   hijos no hay márgenes ni gap que pinten — cero spacing fantasma (block con
+   `gap: 0` implícito; un `display: none` en los < xl ni lo muestra). Edge
+   documentado para F5: sin contactos y con CTA, Separator y CTA quedan
+   adyacentes en flujo block y sus márgenes verticales COLAPSAN (máximo, no
+   suma); en flex serían suma — elegido el flujo block también porque RF-3
+   fija textualmente "fuerza `display: block` en `.additional`" y así el
+   media 1200 no cambia de modelo de layout. */
 
 /* Colapso del bloque de contactos (T4; spec → Responsive, Colapsable < xl:
    "`.additional` oculto con una clase del módulo (`display: none`, nunca
    `style` inline)"). La clase se aplica SOLO cuando `expanded === false`
-   (ternaria en el TSX); en ≥ xl el @media 1200 de T6 fuerza
-   `display: block` sobre el bloque cualquiera sea esta clase (el mecanismo
-   exacto — orden de regla o selector del media — lo resuelve T6; decisión
-   8=a: el botón queda oculto y el bloque siempre visible, sin render
-   condicional por ancho). */
+   (ternaria en el TSX); en ≥ xl el @media 1200 de T6 (abajo) fuerza
+   `display: block` sobre el bloque cualquiera sea esta clase: el override
+   usa el selector COMPUESTO `.additional.additionalCollapsed` (0,2,0) y gana
+   a esta regla (0,1,0) POR ESPECIFICIDAD, sin depender del orden del
+   stylesheet y sin `!important` (decisión 8=a; es el punto marcado en el
+   review de T4: "el media debe pisar la clase de colapso"). */
 .additionalCollapsed {
   display: none;
 }
@@ -53,7 +83,365 @@
 }
 
 /* Estado expandido (T4, RF-4; inspección T6/QA F5: jsdom no computa
-   transformaciones, #101). */
+   transformaciones, #101). El `180deg` es medida FIJA definida textualmente
+   por la spec (RF-4/Estados: "rota el chevron 180°") y no cambia por
+   breakpoint: literal permitido por docs/tokens/breakpoints.md (mismo
+   criterio de CornerTab `.sm`). El chevron queda con el tamaño default de
+   Icon (--size-icon por fallback de --icon-size): la tabla de la spec no
+   fija un --icon-size propio para él (verificación pedida en tasks.md → T4;
+   T6 confirma que ningún estilo de la spec lo pide) y no se inventa uno. */
 .chevronRotated {
   transform: rotate(180deg);
+}
+
+/* baseInfo (Anatomía; spec → Responsive "< md" y "md–lg": "Grilla `auto
+   1fr`: avatar a la izquierda; nombre y badge a la derecha; redes debajo de
+   la identidad"). Fila `< md` y fila `md–lg` comparten layout ("Igual"):
+   una sola regla base, mobile-first; el avatar y el texto más grande de md
+   escalan SOLO por tokens (--size-avatar-sidebar 9rem y --font-size-name
+   27px ≥768 en tokens.css), sin @media de 768 para la grilla.
+   - `auto` = columna del avatar (su ancho es --size-avatar-sidebar);
+     `minmax(0, 1fr)` evita que un valor largo de identidad inflé la columna
+     (breakpoints.md → ejemplo canónico de tracks en grid).
+   - `gap: var(--space-4)`: la spec no fija la separación avatar↔identidad
+     ni identidad↔redes; se usa un token de espaciado existente del kit
+     (16px fijo, no cambia por breakpoint → no requiere token nuevo ni
+     literal). */
+.baseInfo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+/* Avatar (Anatomía `figure.avatar > img`; spec → Estilos y tokens, bloque
+   "Avatar" — valores textuales de la tabla, cada uno con su token):
+   tamaño --size-avatar-sidebar (escala 7.5→9→11.25rem por breakpoint en
+   tokens.css; el img hereda 100% del contenedor, decisión 9), radio
+   --radius-avatar-sidebar (20 <768 → 32 ≥768), borde --size-avatar-border
+   (5→6px ≥768) `solid var(--color-surface)`, sombra --shadow-avatar, fondo
+   --color-surface-muted (placeholder mientras carga la imagen de
+   public/) y `overflow: hidden` para recortar la foto al radio.
+   `margin: 0`: reset del margen de UA del <figure> (necesidad MECÁNICA, 0
+   permitido por breakpoints.md; sin esto el avatar correría 1em/40px y
+   rompería la grilla). La protrusión de xl (margin-top negativo) va en el
+   media 1200, abajo. */
+.avatar {
+  width: var(--size-avatar-sidebar);
+  height: var(--size-avatar-sidebar);
+  margin: 0;
+  border-radius: var(--radius-avatar-sidebar);
+  border: var(--size-avatar-border) solid var(--color-surface);
+  box-shadow: var(--shadow-avatar);
+  background-color: var(--color-surface-muted);
+  overflow: hidden;
+}
+
+/* Fila "Avatar" de la tabla (textual): `img { object-fit: cover; width:
+   100%; height: 100%; }` — el 100% referencia el size del token (decisión
+   9: el img NO lleva atributos width/height HTML; dimensiona solo el CSS). */
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Identidad (Anatomía `div.identity`: `p.name` + `Badge`). Sin estilo
+   propio en la spec; `min-width: 0` es la necesidad MECÁNICA de que la
+   columna 1fr pueda encogerse con un nombre largo (el nombre NO tiene
+   elipsis en la spec: sin overflow hidden, simplemente no expande la
+   columna del grid). */
+.identity {
+  min-width: 0;
+}
+
+/* Nombre (Anatomía `p.name`; spec → Estilos y tokens, fila "Nombre" —
+   textuales: --font-size-name, --font-weight-medium, --color-heading,
+   `margin-bottom: var(--sidebar-name-gap)` (10px <768 → 14px ≥768, token
+   responsive)). `margin-top: 0`: reset del margen de UA del <p> (0
+   permitido; sin él el 1em de arriba separía nombre y badge más que el
+   token). El <p> es el elemento que fija la Anatomía ("el único h1 de la
+   página es el del tabpanel" — spec → No hacer). */
+.name {
+  margin-top: 0;
+  margin-bottom: var(--sidebar-name-gap);
+  font-size: var(--font-size-name);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-heading);
+}
+
+/* Redes (Anatomía `ul.social`; spec → Estilos y tokens, fila "Redes"):
+   fila con wrap y separación FIJA "0.75rem" de la tabla — se aplica con
+   `var(--space-3)`, el token del kit con ese valor exacto (regla dura 2 de
+   DESIGN: tokens semánticos; la tabla no lo define como literal propio del
+   componente). `grid-column: 2`: "redes DEBAJO DE LA IDENTIDAD" (filas < md
+   y md–lg de la tabla Responsive — auto-placement las pondría en la
+   columna 1 bajo el avatar); ignorado en xl donde el contenedor pasa a
+   flex. Resets de <ul> de UA (margin/padding/list-style con 0, permitidos:
+   necesidad mecánica). */
+.social {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Link de red (Estados, fila "Link de red social": reposo
+   --color-text-muted; hover/foco --color-accent-text; foco con anillo
+   estándar; transición de `color` --duration-base — textos literales de
+   spec → Estilos y tokens "Redes" y de la tabla Estados). El color recae
+   en el link y el `BrandIcon` lo hereda con su `fill="currentColor"`
+   (BrandIcon RF-5: monocromo heredado del padre; sin `opacity`, decisión de
+   la tabla: contraste directo 5.02 claro / 6.01 oscuro, registrado en
+   docs/tokens/contrast.md → "Íconos informativos"; hover/foco 5.87/12.06
+   con --color-accent-text, regla dura 5 de DESIGN y Do/Don't: texto de
+   acento SIEMPRE --color-accent-text).
+   Área táctil ≥24×24px (fila "Redes": "Área táctil mínima 24×24px
+   (padding en el link)"): `padding: var(--space-1)` (4px) sobre el ícono
+   default --size-social-icon → 16px+8 = 24px <580 y 18px+8 = 26px ≥580;
+   cumple el mínimo en todos los breakpoints sin medir el ícono acá.
+   `:focus-visible` (no `:focus`): canon del anillo estándar (regla dura 7
+   de DESIGN); el color de hover/foco se aplica también en `:focus-visible`
+   para replicar "hover/foco" de la tabla Estados. */
+.social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  color: var(--color-text-muted);
+  transition: color var(--duration-base) var(--ease-standard);
+}
+
+.social a:hover,
+.social a:focus-visible {
+  color: var(--color-accent-text);
+}
+
+.social a:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* CornerTab del disclosure (Anatomía; RF-3 y decisión 8=a). La clase se UNE
+   a la base de CornerTab vía su prop `className` (su API: "se une a la clase
+   base del <div> raíz"). FUERA del @media 1200 la clase NO pinta nada: la
+   tab es visible en todos los < xl (RF-3); solo el media xl la oculta
+   (abajo), igual que el patrón `.float` de CornerTab (la clase existe sin
+   regla base). */
+
+/* Botón Show/Hide Contacts (spec → Responsive, Colapsable, párrafo
+   "Botón": "Estilo del botón: sin fondo, color --color-accent-text,
+   font-size: var(--font-size-body) (ya escala por token); foco con el
+   anillo estándar (--focus-ring-*)" — textuales de la fila, verificación
+   por inspección/QA F5: los pseudo-estados no son asertables en jsdom, y
+   `aria-expanded`/texto alterno ya los cubren los tests de T4):
+   - `border: none; background: transparent`: implementa "sin fondo"
+     literal (resets de <button> de UA; criterio NavTabs `.tab`).
+   - `font-family: var(--font-family)`: los <button> no heredan la fuente
+     del body (necesidad MECÁNICA, criterio NavTabs/Button).
+   - `display: inline-flex; align-items: center; gap: var(--space-2)`: el
+     DOM pone texto e Icon adyacentes sin espacio; el gap de un token de
+     espaciado existente (fijo, no cambia por breakpoint) es la necesidad
+     MECÁNICA de separarlos (la spec no fija el valor; no se usa literal).
+   - `padding: 0`: el aire de la solapa lo da `padding-inline` de
+     CornerTab `.sm` (20px); el padding de UA del botón lo duplicaría (0
+     permitido).
+   - `color: var(--color-accent-text)`: par registrado 5.47 claro / 10.60
+     oscuro sobre `--color-surface-raised` de la tab (contrast.md; mismo
+     par auditado en NavTabs T4). */
+.disclosureButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  color: var(--color-accent-text);
+}
+
+.disclosureButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Contactos (Anatomía `ul.contacts`; spec → Estilos y tokens, bloque
+   "Contactos" + Responsive: 1 columna < md, 2 columnas md–lg CUANDO el
+   usuario expande (decisión 11: default `false` en todo < xl — la grilla de
+   2 columnas describe el bloque expandido, no un estado inicial), 1
+   columna xl; los cambios de columnas van en los dos @media, abajo).
+   Tracks `minmax(0, 1fr)`: permiten que el valor se recorte con elipsis
+   dentro del track (ejemplo canónico de breakpoints.md; `0` permitido).
+   `gap: var(--space-4)`: separación entre filas/columnas — la tabla de la
+   spec no la fija; token de espaciado existente del kit, fijo (no cambia
+   por breakpoint). Resets de <ul> de UA con 0 (mecánicos). */
+.contacts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Fila de contacto (textual de la tabla "Contactos"): "ítem `display:
+   flex; align-items: center; gap: var(--space-4);` IconBox + bloque de
+   texto". El IconBox (3rem --size-icon-box) ya trae `flex-shrink: 0` de su
+   módulo; el bloque de texto se lo permite encoger abajo (min-width: 0). */
+.contacts li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* Bloque de texto del `li` (Anatomía: `div` con Overhead + valor):
+   `min-width: 0` deja que el valor largo se recorte con elipsis en vez de
+   ensanchar el item (necesidad MECÁNICA del elipsis de la fila "Contactos";
+   0 permitido). */
+.contacts li > div {
+  min-width: 0;
+}
+
+/* Valor del contacto (`<a>` o `<p>` según `getContactHref` — RF-5; el
+   `title` con el valor completo ya está en el DOM desde T3, tabla
+   "Contactos"). Textuales de la fila: color --color-heading (inspección
+   pedida en la nota de T3: ellipsis + --color-heading conectados acá),
+   `font-size: var(--font-size-contact-value)` (13px <580 → 14px ≥580,
+   token responsive), "una línea con `text-overflow: ellipsis`" →
+   `overflow: hidden; white-space: nowrap; text-overflow: ellipsis`.
+   `display: block` (necesidad MECÁNICA: el ellipsis no aplica a un inline
+   y el <a> lo sería por UA; el <p> ya es block; criterio HexAvatar T2
+   "necesidad mecánica fiel") para que el recorte y el anillo de foco cubran
+   la línea. `margin: 0`: reset de UA del <p> (0 permitido; el espacio entre
+   bloques lo rigen Separator/CTA, no el valor). */
+.contacts a,
+.contacts p {
+  display: block;
+  margin: 0;
+  font-size: var(--font-size-contact-value);
+  color: var(--color-heading);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Link de contacto (Estados, fila "Link de contacto": "sin subrayado;
+   subrayado en hover/foco; foco con anillo estándar" + fila "Contactos":
+   "Links sin subrayado; subrayado en hover/foco" + transición de `color`
+   por tokens — la tabla Estados de contactos no fija cambio de color: el
+   color queda --color-heading en reposo/hover/foco y la transición de
+   `color` se declara por textual de la regla "Contactos" del encargo/Estados
+   de redes, inofensiva con color estable y fiel si los compartidos de print
+   lo reasignan; nunca `transition: all`). Los <a> de contacto NO son
+   decorativos como los de redes: son texto, por eso el subrayado (no
+   cambian de color al hover — tabla Estados). */
+.contacts a {
+  text-decoration: none;
+  transition: color var(--duration-base) var(--ease-standard);
+}
+
+.contacts a:hover,
+.contacts a:focus-visible {
+  text-decoration: underline;
+}
+
+.contacts a:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Download CV (Anatomía: `Button … fullWidth`; spec → Estilos y tokens,
+   fila "Download CV": "`margin-top: var(--sidebar-cta-gap)`" — textual; el
+   token es responsive (16px <580 → 20px 580–767 → 32px 768–1199 → 30px ≥1200
+   en tokens.css) por lo que NO hay @media acá. La clase se UNE al raíz del
+   Button por su prop `className` (su API; el T5 dejó el CTA sin clase a
+   propósito: "el margen --sidebar-cta-gap es T6"). Es el margen PROPIO del
+   hijo que el mecanismo de pila documentado arriba (cabecera) exige: el
+   espaciado contactos↔CTA lo da SOLO este margen-top, sin gap del
+   contenedor. */
+.cta {
+  margin-top: var(--sidebar-cta-gap);
+}
+
+/* md (768): contacto expandido en 2 columnas (fila "md–lg (768–1199)" de la
+   tabla Responsive: "Contactos expandidos en 2 COLUMNAS"; cambio puro de
+   layout — columnas — permitido en el @media del componente; el track
+   `repeat(2, minmax(0, 1fr))` es el ejemplo textual de
+   docs/tokens/breakpoints.md). La separación y el resto escalan por tokens
+   (--space-4 también da el column-gap; --sidebar-* y --font-size-* ya
+   saltaron en tokens.css). A partir de acá la grilla base `auto 1fr` de
+   baseInfo NO cambia ("Igual", fila md–lg). */
+@media (min-width: 768px) {
+  .contacts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* xl (≥1200) — ÚNICO media de comportamiento xl del módulo (RF-3, decisión
+   8=a CSS-only; RF-7). Sin `@media print` en todo el archivo (RF-10;
+   inspección). Nada ramifica en JS por ancho: el botón y la CornerTab se
+   montan siempre (T4) y acá dejan de ser visibles/operables. */
+@media (min-width: 1200px) {
+  /* "Vertical y centrado" (fila xl de la tabla Responsive; Anatomía de
+     foundations/layout.md): la grilla `auto 1fr` pasa a columna flex
+     centrada; nombre/badge/redes centrados (align-items + text-align;
+     "centrados" es textual de la fila). El gap de la base sigue rigiendo
+     (propiedad común a grid y flex). */
+  .baseInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Avatar "sobresaliendo arriba" (fila xl, textual):
+     `margin-top: calc(var(--size-avatar-sidebar) * -0.71)` ≈ −8rem con
+     11.25rem — FÓRMULA COMPARTIDA con foundations/layout.md → "xl: sidebar
+     + contenido" ("El avatar sobresale: margin-top: calc(var(
+     --size-avatar-sidebar) * -0.71) … centrado"; el `-0.71` no es un valor
+     inventado acá: es el coeficiente del par protrusión/top del sticky, y
+     por eso el `top` del sticky lo incluye — AppLayout). El HEADROOM de
+     página para la protrusión (el espacio --gutter-top de 10rem en xl) lo
+     aporta AppLayout sobre el contenedor (layout.md: "está contemplado en
+     los 10rem"; el Box raíz ya es `overflow: visible` — su RF-6 — y no
+     recorta). Gana sobre el `margin: 0` de la base por ORDEN (misma
+     especificidad 0-1-0, declarada después dentro del media; dentro de un
+     mismo archivo el orden es determinista). */
+  .avatar {
+    margin-top: calc(var(--size-avatar-sidebar) * -0.71);
+  }
+
+  /* Contactos "siempre visibles en 1 columna" en xl (fila xl de la tabla
+     Responsive; revierte las 2 columnas de md). */
+  .contacts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* RF-3 (decisión 8=a, textual de la tabla Responsive/Colapsable: "en ≥ xl
+     un @media (min-width: 1200px) del propio módulo fuerza `display: block`
+     y oculta la CornerTab"):
+     - `.disclosureTab.disclosureTab` (0,2,0): selector compuesto CON LA MISMA
+       clase duplicada — único mecanismo que pisa el `display: flex` de la
+       clase base `.cornerTab` (OTRO módulo, mismo peso 0,1,0) por
+       ESPECIFICIDAD, sin depender del orden de los stylesheets
+       cross-módulo y sin `!important` (regla dura: el media debe pisar;
+       punto marcado en el review de T4). La tab queda "no visible ni
+       operable" (RF-3: el botón sigue montado, sin render condicional).
+     - `.additional.additionalCollapsed` (0,2,0) pisa el `display: none` de
+       la clase de colapso (0,1,0) también por especificidad, sin depender
+        del orden (los dos selectores compuestos son el mecanismo limpio
+       declarado en tasks.md → T4/T6). Expandido, la clase de colapso no
+       está y el div es block por default: visible en ambos estados, que es
+       exactamente "contactos siempre visibles". */
+  .disclosureTab.disclosureTab {
+    display: none;
+  }
+
+  .additional.additionalCollapsed {
+    display: block;
+  }
 }

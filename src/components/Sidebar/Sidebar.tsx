@@ -43,20 +43,25 @@
 // `target`/`rel`: es una descarga mismo-origen, no un externo de RF-6 (Button
 // omite esos atributos si no se pasan).
 //
-// Diferidos por tasks.md (API completa desde acá, spec → plan → Interfaz):
-// el resto del módulo (grilla,
-// `--color-heading`, ellipsis, estilo del botón Show/Hide y del `@media`
-// 1200 CSS-only 8=a que oculta la CornerTab y fuerza `.additional`, gap de
-// `.additional` con el tramo del Separator) es T6 — `Sidebar.module.css` nace
-// en T4 solo con las clases mínimas de colapso/rotación.
+// T6 hecha: el módulo se completó (specs/layout/Sidebar/tasks.md → T6;
+// RF-7/RF-10 y cierre RF-3 por CSS): grilla `auto 1fr` con avatar/identidad/
+// redes por tokens, `--sidebar-*`, hover/foco de redes y contactos, botón
+// Show/Hide sin fondo en `--color-accent-text`, avatar sobresaliente en xl
+// (`calc(var(--size-avatar-sidebar) * -0.71)`, fórmula compartida con
+// `foundations/layout.md`) y el ÚNICO `@media (min-width: 1200px)` de
+// comportamiento xl (decisión 8=a): oculta la CornerTab (`.disclosureTab`) y
+// fuerza visible `.additional` pisando `.additionalCollapsed` por
+// especificidad (selector compuesto, sin `!important` ni orden de hoja);
+// cero `@media print` propio (RF-10). Las clases de la Anatomía
+// (`baseInfo`/`avatar`/`identity`/`name`/`social`/`additional`/`contacts`) se
+// conectaron acá; el CTA recibe `.cta` (`margin-top: var(--sidebar-cta-gap)`,
+// tabla "Download CV") unida a su raíz por la prop `className` del Button.
+// jsdom no computa CSS (#101): los estilos se verifican por inspección + QA
+// F5; las clases unidas a hijos (CornerTab/Button) y el colapso por clase sí
+// son observables (tests T4/T5 siguen verdes).
+//
 // RF-8 (C2): la pieza no importa `useCv()` ni `useLocale()` — todos los datos
 // y textos entran por props.
-//
-// Clases de la Anatomía (`baseInfo`/`avatar`/`identity`/`name`/`social`/
-// `additional`/`contacts`): las conecta T6 (tasks.md → T2/T3/T6: en estructura
-// no hay estilos observables por tests; jsdom no computa CSS, #101). Por eso
-// acá los contenedores siguen sin clase de layout; la única clase ya aplicada
-// es la de colapso de `.additional` (T4, observable en DOM — test T4).
 //
 // Marca de las redes (plan → Decisiones; spec → Accesibilidad): `BRAND_NAMES`
 // de BrandIcon es el registro `Record<SocialNetwork, string>` (network →
@@ -153,6 +158,20 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 
+  // T6 (RF-3/RF-10; spec → Responsive, Colapsable): `.additional` SIEMPRE
+  // lleva su clase base del módulo (la pila sin acumulación y el selector
+  // compuesto del @media 1200 la necesitan) y la de colapso SOLO cuando
+  // `!expanded` — nunca `style` inline (RF-10: los estilos compartidos de
+  // impresión y el media ≥ xl deben poder sobrescribirla; el media gana por
+  // especificidad, ver comentario del módulo). Mismo join canónico (array +
+  // filtro de `undefined` + join, base primero).
+  const additionalClassName = [
+    styles.additional,
+    expanded ? undefined : styles.additionalCollapsed,
+  ]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
   return (
     // RF-1 + spec → Accesibilidad: landmark `<aside>` nombrado con
     // `labels.region` (por props, no hardcodeado — C3). `variant="outer"` es
@@ -164,9 +183,12 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
           módulo en T6 (decisión CSS-only 8=a — no hay render condicional por
           ancho; el botón queda no visible ni operable). CornerTab solo aporta
           forma/posición (su RF-6: sin rol ni aria-*; el nombre y el estado los
-          lleva el botón). `size="sm"`: la compacta de Show Contacts (tabla
-          CornerTab RF-2). */}
-      <CornerTab size="sm">
+           lleva el botón). `size="sm"`: la compacta de Show Contacts (tabla
+          CornerTab RF-2). T6: `className={styles.disclosureTab}` — se UNE a
+          la base de CornerTab (su API) y el @media 1200 del módulo la oculta
+          (RF-3/8=a; fuera de ese media la clase no pinta nada: visible en
+          todos los < xl). */}
+      <CornerTab size="sm" className={styles.disclosureTab}>
         {/* Patrón disclosure (spec → Accesibilidad): `aria-expanded` +
             `aria-controls` al id de `.additional` (existente siempre — Tests
             5/RF-10). `type="button"`: no es un submit (criterio
@@ -174,8 +196,12 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
             props (RF-4, RF-8); el chevron es decorativo (Icon sin `label` →
             `aria-hidden`, su RF-3), así que el nombre accesible del botón es
             SOLO el texto. */}
+        {/* T6: `.disclosureButton` — estilo de la fila "Botón" de spec →
+            Responsive/Colapsable (sin fondo, --color-accent-text,
+            --font-size-body, anillo estándar en foco). */}
         <button
           type="button"
+          className={styles.disclosureButton}
           aria-expanded={expanded}
           aria-controls={CONTACTS_CONTAINER_ID}
           onClick={() => {
@@ -187,23 +213,25 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
         </button>
       </CornerTab>
 
-      {/* baseInfo (Anatomía): avatar + identidad + redes. Sus clases llegan
-          con el módulo en T6. */}
-      <div>
+      {/* baseInfo (Anatomía): avatar + identidad + redes; T6 conecta las
+          clases del módulo (grilla `auto 1fr` < md y md–lg, columna centrada
+          con avatar sobresaliente en xl — spec → Responsive). */}
+      <div className={styles.baseInfo}>
         {/* Avatar (Anatomía: `figure.avatar > img`). Decisión 9 (spec →
             Estilos y tokens): SIN atributos HTML `width`/`height` ni
             `decoding` explícito — el tamaño es del token
-            `--size-avatar-sidebar` (CSS, T6) y escala por breakpoint. El alt
-            llega desde `profile.avatar.alt` (spec → Accesibilidad). */}
-        <figure>
+            `--size-avatar-sidebar` (CSS, T6: `.avatar` lo dimensiona y escala
+            por breakpoint 7.5→9→11.25rem) y en xl sobresale de la card. El
+            alt llega desde `profile.avatar.alt` (spec → Accesibilidad). */}
+        <figure className={styles.avatar}>
           <img src={profile.avatar.src} alt={profile.avatar.alt} />
         </figure>
 
         {/* Identidad (Anatomía): el nombre es `<p>` con estilo propio — el
             único h1 de la página es el del tabpanel (spec → No hacer: "No
             usar el nombre como h1"). El headline va en el Badge. */}
-        <div>
-          <p>{profile.name}</p>
+        <div className={styles.identity}>
+          <p className={styles.name}>{profile.name}</p>
           <Badge>{profile.headline}</Badge>
         </div>
 
@@ -212,7 +240,7 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
         {social.length > 0 && (
           // spec → Accesibilidad: la lista de redes lleva el nombre
           // `labels.social` traducido.
-          <ul aria-label={labels.social}>
+          <ul className={styles.social} aria-label={labels.social}>
             {social.map((link) => (
               // RF-6 (redes) + D6: links externos SIEMPRE con
               // `target="_blank"` + `rel="noopener noreferrer"`; el `href` es
@@ -240,14 +268,13 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
           T3: el contenedor se monta siempre. T4 (RF-3/RF-10): cuando
           `!expanded` recibe la CLASE de colapso del módulo (nunca `style`
           inline: la expansión forzada de impresión y el `@media` ≥ xl de T6
-          deben poder sobrescribirla); la clase base `.additional` del bloque
-          (gap/tramo del Separator) la conecta T6 y se unirá acá a la
-          condicional. El id sigue alcanzable para el `aria-controls` y para
-          print (RF-10). */}
-      <div
-        id={CONTACTS_CONTAINER_ID}
-        className={expanded ? undefined : styles.additionalCollapsed}
-      >
+          deben poder sobrescribirla); T6 une además la clase base
+          `.additional` — pila sin `gap` cuyo tramo del Separator aporta solo
+          el `margin-block` del separador y el del CTA su `margin-top` (
+          `.cta`) — y el @media 1200 pisa la de colapso por especificidad
+          (selector compuesto; decisión 8=a/RF-10). El id sigue alcanzable
+          para el `aria-controls` y para print (RF-10). */}
+      <div id={CONTACTS_CONTAINER_ID} className={additionalClassName}>
         {/* RF-9: sin contactos **y** sin `downloadCvUrl` no se renderiza el
             Separator (un `.additional` sin contenido no deja huérfano el
             separador). La condición evalúa `profile.downloadCvUrl` según la
@@ -258,7 +285,7 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
         {/* RF-9 (mitad `contact`; Tests 8): `contact=[]` → no se monta la
             lista. Orden de render = orden recibido (CvData). */}
         {contact.length > 0 && (
-          <ul>
+          <ul className={styles.contacts}>
             {contact.map((item) => {
               // RF-5: href explícito con prioridad, o derivado por tipo
               // (`getContactHref`, función pura testeada en T1). `undefined`
@@ -323,11 +350,19 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
             (regla 13 del marco: el link mide el ancho del contenedor). El
             texto viene de `labels.downloadCv` por props (RF-8/C3). Link de
             descarga mismo-origen: NO es externo de RF-6 — sin `target`/`rel`
-            (Button los omite cuando no se pasan). Sin clase nueva acá: el
-            margen `--sidebar-cta-gap` lo aporta el `gap`/tramos del módulo en
-            T6 (encargo: ningún estilo observable en esta tarea). */}
+            (Button los omite cuando no se pasan). T6: `className={styles.cta}`
+            — la clase se UNE al raíz del Button (su API) y aporta el
+            `margin-top: var(--sidebar-cta-gap)` de la tabla "Download CV";
+            en la pila de `.additional` (sin `gap` propio) ese margen es todo
+            lo que separa contactos↔CTA. */}
         {profile.downloadCvUrl !== undefined && (
-          <Button href={profile.downloadCvUrl} download icon="download" fullWidth>
+          <Button
+            href={profile.downloadCvUrl}
+            download
+            icon="download"
+            fullWidth
+            className={styles.cta}
+          >
             {labels.downloadCv}
           </Button>
         )}
