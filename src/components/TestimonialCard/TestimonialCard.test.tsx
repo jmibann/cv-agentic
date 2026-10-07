@@ -1,4 +1,5 @@
-// Tests de T1 y T2 (specs/content/TestimonialCard/tasks.md) — T1: RF-4, RF-7
+// Tests de T1, T2 y el cierre de T3 (specs/content/TestimonialCard/tasks.md) —
+// T1: RF-4, RF-7
 // (Tests esperados 1, 2 y 5 de la spec). T1: el <article> (`Box
 // variant="inner" as="article"`) se nombra por su h3 vía
 // `aria-labelledby="testimonial-${testimonial.id}-name"` (fórmula fija, RF-7),
@@ -13,8 +14,16 @@
 //
 // Diferidos declarados (tasks.md): T3 conecta las clases internas del módulo
 // (`.header`/`.identity`/`.avatar`/`.excerpt`/`.quote`/`.stretched` y el
-// `::after` que cubre la card) y el cierre `expectNoA11yViolations` — el cierre
-// NO se adelanta acá (patrón ServiceCard/HexAvatar: llega con su tarea). En T1
+// `::after` que cubre la card) y AGREGA el cierre `expectNoA11yViolations` de
+// Tests esperados 6 como último describe del archivo (constitución T4; patrón
+// ServiceCard/HexAvatar: llega con la última tarea, no se adelanta).
+// VERDE on-arrival #101 (declarado en el cierre abajo): el markup ya era
+// accesible desde T1/T2 (article nombrada por `aria-labelledby` al h3, botón
+// único nombrado por `aria-label`, avatar `alt=""` y comilla `aria-hidden`
+// decorativas) y T3 agrega solo CSS que jsdom no computa (clamp, hover, anillo
+// del `::after`, print): el cierre no discrimina el estado de la
+// implementación; su valor es la regresión futura sobre la card completa y la
+// verificación real de los estilos es inspección + QA F5 (#101). En T1
 // el módulo nace solo con `.card` (unión del raíz, spec → API / G-B; la
 // alternativa de postergar el módulo a T3 quedó descartada por el encargo: la
 // unión se conecta y se testa en T1). Ninguna aserción de T1 fija la AUSENCIA
@@ -80,6 +89,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 import type { Testimonial } from "@data/cv.types.generated";
+
+import { expectNoA11yViolations } from "../../test/a11y";
 
 import { HexAvatarDefs } from "../HexAvatar";
 import { AccentGradientDefs } from "../Icon";
@@ -406,5 +417,52 @@ describe("TestimonialCard className forwarding (T1: spec → API, G-B)", () => {
     expect(article).toHaveClass(innerClass);
     expect(article).toHaveClass(cardClass);
     expect(article).toHaveClass(consumerClass);
+  });
+});
+
+// ============================================================================
+// CIERRE de accesibilidad (T3; constitución T4, Tests esperados 6; la última
+// entrada del archivo; "Hecho cuando" de T3: "el archivo termina con
+// expectNoA11yViolations").
+//
+// VERDE on-arrival #101 (declarado en el encabezado del archivo): el markup ya
+// era accesible desde T1/T2 — article nombrada por `aria-labelledby` al h3
+// (RF-7), botón único enfocado y nombrado por `aria-label` (RF-1), avatar con
+// `alt=""` y comilla `aria-hidden` decorativas (RF-4) — y T3 conecta SOLO
+// clases de un módulo CSS que jsdom no computa (clamp, hover, anillo del
+// `::after`, print: inspección + QA F5). El cierre no puede discriminar el
+// estado de la implementación de T3 (nada discriminate-testable acá; criterio
+// Box T4/#101): su valor es la REGRESIÓN futura sobre la card completa.
+//
+// Fixture: la card default (`testimonialCard()`: armazones `HexAvatarDefs` +
+// `AccentGradientDefs` — contrato de las primitivas para el recorte del
+// hexágono y el gradiente de la comilla—, render sin overrides).
+// ============================================================================
+describe("TestimonialCard accessibility audit (T3: cierre, spec → Tests esperados 6)", () => {
+  it("has no accessibility violations with the full card", async () => {
+    const { container } = render(testimonialCard());
+
+    // Fija lo auditado (criterio ServiceCard/SkillList/ControlsBar: sin assert
+    // de anclaje el cierre no distingue qué rama recorre): la card completa —
+    // article nombrada por su h3 (RF-7), botón estirado nombrado (RF-1),
+    // extracto presente (RF-4) y las defs de los armazones montadas.
+    const article = screen.getByRole("article", { name: TESTIMONIAL.author });
+    expect(
+      within(article).getByRole("heading", {
+        level: 3,
+        name: TESTIMONIAL.author,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(article).getByRole("button", { name: OPEN_LABEL }),
+    ).toBeInTheDocument();
+    expect(within(article).getByText(TESTIMONIAL.text)).toBeInTheDocument();
+    expect(container.querySelector("clipPath#hex-avatar-outer")).not.toBeNull();
+    expect(container.querySelector("linearGradient")).toHaveAttribute(
+      "id",
+      "accent-gradient",
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
