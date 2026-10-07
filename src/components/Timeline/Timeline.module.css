@@ -1,0 +1,23 @@
+/* Timeline — módulo de estilos (specs/content/Timeline/spec.md → "Estilos y
+   tokens"). T1: el módulo nace SOLO con la clase base del raíz `<ol>`,
+   VACÍA: existe para conectar la unión de `className` del consumidor
+   (G-B/#99), que necesita un selector base exportable por CSS Modules
+   (criterio IconBox/LanguageSwitcher: la clase base nace con la unión, los
+   estilos llegan en la tarea que los declara).
+
+   Diferido T3 (RF-6/RF-7, tabla "Estilos y tokens" de la spec): la lista
+   (`list-style: none; margin: 0; padding` con calc de --size-timeline-dot +
+   --timeline-dot-ring), el ítem (`position: relative`, `border-left` con
+   --timeline-line-width/--color-track, padding con --timeline-indent), el
+   punto `::before` centrado sobre la línea (--size-timeline-dot,
+   --timeline-dot-ring, --color-accent, --timeline-dot-top), el `:last-child`
+   sin línea (`border-left-color: transparent; padding-bottom: 0`), el título
+   (--font-size-h4 + top calc(--timeline-title-shift * -1)) y las clases
+   internas .item/.title/.organization/.description. Cero @media propios
+   (RF-7: la sangría escala por el token --timeline-indent; la impresión es
+   del estilo compartido, G-D). */
+
+.timeline {
+  /* Vacía a propósito en T1: T3 la completa (y declara ítem/punto/
+     :last-child según la tabla de la spec, solo con tokens). */
+}
