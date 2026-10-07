@@ -1,15 +1,208 @@
-/* TestimonialCarousel — specs/content/TestimonialCarousel/spec.md → Estilos y
-   tokens. El módulo nace en T2 SOLO con la clase base del <section> raíz,
-   VACÍA (criterio IconBox T2: la unión G-B de `className` se conecta desde la
-   primera tarea que renderiza el raíz; las reglas llegan después). */
+/* TestimonialCarousel — specs/content/TestimonialCarousel/spec.md → "Estilos y
+   tokens" + Estados + Impresión + Responsive (T5; RF-2, RF-7, RF-8). Transcripción literal de la tabla de la spec tras el Cambio de accesibilidad opción A (decisión del usuario 2026-10-07): track y slides son `div`, ya NO hay `list-style` (eso era del `<ul>`/`<li>` borrado); el resto de la tabla se fija igual. Cero colores literales fuera de tokens/tokens.css (regla dura 1 de docs/DESIGN.md): solo tokens semánticos + las medidas FIJAS citadas textualmente por la tabla (`2rem` de RF-7, `gap: 0.625rem` de la paginación, el `24px` del área táctil del bullet) + `0`, keywords, porcentajes propios del track y `calc()` de tokens (regla dura 2; docs/tokens/breakpoints.md: un literal fijo permitido si la spec lo define textualmente). El módulo tiene EXACTAMENTE dos `@media`: uno de layout (768px → 2 slides por vista; RF-8 veda medidas literales dentro: solo `100%` propio del track, `--layout-gap` y el divisor `2`) y uno `print` (RF-8). Verificación del pintado: INSPECCIÓN + QA F5 (#101: jsdom no computa CSS; snap, columnas, headroom, scrollbar oculta, área táctil y print no tienen test unitario). */
 
 /* Clase base del <section> raíz (spec → API: "Se une a la clase base de la
-   `<section>` raíz (G-B)"). Vacía en T2: la tabla "Estilos y tokens" de la
-   spec (track grid+snap+overflow y scrollbar oculta, headroom
-   `padding-block: var(--testimonial-headroom) 2rem` — RF-7 —, slide
-   snap-align, paginación/bullet con --size-bullet/--gradient-accent y ::after
-   táctil, @media 768 y print) se implementa íntegra en T5 (RF-2, RF-7, RF-8),
-   junto con las clases .track/.slide/.pagination/.bullet que el DOM de T2
-   todavía no lleva. Cero valores literales acá: todo por tokens en T5. */
+   `<section>` raíz (G-B)"). Regla VACÍA a propósito: la tabla de la spec no
+   le asigna ninguna propiedad al raíz (el único lugar que reserva el headroom
+   es el track — RF-7 — y el espaciado externo del componente lo gobierna el
+   padre con `gap`: Do/Don't de DESIGN, "gap del padre para espaciar"; sin
+   margen propio). La clase existe como ancla de la unión G-B (criterio
+   `.identity` de TestimonialCard: clase real sin props inventadas; IconBox T2:
+   el módulo nació en T2 con esta base vacía y acá queda). */
 .carousel {
+}
+
+/* Track (tabla → "Track"; RF-2, RF-7): transcripción literal de la fila, sin
+   `list-style` (el track es `div`, Cambio de accesibilidad opción A).
+   `display: grid; grid-auto-flow: column; grid-auto-columns: 100%` = 1 slide
+   por vista (< md; ≥ md: 2, abajo); `gap: var(--layout-gap)` (token
+   semántico del kit, la medida del gap del track citada por la tabla);
+   `overflow-x: auto` + `scroll-snap-type: x mandatory` = scroll-snap nativo
+   sin librerías (RF-2; sin autoplay/loop/flechas: spec → No hacer);
+   `overscroll-behavior-x: contain` (el swipe no propaga al scroll de la
+   página); `padding-block: var(--testimonial-headroom) 2rem` = ÚNICO lugar
+   que reserva el espacio del avatar protrusivo de la card (RF-7: arriba,
+   protrusión + sombra; abajo, el `2rem` fijo — literal textual de la tabla —
+   para no recortar la sombra de hover; `overflow-x: auto` también recorta el
+   eje vertical; la card NO lleva `margin-top`); `margin: 0` (la tabla lo
+   fija; `0` permitido, reset genérico); `scrollbar-width: none` + el
+   `::-webkit-scrollbar` de abajo = scrollbar oculta (fila "Scrollbar": la
+   navegación visible son los bullets).
+   `position: relative` es NECESIDAD MECÁNICA de la tabla (spec → Track: "es
+   necesidad mecánica del contrato `slideOffsets` relativo al track"), no un
+   valor de diseño: `offsetLeft` de cada slide se mide contra su `offsetParent`
+   (el ancestro posicionado más cercano), así que SIN esto el track no sería
+   el `offsetParent` de sus `div` slide (un Box padre sí es `position:
+   relative`) y offsets/stops/regla stop→n medirían contra otro origen.
+   Criterio del `display: block` de HexAvatar T2 / del flex de
+   TestimonialDialog (necesidades mecánicas aceptadas con comentario). */
+.track {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: var(--layout-gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  padding-block: var(--testimonial-headroom) 2rem;
+  margin: 0;
+  scrollbar-width: none;
+}
+
+/* Scrollbar (fila "Scrollbar", literal): la variante webkit de la ocultación,
+   junto al `scrollbar-width: none` de la base. */
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive (spec → Responsive + Comportamiento: "≥ md: 2 testimonios por
+   vista"; la fila fija el calc textual "`grid-auto-columns: 100%` →
+   `calc((100% - var(--layout-gap)) / 2)`"). ÚNICO @media de breakpoint del
+   módulo (RF-8): cambio de LAYOUT (cantidad de columnas por vista); dentro no
+   hay medidas nuevas — `100%` es el ancho propio del track, `--layout-gap` un
+   token y `2` un divisor puro. La cantidad de bullets se ajusta sola: los
+   stops se recalculan con el tamaño del track vía `ResizeObserver` (RF-3, en
+   el `.tsx`; spec → Responsive "cambia sola con el ancho"). */
+@media (min-width: 768px) {
+  .track {
+    grid-auto-columns: calc((100% - var(--layout-gap)) / 2);
+  }
+}
+
+/* Slide (tabla → "Slide", `div class="slide"` hijo directo del track; spec →
+   Comportamiento "Scroll": "cada slide `scroll-snap-align: start`").
+   `min-width: 0` es NECESIDAD MECÁNICA (tabla lo fija con su comentario,
+   igual que el `min-height: 0` de `.layout` en TestimonialDialog): el tamaño
+   mínimo de un item de grid es `auto` = su min-content, así que un testimonio
+   con una palabra larga inflaría el slide por encima de la columna de la
+   tabla (100% / media ≥ md), rompería "1/2 por vista" y falsearía
+   `scrollWidth`/`maxScroll` de la medición de stops (RF-3). `0` no es una
+   medida nueva (docs/tokens/breakpoints.md: `0` permitido). */
+.slide {
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+/* Paginación (tabla → "Paginación", literal): `display: flex` +
+   `justify-content: center` (bullets centrados) + `gap: 0.625rem` (medida
+   FIJA textual de la tabla, permitida por breakpoints.md; NO se remite a
+   `--size-bullet` porque ese token mide el diámetro del bullet, no la
+   separación — compartirlos crearía un acople accidental) + `margin-top:
+   var(--space-4)` (token). El gap visible se conserva pese al área táctil de
+   24px del bullet porque esa área es el pseudo-elemento `::after` de abajo,
+   no padding (elección fijada en la pasada de Clarificación; Do/Don't DESIGN:
+   los bullets no llevan margen propio). */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.625rem;
+  margin-top: var(--space-4);
+}
+
+/* Bullet (tabla → "Bullet"; RF-3): círculo inactivo de 10px (`--size-bullet`)
+   en `--color-track` — decorativo (regla 3 de docs/tokens/contrast.md: ningún
+   estado depende SOLO del color; el activo se distingue TAMBIÉN por tamaño,
+   fila de abajo y nota bajo la tabla) + `border-radius: var(--radius-round)`
+   + `border: 0` (reset del <button> de la UA; con el box-sizing border-box
+   global, width/height fijan el box 10×10 exacto). La transición de `width`
+   con `--duration-base`/`--ease-emphasized` (fila "Bullet activo") vive en la
+   base para animar ambos sentidos; SOLO `width` (el fondo no se anima: un
+   gradiente no es interpolable, literal de la fila; NUNCA `transition: all`,
+   Do/Don't DESIGN; `--duration-base` colapsa a 0.01ms con
+   prefers-reduced-motion en tokens.css). SIN `cursor: pointer`: ni la tabla
+   "Estilos y tokens" ni la sección "Estados" de ESTA spec lo listan para el
+   bullet (TestimonialCard y NavTabs sí lo fijan para SUS controles en SUS
+   tablas; acá no está en el contrato → no se implementa).
+   `position: relative` es necesidad MECÁNICA del `::after` táctil de abajo
+   (un pseudo-elemento posicionado se ancla al ancestro posicionado más
+   cercano: sin esto el área táctil caería sobre otro contenedor; criterio del
+   `::after` stretched de TestimonialCard anclado en `.card`). */
+.bullet {
+  position: relative;
+  width: var(--size-bullet);
+  height: var(--size-bullet);
+  border-radius: var(--radius-round);
+  background: var(--color-track);
+  border: 0;
+  transition: width var(--duration-base) var(--ease-emphasized);
+}
+
+/* Área táctil 24×24px (fila "Bullet": "lograda con pseudo-elemento
+   transparente (`::after` con inset negativo), no con padding: conserva el
+   `gap: 0.625rem` visual de la paginación"; elección FIJADA en la pasada de
+   Clarificación). El `calc((24px - var(--size-bullet)) / -2)` deriva el
+   `24px` textual de la spec: (24 − 10)/2 = 7px de excedente por lado, escrito
+   como inset negativo → caja táctil 24×24 alrededor del bullet de 10px sin
+   tocar el layout ni el gap (los `10px` los aporta `--size-bullet`; `24px` es
+   literal fijo de la spec). Con el bullet activo (width 20px) sigue ≥24: el
+   `::after` se ancla a su box y lo excede por lado. Verificación: inspección +
+   QA F5. */
+.bullet::after {
+  content: "";
+  position: absolute;
+  inset: calc((24px - var(--size-bullet)) / -2);
+}
+
+/* Estados → "Bullet hover": `background: var(--color-text-muted)` SOLO en
+   inactivos (literal de la tabla Estados; el activo tiene `aria-current` y no
+   debe verse afectado). Inactivo = bullet SIN el atributo (la implementación
+   pasa `undefined`, no "false": criterio tests T3). */
+.bullet:not([aria-current]):hover {
+  background: var(--color-text-muted);
+}
+
+/* Estados → "Bullet focus-visible": anillo estándar del kit, literal de la
+   tabla (regla dura 7 de DESIGN: --focus-ring-width/--color-focus-ring/
+   --focus-ring-offset, solo :focus-visible). */
+.bullet:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Bullet activo (tabla → "Bullet activo"; RF-5 marca `aria-current="true"`):
+   `width: var(--size-bullet-active)` (10 → 20px; la transición de `width`
+   vive en la base, arriba) + `background: var(--gradient-accent)` (uso del
+   gradiente listado explícitamente en docs/DESIGN.md → "Acento escaso":
+   "bullet activo del carrusel"). El cambio de tamaño distingue el estado MÁS
+   ALLÁ del color: regla 3 de docs/tokens/contrast.md porque `--color-track` es
+   decorativo (nota bajo la tabla de la spec). */
+.bullet[aria-current="true"] {
+  width: var(--size-bullet-active);
+  background: var(--gradient-accent);
+}
+
+/* Impresión (spec → Impresión, literal; RF-8): los testimonios se imprimen
+   TODOS, APILADOS, con el texto completo. Track a flujo de bloque
+   (`display: block` + `overflow: visible`: en papel no hay scroll ni snap que
+   proteger) y `padding: var(--testimonial-headroom) 0 0` (token y `0`; el
+   atajo reemplaza el `padding-block` de la base — misma especificidad, gana
+   por orden de hoja: el bloque print va al final del archivo): arriba queda
+   el headroom del avatar protrusivo y abajo/izq/der cero. Cada slide
+   `break-inside: avoid` (no partir una card entre páginas) y, desde el
+   segundo, `margin-top: var(--testimonial-headroom)` (espacio para el avatar
+   que sobresale). Paginación `display: none` (los bullets no significan nada
+   en papel). El dialog no se imprime por su propio `@media print`
+   (TestimonialDialog) y el texto completo / ocultamiento del botón estirado
+   los resuelve el print propio de TestimonialCard; la paleta clara de
+   impresión la fuerza tokens.css (regla dura 1: este módulo no usa
+   `--palette-*` ni en print). */
+@media print {
+  .track {
+    display: block;
+    overflow: visible;
+    padding: var(--testimonial-headroom) 0 0;
+  }
+
+  .slide {
+    break-inside: avoid;
+  }
+
+  .slide + .slide {
+    margin-top: var(--testimonial-headroom);
+  }
+
+  .pagination {
+    display: none;
+  }
 }

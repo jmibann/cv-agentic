@@ -4,7 +4,10 @@
 // ÚNICA (RF-1): el carrusel es dueño de la `<section>` raíz con
 // `aria-roledescription="carousel"` — AboutPage NO lo envuelve en otra section
 // — nombrada por `labelledBy` (si se pasa) o `aria-label={labels.carousel}`
-// (una u otra, nunca ambas); un `<li role="group">` por testimonio con
+// (una u otra, nunca ambas); un `<div role="group">` por testimonio (Cambio de
+// accesibilidad opción A, decisión del usuario 2026-10-07: track y slides
+// pasan de `<ul>`/`<li>` a `<div>` — `li[role="group"]` violaba
+// `aria-allowed-role` de axe; el contrato observable no cambia) con
 // `aria-roledescription="slide"` y nombre "n of N" vía `format` de i18n con
 // `current` 1-based y `total = testimonials.length` (spec → Comportamiento
 // "Nombre del slide": NO de stops); `testimonials = []` → no renderiza nada
@@ -15,8 +18,9 @@
 // mantiene el dialog montado y alterna null ↔ valor, que es justo lo que su
 // effect de apertura por presencia soporta).
 // T3 (RF-3/RF-5): bullets por stops con `aria-current`. Los stops se miden
-// post-render (`measure`, effect de mount): `offsetLeft` de cada `<li>` hijo
-// directo del track y `maxScroll = scrollWidth − clientWidth`, pasada a
+// post-render (`measure`, effect de mount): `offsetLeft` de cada slide hijo
+// directo del track (`div` desde el Cambio de accesibilidad opción A; era `li`)
+// y `maxScroll = scrollWidth − clientWidth`, pasada a
 // `getScrollStops`/`getActiveStop` (T1). El layout medido vive en UN solo
 // state `{ slideOffsets, stops }`: la regla stop→n del nombre del bullet
 // necesita los offsets del MISMO render que sus stops (dos states alternarían
@@ -27,11 +31,12 @@
 // flag pending + `requestAnimationFrame`; en el callback el `scrollLeft` se
 // lee del NODO (el valor del frame, no el del último render) y los stops
 // vigentes de `layoutRef` (un re-measure entre el scroll y el frame no puede
-// usar un closure viejo). El cleanup cancela el frame pendiente. El
-// ResizeObserver del recálculo por resize (RF-3, sin test unitario: decisión
-// 21 → QA F5) se conecta en T5 junto con los estilos; la dep `testimonials`
-// del effect de medición ya re-mide si el set de slides cambia sin desmontar
-// (p. ej. al cambiar de idioma).
+// usar un closure viejo). El cleanup cancela el frame pendiente y desconecta
+// el `ResizeObserver` sobre el track (RF-3, decisión 21 → QA F5, sin test
+// unitario), cableado real en T5: al cambiar el tamaño del track re-mide los
+// stops vía `measure`; la dep `testimonials` del effect de medición también
+// re-mide si el set de slides cambia sin desmontar (p. ej. al cambiar de
+// idioma).
 // T4 (RF-4): el click de un bullet llama a `track.scrollTo` con el `left` de
 // ese stop y `behavior: "smooth"` solo si
 // `window.matchMedia("(prefers-reduced-motion: no-preference)").matches`,
@@ -42,10 +47,14 @@
 // del setup F1 (`matches=false` → "auto"; el caso "smooth" stub local del
 // test). Un `scrollTo` por click (ternaria de behavior, no dos llamadas) y
 // sin guard de bullet activo: RF-4 dice "un bullet" sin excepción, ir al stop
-// vigente es válido. T5 conecta: estilos por tokens (track/slide/pagination/
-// bullet, headroom, print) sobre ESTE DOM con clases (la estructura y los
-// roles NO cambian: criterio TestimonialCard T3), el cierre
-// `expectNoA11yViolations` e `index.ts`.
+// vigente es válido. T5 (RF-2/RF-7/RF-8 + Cambio de accesibilidad opción A):
+// track y slides pasan de `<ul>`/`<li>` a `<div>` con sus clases
+// (`.track`/`.slide`/`.pagination`/`.bullet` unidas al DOM; la estructura de
+// roles y nombres NO cambia: mismo contrato observable), el módulo declara la
+// tabla de estilos por tokens (grid+snap+headroom+scrollbar oculta, 2 columnas
+// ≥ md, bullet con ::after táctil, print apilado) y el effect conecta el
+// `ResizeObserver` de RF-3 sobre el track. Cierran la pieza el
+// `expectNoA11yViolations` (dos casos, Tests 12) e `index.ts`.
 // Decisiones 21 documentadas (spec → RF-2/RF-5): SIN flechas prev/next ni de
 // teclado (Tab entre los botones de las cards + scroll nativo/swipe), sin
 // autoplay, sin loop y sin región `aria-live` (el cambio de slide no se
@@ -137,7 +146,8 @@ export function TestimonialCarousel({
   const [layout, setLayout] = useState<CarouselLayout>(EMPTY_LAYOUT);
   const [activeStop, setActiveStop] = useState(0);
 
-  const trackRef = useRef<HTMLUListElement>(null);
+  // Track `div` (Cambio de accesibilidad opción A): `ref` HTMLDivElement.
+  const trackRef = useRef<HTMLDivElement>(null);
   // Ref sincronizado con el state de layout: el callback rAF lee los stops
   // VIGENTES en el frame; si una re-medición cae entre el scroll y el frame,
   // el closure del render que agendó quedaría obsoleto.
@@ -156,10 +166,11 @@ export function TestimonialCarousel({
       return;
     }
     // `slideOffsets` = `offsetLeft` de cada slide relativo al track (spec →
-    // Comportamiento): los hijos directos `<li>` (Anatomía; dentro de la
-    // card no hay `<li>` anidados).
+    // Comportamiento): los hijos directos `div` del track (Anatomía, Cambio de
+    // accesibilidad opción A; la paginación es HERMANA del track, no hija, y
+    // dentro de la card no hay `div` directo del track).
     const slideOffsets = Array.from(
-      track.querySelectorAll<HTMLElement>(":scope > li"),
+      track.querySelectorAll<HTMLElement>(":scope > div"),
     ).map((slide) => slide.offsetLeft);
     // `maxScroll` = scrollWidth − clientWidth del track (spec → Comportamiento).
     const maxScroll = track.scrollWidth - track.clientWidth;
@@ -174,15 +185,27 @@ export function TestimonialCarousel({
 
   // RF-3: recalcular los stops al montar. La dep `testimonials` re-mide si
   // cambia el set de slides sin desmontar la región (otro idioma): sin ella
-  // los offsets quedarían obsoletos. El ResizeObserver del recálculo por
-  // resize (RF-3, sin test unitario → QA F5, decisión 21) se conecta en T5.
-  // El cleanup cancela el frame de scroll pendiente (RF-5).
+  // los offsets quedarían obsoletos. El `ResizeObserver` sobre el track
+  // re-mide los stops cada vez que cambia el tamaño del track (RF-3, cableado
+  // real en T5; el recálculo por resize NO tiene test unitario — decisión 21:
+  // se elimina el test, no el comportamiento; su validación es QA F5; en
+  // jsdom lo sirve el mock no-op del setup F1). El cleanup desconecta el
+  // observer y cancela el frame de scroll pendiente (RF-5).
   useEffect(() => {
     if (testimonials.length === 0) {
       return;
     }
     measure();
+    // Protegido: sin track montado no hay nodo que observar (RF-1 vacío ya
+    // devolvió null antes del render; esto cubre el ref sin montar).
+    const track = trackRef.current;
+    let resizeObserver: ResizeObserver | null = null;
+    if (track !== null) {
+      resizeObserver = new ResizeObserver(measure);
+      resizeObserver.observe(track);
+    }
     return () => {
+      resizeObserver?.disconnect();
       const frameId = frameIdRef.current;
       if (frameId !== null) {
         cancelAnimationFrame(frameId);
@@ -272,23 +295,30 @@ export function TestimonialCarousel({
         ? { "aria-labelledby": labelledBy }
         : { "aria-label": labels.carousel })}
     >
-      {/* Track (Anatomía): <ul> con overflow-x + scroll-snap y cada slide
-          <li> `scroll-snap-align: start`; las clases `.track`/`.slide` y los
-          estilos de columnas/headroom/scrollbar oculta conectan en T5 (RF-2,
-          RF-7) — acá el DOM ya tiene la estructura definitiva. `onScroll` =
-          RF-5 con un cálculo por frame. Sin flechas prev/next ni navegación
-          por teclado (decisión 21; RF-2 → No hacer). */}
-      <ul ref={trackRef} onScroll={handleScroll}>
+      {/* Track (Anatomía, Cambio de accesibilidad opción A: `div`, no `<ul>`):
+          `styles.track` = overflow-x + scroll-snap + headroom `padding-block`
+          (RF-2, RF-7) y `position: relative` como offsetParent de la medición
+          (necesidad mecánica, ver módulo); cada slide `div` lleva
+          `styles.slide` con `scroll-snap-align: start`. `onScroll` = RF-5 con
+          un cálculo por frame. Sin flechas prev/next ni navegación por teclado
+          (decisión 21; RF-2 → No hacer). */}
+      <div
+        ref={trackRef}
+        className={styles.track}
+        onScroll={handleScroll}
+      >
         {testimonials.map((testimonial, index) => (
-          // Cada slide: role="group" + aria-roledescription="slide" + nombre
-          // "n of N" (spec → Comportamiento: `current` = índice 1-based,
-          // `total = testimonials.length`, no de stops). La card canaliza el
-          // contenido (C2: llega por props desde el padre de la pieza) y su
-          // botón estirado emite `onOpen(testimonial.id)` → setSelectedId
-          // (RF-6; `openLabel` = `readMore` interpolado con el author de ESTA
-          // card, spec → API).
-          <li
+          // Cada slide (`div` hijo directo del track): role="group" +
+          // aria-roledescription="slide" + nombre "n of N" (spec →
+          // Comportamiento: `current` = índice 1-based, `total =
+          // testimonials.length`, no de stops). La card canaliza el contenido
+          // (C2: llega por props desde el padre de la pieza) y su botón
+          // estirado emite `onOpen(testimonial.id)` → setSelectedId (RF-6;
+          // `openLabel` = `readMore` interpolado con el author de ESTA card,
+          // spec → API).
+          <div
             key={testimonial.id}
+            className={styles.slide}
             role="group"
             aria-roledescription="slide"
             aria-label={format(labels.slide, {
@@ -303,25 +333,26 @@ export function TestimonialCarousel({
               })}
               onOpen={setSelectedId}
             />
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       {showBullets && (
-        // RF-3/RF-5 (Anatomía): div de paginación con un <button type="button">
-        // por stop, en orden ascendente. Nombre: `goToSlide` interpolado con
-        // la regla stop→n (`bulletNumber`, decisión 21); `aria-current="true"`
-        // SOLO en el activo según `getActiveStop` (los demás, SIN atributo:
-        // `undefined`, no "false"). Las clases `.pagination`/`.bullet` y el
-        // área táctil `::after` conectan en T5 (criterio T2: DOM con roles y
-        // nombres, sin clases). `onClick` → `handleBulletClick(stop)` (T4,
+        // RF-3/RF-5 (Anatomía): `styles.pagination` con un <button
+        // type="button" class="bullet"> por stop, en orden ascendente. Nombre:
+        // `goToSlide` interpolado con la regla stop→n (`bulletNumber`,
+        // decisión 21); `aria-current="true"` SOLO en el activo según
+        // `getActiveStop` (los demás, SIN atributo: `undefined`, no "false").
+        // El área táctil 24×24 es el `::after` del módulo (conserva el
+        // `gap: 0.625rem` visual). `onClick` → `handleBulletClick(stop)` (T4,
         // RF-4): scrollTo al stop con behavior leído en el click.
-        <div>
+        <div className={styles.pagination}>
           {layout.stops.map((stop, index) => (
             <button
               // stops sin duplicados (tolerancia 1px garantizada por
               // `getScrollStops`, T1): el número del stop es clave única.
               key={stop}
               type="button"
+              className={styles.bullet}
               onClick={() => handleBulletClick(stop)}
               aria-label={format(labels.goToSlide, {
                 n: bulletNumber(stop, layout.slideOffsets),
