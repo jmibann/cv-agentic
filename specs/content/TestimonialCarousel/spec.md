@@ -1,5 +1,5 @@
 # TestimonialCarousel
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
