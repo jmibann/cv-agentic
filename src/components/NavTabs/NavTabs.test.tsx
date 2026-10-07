@@ -1,4 +1,4 @@
-// Tests de T1–T2 (specs/layout/NavTabs/tasks.md) — T1: RF-1, RF-2, RF-7: un tablist
+// Tests de T1–T3 (specs/layout/NavTabs/tasks.md) — T1: RF-1, RF-2, RF-7: un tablist
 // nombrado (`getByRole("tablist", { name: LABEL })`) con
 // `aria-orientation="horizontal"` y un `role="tab"` por item en el orden
 // recibido (RF-1), cada tab con `id = getTabId(item.id)` y `aria-controls` al
@@ -14,12 +14,12 @@
 // del `<button>` (spec → Comportamiento, plan → Decisiones): NavTabs no
 // re-gestiona el foco, no hay assert de foco en click (inspección).
 //
-// Diferidos por tasks.md: teclado ←/→ circular,
-// Home/End y Espacio (T3: RF-4), `NavTabs.module.css` + `index.ts` + cierre
+// Diferidos por tasks.md: `NavTabs.module.css` + `index.ts` + cierre
 // `expectNoA11yViolations` del archivo (T4: RF-5, RF-6) — criterio Separator
 // T1–T2 y CornerTab T1–T3, que agregaron el cierre en la última tarea. RF-6
 // (visible en todos los breakpoints, sin hamburguesa) no es verificable en
-// jsdom por tests: inspección del CSS y QA F5 (#101).
+// jsdom por tests: inspección del CSS y QA F5 (#101). Los escenarios de
+// teclado de T3 (RF-4) viven en su describe al final del archivo.
 //
 // extra (P3, con su motivo): el caso de `className` (G-B) — la API de la spec
 // lo exige ("Se une al raíz de la pieza — se transmite a la clase base de
@@ -226,6 +226,219 @@ describe("NavTabs click activation and active-tab guard (T2: RF-3)", () => {
 
     // RF-3 (SI): "click en el tab activo → no lo invoca" (spec → Comportamiento:
     // "Click en el tab ya activo: No llama onChange").
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
+// --- T3 · Teclado: ←/→ circular, Home/End, Espacio, single-item (RF-4) -------
+// spec → Tests esperados 6–9 y "Hecho cuando" de T3 (RF-4 post-Clarificación 6:
+// activación automática = mover foco + emitir `onChange`). Posicionamiento del
+// foco: `user.tab()` (roving de T1: el único tabulable es el activo; precedente
+// LanguageSwitcher T2) y `.focus()` DIRECTO cuando hay que posar el foco en un
+// INACTIVO sin pasar por su click (el click es RF-3, ya testeado en T2; acá
+// interesa la ruta teclado pura; jsdom permite focus() programático sobre
+// `tabindex="-1"`). Emisión con call-counts EXACTOS (precedente LS T2) y foco
+// con `toHaveFocus` (plan → Estrategia de tests).
+// Discrimen del Espacio sobre la simulación NATIVA: user-event v14 dispara el
+// click del `<button>` en el keyup de Espacio SOLO si el keydown NO fue
+// defaultPrevented (event/behavior/keyup.js + pressed.isUnprevented en
+// system/keyboard.js). Por eso el call-count de Espacio NACERÍA verde
+// (ruta nativa: 1 llamada en el inactivo; 0 en el activo por el guard de T2):
+// el discriminator honesto es `defaultPrevented === true` del keydown,
+// capturado con un listener DOM NATIVO en el tab (addEventListener por fuera
+// de React: se guarda el evento y se lee su `defaultPrevented` FINAL, tras
+// todos los handlers; la invariante del listener nativo es legítima porque lo
+// que se prueba es un efecto DOM de RF-4, no un detalle de implementación).
+// El call-count exacto 1 sigue asiértado: sin el preventDefault habría 2
+// llamadas (manual + click nativo de keyup) — doble activación, exactamente lo
+// que la decisión "Espacio" del plan evita.
+// Declarados #101 (VERDE on-arrival): (a) single-item: hoy no hay handler y
+// nace verde; su honestidad es el anclaje `toHaveFocus` EN EL PROPIO tab más el
+// guard no vacío de aria-selected; el discrimen real es la inspección del
+// reviewer: onKeyDown existe y el wrap `(i±1+n)%n` con n=1 enfoca el propio tab
+// sin emitir (destino===activo); (b) ↑/↓: nace verde por ausencia de handler y
+// debe seguir verde con T3 fiel (RF-4: "↑/↓ no mueven el foco"; la spec NO pide
+// preventDefault para ellas → no se inventa). Su valor fija los casos negativos
+// de RF-4 contra regresiones. Enter no se teste aparte: comparte el activation
+// behavior nativo del `<button>` con Espacio (precedente ThemeToggle T2; la
+// spec no lo lista como escenario separado).
+describe("NavTabs keyboard roving and Space activation (T3: RF-4)", () => {
+  it("wraps ArrowRight from the last focused tab to the first, focusing and emitting", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    // activeId="resume": el último tab es además el activo y el único
+    // tabulable — así `user.tab()` cumple el "Hecho cuando" de partida "con
+    // foco en el último" sin pasar por un click (RF-3 es de T2).
+    renderNavTabs({ activeId: "resume", onChange });
+
+    await user.tab();
+    expect(screen.getByRole("tab", { name: "Resume" })).toHaveFocus();
+
+    await user.keyboard("{ArrowRight}");
+
+    // RF-4: vuelta circular al primero + foco + emisión de su `onChange`
+    // (activación automática; About es inactivo → guard destino≠activo).
+    expect(screen.getByRole("tab", { name: "About" })).toHaveFocus();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("about");
+  });
+
+  it("wraps ArrowLeft from the first focused tab to the last, focusing and emitting", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    // activeId="about" (default): foco inicial en el primero (tabulable por
+    // roving), ArrowLeft → último (Resume, inactivo).
+    renderNavTabs({ onChange });
+
+    await user.tab();
+    expect(screen.getByRole("tab", { name: "About" })).toHaveFocus();
+
+    await user.keyboard("{ArrowLeft}");
+
+    // spec → Tests 7 / RF-4: desde el primero va al último con vuelta.
+    expect(screen.getByRole("tab", { name: "Resume" })).toHaveFocus();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("resume");
+  });
+
+  it("Home from the focused last tab moves focus to the first and emits its onChange", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderNavTabs({ activeId: "resume", onChange });
+
+    await user.tab();
+    expect(screen.getByRole("tab", { name: "Resume" })).toHaveFocus();
+
+    await user.keyboard("{Home}");
+
+    // spec → Tests 8 / "Hecho cuando" de T3: Home enfoca y emite el primero.
+    expect(screen.getByRole("tab", { name: "About" })).toHaveFocus();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("about");
+  });
+
+  it("End from the focused first tab moves focus to the last and emits its onChange", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderNavTabs({ onChange });
+
+    await user.tab();
+    expect(screen.getByRole("tab", { name: "About" })).toHaveFocus();
+
+    await user.keyboard("{End}");
+
+    // spec → Tests 8 / "Hecho cuando" de T3: End enfoca y emite el último.
+    // Render independiente del de Home: como la pieza es CONTROLADA,
+    // encadenar Home+End en el mismo render dejaría `activeId` en "resume" y
+    // el End golpearía el guard destino===activo (no emitiría) — cada RF-4
+    // emisión se mide fresca.
+    expect(screen.getByRole("tab", { name: "Resume" })).toHaveFocus();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("resume");
+  });
+
+  // #101 VERDE on-arrival (motivo en el bloque de encabezado de T3).
+  it("keeps focus on the only tab and emits nothing when arrows are pressed with a single item", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderNavTabs({ items: [{ id: "about", label: "About" }], onChange });
+
+    await user.tab();
+    const onlyTab = screen.getByRole("tab", { name: "About" });
+    // Guard "no vacío": el único item es el activo (el wrap destino≠activo es
+    // lo que corta la emisión, no un activeId cualquiera).
+    expect(onlyTab).toHaveAttribute("aria-selected", "true");
+    expect(onlyTab).toHaveFocus();
+
+    // spec → Tests 9 / RF-4 SI-clause: "SI el tab resultante es el mismo (un
+    // solo item), ENTONCES no emite onChange" — y "Hecho cuando": las flechas
+    // enfocan el propio tab (no fallan).
+    await user.keyboard("{ArrowRight}");
+    expect(onlyTab).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(onlyTab).toHaveFocus();
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it("prevents the default on Space over a focused inactive tab and emits exactly once", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderNavTabs({ onChange }); // activo About; Resume inactivo
+
+    const inactiveTab = screen.getByRole("tab", { name: "Resume" });
+    // Foco directo en el INACTIVO: la ruta teclado pura sin click (el click ya
+    // cubre RF-3 en T2); jsdom permite focus() programático sobre tabindex="-1".
+    inactiveTab.focus();
+    expect(inactiveTab).toHaveFocus();
+
+    // Spy del evento NATIVO (encabezado T3): se guarda el keydown y se lee su
+    // `defaultPrevented` final, después de todos los handlers.
+    const keydownEvents: KeyboardEvent[] = [];
+    inactiveTab.addEventListener("keydown", (event) => {
+      keydownEvents.push(event);
+    });
+
+    await user.keyboard(" ");
+
+    // RF-4 / plan → Decisiones "Espacio": preventDefault en keydown (no scrollea
+    // la página) cancela el click nativo de keyup y la activación es MANUAL por
+    // el mismo camino del click → UNA sola emisión (sin preventDefault serían
+    // 2: manual + nativa — doble activación prohibida por "Hecho cuando").
+    expect(keydownEvents).toHaveLength(1);
+    expect(keydownEvents[0]?.defaultPrevented).toBe(true);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith("resume");
+    expect(inactiveTab).toHaveFocus(); // Espacio no mueve el foco
+  });
+
+  it("prevents the default on Space over the already-active tab without emitting", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderNavTabs({ onChange });
+
+    const activeTab = screen.getByRole("tab", { name: "About" });
+    // Guard "no vacío" (precedente LS T2): first se fija que es el ACTIVO.
+    expect(activeTab).toHaveAttribute("aria-selected", "true");
+    await user.tab();
+    expect(activeTab).toHaveFocus();
+
+    const keydownEvents: KeyboardEvent[] = [];
+    activeTab.addEventListener("keydown", (event) => {
+      keydownEvents.push(event);
+    });
+
+    await user.keyboard(" ");
+
+    // RF-4: Espacio SIEMPRE hace preventDefault; la activación va por el mismo
+    // camino que el click y el guard del activo (RF-3, compartido) → 0 emisiones.
+    // Nacería verde SOLO con el count (hoy: click simulado de keyup + guard → 0);
+    // el assert de `defaultPrevented` es el discriminator rojo-on-arrival (hoy
+    // no hay handler: false).
+    expect(keydownEvents).toHaveLength(1);
+    expect(keydownEvents[0]?.defaultPrevented).toBe(true);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(activeTab).toHaveFocus();
+  });
+
+  // #101 VERDE on-arrival (motivo en el bloque de encabezado de T3).
+  it("leaves ArrowUp and ArrowDown without effect on a focused tab (horizontal tablist)", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderNavTabs({ activeId: "resume", onChange });
+
+    await user.tab();
+    const focusedTab = screen.getByRole("tab", { name: "Resume" });
+    expect(focusedTab).toHaveFocus();
+
+    // RF-4: "↑/↓ no mueven el foco (tablist horizontal)" y "las demás teclas
+    // quedan al comportamiento nativo sin efecto adicional" → no se
+    // preventDeFEaultean (no se inventa más; plan → Decisiones: ↑/↓ ignoradas).
+    await user.keyboard("{ArrowUp}");
+    expect(focusedTab).toHaveFocus();
+    expect(onChange).not.toHaveBeenCalled();
+
+    await user.keyboard("{ArrowDown}");
+    expect(focusedTab).toHaveFocus();
     expect(onChange).not.toHaveBeenCalled();
   });
 });
