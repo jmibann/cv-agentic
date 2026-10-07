@@ -40,9 +40,9 @@
 // `aria-roledescription` no cambia el rol, solo su descripción; slides por
 // `getByRole("group", { name: "1 of 3" })` con el nombre LITERAL (el test no
 // recalcula `format`: no ser tautológico sobre la implementación; la
-// interpolación ya está testeada en i18n); la estructura `<ul>`/`<li>` por
-// inspección DOM (Anatomía, sin clases hasta T5, criterio TestimonialDialog
-// T1); dialog por `getByRole("dialog", { name: author })` y su desaparición
+// interpolación ya está testeada en i18n); la estructura track/slide (`div`
+// con `role="group"`, Cambio de accesibilidad opción A) por inspección DOM
+// (Anatomía, sin clases hasta T5, criterio TestimonialDialog T1); dialog por `getByRole("dialog", { name: author })` y su desaparición
 // además por `container.querySelector("dialog")` null: con un estado `null`
 // mal vuelto, el nodo podría quedar montado CERRADO y `queryByRole` daría null
 // igual (jsdom aplica el `display: none` UA del dialog cerrado) — el assert
@@ -68,6 +68,8 @@ import { afterEach, vi } from "vitest";
 
 import type { Testimonial } from "@data/cv.types.generated";
 
+import { expectNoA11yViolations } from "../../test/a11y";
+
 import { HexAvatarDefs } from "../HexAvatar";
 import { AccentGradientDefs } from "../Icon";
 
@@ -76,6 +78,11 @@ import type {
   TestimonialCarouselLabels,
   TestimonialCarouselProps,
 } from "./TestimonialCarousel";
+
+// Clase base propia del raíz (la unión G-B la conecta el componente desde T2;
+// el nombre real resuelto se fija importando el propio módulo — #99, precedente
+// TestimonialCard.test / SkillList.test; prohibidos `!` y `as`).
+import styles from "./TestimonialCarousel.module.css";
 
 // --- Fixtures -----------------------------------------------------------------
 // `Testimonial` del esquema (D4: personas ficticias, espejo de la forma de
@@ -180,14 +187,19 @@ describe("TestimonialCarousel slide groups one-based n of total (T2: RF-1, Tests
       expect(group).toHaveAttribute("aria-roledescription", "slide");
     }
 
-    // Anatomía (spec → Anatomía): <section> > <ul> track > <li role="group">
-    // por slide, en orden del array — orden y estructura por inspección DOM
-    // (las clases `.track`/`.slide` conectan en T5; acá el DOM nace sin ellas).
-    expect(groupA.tagName).toBe("LI");
-    expect(groupB.tagName).toBe("LI");
-    expect(groupC.tagName).toBe("LI");
+    // Anatomía (spec → Anatomía, Cambio de accesibilidad opción A del usuario
+    // 2026-10-07): <section> > <div class="track"> > <div role="group"> por
+    // slide, en orden del array — orden y estructura por inspección DOM (el
+    // contrato observable es idéntico: un `group` con nombre "n of N" por
+    // testimonio; SOLO cambia el tag de los slides UL/LI → div, decisión del
+    // usuario; las clases `.track`/`.slide` conectan en T5). Rojo on-arrival
+    // #101: con el `.tsx` aún en ul/li estos tagName dan "LI"/"UL"; el feat
+    // del Cambio A los vuelve "DIV".
+    expect(groupA.tagName).toBe("DIV");
+    expect(groupB.tagName).toBe("DIV");
+    expect(groupC.tagName).toBe("DIV");
     const track = groupA.parentElement;
-    expect(track?.tagName).toBe("UL");
+    expect(track?.tagName).toBe("DIV");
     expect(track?.children).toHaveLength(3);
     expect(track?.parentElement).toBe(
       screen.getByRole("region", { name: LABELS.carousel }),
@@ -350,7 +362,8 @@ describe("TestimonialCarousel wires the single dialog through card open and clos
 // cards, que no coinciden). `aria-current` por atributo literal "true" (RF-5
 // lo fija con ese valor); ausencia = not.toHaveAttribute (la implementación
 // pasa `undefined`, no "false"). La estructura (div paginación hermano
-// del <ul> track dentro de la región única) por inspección DOM —Anatomía—,
+// del track (`div` desde el Cambio A) dentro de la región única) por
+// inspección DOM —Anatomía—,
 // sin clases de módulo hasta T5 (criterio T2). Sin `data-testid`: la API
 // expone roles y nombres.
 // ============================================================================
@@ -419,16 +432,20 @@ describe("TestimonialCarousel renders one bullet per reachable stop with the fir
     expect(bullet1).toHaveAttribute("aria-current", "true");
     expect(bullet2).not.toHaveAttribute("aria-current");
 
-    // Anatomía (spec → Anatomía): div de paginación con exactamente los 2
-    // botones en orden, hermano del <ul> track y dentro de la región única
-    // (sin clases de módulo hasta T5: inspección DOM, criterio T2).
+    // Anatomía (spec → Anatomía, Cambio de accesibilidad opción A): div de
+    // paginación con exactamente los 2 botones en orden, hermano del track
+    // (ahora `div`, no `ul`) y dentro de la región única (sin clases de módulo
+    // hasta T5: inspección DOM, criterio T2). El track pasa a `div` por el
+    // Cambio; el contrato (paginación hermana del track, ambos hijos de la
+    // región) no cambia. Rojo on-arrival #101: el previousElementSibling aún
+    // "UL" en el `.tsx` vigente.
     const pagination = bullet1.parentElement;
     expect(pagination?.tagName).toBe("DIV");
     expect(pagination?.children).toHaveLength(2);
     expect(pagination?.children.item(1)).toBe(bullet2);
     const region = screen.getByRole("region", { name: LABELS.carousel });
     expect(pagination?.parentElement).toBe(region);
-    expect(pagination?.previousElementSibling?.tagName).toBe("UL");
+    expect(pagination?.previousElementSibling?.tagName).toBe("DIV");
 
     // Los bullets no reemplazan slides: la región sigue con sus 3 groups.
     expect(screen.getAllByRole("group")).toHaveLength(3);
@@ -442,10 +459,14 @@ describe("TestimonialCarousel moves aria-current to the bullet of the active sto
     mockCarouselLayout([0, 300, 600], 900, 600);
     render(carousel());
 
-    const region = screen.getByRole("region", { name: LABELS.carousel });
-    const track = region.querySelector("ul");
+    // Track = padre de los slides (el Cambio A lo pasa de <ul> a <div>; se
+    // toma por su relación con el group, no por tag ni clase, para que el test
+    // sea estable en ambos modelos y solo el assert de tag discriminate).
+    const track = screen
+      .getByRole("group", { name: "1 of 3" })
+      .parentElement;
     if (track === null) {
-      throw new Error("T3: la región del carrusel no contiene el <ul> track");
+      throw new Error("T3: el slide no tiene track padre en el DOM");
     }
 
     // Scroll real post-mount: `scrollLeft` se fija POR INSTANCIA
@@ -531,7 +552,8 @@ describe("TestimonialCarousel renders no bullets when there is one stop or fewer
 // behavior correcto) es exactamente el alcance de T4.
 //
 // `scrollTo` se mockea POR INSTANCIA post-render (`Object.defineProperty` en
-// el <ul> track, configurable: true): el handler lo lee VIVO del nodo vía
+// el track — `div` desde el Cambio A, obtenido como padre del group "1 of 3";
+// configurable: true): el handler lo lee VIVO del nodo vía
 // trackRef (mismo criterio del `scrollLeft` en T3 — la instancia mockeada es la
 // que el handler usa, no hace falta rerender). Alternativa descartada: espiar
 // `Element.prototype.scrollTo` — funcionaría, pero observaría TODOS los
@@ -550,7 +572,7 @@ describe("TestimonialCarousel renders no bullets when there is one stop or fewer
 //
 // Justificación de queries (constitución T3): bullets por rol `button` +
 // nombre accesible LITERAL ("Go to slide 1"/"Go to slide 2", criterio T3); el
-// track por inspección DOM de la región (`region.querySelector("ul")`,
+// track como `parentElement` del group "1 of 3" (Cambio A: track `div`,
 // criterio T3 scroll — sin clases de módulo hasta T5). Click con userEvent
 // (real, y no invoca `scrollTo` por su cuenta: la única llamada sale del
 // handler). `aria-current="true"` del bullet 1 se re-verifica en el caso 3 como
@@ -560,16 +582,18 @@ describe("TestimonialCarousel renders no bullets when there is one stop or fewer
 describe("TestimonialCarousel bullet click scrolls the track to its stop with behavior read at click time (T4: RF-4, Tests 8)", () => {
   // Fixture compartido: layout medido con 2 stops ([0,300,600]/maxScroll 300,
   // el mismo de T3) + spy de `scrollTo` fijado en la INSTANCIA del track
-  // post-render. Devuelve el spy (el <ul> se re-encuentra por DOM si hace
-  // falta); el stub de matchMedia se aplica en el propio caso, no acá.
+  // post-render. El track se toma como padre del group "1 of 3" (Cambio A:
+  // pasa de <ul> a <div>; criterio T3 — por relación con el slide, no por tag).
+  // El stub de matchMedia se aplica en el propio caso, no acá.
   const renderWithTrackScrollSpy = () => {
     mockCarouselLayout([0, 300, 600], 900, 600);
     render(carousel());
 
-    const region = screen.getByRole("region", { name: LABELS.carousel });
-    const track = region.querySelector("ul");
+    const track = screen
+      .getByRole("group", { name: "1 of 3" })
+      .parentElement;
     if (track === null) {
-      throw new Error("T4: la región del carrusel no contiene el <ul> track");
+      throw new Error("T4: el slide no tiene track padre en el DOM");
     }
     const scrollTo = vi.fn();
     Object.defineProperty(track, "scrollTo", {
@@ -628,5 +652,136 @@ describe("TestimonialCarousel bullet click scrolls the track to its stop with be
     // setup). Exactamente UNA llamada: ni cero (guard inventado) ni dos.
     expect(scrollTo).toHaveBeenCalledTimes(1);
     expect(scrollTo).toHaveBeenCalledWith({ left: 0, behavior: "auto" });
+  });
+});
+
+// ============================================================================
+// T5 — Cambio de accesibilidad opción A (modelo div) + estilos + RO + cierre
+// (spec → Anatomía nota del Cambio, plan → Decisiones "Modelo DOM de slides",
+// tasks.md T5 a/b/c/d; decisión del usuario 2026-10-07). Alcance del commit
+// `test(TestimonialCarousel): T5`:
+//   1. Updates estructurales de T2/T3: asserts de tag `UL`/`LI` → `div` con
+//      `role="group"` (mismo contrato observable: "un `group` por testimonio
+//      n of N"; NO cambia el sentido de ningún assert, solo el tag/nodo —
+//      decisión explícita del usuario, documentada en spec → Anatomía; NO es
+//      debilitar). Más el extra-test de unión `className` (G-B, punto 3) y el
+//      cierre axe (punto 4).
+//   2. El `querySelector("ul")` de los tracks de T3/T4 pasa a `parentElement`
+//      del group (mecánica para localizar el track sin depender del tag); los
+//      asserts de comportamiento (scroll → aria-current; scrollTo) quedan
+//      idénticos.
+//   3. extra-test unión G-B de `className` en el `<section>` raíz (pendiente
+//      registrado en la fila T2 de tasks.md: "menor→T5: sumar el test
+//      `// extra:` de la unión `className` G-B", reiterado en el OBLIGATORIO
+//      de T4; sin contrapartida en "Tests esperados" → marcado `// extra:`
+//      con su motivo, criterio exacto TestimonialCard.test T1; P3).
+//   4. Cierre `expectNoA11yViolations` DOS casos (Tests 12, "cerrado y con el
+//      dialog abierto"): el caso CERRADO es LA PRUEBA del Cambio — con el
+//      modelo div debe dar cero violaciones con axe SIN filtros (no se toca
+//      `src/test/a11y.ts` ni se desactiva regla alguna; la contradicción
+//      original era `aria-allowed-role` + `list` sobre `li[role=group]`).
+//      Armazón de layout de T3 (`mockCarouselLayout` [0,300,600]/900/600 →
+//      paginación dibujada: la auditoría recorre la anatomía COMPLETA: defs +
+//      región + 3 slides group + 2 bullets). El caso abierto: click al botón
+//      estirado de la card B (criterio T2 caso 5) → dialog real de
+//      TestimonialDialog (mock F1 de `showModal` = atributo `open`). Anclajes
+//      (criterio ServiceCard/TestimonialCard T3): sin fijar QUÉ se audita el
+//      cierre no distingue la rama recorrida.
+//
+// Rojo on-arrival (decisión #101, DECLARADO con la salida en este commit
+// `test`): FALLA por la razón correcta — el `.tsx` aún renderiza el modelo
+// viejo `ul`/`li` (el DOM es del `feat`):
+//   · "renders one slide group..." → `expected 'LI' to be 'DIV'`
+//   · "renders two bullets named..." → `expected 'UL' to be 'DIV'`
+//   · el cierre CERRADO → axe `aria-allowed-role` (3× li[role=group]) +
+//     `list` (ul): eso es exactamente lo que el Cambio A elimina.
+// Y ya están VERDES (no discriminan el estado de T5; regresión futura):
+// unión G-B (conectada desde T2, `styles.carousel` ya existe como base vacía),
+// cierre con dialog abierto (axe audita el dialog modal y excluye el fondo),
+// T3 scroll y T4 scrollTo (la nueva mecánica padre-del-group encuentra el
+// track en ambos modelos). T1 y T4 intactos en contenido.
+// ============================================================================
+
+// extra: unión G-B de `className` en el `<section>` raíz — pendiente registrado
+// en la fila T2 de tasks.md ("menor→T5: sumar el test `// extra:` de la unión
+// `className` G-B en el próximo commit `test` de la pieza", reiterado en el
+// OBLIGATORIO de la fila T4): la spec → API la fija pero "Tests esperados" no
+// le asigna contrapartida (criterio exacto del describe extra de
+// TestimonialCard.test T1; P3: marcado como extra con su motivo).
+describe("TestimonialCarousel className forwarding on the carousel section (T5: spec → API, G-B)", () => {
+  it("joins an external className on the root section alongside the .carousel base", () => {
+    const consumerClass = "about-testimonials-carousel";
+    const carouselClass = styles.carousel ?? "carousel";
+
+    render(carousel({ className: consumerClass }));
+
+    // Coexistencia (G-B): la base del módulo y la clase externa conviven en
+    // el único <section> región — ni reemplazo ni clase vacía residual
+    // (criterio TestimonialCard T1; la unión la construye `rootClassName`
+    // desde T2, base primero).
+    const region = screen.getByRole("region", { name: LABELS.carousel });
+    expect(region).toHaveClass(carouselClass);
+    expect(region).toHaveClass(consumerClass);
+  });
+});
+
+// ============================================================================
+// CIERRE de accesibilidad (T5; constitución T4, Tests esperados 12; ÚLTIMA
+// entrada del archivo; "Hecho cuando" (c): "el archivo termina con
+// expectNoA11yViolations... debe quedar en verde con axe sin filtros"). Es la
+// verificación ejecutable del Cambio de accesibilidad opción A: con el modelo
+// div de track/slides las dos violaciones del modelo ul/li
+// (`aria-allowed-role`, `list`) desaparecen SIN tocar el helper del kit.
+// Verde on-arrival esperado SOLO tras el `feat` (declaración arriba).
+// ============================================================================
+describe("TestimonialCarousel accessibility audit closed and with the dialog open (T5: cierre, Tests esperados 12)", () => {
+  it("has no accessibility violations with the full closed carousel", async () => {
+    mockCarouselLayout([0, 300, 600], 900, 600);
+    const { container } = render(carousel());
+
+    // Anclaje del caso "cerrado": anatomía COMPLETA auditada — región
+    // carousel nombrada, 3 slides `group` "n of N", 2 bullets con el primero
+    // activo y SIN <dialog> en el DOM (RF-6 inicial), con las defs de los
+    // armazones montadas (contrato HexAvatar/Icon tone="gradient" de las
+    // cards; criterio ServiceCard/TestimonialCard: sin anclaje el cierre no
+    // distingue la rama).
+    const region = screen.getByRole("region", { name: LABELS.carousel });
+    expect(region).toHaveAttribute("aria-roledescription", "carousel");
+    expect(screen.getAllByRole("group")).toHaveLength(3);
+    expect(
+      screen.getAllByRole("button", { name: /Go to slide/ }),
+    ).toHaveLength(2);
+    expect(
+      screen.getByRole("button", { name: "Go to slide 1" }),
+    ).toHaveAttribute("aria-current", "true");
+    expect(container.querySelector("dialog")).toBeNull();
+    expect(container.querySelector("clipPath#hex-avatar-outer")).not.toBeNull();
+    expect(container.querySelector("linearGradient")).toHaveAttribute(
+      "id",
+      "accent-gradient",
+    );
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with the dialog open", async () => {
+    const user = userEvent.setup();
+    mockCarouselLayout([0, 300, 600], 900, 600);
+    const { container } = render(carousel());
+
+    // Rama "con el dialog abierto" (Tests 12): click al botón estirado de la
+    // card B (criterio T2 caso 5) → dialog REAL de TestimonialDialog abierto
+    // dentro de la región (mock F1 de showModal: atributo `open`). El anclaje
+    // fija el estado auditado.
+    await user.click(
+      screen.getByRole("button", {
+        name: "Read full testimonial from Grace Hopper",
+      }),
+    );
+
+    const dialog = screen.getByRole("dialog", { name: TESTIMONIAL_B.author });
+    expect(dialog).toHaveAttribute("open");
+
+    await expectNoA11yViolations(container);
   });
 });
