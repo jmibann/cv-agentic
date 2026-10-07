@@ -1,0 +1,21 @@
+/* TestimonialCard.module.css — ajustes de la card sobre el Box inner
+   (specs/content/TestimonialCard/spec.md → "Estilos y tokens"). T1: el módulo
+   nace SOLO con `.card` declarada (vacía) para fijar la unión del raíz
+   (G-B: `[styles.card, className]` antes de llegar al Box); ninguna otra
+   clase existe todavía.
+
+   T3 declara acá (RF-2, RF-5, RF-6, todo por tokens):
+   - `.card`: position relative, flex column, --radius-16,
+     --testimonial-padding, height 100%, sin margin-top; hover con
+     --shadow-control y transición box-shadow --duration-base --ease-standard.
+   - `.header` (grid auto 1fr), `.identity`, `.name`, `.role`, `.avatar`
+     (margin-top calc(--testimonial-avatar-offset * -1)), `.excerpt` (clamp 4
+     líneas) y `.quote` (--icon-size: 2rem, absolute con
+     --testimonial-quote-inset-*).
+   - `@media print` propio (RF-2) y CERO @media de breakpoints (RF-6). */
+
+/* Unión del raíz con la variante `inner` del Box (las propiedades de la
+   card se conectan en T3; el selector debe existir para que la unión
+   resuelva una clase real). */
+.card {
+}
