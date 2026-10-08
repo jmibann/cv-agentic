@@ -95,6 +95,28 @@
   clip-path: none;
 }
 
+/* Anillo de foco estándar en el skip link enfocado (Cambio F5, hallazgo D2
+   de docs/qa-report.md; decisión #104c; tarea T8). La QA con la app servida
+   midió que el reveal NO fijaba outline propio — se veía el anillo de la UA
+   (`outline: auto` azul), que no es el del kit (regla dura 7 de
+   docs/DESIGN.md). La regla aplica el anillo LITERAL de la regla 7 con los
+   tokens REALES de tokens.css (líneas 112 --color-focus-ring, 240
+   --focus-ring-width, 241 --focus-ring-offset), igual que el tabpanel
+   (.panel:focus-visible, más abajo): un solo anillo en todo el sitio.
+   `:focus-visible` (literal de tasks.md T8 y regla dura 7; el renglón
+   #104(c) del README dice ":focus" como resumen suelto — gana la tarea
+   aprobada): el ANILLO es solo teclado, y el REVEAL queda intacto en
+   `:focus` (regla de arriba) — cualquier foco (Tab, Enter, programático del
+   handler RF-4) muestra el link arriba-izquierda; solo el teclado le suma
+   el anillo. Cero otros cambios visuales (Hecho cuando T8). Sin test jsdom
+   (#101: los estilos computados y el estado :focus-visible no son
+   observables); la efectividad se confirma por inspección del reviewer y
+   en la re-pasada F5 con la app servida (#91). */
+.skipLink:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
 /* main como item de la columna (base) y de la grilla 3/9 (≥ xl):
    `min-width: 0` es la cota mínima del ITEM (la de la pista ya la pone el
    `minmax(0, 9fr)` de foundations) — sin esto, un descendiente ancho (p. ej.
