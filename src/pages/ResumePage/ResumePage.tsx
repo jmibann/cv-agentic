@@ -11,23 +11,32 @@
 // `useLocale().t` (RF-5): la página no importa contenido, no hardcodea textos
 // (C2/C3) y NO ordena las entradas (el orden es el de los datos; el test 2
 // refuerza el orden observablemente).
-// Diferidos a sus tareas: skills (`<section aria-labelledby>` + `SkillList`,
-// RF-4, T3), módulo CSS con la tabla "Estilos y tokens" (`.page`/`.columns`),
-// unión de `className` al raíz y cierre `expectNoA11yViolations` (T4) — por
-// eso hoy las clases `page`/`columns` son literales del markup, sin módulo
-// todavía ("Hecho cuando" de T1; los asserts de clases con el canon #99 llegan
-// con T4, precedente AboutPage). `index.ts` también llega en T4 (criterio
-// AboutPage).
+// Diferidos a sus tareas: módulo CSS con la tabla "Estilos y tokens"
+// (`.page`/`.columns`), unión de `className` al raíz y cierre
+// `expectNoA11yViolations` (T4) — por eso hoy las clases `page`/`columns` son
+// literales del markup, sin módulo todavía ("Hecho cuando" de T1; los asserts
+// de clases con el canon #99 llegan con T4, precedente AboutPage). `index.ts`
+// también llega en T4 (criterio AboutPage).
 // T2 hecha: el bloque `.columns` se monta solo si AL MENOS UNA de las dos
 // colecciones tiene entradas (RF-2: "SI ambos están vacíos, no renderiza
 // .columns"; los guards por columna de T1 siguen, cada sección no aparece con
 // su conjunto vacío). `presentLabel` ya viajaba desde T1 (RF-7) y su test 4
 // con mock lo fija.
+// T3 hecha: sección de skills (RF-4) — `<section aria-labelledby=
+// "resume-skills-title">` con su `SectionTitle as="h2"` con ese id y
+// `SkillList skills={cv.skills} labelledBy="resume-skills-title"` (la API de
+// SkillList exige nombre: `labelledBy` al h2 visible, spec → Anatomía),
+// montada SOLO si `cv.skills` no está vacío ("SI está vacío, ENTONCES no la
+// renderiza"; no alcanza con el null interno de SkillList: sin el guard la
+// región nombrada quedaría vacía). Es hija directa del raíz, DESPUÉS de
+// .columns (spec → Responsive), como `<section>` — no `<div>` —, por eso el
+// assert 5b de T2 (raíz sin `<div>` hijo) sigue siendo válido.
 
 import type { ReactNode } from "react";
 
 import { ResumeSection } from "../../components/ResumeSection";
 import { SectionTitle } from "../../components/SectionTitle";
+import { SkillList } from "../../components/SkillList";
 import { useCv, useLocale } from "../../providers/LocaleProvider";
 
 // API (spec → API): `className` se une a la clase `.page` del raíz (G-B). Se
@@ -83,6 +92,24 @@ export function ResumePage(): ReactNode {
             />
           ) : null}
         </div>
+      ) : null}
+
+      {/* T3 · RF-4: skills — <section aria-labelledby> + SectionTitle as="h2"
+          con ese id (Anatomía literal) + SkillList con `labelledBy` al mismo
+          id (su API exige nombre accesible). Guard por colección: con
+          cv.skills vacío no se monta NI la región ni el h2 (la región
+          nombraría igual por su labelledby aunque SkillList devolviera null).
+          RF-5: las skills viajan en el orden de los datos (el map sin sort es
+          de SkillList, RF-1 suya). RF-4 de SkillList (superficie): la lista
+          va directa sobre la superficie del panel, nunca dentro de un Box
+          inner — la página la cuelga del raíz, cumplido. */}
+      {cv.skills.length > 0 ? (
+        <section aria-labelledby="resume-skills-title">
+          <SectionTitle as="h2" id="resume-skills-title">
+            {t.resume.skills}
+          </SectionTitle>
+          <SkillList skills={cv.skills} labelledBy="resume-skills-title" />
+        </section>
       ) : null}
     </div>
   );
