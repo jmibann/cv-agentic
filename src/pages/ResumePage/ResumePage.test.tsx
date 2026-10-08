@@ -276,7 +276,13 @@ describe("ResumePage in Spanish locale (T1: Tests 7, real LocaleProvider seeded 
 // ===========================================================================
 
 interface ResumeCvHarness {
-  scenario: "real" | "presentNull" | "educationEmpty" | "columnsEmpty";
+  scenario:
+    | "real"
+    | "presentNull"
+    | "educationEmpty"
+    | "columnsEmpty"
+    // T3 (test 6): mismo mecanismo para vaciar `skills`.
+    | "skillsEmpty";
 }
 
 const cvHarness = vi.hoisted((): ResumeCvHarness => ({
@@ -309,6 +315,9 @@ vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
       }
       if (cvHarness.scenario === "columnsEmpty") {
         return { ...cv, education: [], experience: [] };
+      }
+      if (cvHarness.scenario === "skillsEmpty") {
+        return { ...cv, skills: [] };
       }
       return cv;
     },
@@ -436,7 +445,7 @@ describe("ResumePage with education and experience both empty (T2: RF-2, Tests 5
     // markup generado: el raíz NO tiene ningún `<div>` hijo directo (no
     // asértamos "el h1 es el único hijo" porque la sección de skills de T3
     // cuelga del raíz como `<section>` y un assert de hijos totales sería
-    // inválido al llegar T3 — patrón T2b/T3b evitado).
+    // inválido mañana — patrón T2b/T3b evitado a propósito).
     const h1 = screen.getByRole("heading", { level: 1, name: RESUME_TITLE });
     const pageRoot = h1.parentElement;
     if (pageRoot === null) {
@@ -445,6 +454,133 @@ describe("ResumePage with education and experience both empty (T2: RF-2, Tests 5
     expect(pageRoot.querySelectorAll(":scope > div")).toHaveLength(0);
 
     // El `h1` sigue presente y único.
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+});
+
+// ===========================================================================
+// Tests de T3 (specs/pages/ResumePage/tasks.md) — RF-4: test 3 de la spec (la
+// `<section aria-labelledby="resume-skills-title">` de skills es región
+// nombrada por su `h2` (SectionTitle con ese id, Anatomía literal) y contiene
+// el `SkillList` — un `list` nombrado vía `labelledBy` con un `listitem` por
+// skill, en el orden de los datos (RF-5 de la página: sin ordenar)—) y test 6
+// (con `skills: []` por mock la región no existe). El mock usa el HARNESS ya
+// existente del archivo (escenario nuevo `skillsEmpty` = `{ ...cv real,
+// skills: [] }`; reset en el outer `beforeEach`).
+// Criterias de jsdom/RTL: el `<ul>` de SkillList expone el rol implícito
+// `list` sin necesidad de `role` explícito (a diferencia de Timeline, que fija
+// `role="list"` por el quirk de `list-style: none` — decisión 13 de esa pieza,
+// consumidor: queries por rol canónicas); los chips son `Badge as="li"` →
+// `listitem`. El `labelledBy` de SkillList queda asertado en el extremo de la
+// LISTA (además del `<section>` y del `h2`): tres nodos apuntan al mismo id
+// (Anatomía).
+// Convive con el assert 5b de T2: la región de skills es `<section>` (no
+// `<div>`) hija del raíz, así que "raíz sin <div> hijo directo" sigue siendo
+// discriminatorio de `.columns` y se verifica al correr el suite completo.
+// Verde on-arrival declarado en el cuerpo del commit (#101): el TEST 6 — antes
+// del feat la página no renderiza skills, así que la ausencia ya se cumple;
+// su discrimen es FUTURO: protege la rama RF-4 ("SI está vacío, ENTONCES no la
+// renderiza") contra montar el `<section>`+`h2` con la colección vacía (el
+// SkillList devolvería null pero la región nombrada existiría y este test la
+// cazaría). El ROJO del commit lo pone el test 3 (la región no existe todavía).
+// ===========================================================================
+
+// Esperados desde las FUENTES del kit (C3): el título de `uiEn.resume.skills`
+// y las skills del mismo `cvByLocale.en` que sirve el provider.
+const SKILLS_TITLE = uiEn.resume.skills;
+const SKILLS = cvByLocale.en.skills;
+
+describe("ResumePage skills region (T3: RF-4, Tests 3)", () => {
+  it("renders a region named by t.resume.skills with one labelled list and one listitem per skill in data order", () => {
+    // Invariante del escenario (criterio T1/T2): sin skills en el kit el test
+    // sería vacío y no discriminaría nada; se frena y se reporta.
+    if (SKILLS.length === 0) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer skills en cv.skills (test 3 de la spec no puede correr vacío)",
+      );
+    }
+
+    renderResumePage();
+
+    // Test 3 / RF-4: región nombrada por `t.resume.skills`. Anatomía literal:
+    // `<section aria-labelledby="resume-skills-title">` + `SectionTitle
+    // as="h2" id="resume-skills-title"` — se asiértan ambos extremos del
+    // vínculo (criterio test 2/3 de AboutPage).
+    const region = screen.getByRole("region", { name: SKILLS_TITLE });
+    expect(region.tagName).toBe("SECTION");
+    expect(region).toHaveAttribute("aria-labelledby", "resume-skills-title");
+
+    const heading = screen.getByRole("heading", { level: 2, name: SKILLS_TITLE });
+    expect(heading).toHaveAttribute("id", "resume-skills-title");
+    expect(region).toContainElement(heading);
+
+    // El SkillList dentro de la región: `<ul>` (rol implícito `list`) nombrado
+    // por el MISMO id vía `labelledBy` (prop de su API) y un `listitem` por
+    // skill, en el orden de los datos (RF-5: la página no ordena; RF-1 de
+    // SkillList: su map sin sort).
+    const list = within(region).getByRole("list");
+    expect(list).toHaveAttribute("aria-labelledby", "resume-skills-title");
+
+    const items = within(list).getAllByRole("listitem");
+    expect(items).toHaveLength(SKILLS.length);
+    expect(items.map((item) => item.textContent)).toEqual(SKILLS);
+
+    // Anatomía: la región de skills es HIJA DIRECTA del raíz `.page` (no vive
+    // dentro de `.columns`), debajo de las columnas.
+    const pageRoot = region.parentElement;
+    if (pageRoot === null) {
+      throw new Error(
+        "la <section> de skills debe ser hijo del raíz .page (Anatomía)",
+      );
+    }
+    expect(pageRoot.tagName).toBe("DIV");
+    const h1 = screen.getByRole("heading", { level: 1, name: RESUME_TITLE });
+    expect(pageRoot.firstElementChild).toBe(h1);
+    // Education/experience van ANTES que skills (spec → Responsive: "Skills
+    // siempre a ancho completo, debajo"): el hijo previo a la región de skills
+    // es el bloque .columns.
+    const columns = pageRoot.querySelector(":scope > div");
+    if (columns === null) {
+      throw new Error(".columns debe seguir montado con el contenido real (Anatomía)");
+    }
+    expect(region.previousElementSibling).toBe(columns);
+  });
+});
+
+describe("ResumePage with empty skills (T3: RF-4, Tests 6, mocked provider)", () => {
+  beforeEach(() => {
+    cvHarness.scenario = "skillsEmpty";
+  });
+
+  it("renders no skills region nor its h2 when skills is empty", () => {
+    // Freno anti-test-vacío (criterio 5a/5b): con skills ya vacías en el kit
+    // el escenario mockeado no discriminaría nada.
+    if (SKILLS.length === 0) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer skills para que el escenario vacío (test 6) discrimine",
+      );
+    }
+
+    renderResumePage();
+
+    // RF-4: "SI está vacío, ENTONCES no la renderiza" — ni la región ni el h2
+    // (la <section> entera no se monta; no alcanza con que SkillList devuelva
+    // null: sin el guard de la página quedaría una región nombrada vacía).
+    expect(
+      screen.queryByRole("region", { name: SKILLS_TITLE }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { level: 2, name: SKILLS_TITLE }),
+    ).not.toBeInTheDocument();
+
+    // El mock es quirúrgico: solo vacía `skills` — las columnas de timelines
+    // (contenido real del kit) siguen montadas y el h1 sigue único.
+    expect(
+      screen.getByRole("region", { name: uiEn.resume.education }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: uiEn.resume.experience }),
+    ).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 });
