@@ -175,6 +175,31 @@ describe("ControlsBar className joining (T1: spec → API, G-B)", () => {
   });
 });
 
+// Test de T3 (specs/controls/ControlsBar/tasks.md) — RF-6 (Cambio F5
+// 2026-10-08, hallazgo B-2 de `docs/qa-report.md`, decisión #104): el `<header>`
+// raíz renderiza el hook `data-print-hide` del contrato de impresión.
+// `global.css` lo oculta con la variante compuesta `header[data-print-hide]`
+// (0,1,1), que GANA por especificidad a la clase hasheada del módulo (0,1,0):
+// en impresión la barra desaparece (spec → RF-6; "No hacer": la pieza no
+// declara `@media print`, lo ocultan los estilos compartidos). TEST
+// ESTRUCTURAL SIMPLE, literal del "Hecho cuando": `expect(banner).toHave-
+// Attribute("data-print-hide")` sobre el banner (query por rol, constitución
+// T3: el `<header>` expone el rol banner por semántica nativa, RF-2). El
+// atributo NO es `aria-*` ni cambia estructura/estilos: los asserts de T1/T2
+// (contención, rename por idioma, unión G-B, cierre axe) siguen fijando el
+// resto del contrato y quedan intactos. Rojo on-arrival legítimo: el atributo
+// aún no está en el markup del raíz (patrón aprobado en CornerTab T5, hermana
+// del mismo paquete de correcciones #104).
+describe("ControlsBar print hook on the root banner (T3: RF-6)", () => {
+  it("renders data-print-hide on the root banner header", () => {
+    renderBar();
+
+    // "Hecho cuando" de T3 (literal): el <header> raíz expone el hook para
+    // que header[data-print-hide] de global.css gane a la clase del módulo.
+    expect(screen.getByRole("banner")).toHaveAttribute("data-print-hide");
+  });
+});
+
 // Test de T2 (specs/controls/ControlsBar/tasks.md) — cierre del archivo
 // (constitución T4; spec → Tests esperados: "expectNoA11yViolations sin
 // violaciones").
