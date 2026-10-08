@@ -1,0 +1,179 @@
+/* AppLayout — módulo de layout de página (specs/layout/AppLayout/spec.md →
+   "Estilos y tokens" + foundations/layout.md; T5 cierra RF-1 no-BFC y los
+   estilos, verificación por INSPECCIÓN + QA F5: jsdom no computa). SOLO
+   layout y el skip link con foco (única pieza con color propio acá, y SOLO
+   por tokens semánticos — la spec fija "fondo --color-surface, texto
+   --color-accent-text, radio --radius-8, --shadow-control, z-index --z-skip"):
+   cero medidas literales fuera de tokens/`calc()`/keywords; cero `@media
+   print` (el contrato transversal vive en src/styles/global.css, regla dura 3
+   de docs/DESIGN.md). Cada `@media` usa el literal de breakpoint aprobado en
+   docs/tokens/breakpoints.md (992 = lg, 1200 = xl; los @media no aceptan
+   custom properties) y cambia solo layout. Las fórmulas de contenedor, grilla
+   y sticky se copian EXACTAS de foundations/layout.md (no hay números propios).
+
+   Cadena no-BFC del tramo del `h1` (spec → Estilos, "para que el flujo
+   funcione"): float (CornerTab ≥ lg) y `h1` (dentro de .panel) comparten el
+   contexto de formato del item de .grid (main); NINGÚN nodo entre la tab y el
+   texto de la página puede crear BFC: Box outer ya trae `overflow: visible`
+   explícito (su RF-6) y las páginas garantizan su raíz no-BFC en sus propios
+   módulos — este módulo no declara flex/grid/overflow ≠ visible en .panel ni
+   en .contentCard (se deja constancia con reglas contractuales, ver cada
+   bloque).
+
+   Orden de cascada: .panel base antes de su @media 992 (especificidad igual,
+   el media gana por orden); los media queries son tres y de CONCURRENCIA
+   disjunta por propiedad: 992 toca padding-top, 1200 redefine .grid (display
+   completo), 1200+900 toca SOLO .aside. */
+
+/* foundations → "Contenedor": max-width centrado, gutter lateral, el fondo
+   inferior por token y ARRIBA el espacio --gutter-top que aloja la
+   ControlsBar (la barra ocupa la parte inferior de ese espacio, fórmula
+   textual de foundations: gutter − control − space-4; el token --gutter-top
+   escala a 10rem en xl por tokens.css, sin media propio). */
+.container {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-padding-inline);
+  padding-top: calc(var(--gutter-top) - var(--size-control) - var(--space-4));
+  padding-bottom: var(--gutter-bottom);
+}
+
+/* ControlsBar (spec RF-1/plan: "la posición vertical en --gutter-top y el
+   ancho full-width son de AppLayout"; su módulo declara CERO margen externo,
+   el padre posiciona): el <header> raíz del hijo directo recibe el
+   `margin-bottom: var(--space-4)` del esquema de foundations (debajo de la
+   barra viene .grid). Selector por etiqueta nativa: el `<header>` es único en
+   el documento (ControlsBar RF-2, invariante probada por el test 1) y es el
+   mecanismo del que AppLayout posiciona al hijo sin tocar la pieza (analogía
+   del descendiente scoped `.card p` de ServiceCard). */
+.container > header {
+  margin-bottom: var(--space-4);
+}
+
+/* foundations → "Grilla por breakpoint": < 1200 una columna apilada
+   (ControlsBar no cuenta; Sidebar arriba del card) con la separación del
+   esquema → `gap: var(--stack-gap)` del dibujo base; se materializa con flex
+   column porque la regla de espaciado de foundations es "el padre posiciona
+   con gap (flex/grid), nunca márgenes sueltos". En ≥ 1200 pasa a grid 3/9
+   EXACTA de foundations (display: grid reemplaza el flex column; el gap pasa
+   a --layout-gap, también literal del bloque css de foundations). */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap);
+}
+
+/* Skip link (spec → Estilos): visualmente OCULTO hasta recibir foco.
+   Ocultación accesible estándar: `clip-path: inset(50%)` sobre posición fixed
+   en la esquina superior izquierda — NUNCA `display:none`/`visibility:hidden`
+   (test 8 lo exige primer enfocable del documento; clipped sigue en orden de
+   tabulación). Las properties visuales del spec se declaran en la base para
+   que :focus solo revele (cambio único: `clip-path: none`); el desplazamiento
+   `top/left: var(--space-4)` es elección documentada (la base no fija el
+   offset y 0 pegado al borde quedaría incómodo; token real de
+   tokens.css). `z-index: var(--z-skip)` (30) por encima de --z-controls (20):
+   el skip enfocado gana el apilamiento siempre (decisión de Clarificación
+   F4, spec → Estilos). */
+.skipLink {
+  position: fixed;
+  top: var(--space-4);
+  left: var(--space-4);
+  z-index: var(--z-skip);
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-surface);
+  color: var(--color-accent-text);
+  border-radius: var(--radius-8);
+  box-shadow: var(--shadow-control);
+  clip-path: inset(50%);
+}
+
+/* Spec → Estados "Skip link con foco → visible arriba a la izquierda":
+   `:focus` (no `:focus-visible`) porque la spec dice "hasta recibir foco" y
+   el link solo es alcanzable por teclado/click programático; revelar el clip
+   es la única diferencia. */
+.skipLink:focus {
+  clip-path: none;
+}
+
+/* main como item de la columna (base) y de la grilla 3/9 (≥ xl):
+   `min-width: 0` es la cota mínima del ITEM (la de la pista ya la pone el
+   `minmax(0, 9fr)` de foundations) — sin esto, un descendiente ancho (p. ej.
+   el track del carrusel) ensancharía la pista 9fr y rompería la repartición
+   sidebar/contenido. Layout puro; cero relación con la cadena no-BFC. */
+.main {
+  min-width: 0;
+}
+
+/* Card de contenido (Box outer): el slot de la Anatomía queda declarado con
+   su CONTRACTO no-BFC explícito (spec → Estilos "para que el flujo funcione":
+   el tramo tab→h1 no puede volverse contexto de formato propio; Box ya trae
+   `overflow: visible` explícito y `display: block` por defecto — esta regla
+   NO cambia la apariencia: FIJA la garantía del anatomy slot contra una
+   futura variante de clase; documentado para el reviewer como contrato, no
+   como estilo). */
+.contentCard {
+  display: block;
+}
+
+/* Tabpanel (spec → Estilos + foundations < lg): por debajo de lg la CornerTab
+   va en absoluto sobre la esquina de la card (su módulo la ancla al Box
+   `position: relative`) y el `h1` tiene que caer DEBAJO: ÚNICA fórmula,
+   textual de la spec — descuenta --box-padding del Box porque la tab se
+   posiciona desde el borde de la card, no desde su contenido; --size-nav-
+   tab-height escala a 3.75rem en ≥992 por tokens.css, la fórmula no cambia
+   valores propios. La base de .panel es bloque con `overflow` visible por
+   omisión: NADA de flex/grid/overflow aquí ni en el media (RF-6 pages /
+   "No hacer" de la spec; la solapa y el h1 comparten contexto de formato). */
+.panel {
+  padding-top: calc(var(--size-nav-tab-height) - var(--box-padding) + var(--space-4));
+}
+
+/* Spec → Estilos, ≥ lg: la tab pasa a `placement="float"` (CornerTab flota
+   con su ancho REAL) y el `h1` fluye a su izquierda: la reserva superior ya
+   no sirve → `0` (único cambio del media; ningún otro valor escala — las
+   medidas responsive viven en tokens.css). */
+@media (min-width: 992px) {
+  .panel {
+    padding-top: 0;
+  }
+}
+
+/* Foco del tabpanel (spec → Estados + plan "foco tabpanel :focus-visible
+   anillo estándar"): anillo del kit LITERAL con los tokens REALES de
+   tokens.css (líneas 112 --color-focus-ring, 240 --focus-ring-width, 241
+   --focus-ring-offset; no existe `--color-focus` — la forma del brief era
+   aproximada) y solo `:focus-visible` (regla dura 7 de DESIGN; el click del
+   skip link enfoca por programa y NO pinta anillo: el estado tabla dice
+   "Tabpanel con foco (teclado) → anillo estándar"). */
+.panel:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* foundations → "xl (≥ 1200px)": Sidebar + contenido 3/12 + 9/12, bloque css
+   COPIADO EXACTO (pistas `minmax(0, …)`, gap --layout-gap, align-items start
+   para que el sticky y la altura del sidebar no estiren la otra columna). */
+@media (min-width: 1200px) {
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+    gap: var(--layout-gap);
+    align-items: start;
+  }
+}
+
+/* foundations → sticky del Sidebar: SOLO con altura ≥ 900 (única media query
+   de altura permitida, docs/tokens/breakpoints.md; con pantallas más bajas el
+   sidebar fijo no entra entero y el CTA quedaría fuera — scrollea con la
+   página). `top` literal de foundations: incluye la protrusión del avatar
+   (0.71 × su tamaño, mismo factor del módulo de Sidebar con signo inverso)
+   para que el recorte no lo corte al fijarse; z-index SIEMPRE token
+   (--z-sticky, regla 2 de DESIGN). La clase va al `className` del Sidebar
+   (Box as="aside", G-B). */
+@media (min-width: 1200px) and (min-height: 900px) {
+  .aside {
+    position: sticky;
+    top: calc(var(--size-avatar-sidebar) * 0.71 + var(--space-7));
+    z-index: var(--z-sticky);
+  }
+}

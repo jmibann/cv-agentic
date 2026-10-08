@@ -22,13 +22,28 @@
 // (A1: sin casts, NavTabs intacta con su firma `onChange: (id: string)`) y
 // `aria-labelledby={getTabId(active)}` del panel apuntando siempre a un tab
 // existente.
-// Clases: en T1 el markup usa los LITERALES de los nombres de la Anatomía
-// (`skipLink`/`container`/`grid`/`aside`/`main`/`contentCard`/`panel`) — el
-// módulo `AppLayout.module.css` llega en T5 (criterio páginas F4: markup
-// primero, estilos después; `styles.*` se conecta ahí sin cambiar estructura).
-// `index.ts`, unión `className` assertada (test de T5) y cierre a11y (test 10)
-// tampoco existen aún. T6 (reemplazo de `App.tsx`) NO se toca: aprobación
-// pendiente del usuario.
+// T5 hecha: `AppLayout.module.css` declara el layout de foundations/layout.md
+// y la tabla "Estilos y tokens" de la spec AL PIE (contenedor/gutter con la
+// fórmula `padding-top: calc(--gutter-top - --size-control - --space-4)` y el
+// `margin-bottom: --space-4` aplicado al `<header>` hijo (el padre posiciona;
+// su propio módulo declara cero margen); `.grid` una columna con
+// `gap: --stack-gap` < 1200 → grid 3/9 con la fórmula EXACTA de foundations ≥
+// 1200; sticky `.aside` solo `@media (min-width: 1200px) and (min-height:
+// 900px)` con `top: calc(--size-avatar-sidebar * 0.71 + --space-7)` y
+// `--z-sticky`; `.panel` con la ÚNICA fórmula de la solapa < lg y `padding-
+// top: 0` en `@media (min-width: 992px)` — sin flex/grid/overflow en la cadena
+// del h1 (no-BFC); skip link oculto por `clip-path` (jamás `display:none`:
+// debe seguir siendo primer enfocable, test 8) → visible con `:focus` arriba
+// a la izquierda con `--color-surface`/`--color-accent-text`/`--radius-8`/
+// `--shadow-control`/`--z-skip`; tabpanel con anillo `--focus-ring-*` solo
+// `:focus-visible`). Los LITERALES de T1 se reemplazaron por `styles.*` sin
+// cambiar la estructura (menor registrada en la aprobación de T1) y la unión
+// del container pasó a base `styles.container` (su test: el de unión #99 del
+// archivo de tests, T5). El print transversal del contrato vive en
+// `src/styles/global.css` (T5; la paleta la reasigna tokens.css). `index.ts`
+// re-exporta la superficie pública (AppLayout + AppLayoutProps).
+// Diferido: T6 (reemplazo de `App.tsx`) NO se toca: aprobación pendiente del
+// usuario.
 
 import type { MouseEvent, ReactNode } from "react";
 import { useRef } from "react";
@@ -46,6 +61,8 @@ import { NavTabs, getTabId } from "../NavTabs";
 import { Sidebar } from "../Sidebar";
 import type { SidebarLabels } from "../Sidebar";
 
+import styles from "./AppLayout.module.css";
+
 // Constante del módulo: orden e ids fijos de los tabs (nunca vacía — RF-5).
 const TAB_IDS = ["about", "resume"] as const;
 type TabId = (typeof TAB_IDS)[number];
@@ -57,8 +74,8 @@ const isTabId = (id: string): id is TabId =>
   (TAB_IDS as readonly string[]).includes(id);
 
 // API (spec → API): `className` se aplica al `div.container` de la Anatomía
-// (la raíz es un fragment; el lugar de la unión es deliberado, A7). Su test
-// (unión #99) llega en T5 con el módulo.
+// (la raíz es un fragment; el lugar de la unión es deliberado, A7), unida a
+// la base del módulo `styles.container` (T5: unión canónica + su test #99).
 export interface AppLayoutProps {
   className?: string;
 }
@@ -109,11 +126,11 @@ export function AppLayout({ className }: AppLayoutProps): ReactNode {
   const inactive: TabId = active === "about" ? "resume" : "about";
 
   // G-B/#99 (spec → API): unión canónica en el `div.container` — array +
-  // filtro de undefined + join, base literal primero (T1 usa el literal
-  // "container"; T5 lo reemplaza por `styles.container` sin cambiar el
-  // mecanismo); con `className` externa ambas COEXISTEN (su test llega con
-  // el módulo, T5).
-  const containerClassName = ["container", className]
+  // filtro de undefined + join, base primero (mecanismo canónico de
+  // Box/AboutPage/ResumePage); con `className` externa ambas COEXISTEN (test
+  // de unión en el archivo). T5 cambió solo la BASE: literal "container" →
+  // `styles.container` (el nombre resuelto por CSS Modules), misma estructura.
+  const containerClassName = [styles.container, className]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 
@@ -128,7 +145,7 @@ export function AppLayout({ className }: AppLayoutProps): ReactNode {
           hash (preventDefault + foco al panel). `data-print-hide` = contrato
           de impresión (global.css, T5). */}
       <a
-        className="skipLink"
+        className={styles.skipLink}
         data-print-hide
         href="#main-panel"
         onClick={focusPanel}
@@ -136,20 +153,20 @@ export function AppLayout({ className }: AppLayoutProps): ReactNode {
         {t.skipToContent}
       </a>
 
-      {/* Contenedor de página (unión #99 con el módulo en T5): ControlsBar +
-          grid Sidebar/contenido. */}
+      {/* Contenedor de página (unión #99 con la base styles.container):
+          ControlsBar + grid Sidebar/contenido. */}
       <div className={containerClassName}>
         <ControlsBar />
-        <div className="grid">
+        <div className={styles.grid}>
           <Sidebar
-            className="aside"
+            className={styles.aside}
             profile={cv.profile}
             contact={cv.contact}
             social={cv.social}
             labels={sidebarLabels}
           />
-          <main className="main">
-            <Box variant="outer" as="section" className="contentCard">
+          <main className={styles.main}>
+            <Box variant="outer" as="section" className={styles.contentCard}>
               {/* RF-2/RF-3: NavTabs controlada; el onChange de string se
                   estrecha con el guard de módulo (A1: sin casts). */}
               <NavTabs
@@ -174,7 +191,7 @@ export function AppLayout({ className }: AppLayoutProps): ReactNode {
                   aria-labelledby={getTabId(active)}
                   tabIndex={0}
                   data-print-page={active}
-                  className="panel"
+                  className={styles.panel}
                 >
                   {active === "about" ? <AboutPage /> : <ResumePage />}
                 </div>

@@ -41,3 +41,93 @@ strong, b { font-weight: var(--font-weight-semibold); color: var(--color-heading
 html:has(dialog[open]) {
   overflow: hidden;
 }
+
+/* ---------------------------------------------------------------------------
+ * IMPRESIÓN (`@media print`) — contrato transversal de
+ * specs/layout/AppLayout/spec.md → "Impresión" + foundations/layout.md →
+ * "Impresión" (T5 de AppLayout; regla dura 3 de docs/DESIGN.md: todos los
+ * @media print transversales viven ACÁ, ningún componente los replica).
+ * El contrato habla en `data-*`/elementos nativos, NO en clases de CSS
+ * Modules (los nombres de módulo se hashean y este archivo no puede
+ * apuntarlos; los selectores nativos `header`, `[role="tablist"]` y
+ * `aside button` son DELIBERADOS y forman parte del contrato — decisión del
+ * usuario registrada en la spec —: `header` es el único <header> del
+ * documento (ControlsBar, RF-2 probada por el test 1 de AppLayout),
+ * `[role="tablist"]` es la fila de tabs de NavTabs/CornerTab y `aside
+ * button` el botón Show/Hide Contacts del Sidebar.
+ * LA PALETA DE IMPRESIÓN NO SE TOCA ACÁ: los colores literales están
+ * prohibidos (regla dura 1); el papel claro con fondo blanco y sin sombras
+ * lo reasigna tokens/tokens.css en su propio @media print (líneas ~437+), y
+ * TestimonialCarousel/TestimonialDialog ya resuelven su impresión en sus
+ * módulos (excepción documentada G-D-1). Todo lo de arriba se verifica por
+ * INSPECCIÓN del reviewer + QA F5 con la app servida (decisión #91): F4 fija
+ * el contrato, F5 verifica el resultado.
+ * ------------------------------------------------------------------------- */
+@media print {
+  /* RF-8: ambos paneles se imprimen SIEMPRE en orden About → Resume, con
+   * independencia del tab activo. La raíz común del stack (data-print-stack,
+   * AppLayout → Anatomía) se apila en columna y el orden sale del
+   * data-print-page: el tabpanel activo y el bloque inactivo se reordenan
+   * por atributo, nunca por posición en el DOM. */
+  [data-print-stack] {
+    display: flex;
+    flex-direction: column;
+  }
+  [data-print-page="about"] {
+    order: 0;
+  }
+  [data-print-page="resume"] {
+    order: 1;
+  }
+
+  /* El bloque inactivo (hidden en pantalla: fuera del árbol de accesibilidad)
+   * se muestra en print. Gana al `display: none` del atributo `hidden` porque
+   * las reglas de AUTOR vencen a las de USER AGENT en el origen de cascada
+   * (spec → Impresión; sin esto el segundo panel desaparecería). */
+  [data-print-only] {
+    display: block;
+  }
+
+  /* Ocultar la chrome de pantalla (foundations → "Impresión"): la barra de
+   * controles (banner), la fila de tabs y el skip link (cuyo contrato es el
+   * atributo propio data-print-hide en su raíz, spec → Impresión). */
+  header,
+  [role="tablist"],
+  [data-print-hide] {
+    display: none;
+  }
+
+  /* Ocultar los botones del Sidebar (Show/Hide Contacts). NOTA PARA QA F5
+   * (reportada por el integrator en T5, no corregida acá por límites de la
+   * tarea — la spec es el contrato): el CTA "Download CV" del Sidebar usa el
+   * Button polimórfico CON `href`, que renderiza <a> (src/components/Button/
+   * Button.tsx T3, rama link línea ~115), así que ESTE selector del contrato
+   * no lo alcanza. El intent de foundations es ocultarlo también; si F5 lo
+   * confirma, hace falta un hook estable (decide el usuario/orchestrator:
+   * no se inventa selectores fuera del contrato ni se toca Sidebar). */
+  aside button {
+    display: none;
+  }
+
+  /* Contactos SIEMPRE expandidos (foundations → "Impresión"). Hook estable
+   * INSPECCIONADO (Sidebar.tsx): el contenedor lleva el id NATIVO estable
+   * `sidebar-contacts` — línea 139 `CONTACTS_CONTAINER_ID =
+   * "sidebar-contacts"`, montado en el div de la línea 277; su propia spec lo
+   * declara "contrato público… para el aria-controls y para print (RF-10)"
+   * (comentario línea ~276). El colapso de pantalla es por CLASE hasheada no
+   * alcanzable (.additionalCollapsed display:none, Sidebar.module.css línea
+   * 68; y la pila xl .additional.additionalCollapsed (0,2,0) línea ~444) — el
+   * selector por ID (1,0,0) gana a ambas por especificidad, sin importar el
+   * orden de las hojas. */
+  #sidebar-contacts {
+    display: block;
+  }
+
+  /* sin saltos de página dentro de ítems (foundations → "Impresión":
+   * break-inside en TimelineItem y ServiceCard; se aplica a la semántica
+   * nativa article/li que esas piezas producen) */
+  article,
+  li {
+    break-inside: avoid;
+  }
+}
