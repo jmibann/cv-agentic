@@ -142,4 +142,31 @@ describe("index.html anti-flash (RF-1)", () => {
       /<script type="module" src="\/src\/main\.tsx"><\/script>/,
     );
   });
+
+  it("ships an SVG favicon linked from the <head>", () => {
+    // T13 (Cambio F5, hallazgo D4 de docs/qa-report.md): el navegador pedía
+    // /favicon.ico → 404. El link debe vivir en el <head>; su posición exacta
+    // (después del anti-flash) ya la garantiza el test "runs before the
+    // bundle" de arriba, que no admite ningún <link> antes del script.
+    const head = capture(
+      indexHtml,
+      /<head>([\s\S]*?)<\/head>/,
+      "<head>…</head>",
+    );
+    expect(head).toMatch(
+      /<link rel="icon" type="image\/svg\+xml" href="\/favicon\.svg" \/>/,
+    );
+
+    // `public/favicon.svg` debe existir (readFileSync lanza si no: rojo) y ser
+    // XML simple válido sin parser nuevo: raíz <svg> abierta y cerrada.
+    const faviconSvg = readRepoFile("../../public/favicon.svg");
+    expect(faviconSvg.trimStart().startsWith("<svg")).toBe(true);
+    expect(faviconSvg).toMatch(/<\/svg>\s*$/);
+    // Contrato del asset con la spec (Anatomía → public/favicon.svg):
+    // hexágono pointy-top sobre viewBox cuadrado 64×64 y fill #ffb729.
+    // El literal vive acá y en el SVG (asset público, no CSS de app).
+    expect(faviconSvg).toMatch(/viewBox="0 0 64 64"/);
+    expect(faviconSvg).toContain('fill="#ffb729"');
+    expect(faviconSvg).not.toMatch(/<text\b/); // sin texto ni marcas
+  });
 });
