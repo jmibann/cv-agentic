@@ -48,6 +48,18 @@ import { LocaleProvider } from "../../providers/LocaleProvider";
 
 import { ResumePage } from "./ResumePage";
 
+// Cierre a11y de T4 (constitución T4; helper de src/test/a11y.ts).
+import { expectNoA11yViolations } from "../../test/a11y";
+
+// El test importa el módulo CSS solo para fijar los nombres REALES de las
+// clases base (`page`/`columns`, resueltas por CSS Modules en runtime) y
+// asiértalas con el canon #99 `styles.x ?? "x"` (menor registrada en la
+// aprobación de T1 de AboutPage, aplicada igual acá; precedente exacto
+// AboutPage.test.tsx T4 y LanguageSwitcher.test.tsx). El módulo no existe
+// hasta `feat(ResumePage): T4`: el import pone el archivo entero en rojo en
+// colecta (rojo declarado en el commit de tests, ídem AboutPage T4).
+import styles from "./ResumePage.module.css";
+
 // Valores esperados desde las FUENTES del kit (C3): el contenido que la página
 // debe mostrar sale de `useCv()` —el mismo `cvByLocale.en` que sirve el
 // provider— y los títulos de `uiEn.resume.*` (el `t` del provider); el test
@@ -56,10 +68,19 @@ const RESUME_TITLE = uiEn.resume.title;
 const EDUCATION = cvByLocale.en.education;
 const EXPERIENCE = cvByLocale.en.experience;
 
-const renderResumePage = () =>
+// Clases base canon #99 (el módulo resuelve nombres hasheados en runtime; el
+// `?? "x"` cubre el escenario sin módulo en otras herramientas).
+const PAGE_CLASS = styles.page ?? "page";
+const COLUMNS_CLASS = styles.columns ?? "columns";
+
+// Render del escenario por defecto. T4: `className` opcional — la pasa solo
+// el test 9 (unión G-B en el raíz); los demás call-sites la dejan undefined
+// (React omite el atributo) y el andamiaje no cambia nada más: el raíz de la
+// página sigue siendo `container.firstElementChild` (los defs van DESPUÉS).
+const renderResumePage = (className?: string) =>
   render(
     <LocaleProvider>
-      <ResumePage />
+      <ResumePage className={className} />
       <AccentGradientDefs />
     </LocaleProvider>,
   );
@@ -149,8 +170,8 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
     }
 
     // Anatomía: ambas `<section>` son hermanas directas de UN único div
-    // (`.columns`) — verificación estructural sin clase (el módulo `.columns`
-    // se conecta y asiértá con el canon #99 en T4).
+    // (`.columns`). T4 conecta el módulo y agrega los asserts de clase con el
+    // canon #99 (menor registrada de T1): la estructura queda intacta.
     const educationRegion = screen.getByRole("region", {
       name: uiEn.resume.education,
     });
@@ -162,6 +183,7 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
       throw new Error("las <section> deben colgar del bloque .columns (Anatomía)");
     }
     expect(columns.tagName).toBe("DIV");
+    expect(columns).toHaveClass(COLUMNS_CLASS);
     expect(experienceRegion.parentElement).toBe(columns);
     expect(columns.children).toHaveLength(2);
     expect(columns.firstElementChild).toBe(educationRegion);
@@ -175,6 +197,7 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
       throw new Error(".columns debe ser hijo del raíz .page (Anatomía)");
     }
     expect(pageRoot.tagName).toBe("DIV");
+    expect(pageRoot).toHaveClass(PAGE_CLASS);
     const h1 = screen.getByRole("heading", { level: 1, name: RESUME_TITLE });
     expect(h1.parentElement).toBe(pageRoot);
     expect(pageRoot.firstElementChild).toBe(h1);
@@ -582,5 +605,64 @@ describe("ResumePage with empty skills (T3: RF-4, Tests 6, mocked provider)", ()
       screen.getByRole("region", { name: uiEn.resume.experience }),
     ).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+});
+
+// ===========================================================================
+// Tests de T4 (specs/pages/ResumePage/tasks.md) — RF-3 y RF-6 por INSPECCIÓN
+// del módulo (jsdom no computa estilos: el grid ≥ md, la cláusula
+// `grid-column: 1 / -1` del hijo único y el flujo de bloque del raíz se
+// verifican a mano + QA F5, lo declara la spec) y por tests: test 9 (unión
+// `className` del consumidor en el raíz `.page`, G-B — canon #99: base y
+// externa COEXISTEN, precedente AboutPage test 8 / LanguageSwitcher) y test 8
+// (cierre `expectNoA11yViolations` en escenario completo; la spec dice "sin
+// violaciones" a secas: un solo caso `en` basta — el escenario `es` no añade
+// forma DOM propia, solo strings, y su jerarquía/regiones ya están cubiertas
+// por los asserts de roles). Además T4 sumó los asserts de clases
+// `.page`/`.columns` con el canon en el test 2 de T1 (adición pura, menor
+// registrada) y el parámetro `className` del helper (andamiaje).
+// Rojo del commit (#101, ídem AboutPage T4): el import canónico del módulo
+// (`./ResumePage.module.css`) no resuelve hasta el feat — TODO el archivo
+// queda rojo en colecta, incluido el cierre axe (no es verde on-arrival: el
+// discrimen del cierre y de los asserts de clase llega junto con el módulo y
+// la unión). El test 9 fallaría además por sí solo (la página aún ignora
+// `className`).
+// ===========================================================================
+
+describe("ResumePage className joining (T4: spec → API, G-B, Tests 9)", () => {
+  it("joins an external className to the base .page class on the page root, coexisting", () => {
+    const consumerClass = "app-tabpanel-resume";
+
+    const { container } = renderResumePage(consumerClass);
+
+    // Test 9 de la spec / plan → Interfaz (#99): `className` se UNE a la clase
+    // base `.page` del raíz — COEXISTEN (precedente Box/Icon/Badge/
+    // AboutPage test 8; rige la hoja de estilos, no el orden del atributo
+    // class). El raíz se localiza por `container.firstElementChild` (criterio
+    // del andamiaje: los defs van después del componente, y el test 5b de T2 —
+    // "raíz sin <div> hijo directo" en escenario mockeado — no se ve afectado
+    // por nada de T4). Se refuerza que el nodo localizado es el raíz de la
+    // página (padre del h1).
+    const pageRoot = container.firstElementChild;
+    if (pageRoot === null) {
+      throw new Error("ResumePage debe renderizar el raíz .page (Anatomía)");
+    }
+    const h1 = screen.getByRole("heading", { level: 1, name: RESUME_TITLE });
+    expect(h1.parentElement).toBe(pageRoot);
+    expect(pageRoot).toHaveClass(PAGE_CLASS);
+    expect(pageRoot).toHaveClass(consumerClass);
+  });
+});
+
+// --- T4 · Cierre a11y (constitución T4) — test 8 ----------------------------
+describe("ResumePage accessibility audit (T4: cierre, Tests 8)", () => {
+  it("has no accessibility violations with the full content", async () => {
+    // Escenario completo en `en` con el contenido real del kit: h1 + .columns
+    // (dos regiones Education/Experience con ol/li/article/h3 y periods) +
+    // región de skills con su lista de chips + armazón AccentGradientDefs del
+    // helper. axe sobre el `container` completo (criterio AboutPage test 7).
+    const { container } = renderResumePage();
+
+    await expectNoA11yViolations(container);
   });
 });
