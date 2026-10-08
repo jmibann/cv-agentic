@@ -21,6 +21,11 @@
 // archivo de test termina con `expectNoA11yViolations` y `index.ts` re-exporta
 // CornerTab y CornerTabProps (nota de cierre en tasks.md). El TSX no cambia:
 // la forma es solo CSS y el markup ya era el de la spec desde T1 (RF-6).
+// T5 (Cambio F5 2026-10-08, RF-7): el `<div>` raíz suma el hook de impresión
+// `data-print-hide` (contrato #103/#104; hallazgo M-1: en print la tab debe
+// desaparecer completa, no quedar como franja vacía con fondo/borde). Único
+// cambio: el atributo en el raíz, en ambos `placement`; no es `aria-*`
+// (RF-6 intacto) y el módulo sigue sin `@media print` propio (RF-4).
 
 import type { ReactNode } from "react";
 
@@ -96,5 +101,18 @@ export function CornerTab({
   // Accesibilidad: "Sin rol propio (es un contenedor visual). No debe tener
   // `aria-*`"): los nombres y estados los aportan los children (NavTabs,
   // botón Show Contacts).
-  return <div className={rootClassName}>{children}</div>;
+  // RF-7 (T5, Cambio F5 2026-10-08; hallazgo M-1 de `docs/qa-report.md`): el
+  // raíz renderiza el hook `data-print-hide` del contrato de impresión
+  // (#103/#104), en ambos `placement`: `global.css` (AppLayout T7) oculta
+  // `div[data-print-hide]` para que en impresión la tab desaparezca completa
+  // (envoltorio con fondo/borde incluido) y no quede la franja vacía. No es
+  // un atributo `aria-*`, así que RF-6 sigue vigente, y la pieza no declara
+  // `@media print` propio (RF-4: manda el estilo compartido; plan →
+  // Decisiones, resolución R-1). Misma forma que el skip link de AppLayout
+  // (`data-print-hide` en JSX → atributo presente en el DOM).
+  return (
+    <div className={rootClassName} data-print-hide>
+      {children}
+    </div>
+  );
 }
