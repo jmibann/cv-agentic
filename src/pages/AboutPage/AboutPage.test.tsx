@@ -327,7 +327,10 @@ describe("AboutPage with empty services (T2: RF-2, Tests 5a, mocked provider)", 
       screen.queryByRole("heading", { level: 2, name: SERVICES_TITLE }),
     ).not.toBeInTheDocument();
     expect(screen.queryAllByRole("list")).toHaveLength(0);
-    expect(screen.queryAllByRole("article")).toHaveLength(0);
+    // T3b (patrón T2b aprobado): sin assert global de `article` — desde T3
+    // los `article` de las cards del carrusel son legítimos en este
+    // escenario; la no-montada de la sección de servicios ya la cubren
+    // region/h2/list de arriba.
 
     // Test 5 "en ambos escenarios": el `h1` sigue siendo el único y la página
     // sigue renderizando el resto (intro real: el mock solo vacía `services`).
