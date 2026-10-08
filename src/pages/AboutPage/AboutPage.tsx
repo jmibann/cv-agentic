@@ -12,15 +12,28 @@
 // servicios como <ul>"; sin `role="list"`: el quirk Safari/VoiceOver se unifica
 // en QA F5, decisión de Clarificación F4). Clave por `service.id` (único por
 // esquema, `data/cv.schema.json`), no por el texto.
-// Diferidos a sus tareas: h2 "Testimonials" + `TestimonialCarousel` y locale
-// `es` (T3), módulo CSS con el layout de la tabla "Estilos y tokens" y unión
-// de `className` al raíz (T4) — por eso hoy las clases `page`/`intro`/
-// `services` son literales del markup, sin módulo todavía ("Hecho cuando" de
-// T1/T2, y la unión se asierta con `styles.x ?? "x"` en T4, canon #99).
-// `carouselLabels` tampoco aparece acá: llega con el carrusel en T3 (RF-3).
+// T3 hecha: testimonios (RF-2/RF-3) — `h2` "Testimonials" (`SectionTitle
+// as="h2" id="about-testimonials-title"`) y `TestimonialCarousel` como
+// HERMANOS DIRECTOS del raíz (decisión 20: la región es la `<section>` propia
+// del carrusel, sin wrapper de la página), montados solo si
+// `cv.testimonials` no está vacío (RF-2: "SI testimonials está vacío,
+// ENTONCES no renderiza ni el h2 ni el carrusel"). El carrusel recibe
+// `labelledBy="about-testimonials-title"` (su `<section>` se nombra por el h2;
+// nunca `aria-label` propio) y `labels={carouselLabels}`: objeto literal con
+// las 5 claves CRUDAS de `t.testimonials` — la página NO importa ni llama
+// `format` (RF-3: quien interpola es el carrusel). SIN `className` todavía:
+// `styles.testimonials` (`margin-top: 0`) llega con el módulo en T4.
+// Diferidos a sus tareas: módulo CSS con el layout de la tabla "Estilos y
+// tokens" (`.page`/`.intro`/`.services`/`.testimonials`), unión de `className`
+// al raíz y cierre `expectNoA11yViolations` (T4) — por eso hoy las clases
+// `page`/`intro`/`services` son literales del markup, sin módulo todavía
+// ("Hecho cuando" de T1/T2, y la unión se asierta con `styles.x ?? "x"` en
+// T4, canon #99).
 
 import type { ReactNode } from "react";
 
+import { TestimonialCarousel } from "../../components/TestimonialCarousel";
+import type { TestimonialCarouselLabels } from "../../components/TestimonialCarousel";
 import { ServiceCard } from "../../components/ServiceCard";
 import { SectionTitle } from "../../components/SectionTitle";
 import { useCv, useLocale } from "../../providers/LocaleProvider";
@@ -38,6 +51,17 @@ export function AboutPage(): ReactNode {
   // documentada en specs/README.md).
   const { t } = useLocale();
   const cv = useCv();
+
+  // RF-3 / plan P8: plantillas CRUDAS de `t.testimonials` (mapeo explícito de
+  // la spec → API, 5 claves). La página NO llama `format`: quien interpola
+  // `{current}`/`{total}`/`{n}`/`{author}` es el carrusel.
+  const carouselLabels: TestimonialCarouselLabels = {
+    carousel: t.testimonials.carouselLabel,
+    slide: t.testimonials.slideLabel,
+    goToSlide: t.testimonials.goToSlide,
+    readMore: t.testimonials.readMore,
+    close: t.testimonials.close,
+  };
 
   return (
     <div className="page">
@@ -77,6 +101,25 @@ export function AboutPage(): ReactNode {
             ))}
           </ul>
         </section>
+      ) : null}
+
+      {/* T3 · RF-2 (testimonios): h2 del título y carrusel como hermanos
+          DIRECTOS del raíz (decisión 20: la región es la <section> propia del
+          TestimonialCarousel, nombrada vía labelledBy; la página NO la
+          envuelve). Nada se monta con cv.testimonials vacío (spec → Estados).
+          Fragment: sin nodo wrapper intermedio, el DOM hijo del raíz es h2 y
+          section. className (styles.testimonials) se conecta en T4. */}
+      {cv.testimonials.length > 0 ? (
+        <>
+          <SectionTitle as="h2" id="about-testimonials-title">
+            {t.about.testimonials}
+          </SectionTitle>
+          <TestimonialCarousel
+            testimonials={cv.testimonials}
+            labels={carouselLabels}
+            labelledBy="about-testimonials-title"
+          />
+        </>
       ) : null}
     </div>
   );
