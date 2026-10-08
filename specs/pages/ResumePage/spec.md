@@ -1,5 +1,5 @@
 # ResumePage
-Estado: aprobada
+Estado: implementada
 
 ## Propósito
 
