@@ -56,9 +56,29 @@ import { uiEs } from "../../i18n/ui.es";
 
 import { AppLayout } from "./AppLayout";
 
+// Cierre a11y de T5 (constitución T4; helper de src/test/a11y.ts).
+import { expectNoA11yViolations } from "../../test/a11y";
+
+// El test importa el módulo CSS solo para fijar el nombre REAL de la clase
+// base del `div.container` (`container`, resuelto por CSS Modules en runtime)
+// y asiértala con el canon #99 `styles.x ?? "x"` al coexistir con la clase
+// externa (menor registrada en la aprobación de T1: "assert de unión
+// `className` en `div.container`"; precedente AboutPage T4 / ResumePage T4 /
+// LanguageSwitcher). El módulo no existe hasta `feat(AppLayout): T5`: el
+// import canónico pone TODO el archivo en rojo en colecta — rojo declarado
+// en el cuerpo del commit (precedente exacto AboutPage T4, aprobado por el
+// reviewer: la unión ya existe en el `.tsx` desde T1, pero el nombre hasheado
+// de la base solo se conoce con el módulo).
+import styles from "./AppLayout.module.css";
+
 // Nombre del landmark `complementary` desde la FUENTE del kit (C3): el
 // AppLayout lo pasa por `labels.region` de `t.sidebar`.
 const SIDEBAR_REGION = uiEn.sidebar.region;
+
+// Clase base del `div.container` canon #99 (el módulo resuelve el nombre
+// hasheado en runtime; el `?? "container"` cubre herramientas sin CSS
+// Modules; precedente AboutPage T4 / LanguageSwitcher).
+const CONTAINER_CLASS = styles.container ?? "container";
 
 function renderWithProviders(ui: ReactNode) {
   return render(
@@ -616,5 +636,107 @@ describe("AppLayout inactive page lives hidden outside the tabpanel (T4: RF-8, T
     expect(document.querySelectorAll("#about-services-title")).toHaveLength(1);
     // …y escaneo global.
     expectNoDuplicateIds();
+  });
+});
+
+// ===========================================================================
+// Tests de T5 (specs/layout/AppLayout/tasks.md) — cierre a11y y unión: test
+// 10 de la spec (`expectNoA11yViolations` sin violaciones EN About Y EN
+// Resume, EN ambos idiomas → cuatro combinaciones, un `it` cada una para
+// localize la falla; los Seeds son los caminos ya usados en la pieza: hash
+// `replaceState` real antes de montar (test 3) y `lang="es"` antes de montar
+// (test 5 semilla anti-flash; el provider lo toma como idioma inicial)) y
+// test de unión `className` en el `div.container` (G-B; la unión existe desde
+// T1 y el `.tsx` de T5 solo cambia la BASE literal "container" por
+// `styles.container`, así que este `it` es VERDE ON-ARRIVAL respecto de la
+// lógica de unión (#101 — su rojo en el commit de tests viene únicamente del
+// import del módulo inexistente en colecta; declarado en el cuerpo del
+// commit). El container se localiza por el padre del `banner` (Anatomía: el
+// `<header>` de ControlsBar es hijo directo del container).
+// Los cuatro cierres axe corren sobre el documento COMPLETO (providers reales
+// + armazón defs de la propia página): jsdom no carga el CSS del módulo ni el
+// print de global.css (decisión #101: las reglas de layout/impresión se
+// verifican por INSPECCIÓN del reviewer + QA F5); lo que axe audita acá es el
+// árbol de accesibilidad completo ya ensamblado — landmarks, tablist/tab/
+// panel con sus relaciones, regiones nombradas sin duplicados, el bloque
+// `hidden` excluido. Si una forma nueva naciera violación, el `it` falla: no
+// es decorativo.
+// ===========================================================================
+
+describe("AppLayout container className joining (T5: spec → API, G-B)", () => {
+  it("joins an external className to the base .container class on the page container, coexisting", () => {
+    const consumerClass = "app-shell-custom";
+
+    renderWithProviders(<AppLayout className={consumerClass} />);
+
+    // Unión #99 (spec → API: "className se aplica al div.container de la
+    // Anatomía; la raíz es fragment y el lugar es deliberado, A7"): base del
+    // módulo y clase externa COEXISTEN en el único container (precedente
+    // Box/AboutPage/ResumePage: rige la hoja de estilos, no el orden del
+    // atributo class). El container es el padre del banner (Anatomía: el
+    // `<header>` de ControlsBar es hijo directo del container; el skip link y
+    // las defs son HERMANOS del container bajo el fragment, no lo contienen).
+    const banner = screen.getByRole("banner");
+    const containerDiv = banner.parentElement;
+    if (containerDiv === null) {
+      throw new Error("el banner debe colgar del div.container (Anatomía)");
+    }
+    expect(containerDiv.tagName).toBe("DIV");
+    expect(containerDiv).toHaveClass(CONTAINER_CLASS);
+    expect(containerDiv).toHaveClass(consumerClass);
+  });
+});
+
+// --- T5 · Cierre a11y (constitución T4) — test 10: 2 tabs × 2 idiomas -------
+describe("AppLayout accessibility audit (T5: cierre, Tests 10)", () => {
+  it("has no accessibility violations with About active in English", async () => {
+    const { container } = renderWithProviders(<AppLayout />);
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with Resume active in English", async () => {
+    // Tab Resume por hash real antes de montar (criterio test 3).
+    window.history.replaceState(null, "", "#resume");
+
+    const { container } = renderWithProviders(<AppLayout />);
+
+    // Freno de la rama sembrada (criterio test 6 de LanguageSwitcher): sin
+    // esto, un fallback silencioso a "about" auditaría dos veces el mismo
+    // árbol.
+    expect(
+      screen.getByRole("heading", { level: 1, name: uiEn.resume.title }),
+    ).toBeInTheDocument();
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with About active in Spanish", async () => {
+    // Idioma por semilla anti-flash: `lang="es"` antes del render (criterio
+    // test 5 del propio archivo… donde el cambio fue por click; acá la semilla
+    // basta para el árbol axe y es el camino probado en ResumePage/AboutPage).
+    document.documentElement.lang = "es";
+
+    const { container } = renderWithProviders(<AppLayout />);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: uiEs.about.title }),
+    ).toBeInTheDocument();
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with Resume active in Spanish", async () => {
+    // Las dos semillas juntas: la combinación completa pedida por el test 10.
+    document.documentElement.lang = "es";
+    window.history.replaceState(null, "", "#resume");
+
+    const { container } = renderWithProviders(<AppLayout />);
+
+    expect(
+      screen.getByRole("heading", { level: 1, name: uiEs.resume.title }),
+    ).toBeInTheDocument();
+
+    await expectNoA11yViolations(container);
   });
 });
