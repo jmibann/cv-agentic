@@ -163,10 +163,12 @@ describe("index.html anti-flash (RF-1)", () => {
     expect(faviconSvg.trimStart().startsWith("<svg")).toBe(true);
     expect(faviconSvg).toMatch(/<\/svg>\s*$/);
     // Contrato del asset con la spec (Anatomía → public/favicon.svg):
-    // hexágono pointy-top sobre viewBox cuadrado 64×64 y fill #ffb729.
+    // hexágono pointy-top sobre viewBox cuadrado 64×64 y fill #304cfd, el
+    // valor de --color-accent (T13b: el original #ffb729 era un error del
+    // brief, enmendado en spec/tasks).
     // El literal vive acá y en el SVG (asset público, no CSS de app).
     expect(faviconSvg).toMatch(/viewBox="0 0 64 64"/);
-    expect(faviconSvg).toContain('fill="#ffb729"');
+    expect(faviconSvg).toContain('fill="#304cfd"');
     expect(faviconSvg).not.toMatch(/<text\b/); // sin texto ni marcas
   });
 });
