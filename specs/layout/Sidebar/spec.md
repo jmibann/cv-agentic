@@ -146,8 +146,8 @@ IconBox + bloque de texto. Valor en `--color-heading`,
 
 | Viewport | Layout |
 |---|---|
-| **< md (768)** | Grilla `auto 1fr`: avatar (**6.375rem** — −15% del valor previo 7.5rem, Cambio F5 2026-10-08 por solapamiento medido a 375px; el token base `--size-avatar-sidebar` queda en manos del usuario en `tokens.css`) a la izquierda; **nombre y headline desplazados a la izquierda, junto al avatar** (bloque de identidad alineado al inicio, sin reserves de columna bajo la esquina superior derecha); redes debajo de la identidad. Contactos colapsados; al expandir, **1 columna**. |
-| **md – lg (768–1199)** | Igual, avatar 9rem (**provisional**: se ajusta el token en la QA visual de F5), texto más grande; identidad pegada al avatar como en < md. Contactos colapsados por defecto; al expandir, en **2 columnas**. |
+| **< md (768)** | Grilla `auto 1fr`: avatar (**6.375rem** — −15% del valor previo 7.5rem, Cambio F5 2026-10-08 por solapamiento medido a 375px; aplicado en `tokens.css:201` el 2026-10-08) a la izquierda; **nombre y headline desplazados a la izquierda, junto al avatar** (bloque de identidad alineado al inicio, sin reserves de columna bajo la esquina superior derecha); redes debajo de la identidad, centradas. Contactos colapsados; al expandir, **1 columna**. |
+| **md – lg (768–1199)** | Igual, avatar 9rem (**definitivo** — F8 cerrado por decisión del usuario #105b, 2026-10-08, sin captura de referencia: proporciones verificadas en QA 1024/1440), texto más grande; identidad pegada al avatar como en < md. Contactos colapsados por defecto; al expandir, en **2 columnas**. |
 | **xl (≥ 1200)** | Vertical y centrado. Avatar 11.25rem **sobresaliendo** arriba (`margin-top: calc(var(--size-avatar-sidebar) * -0.71)`, ≈ −8rem; fórmula compartida con `foundations/layout.md`), nombre/badge/redes centrados, contactos **siempre visibles** en 1 columna, botón de disclosure **oculto por CSS** (decisión 8=a; antes "sin CornerTab ni botón" — Cambio F5). Sticky solo con alto de pantalla ≥ 900px (lo aplica AppLayout). |
 
 Colapsable (< xl):

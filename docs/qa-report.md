@@ -19,10 +19,10 @@ Suite tras todo: **445/40**, build ✅ validate:content ✅.
 
 ### Quedan en manos del usuario (no verificables por agentes)
 
-1. **Ctrl+P real**: render de papel con paginación/`@page` (la emulación cubrió estilos, no el motor de impresión).
-2. **Favicon visible en la solapa** (no observable por MCP).
-3. **F8 + token < md**: `--size-avatar-sidebar` base sigue en **7.5rem** (`tokens.css:201`; la spec #104b fija 6.375rem = −15% — pendiente de tu edición) y el **9rem (≥768) provisional** espera tu captura de referencia. Medido en vivo: cero solape igualmente (la reserva de la identidad lo garantiza con 7.5rem).
-4. **Matiz del "dorado" (necesita tu decisión)**: el chevron usa `--color-accent-text`, el acento **semántico del tema**: dorado `#fadd7f` en oscuro (12.06:1 ✓), **azul `#304cfd` en claro** (5.87:1 ✓) — mismo criterio que tabs/links del kit. Tu criterio de #104b decía "amarillo-dorado": si lo querés dorado **también en claro**, es una decisión de diseño nueva (un token de icono dorado fijo con su fila de contraste; un literal está prohibido). Si aceptás la lectura semántica (dorado en oscuro / acento en claro), el item queda cerrado como está.
+1. **Ctrl+P real** — **PENDIENTE (único que falta para cerrar F5)**: render de papel con paginación/`@page` sobre `#resume` en tema oscuro (criterios en el checklist de la puerta: orden About→Resume, chrome oculto, contactos expandidos, testimonios completos, paleta clara, cortes).
+2. **Favicon visible en la solapa** — **RESUELTO (decisión #105a)**: se cierra como está (azul `#304cfd`, hexágono pointy-top); no se abre cambio estético sin motivo.
+3. **F8 + token < md** — **RESUELTOS (decisión #105b/c)**: F8 cerrado, `9rem` (≥768) queda definitivo sin captura de referencia; se aplica la base `< md` `6.375rem`. Ediciones de `tokens.css` **aplicadas** por el orquestador por instrucción explícita del usuario (#105c, 2026-10-08): línea 201 (`6.375rem`) y comentario línea 336 (definitivo documentado). **Commit en manos del usuario** (`feat(tokens): set avatar base 6.375rem and finalize 9rem (F5 #105b/c)` — el `git add tokens/…` no está en el allowlist del orquestador). La QA midió cero solape también con 7.5rem: el valor es estético, no funcional.
+4. **Matiz del "dorado"** — **RESUELTO (decisión #105d)**: se acepta la lectura semántica por tema de `--color-accent-text` (dorado `#fadd7f` en oscuro, azul `#304cfd` en claro; contrastes 12.06:1 / 5.87:1 ✓); descartado un dorado fijo en claro.
 
 ## Pass 1–2 original (registro histórico)
 
