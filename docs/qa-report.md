@@ -1,5 +1,31 @@
 # QA de F5 — informe (2026-10-08)
 
+## RESOLUCIÓN (pasadas 3–4, tras el paquete #104)
+
+Las correcciones #104 se implementaron, revisaron y verificaron en vivo:
+
+| Defecto | Fix (tarea/commit) | Verificación en vivo (pasada 3/4) |
+|---|---|---|
+| B-2 controles visibles en print | ControlsBar T3 `eaa4d01` + AppLayout T7 `87edfd1` (`header[data-print-hide]`) | PASADA 3-A APROBADO: `display:none` en emulación |
+| B-3 botón "Mostrar contactos" en print | Sidebar T7 `fac2fbe` + T7 AppLayout (`button[data-print-hide]`) | PASADA 3-A APROBADO |
+| M-1 franja vacía de la tab | CornerTab T5 `25e2ee4` + T7 (`div[data-print-hide]`) | PASADA 3-A APROBADO: sin leftovers |
+| D1 solape 375 | Sidebar T7 (rediseño #104b: chevron icon-only, identidad a la izquierda, redes centradas) | PASADA 3-B + 4-4: gap 23px, cero solape es/en/Resume, claro/oscuro, overflow 0 |
+| D2 anillo UA en skip link | AppLayout T8 `74bafe2` | PASADA 3-C: outline 2px `#304cfd` offset 2; el panel recibe el anillo tras Enter |
+| D3 outline UA doble en card | TestimonialCard T4 `02a2756` | PASADA 3-C: outline-style none; único anillo en ::after tras Esc del dialog |
+| D4 favicon 404 | Foundation T13/T13b `b93c510` (`/favicon.svg`, azul `#304cfd`) | PASADA 3-D: 200 `image/svg+xml`, cero petición al .ico, consola limpia |
+| Pendientes E de pasada 1/2 | — | PASADA 3-E1–E3 (overflow 1024/768; sticky OFF 1440×800 + último contacto; disclosure teclado 1024) y PASADA 4 (bullet 2 Enter→aria-current+scrollLeft 445; hover NavTabs = spec RF-5; axe 0 violaciones en×claro×about y es×oscuro×resume; contraste del chevron claro 5.87 / oscuro 12.06 ✓ contrast.md filas 15/19/39) |
+
+Suite tras todo: **445/40**, build ✅ validate:content ✅.
+
+### Quedan en manos del usuario (no verificables por agentes)
+
+1. **Ctrl+P real**: render de papel con paginación/`@page` (la emulación cubrió estilos, no el motor de impresión).
+2. **Favicon visible en la solapa** (no observable por MCP).
+3. **F8 + token < md**: `--size-avatar-sidebar` base sigue en **7.5rem** (`tokens.css:201`; la spec #104b fija 6.375rem = −15% — pendiente de tu edición) y el **9rem (≥768) provisional** espera tu captura de referencia. Medido en vivo: cero solape igualmente (la reserva de la identidad lo garantiza con 7.5rem).
+4. **Matiz del "dorado" (necesita tu decisión)**: el chevron usa `--color-accent-text`, el acento **semántico del tema**: dorado `#fadd7f` en oscuro (12.06:1 ✓), **azul `#304cfd` en claro** (5.87:1 ✓) — mismo criterio que tabs/links del kit. Tu criterio de #104b decía "amarillo-dorado": si lo querés dorado **también en claro**, es una decisión de diseño nueva (un token de icono dorado fijo con su fila de contraste; un literal está prohibido). Si aceptás la lectura semántica (dorado en oscuro / acento en claro), el item queda cerrado como está.
+
+## Pass 1–2 original (registro histórico)
+
 App servida por el usuario en `http://localhost:5173/`; pasada del `reviewer`
 con chrome-devtools MCP (decisiones #85 y #91). **Dos pasadas**: la 1ª agotó
 pasos del agente con 34 checks; la 2ª, enfocada en impresión/teclado/axe,
