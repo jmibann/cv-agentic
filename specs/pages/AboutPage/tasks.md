@@ -1,6 +1,6 @@
 # Tareas — AboutPage
 
-- [ ] **T1. Página con `h1` único e `.intro`.** RF-1, RF-2 (intro)
+- [x] **T1. Página con `h1` único e `.intro`.** RF-1, RF-2 (intro) — 4a78293 (APROBADA. Menores registradas: subject `bc040d2` con sufijo en español (#102, no enmendable; el patrón para la pieza es `test(AboutPage): Tn` a secas); PARA T4: las aserciones deben afirmar las clases `.page`/`.intro` con `styles.x ?? "x"` (canon #99), no solo estructura; `key={paragraph}` usa el texto como clave — con duplicados reales daría warning de React, inspección al cerrar)
   - Hecho cuando: `AboutPage.test.tsx` cubre tests 1 y 2 de la spec: `getAllByRole("heading", { level: 1 })` de longitud 1 con `t.about.title` (`SectionTitle as="h1" decorated`) y un `<p>` por cada elemento de `profile.about` dentro de `.intro`; `AboutPage.tsx` existe con raíz `div.page` (markup, sin módulo todavía); verde tras `feat(AboutPage): T1`.
 
 - [ ] **T2. Sección de servicios con región y `<ul>`.** RF-2 (servicios), RF-5
