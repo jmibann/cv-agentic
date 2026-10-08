@@ -1,6 +1,6 @@
 # Tareas — ResumePage
 
-- [ ] **T1. Página con `h1` único y `.columns` con las dos secciones.** RF-1, RF-2, RF-5
+- [x] **T1. Página con `h1` único y `.columns` con las dos secciones.** RF-1, RF-2, RF-5 — 6b498ee (APROBADA. Test 2 discrimina RF-5 (orden h3 = orden de datos). Menores informativas: `.columns` se renderiza siempre — rama "ambos vacíos" es T2; `ResumePageProps` sin consumidor hasta T4)
   - Hecho cuando: `ResumePage.test.tsx` cubre tests 1, 2 y 7 de la spec: `getAllByRole("heading", { level: 1 })` longitud 1 con `t.resume.title`; regiones con nombre `t.resume.education` y `t.resume.experience`, cada una con un `listitem` por entrada del kit; con locale `es` muestra textos de `ui.es` y contenido de `cv.es`; `ResumePage.tsx` pasa a cada `ResumeSection` `id`, `title`, `icon` (`"book-open"`/`"briefcase"`), `entries`, `locale={locale}` de `useLocale()`, `timelineIdPrefix="edu"`/`"exp"` y `presentLabel={t.timeline.present}`; armazón `AccentGradientDefs` en el wrapper; verde tras `feat(ResumePage): T1`.
 
 - [ ] **T2. `presentLabel` reenviado y columnas vacías.** RF-7, RF-2 (vacíos)
