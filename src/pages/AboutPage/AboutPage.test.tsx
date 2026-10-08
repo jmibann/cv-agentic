@@ -38,9 +38,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { HexAvatarDefs } from "../../components/HexAvatar";
 import { AccentGradientDefs } from "../../components/Icon";
 import { cvByLocale } from "../../content";
 import { uiEn } from "../../i18n/ui.en";
+import { uiEs } from "../../i18n/ui.es";
 import { LocaleProvider } from "../../providers/LocaleProvider";
 
 import { AboutPage } from "./AboutPage";
@@ -169,9 +171,14 @@ describe("AboutPage intro paragraphs (T1: RF-2 intro, Tests 2)", () => {
 
 interface CvHarness {
   emptyServices: boolean;
+  // T3 (test 5b): mismo mecanismo para vaciar `testimonials`.
+  emptyTestimonials: boolean;
 }
 
-const cvHarness = vi.hoisted((): CvHarness => ({ emptyServices: false }));
+const cvHarness = vi.hoisted((): CvHarness => ({
+  emptyServices: false,
+  emptyTestimonials: false,
+}));
 
 vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
   const actual =
@@ -179,21 +186,29 @@ vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
   return {
     ...actual,
     // Desarmado (default): delega en el `useCv` REAL del contexto del
-    // LocaleProvider de verdad; armado: mismo cv real con `services: []`.
-    // `useLocale`/`LocaleProvider` se conservan vía el spread de `actual`
-    // (precedente LanguageSwitcher).
+    // LocaleProvider de verdad; armado: mismo cv real con la colección vacía
+    // del flag activo. `useLocale`/`LocaleProvider` se conservan vía el spread
+    // de `actual` (precedente LanguageSwitcher).
     useCv: () => {
       const cv = actual.useCv();
-      return cvHarness.emptyServices ? { ...cv, services: [] } : cv;
+      if (cvHarness.emptyServices) {
+        return { ...cv, services: [] };
+      }
+      if (cvHarness.emptyTestimonials) {
+        return { ...cv, testimonials: [] };
+      }
+      return cv;
     },
   };
 });
 
 // Harness por defecto de cada test: desarmado (cv real del kit). Vitest corre
-// el beforeEach outer ANTES del inner, así que el describe de 5a puede armarlo
-// tranquilo. Sin afterEach: este propio beforeEach re-setea el estado cada vez.
+// el beforeEach outer ANTES del inner, así que los describes de 5a/5b pueden
+// armarlo tranquilo. Sin afterEach: este propio beforeEach re-setea el estado
+// cada vez.
 beforeEach(() => {
   cvHarness.emptyServices = false;
+  cvHarness.emptyTestimonials = false;
 });
 
 // Esperados desde las FUENTES del kit (C3): el título de `uiEn.about.services`
@@ -320,5 +335,251 @@ describe("AboutPage with empty services (T2: RF-2, Tests 5a, mocked provider)", 
     expect(
       screen.getByRole("heading", { level: 1, name: ABOUT_TITLE }),
     ).toBeInTheDocument();
+  });
+});
+
+// ===========================================================================
+// Tests de T3 (specs/pages/AboutPage/tasks.md) — RF-2 (testimonios) y RF-3:
+// test 4 de la spec (la `region` con nombre `t.about.testimonials` es la
+// `<section>` PROPIA del `TestimonialCarousel` —dueña única de la región,
+// decisión 20: hermana directa del `h2` en `.page`, sin wrapper de la página—,
+// nombrada vía `labelledBy` y alimentada con las 5 plantillas CRUDAS de
+// `t.testimonials`; la página NO llama `format`: se verifica observablemente,
+// los nombres de slides/readMore salen interpolados del carrusel), test 5b
+// (con `testimonials: []` por mock no existen el `h2` "Testimonials" ni la
+// región y el `h1` sigue único) y test 6 (locale `es`: textos de `uiEs` y
+// contenido de `cvByLocale.es`).
+// Mock 5b: MISMO mecanismo hoisted/importOriginal del 5a, flag
+// `emptyTestimonials`, reset en el `beforeEach` outer.
+// Test 6: semilla del idioma por el camino del precedente LanguageSwitcher —
+// `document.documentElement.lang = "es"` ANTES del render (lo lee
+// `readInitialLocale`, ruta del anti-flash; el `afterEach` de `setup.ts` limpia
+// `lang`/storage entre tests). Sin literales: todo lo esperado se importa de
+// `uiEs`/`cvByLocale.es`.
+// Armazones: `AccentGradientDefs` + `HexAvatarDefs` en los renders de T3 (las
+// cards del carrusel montan `HexAvatar` con `clip-path` a `url(#hex-avatar-*)`
+// e `Icon tone="gradient"` en la comilla; contracto de las primitivas,
+// precedente TestimonialCard/TestimonialDialog.test.tsx).
+// Verde on-arrival declarado en el commit test (decisión #101): el TEST 5B —
+// antes del feat la página aún no renderiza nada de testimonios, así que las
+// ausencias ya se cumplen; su discrimen es proteger la rama RF-2 contra una
+// regresión que montara el h2/carrusel con la colección vacía. El rojo del
+// commit lo ponen el test 4 (no hay h2 ni carrusel todavía) y el test 6 (la
+// región de testimonios en `es` tampoco existe; sus asserts de servicios/h1
+// ya pasan por T1/T2).
+// `className` NO se pasa aún en el carrusel: `styles.testimonials` llega con
+// el módulo en T4 (Anatomía → tabla "Estilos y tokens"); la hermandad
+// h2↔section se verifica por estructura.
+// ===========================================================================
+
+// Esperados desde las FUENTES del kit (C3).
+const TESTIMONIALS_TITLE = uiEn.about.testimonials;
+const TESTIMONIALS = cvByLocale.en.testimonials;
+
+// Render con los dos armazones de defs que requieren los hijos con gradient
+// y hexágonos de la página completa.
+const renderAboutPageWithAllDefs = () =>
+  render(
+    <LocaleProvider>
+      <AccentGradientDefs />
+      <HexAvatarDefs />
+      <AboutPage />
+    </LocaleProvider>,
+  );
+
+describe("AboutPage testimonials region is the carousel own section (T3: RF-2 testimonials, RF-3, Tests 4)", () => {
+  it("renders the carousel section named by t.about.testimonials as direct sibling of its h2, fed with the raw t.testimonials templates", () => {
+    // Invariante del escenario (criterio T1/T2): sin testimonios en el kit el
+    // test sería vacío y no discriminaría nada; se frena y se reporta.
+    if (TESTIMONIALS.length === 0) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer testimonios en cv.testimonials (test 4 de la spec no puede correr vacío)",
+      );
+    }
+
+    renderAboutPageWithAllDefs();
+
+    // Test 4 / RF-2 (decisión 20): la región con nombre `t.about.testimonials`
+    // es la `<section>` PROPIA del carrusel — no un wrapper de la página.
+    // Discrimen de autoría: `aria-roledescription="carousel"` (RF-1 de
+    // TestimonialCarousel) y NADA de wrapper intermedio (la hermandad se
+    // asierta abajo por padre común).
+    const region = screen.getByRole("region", { name: TESTIMONIALS_TITLE });
+    expect(region.tagName).toBe("SECTION");
+    expect(region).toHaveAttribute("aria-roledescription", "carousel");
+
+    // La página le pasa `labelledBy="about-testimonials-title"`: el nombre
+    // resuelve por `aria-labelledby` al h2 y el carrusel NO usa `aria-label`
+    // (una u otra, nunca ambas — contrato de su spec). Así se discrimina que
+    // el `labelledBy` llegó: `uiEn.about.testimonials` y
+    // `uiEn.testimonials.carouselLabel` son el mismo literal "Testimonials",
+    // el nombre por sí solo no distinguiría.
+    expect(region).toHaveAttribute("aria-labelledby", "about-testimonials-title");
+    expect(region).not.toHaveAttribute("aria-label");
+
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: TESTIMONIALS_TITLE,
+    });
+    expect(heading).toHaveAttribute("id", "about-testimonials-title");
+
+    // Anatomía/decisión 20: `h2` y carrusel son HERMANOS DIRECTOS en `.page`,
+    // sin wrapper de la página: comparten padre, el h2 va inmediatamente
+    // antes de la section, y el raíz sigue abriendo con el h1 primero.
+    const pageRoot = region.parentElement;
+    if (pageRoot === null) {
+      throw new Error(
+        "la <section> del carrusel debe ser hijo del raíz .page (decisión 20: sin wrapper)",
+      );
+    }
+    expect(pageRoot.tagName).toBe("DIV");
+    expect(heading.parentElement).toBe(pageRoot);
+    expect(region.previousElementSibling).toBe(heading);
+    const h1 = screen.getByRole("heading", { level: 1, name: ABOUT_TITLE });
+    expect(pageRoot.firstElementChild).toBe(h1);
+
+    // RF-3: la página pasa las plantillas CRUDAS de `t.testimonials` y no
+    // llama `format` — verificación observable: los nombres que produce el
+    // CARRUSEL interpolando existen en el DOM (si la página hubiera
+    // pre-interpolado o mandado cualquier otra cosa, estos nombres no
+    // clavarían). Un `group` por testimonio con "{current} of {total}".
+    for (let index = 0; index < TESTIMONIALS.length; index += 1) {
+      const slideName = uiEn.testimonials.slideLabel
+        .replace("{current}", String(index + 1))
+        .replace("{total}", String(TESTIMONIALS.length));
+      expect(within(region).getByRole("group", { name: slideName })).toBeInTheDocument();
+    }
+
+    // Y el botón "read more" de cada card nombrado con la plantilla `readMore`
+    // interpolada por el carrusel con el author de `cvByLocale.en` (prueba de
+    // que la plantilla viajó cruda y el contenido lo canaliza `useCv()`).
+    for (const testimonial of TESTIMONIALS) {
+      const openName = uiEn.testimonials.readMore.replace(
+        "{author}",
+        testimonial.author,
+      );
+      expect(
+        within(region).getByRole("button", { name: openName }),
+      ).toBeInTheDocument();
+    }
+  });
+});
+
+describe("AboutPage with empty testimonials (T3: RF-2, Tests 5b, mocked provider)", () => {
+  // Arma el harness: el `useCv` mockeado devuelve el cv real del kit con
+  // `testimonials: []` (mismo mecanismo del 5a; LocaleProvider sigue real).
+  beforeEach(() => {
+    cvHarness.emptyTestimonials = true;
+  });
+
+  it("renders no testimonials h2 nor carousel region and keeps the unique h1 when testimonials is empty", () => {
+    // Freno anti-test-vacío (criterio 5a): si el kit no trajera testimonios,
+    // la variante con [] no discriminaría nada.
+    if (TESTIMONIALS.length === 0) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer testimonios para que el escenario vacío (test 5b) discrimine",
+      );
+    }
+
+    renderAboutPageWithAllDefs();
+
+    // RF-2: "SI testimonials está vacío, ENTONCES no renderiza ni el h2 ni el
+    // carrusel" (la región es la section del propio carrusel, que tampoco se
+    // monta: con [] el carrusel devuelve null — RF-1 de su spec).
+    expect(
+      screen.queryByRole("heading", { level: 2, name: TESTIMONIALS_TITLE }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: TESTIMONIALS_TITLE }),
+    ).not.toBeInTheDocument();
+    // Sin slides (groups) ni cards de testimonio (articles nombradas por el
+    // author); los articles de SERVICIOS quedan, no se cuentan acá.
+    expect(screen.queryAllByRole("group")).toHaveLength(0);
+    for (const testimonial of TESTIMONIALS) {
+      expect(
+        screen.queryByRole("article", { name: testimonial.author }),
+      ).not.toBeInTheDocument();
+    }
+
+    // El mock es quirúrgico: solo vacía `testimonials` — la región de
+    // servicios (T2) sigue montada con el cv real.
+    expect(screen.getByRole("region", { name: SERVICES_TITLE })).toBeInTheDocument();
+
+    // Test 5 "en ambos escenarios": el `h1` sigue siendo el único.
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+});
+
+describe("AboutPage in Spanish locale (T3: Tests 6, real LocaleProvider seeded es)", () => {
+  it("shows the ui.es interface strings and the cv.es content when the active locale is es", () => {
+    // Invariante: el cv.es del kit trae servicios y testimonios (los asserts
+    // por array no pueden correr vacíos).
+    if (
+      cvByLocale.es.services.length === 0 ||
+      cvByLocale.es.testimonials.length === 0 ||
+      cvByLocale.es.profile.about.length === 0
+    ) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer about, services y testimonials en cv.es para el test 6",
+      );
+    }
+
+    // Semilla anti-flash (precedente LanguageSwitcher T2/T3): `lang="es"` en
+    // <html> ANTES del render; `readInitialLocale` lee solo ese atributo y el
+    // provider resuelve `uiEs` + `cvByLocale.es`. El afterEach de setup.ts
+    // limpia `lang`/storage.
+    document.documentElement.lang = "es";
+    renderAboutPageWithAllDefs();
+    expect(document.documentElement).toHaveAttribute("lang", "es");
+
+    // Textos de UI desde uiEs (sin literales): h1 `about.title`, región de
+    // servicios `about.services`, región de testimonios `about.testimonials`
+    // (la section del carrusel) y el h1 sigue único.
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { level: 1, name: uiEs.about.title }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("region", { name: uiEs.about.services }),
+    ).toBeInTheDocument();
+    const regionEs = screen.getByRole("region", {
+      name: uiEs.about.testimonials,
+    });
+    expect(regionEs).toHaveAttribute("aria-roledescription", "carousel");
+
+    // Contenido desde cv.es: los <p> de la intro (sin rol: query de texto,
+    // criterio estructural de T1), las cards de servicio nombradas por sus
+    // títulos en español (distintos de los ingleses: discrimina que `useCv()`
+    // devolvió el cv del locale activo, no el inglés).
+    for (const paragraph of cvByLocale.es.profile.about) {
+      expect(screen.getByText(paragraph)).toBeInTheDocument();
+    }
+    for (const service of cvByLocale.es.services) {
+      expect(
+        screen.getByRole("article", { name: service.title }),
+      ).toBeInTheDocument();
+    }
+
+    // Y el carrusel arma sus nombres con las plantillas de `uiEs` y el
+    // contenido de `cv.es` (todo el viaje pasó crudo por `carouselLabels`):
+    // "1 de 3"-style por slide y readMore con el author.
+    const esTestimonials = cvByLocale.es.testimonials;
+    for (let index = 0; index < esTestimonials.length; index += 1) {
+      const slideName = uiEs.testimonials.slideLabel
+        .replace("{current}", String(index + 1))
+        .replace("{total}", String(esTestimonials.length));
+      expect(
+        within(regionEs).getByRole("group", { name: slideName }),
+      ).toBeInTheDocument();
+    }
+    for (const testimonial of esTestimonials) {
+      const openName = uiEs.testimonials.readMore.replace(
+        "{author}",
+        testimonial.author,
+      );
+      expect(
+        within(regionEs).getByRole("button", { name: openName }),
+      ).toBeInTheDocument();
+    }
   });
 });
