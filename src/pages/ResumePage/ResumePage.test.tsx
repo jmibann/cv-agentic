@@ -38,7 +38,7 @@
 // colecciones vacías; en T1 no hace falta: ninguna rama lo necesita.
 
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AccentGradientDefs } from "../../components/Icon";
 import { cvByLocale } from "../../content";
@@ -237,5 +237,214 @@ describe("ResumePage in Spanish locale (T1: Tests 7, real LocaleProvider seeded 
           .map((headingEl) => headingEl.textContent),
       ).toEqual(section.entries.map((entry) => entry.title));
     }
+  });
+});
+
+// ===========================================================================
+// Tests de T2 (specs/pages/ResumePage/tasks.md) — RF-7 y RF-2 (vacíos): test 4
+// de la spec (contenido MOCKEADO con una entrada `"end": null`, sin depender
+// del fixture: el panel muestra `t.timeline.present`) y test 5 en dos
+// escenarios (con `education: []` no existe esa región y Experience sigue
+// presente; con ambas colecciones vacías no existe ninguna de las dos regiones
+// y el `h1` sigue presente — la ausencia de `.columns` por inspección del
+// markup: se asiértá que el raíz NO tiene ningún `<div>` hijo directo, no que
+// el h1 sea su único hijo, porque la sección de skills de T3 cuelga del raíz
+// como `<section>` y un assert de "único hijo" sería inválido mañana
+// — patrón T2b/T3b evitado a propósito).
+// Mock: MISMO mecanismo que AboutPage T2/T3 (`vi.mock` del módulo de providers
+// con `importOriginal` + `vi.hoisted` como estado mutable del escenario,
+// delegando siempre en el `useCv` REAL y aplicando la variante solo con el
+// escenario armado; `LocaleProvider`/`useLocale` conservados vía el spread de
+// `actual`). Cada archivo de test usa su propio mock (no se comparte entre
+// archivos): los tests de T1 de arriba corren con el escenario "real" por
+// defecto (el outer `beforeEach` resetea) y su comportamiento no cambia: el
+// override delega en el hook real.
+// Entrada del test 4: construida en el propio override como COPIA MODIFICADA
+// de una base del kit (`{ ...cv.education[0], end: null }`, tipo
+// `TimelineEntry` del generated — sin literales del JSON a mano), con
+// `experience: []` de acompañamiento para que la región asertada sea solo la
+// de education.
+// Verde on-arrival declarado en el cuerpo del commit (#101): el TEST 4 y el
+// 5a — la página ya reenvía `presentLabel` y ya guarda cada columna por su
+// colección desde T1; su discrimen es FUTURO: el 4 protege el reenvío de RF-7
+// (una pérdida de `presentLabel` o un `cv.locale` en lugar de `locale` lo
+// rompen) y prueba que el override rigió (el kit trae 2 entradas de education;
+// la región con el mock tiene que traer EXACTAMENTE 1 `listitem`); el 5a
+// protege la rama RF-2 de education vacía. El ROJO del commit lo pone el 5b:
+// hoy la página monta `.columns` incluso con ambas colecciones vacías y el
+// assert "raíz sin <div> hijo" falla hasta `feat(ResumePage): T2`.
+// ===========================================================================
+
+interface ResumeCvHarness {
+  scenario: "real" | "presentNull" | "educationEmpty" | "columnsEmpty";
+}
+
+const cvHarness = vi.hoisted((): ResumeCvHarness => ({
+  scenario: "real",
+}));
+
+vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../providers/LocaleProvider")>();
+  return {
+    ...actual,
+    // "real" (default): delega en el `useCv` REAL del contexto del
+    // LocaleProvider de verdad; los escenarios de T2 devuelven el cv real del
+    // locale activo con las variantes fijadas en el propio override.
+    useCv: () => {
+      const cv = actual.useCv();
+      if (cvHarness.scenario === "presentNull") {
+        const base = cv.education[0];
+        if (base === undefined) {
+          throw new Error(
+            "el cv del locale activo debe traer al menos una entrada de education para el escenario del test 4",
+          );
+        }
+        // Copia modificada de la base del kit: única entrada con `end: null`
+        // (RF-7 sin depender del fixture) y experience vacía.
+        return { ...cv, education: [{ ...base, end: null }], experience: [] };
+      }
+      if (cvHarness.scenario === "educationEmpty") {
+        return { ...cv, education: [] };
+      }
+      if (cvHarness.scenario === "columnsEmpty") {
+        return { ...cv, education: [], experience: [] };
+      }
+      return cv;
+    },
+  };
+});
+
+// Escenario por defecto de cada test: "real" (cv completo del kit). Vitest
+// corre el beforeEach outer ANTES del inner, así que los describes pueden
+// armar su escenario tranquilo. Sin afterEach: este propio beforeEach
+// re-setea el estado cada vez.
+beforeEach(() => {
+  cvHarness.scenario = "real";
+});
+
+describe("ResumePage presentLabel forwarded to an open-ended entry (T2: RF-7, Tests 4, mocked provider)", () => {
+  beforeEach(() => {
+    cvHarness.scenario = "presentNull";
+  });
+
+  it("shows t.timeline.present for the mocked end:null entry, proving the label travels through the page", () => {
+    // Invariante: el kit trae education no vacía (la base modificada del
+    // override sale de ahí) y trae MAS de una entrada: con una sola, el
+    // assert de `listitem` longitud 1 no discriminaría el mock.
+    if (EDUCATION.length < 2) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer al menos DOS entradas de education para que el escenario mockeado (1 listitem) del test 4 discrimine",
+      );
+    }
+
+    renderResumePage();
+
+    // RF-7: la página reenvía `t.timeline.present` como `presentLabel` y el
+    // Timeline de la sección lo muestra como TEXTO con `end: null` (su RF-3).
+    // El nombre de la región sigue saliendo de `t.resume.education`.
+    // `exact: false` justificado: el `<p>` del período arma el texto mixto
+    // "2012 — Present" (nodo `<time>` + literales de texto hermanos;
+    // precedente Timeline.test.tsx aserta el textContent compuesto), así que
+    // el `getByText` exacto no matchea ningún elemento. Con substring el único
+    // candidato es el `<p>` del período (el matcher de texto de RTL evalúa el
+    // texto PROPIO de cada elemento, sin los de sus hijos).
+    const region = screen.getByRole("region", {
+      name: uiEn.resume.education,
+    });
+    expect(
+      within(region).getByText(uiEn.timeline.present, { exact: false }),
+    ).toBeInTheDocument();
+
+    // El override rigió (no es el fixture): UNA sola entrada — la copia con
+    // `end: null` — y Experience fue vaciada (su región no existe).
+    expect(within(region).getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      screen.queryByRole("region", { name: uiEn.resume.experience }),
+    ).not.toBeInTheDocument();
+
+    // El `h1` sigue presente y único en el escenario mockeado.
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+});
+
+describe("ResumePage with education empty (T2: RF-2, Tests 5, mocked provider)", () => {
+  beforeEach(() => {
+    cvHarness.scenario = "educationEmpty";
+  });
+
+  it("renders no education region while Experience stays present and the h1 remains the only one", () => {
+    // Invariante (criterio T1/T2): el escenario solo discrimina si el kit trae
+    // ambas colecciones llenas.
+    if (EDUCATION.length === 0 || EXPERIENCE.length === 0) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer education y experience no vacías para que el escenario 5a discrimine",
+      );
+    }
+
+    renderResumePage();
+
+    // RF-2: "SI un conjunto está vacío, ENTONCES no aparece su columna".
+    expect(
+      screen.queryByRole("region", { name: uiEn.resume.education }),
+    ).not.toBeInTheDocument();
+    const experienceRegion = screen.getByRole("region", {
+      name: uiEn.resume.experience,
+    });
+    expect(experienceRegion).toBeInTheDocument();
+
+    // .columns sigue montado con la ÚNICA columna presente (Anatomía; el
+    // ancho completo en ≥ md es de inspección CSS, RF-3/T4).
+    const columns = experienceRegion.parentElement;
+    if (columns === null) {
+      throw new Error(
+        "la <section> de experience debe colgar del bloque .columns (Anatomía)",
+      );
+    }
+    expect(columns.tagName).toBe("DIV");
+    expect(columns.children).toHaveLength(1);
+
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+});
+
+describe("ResumePage with education and experience both empty (T2: RF-2, Tests 5, mocked provider)", () => {
+  beforeEach(() => {
+    cvHarness.scenario = "columnsEmpty";
+  });
+
+  it("renders no timeline regions, no columns container, and keeps the unique h1", () => {
+    // Invariante: ambas colecciones llenas en el kit (sin esto el escenario
+    // vacío no discriminaría nada).
+    if (EDUCATION.length === 0 || EXPERIENCE.length === 0) {
+      throw new Error(
+        "el contenido de ejemplo del kit debe traer education y experience no vacías para que el escenario 5b discrimine",
+      );
+    }
+
+    renderResumePage();
+
+    // RF-2: ninguna de las dos regiones existe…
+    expect(
+      screen.queryByRole("region", { name: uiEn.resume.education }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("region", { name: uiEn.resume.experience }),
+    ).not.toBeInTheDocument();
+
+    // …y "SI ambos están vacíos, no renderiza `.columns`" — inspección del
+    // markup generado: el raíz NO tiene ningún `<div>` hijo directo (no
+    // asértamos "el h1 es el único hijo" porque la sección de skills de T3
+    // cuelga del raíz como `<section>` y un assert de hijos totales sería
+    // inválido al llegar T3 — patrón T2b/T3b evitado).
+    const h1 = screen.getByRole("heading", { level: 1, name: RESUME_TITLE });
+    const pageRoot = h1.parentElement;
+    if (pageRoot === null) {
+      throw new Error("el h1 debe ser hijo del raíz .page (Anatomía)");
+    }
+    expect(pageRoot.querySelectorAll(":scope > div")).toHaveLength(0);
+
+    // El `h1` sigue presente y único.
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 });
