@@ -21,19 +21,19 @@
 // completo (tabla Contactos). RF-6/decisión 10/D6: `target`/`rel` SOLO en
 // links externos (criterio abajo, en `external`).
 //
-// T4 hecha: disclosure (RF-3/RF-4) — `CornerTab size="sm"` como PRIMER hijo
-// del landmark (Anatomía: pegada a la esquina superior derecha; su posición la
-// fija la base absoluta del módulo de CornerTab), con un `<button
-// type="button">` que lleva `aria-expanded` (estado local `expanded`, default
-// `false` en todo < xl — decisión 11), `aria-controls` al `id` de `.additional`
-// y el texto alterno `showContacts`/`hideContacts` (RF-4, por props — RF-8).
-// El colapso es por CLASE del módulo (`styles.additionalCollapsed` aplicada
-// SOLO cuando `!expanded`, nunca `style` inline — RF-10: la expansión forzada
-// de impresión y el `@media` ≥ xl de T6 deben poder sobrescribirla). El
-// chevron es `Icon name="chevron-down"` sin `label` → decorativo (aria-hidden,
-// Icon RF-3) con las clases `.chevron`/`.chevronRotated` del módulo unidas en
-// su `<svg>` (Icon RF-6); la rotación (`transform` + `--duration-base`) es
-// CSS: en jsdom solo se observa la clase.
+// T4 hecha (luego rediseñada por T7): disclosure (RF-3/RF-4) — nació como
+// `CornerTab size="sm"` con botón de texto; T7 lo reemplazó (ver abajo).
+// Permanecen de T4: el botón como PRIMER hijo del landmark, `aria-expanded`
+// (estado local `expanded`, default `false` en todo < xl — decisión 11),
+// `aria-controls` al `id` de `.additional` y el nombre alterno
+// `showContacts`/`hideContacts` (RF-4, por props — RF-8). El colapso es por
+// CLASE del módulo (`styles.additionalCollapsed` aplicada SOLO cuando
+// `!expanded`, nunca `style` inline — RF-10: la expansión forzada de impresión
+// y el `@media` ≥ xl de T6 deben poder sobrescribirla). El chevron es `Icon
+// name="chevron-down"` sin `label` → decorativo (aria-hidden, Icon RF-3) con
+// las clases `.chevron`/`.chevronRotated` del módulo unidas en su `<svg>`
+// (Icon RF-6); la rotación (`transform` + `--duration-base`) es CSS: en jsdom
+// solo se observa la clase.
 //
 // T5 hecha: CTA de descarga (RF-2; Anatomía) — `Button href={downloadCvUrl}
 // download icon="download" fullWidth` con el label `labels.downloadCv`,
@@ -49,7 +49,8 @@
 // Show/Hide sin fondo en `--color-accent-text`, avatar sobresaliente en xl
 // (`calc(var(--size-avatar-sidebar) * -0.71)`, fórmula compartida con
 // `foundations/layout.md`) y el ÚNICO `@media (min-width: 1200px)` de
-// comportamiento xl (decisión 8=a): oculta la CornerTab (`.disclosureTab`) y
+// comportamiento xl (decisión 8=a): oculta el botón de disclosure (en T7 la
+// clase `.disclosure` propia del módulo; antes la CornerTab `.disclosureTab`) y
 // fuerza visible `.additional` pisando `.additionalCollapsed` por
 // especificidad (selector compuesto, sin `!important` ni orden de hoja);
 // cero `@media print` propio (RF-10). Las clases de la Anatomía
@@ -57,8 +58,23 @@
 // conectaron acá; el CTA recibe `.cta` (`margin-top: var(--sidebar-cta-gap)`,
 // tabla "Download CV") unida a su raíz por la prop `className` del Button.
 // jsdom no computa CSS (#101): los estilos se verifican por inspección + QA
-// F5; las clases unidas a hijos (CornerTab/Button) y el colapso por clase sí
+// F5; las clases unidas a hijos (Button) y el colapso por clase sí
 // son observables (tests T4/T5 siguen verdes).
+//
+// T7 hecha (Cambio F5 2026-10-08, decisión del usuario #104b ante D1/B-3 de
+// `docs/qa-report.md`; RF-3/RF-4/RF-10): rediseño del disclosure a botón
+// icon-only SIN CornerTab (la tab con fondo `surface-raised` solapaba el
+// nombre a 375px). Cambios en este archivo: eliminado el import/uso de
+// `CornerTab`; el `<button>` queda directo como primer hijo del `<aside>`, con
+// `data-print-hide` en su raíz (hook del contrato de impresión #103/#104a —
+// RF-10) y `aria-label` alterno `showContacts`/`hideContacts` (RF-4: el nombre
+// accesible reemplaza al texto visible; el único contenido es el chevron
+// decorativo). La posición y el estilo viven en `.disclosure` del módulo
+// (absoluto arriba-derecha; el anclaje lo da Box `.outer`, que ya es
+// `position: relative` — verificado en Box.module.css, sin clase extra en el
+// raíz). El token `--size-avatar-sidebar` base (−15% por el Cambio) LO APLICA
+// EL USUARIO en `tokens.css`: este archivo no lo toca ni lo hardcodea (el
+// layout no depende del valor). `index.ts` sin cambios.
 //
 // RF-8 (C2): la pieza no importa `useCv()` ni `useLocale()` — todos los datos
 // y textos entran por props.
@@ -77,7 +93,6 @@ import { Badge } from "../Badge";
 import { Box } from "../Box";
 import { BRAND_NAMES, BrandIcon } from "../BrandIcon";
 import { Button } from "../Button";
-import { CornerTab } from "../CornerTab";
 import { Icon } from "../Icon";
 import { IconBox } from "../IconBox";
 import { Overhead } from "../Overhead";
@@ -99,9 +114,9 @@ export interface SidebarLabels {
   region: string;
   /** Nombre de la `ul` de redes ("Social profiles"). */
   social: string;
-  /** Texto del botón disclosure colapsado ("Show Contacts") — lo usa T4. */
+  /** Nombre accesible (`aria-label`) del botón disclosure colapsado ("Show Contacts") — lo usa T4; desde T7 es icon-only y el label ES el nombre (RF-4). */
   showContacts: string;
-  /** Texto del botón disclosure expandido ("Hide Contacts") — lo usa T4. */
+  /** Nombre accesible (`aria-label`) del botón disclosure expandido ("Hide Contacts") — ídem T7. */
   hideContacts: string;
   /** Texto del CTA de descarga ("Download CV") — lo usa el `Button` de T5. */
   downloadCv: string;
@@ -177,41 +192,45 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
     // `labels.region` (por props, no hardcodeado — C3). `variant="outer"` es
     // el default del Box pero se explicita por la Anatomía (spec → plan).
     <Box variant="outer" as="aside" aria-label={labels.region} className={className}>
-      {/* T4 (RF-3/RF-4; Anatomía): la CornerTab del disclosure va PRIMERA en
-          el DOM (su base absoluta la pega a la esquina superior derecha del
-          Box) y se monta SIEMPRE: en ≥ xl la oculta solo el @media 1200 del
-          módulo en T6 (decisión CSS-only 8=a — no hay render condicional por
-          ancho; el botón queda no visible ni operable). CornerTab solo aporta
-          forma/posición (su RF-6: sin rol ni aria-*; el nombre y el estado los
-           lleva el botón). `size="sm"`: la compacta de Show Contacts (tabla
-          CornerTab RF-2). T6: `className={styles.disclosureTab}` — se UNE a
-          la base de CornerTab (su API) y el @media 1200 del módulo la oculta
-          (RF-3/8=a; fuera de ese media la clase no pinta nada: visible en
-          todos los < xl). */}
-      <CornerTab size="sm" className={styles.disclosureTab}>
-        {/* Patrón disclosure (spec → Accesibilidad): `aria-expanded` +
-            `aria-controls` al id de `.additional` (existente siempre — Tests
-            5/RF-10). `type="button"`: no es un submit (criterio
-            ThemeToggle/LanguageSwitcher). El texto alterna los labels por
-            props (RF-4, RF-8); el chevron es decorativo (Icon sin `label` →
-            `aria-hidden`, su RF-3), así que el nombre accesible del botón es
-            SOLO el texto. */}
-        {/* T6: `.disclosureButton` — estilo de la fila "Botón" de spec →
-            Responsive/Colapsable (sin fondo, --color-accent-text,
-            --font-size-body, anillo estándar en foco). */}
-        <button
-          type="button"
-          className={styles.disclosureButton}
-          aria-expanded={expanded}
-          aria-controls={CONTACTS_CONTAINER_ID}
-          onClick={() => {
-            setExpanded((current) => !current);
-          }}
-        >
-          {expanded ? labels.hideContacts : labels.showContacts}
-          <Icon name="chevron-down" className={chevronClassName} />
-        </button>
-      </CornerTab>
+      {/* T7 (RF-3/RF-4/RF-10; Anatomía del Cambio F5 2026-10-08, decisión
+          #104b): el disclosure es un botón icon-only DIRECTO como PRIMER hijo
+          del landmark — sin CornerTab (su fondo `surface-raised` solapaba el
+          nombre a 375px, hallazgo D1 de qa-report). El módulo lo posiciona
+          absoluto en la esquina superior derecha del raíz: el anclaje lo da el
+          propio `<aside>`, porque Box `.outer` ya declara `position: relative`
+          (verificado en Box.module.css T4 — su comentario lo fija como "ancla
+          de CornerTab"; acá cumple la misma función sin clase extra). Se monta
+          SIEMPRE: en ≥ xl lo oculta solo el @media 1200 del módulo (decisión
+          8=a: CSS-only, sin render condicional por ancho). `type="button"`: no
+          es un submit (criterio ThemeToggle/LanguageSwitcher). `data-print-hide`
+          en la raíz: hook del contrato de impresión #103/#104a (RF-10;
+          global.css lo alcanza con la variante compuesta elemento+atributo
+          (0,1,1), que gana a la clase del módulo). Patrón disclosure (spec →
+          Accesibilidad): `aria-expanded` (estado local `expanded`, default
+          `false` en todo < xl — decisión 11) + `aria-controls` al id de
+          `.additional` (existente siempre — Tests 5/RF-10) + `aria-label`
+          alterno showContacts/hideContacts (RF-4: el nombre accesible
+          reemplaza al texto visible; textos por props — RF-8). El chevron es
+          `Icon name="chevron-down"` sin `label` → decorativo (`aria-hidden`,
+          Icon RF-3) con las clases `.chevron`/`.chevronRotated` del módulo
+          unidas en su `<svg>` (Icon RF-6); la rotación (`transform` +
+          `--duration-base`) es CSS: en jsdom solo se observa la clase.
+          `.disclosure` — estilo de la fila "Botón de disclosure" de spec →
+          Colapsable/Estados (sin fondo ni border, --color-accent-text, anillo
+          estándar en foco; T6/QA F5: pseudo-estados no asertables en jsdom). */}
+      <button
+        type="button"
+        className={styles.disclosure}
+        data-print-hide
+        aria-label={expanded ? labels.hideContacts : labels.showContacts}
+        aria-expanded={expanded}
+        aria-controls={CONTACTS_CONTAINER_ID}
+        onClick={() => {
+          setExpanded((current) => !current);
+        }}
+      >
+        <Icon name="chevron-down" className={chevronClassName} />
+      </button>
 
       {/* baseInfo (Anatomía): avatar + identidad + redes; T6 conecta las
           clases del módulo (grilla `auto 1fr` < md y md–lg, columna centrada
@@ -221,7 +240,8 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
             Estilos y tokens): SIN atributos HTML `width`/`height` ni
             `decoding` explícito — el tamaño es del token
             `--size-avatar-sidebar` (CSS, T6: `.avatar` lo dimensiona y escala
-            por breakpoint 7.5→9→11.25rem) y en xl sobresale de la card. El
+            por breakpoint vía el token; el valor base del tramo < md lo fija
+            el usuario en `tokens.css` — Cambio F5, T7) y en xl sobresale de la card. El
             alt llega desde `profile.avatar.alt` (spec → Accesibilidad). */}
         <figure className={styles.avatar}>
           <img src={profile.avatar.src} alt={profile.avatar.alt} />

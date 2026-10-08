@@ -1,15 +1,23 @@
 /* Sidebar — specs/layout/Sidebar/spec.md → Estilos y tokens / Responsive /
    Estados. Nació en T4 con las clases mínimas del disclosure; T6 conecta el
-   módulo completo (RF-7, RF-10 y el cierre de RF-3 por CSS): grilla `auto
+   módulo completo (RF-7, RF-10 y el cierre de RF-3 por CSS); T7 (Cambio F5
+   2026-10-08, decisión #104b) rediseña el disclosure a botón icon-only sin
+   CornerTab (`.disclosure` absoluto, `.chevron*` intactos) y reubica el media
+   1200 de la tab a `.disclosure` (la grilla < md/md–lg ya alineaba la
+   identidad al inicio junto al avatar — el Cambio agrega acá la reserva
+   anti-solape `< md` de `.identity` y el centrado de redes). Grilla `auto
    1fr` base (< md y md–lg, filas de la tabla Responsive — el avatar y la
-   tipografía escalan SOLO por tokens: --size-avatar-sidebar 7.5rem→9rem→
-   11.25rem, --font-size-name, --size-avatar-border, --radius-avatar-sidebar,
-   --size-social-icon, --sidebar-name-gap, --sidebar-cta-gap,
-   --font-size-contact-value, todos de tokens/tokens.css), columna vertical
-   centrada en xl con el avatar sobresaliente, redes/links con hover/foco, y
-   el `@media (min-width: 1200px)` — el ÚNICO media de comportamiento xl del
-   módulo (decisión 8=a: oculta la CornerTab del disclosure y fuerza visible
-   `.additional`) más el `@media (min-width: 768px)` de la grilla de
+   tipografía escalan SOLO por tokens: --size-avatar-sidebar (base → 9rem
+   ≥768 → 11.25rem ≥1200; el valor base del tramo < md lo fija el usuario en
+    tokens.css por el Cambio F5 −15%, no se hardcodea acá), --font-size-name,
+    --size-avatar-border, --radius-avatar-sidebar,
+    --size-social-icon, --sidebar-name-gap, --sidebar-cta-gap,
+    --font-size-contact-value, todos de tokens/tokens.css), columna vertical
+    centrada en xl con el avatar sobresaliente, redes/links con hover/foco, y
+    el `@media (min-width: 1200px)` — el ÚNICO media de comportamiento xl del
+    módulo (decisión 8=a: oculta el botón de disclosure `.disclosure` — desde
+    T7, antes la CornerTab — y fuerza visible
+    `.additional`) más el `@media (min-width: 768px)` de la grilla de
    contactos (2 columnas expandidas en md–lg; 1 columna < md y xl), que es
    cambio puro de layout. Dentro de ambos `@media` solo hay keywords de
    layout, tokens, `calc()` de tokens y `0` (docs/tokens/breakpoints.md →
@@ -23,9 +31,11 @@
    semánticos; los pares usados están registrados en docs/tokens/contrast.md
    (redes `text-muted` sobre surface 5.02/6.01 y su hover/foco
    `accent-text` sobre surface 5.87/12.06 — sección "Íconos informativos";
-   contactos e identidad `heading` sobre surface 8.92/16.11; botón
-   Show/Hide `accent-text` sobre `surface-raised` de la CornerTab 5.47/10.60
-   — mismo par ya auditado en NavTabs T4). Transiciones de PROPIEDADES
+    contactos e identidad `heading` sobre surface 8.92/16.11; botón de
+    disclosure T7 `accent-text` sobre `surface` del aside 5.87/12.06
+    — el MISMO par ya registrado para hover/foco de redes, contrast.md →
+    "Íconos informativos"; el botón no tiene fondo propio, así que ya no
+    aplica el par sobre `surface-raised` de la CornerTab 5.47/10.60). Transiciones de PROPIEDADES
    concretas con `--duration-base`/`--ease-standard` (Do/Don't de DESIGN:
    nunca `transition: all`); `--duration-base` colapsa a 0.01ms bajo
    prefers-reduced-motion en tokens.css. Literales del módulo: SOLO los que
@@ -115,8 +125,10 @@
 
 /* Avatar (Anatomía `figure.avatar > img`; spec → Estilos y tokens, bloque
    "Avatar" — valores textuales de la tabla, cada uno con su token):
-   tamaño --size-avatar-sidebar (escala 7.5→9→11.25rem por breakpoint en
-   tokens.css; el img hereda 100% del contenedor, decisión 9), radio
+   tamaño --size-avatar-sidebar (escala por breakpoint en tokens.css: base —
+   el −15% del Cambio F5 lo aplica el usuario ahí, no se hardcodea acá — →
+   9rem ≥768 → 11.25rem ≥1200; el img hereda 100% del contenedor, decisión
+   9), radio
    --radius-avatar-sidebar (20 <768 → 32 ≥768), borde --size-avatar-border
    (5→6px ≥768) `solid var(--color-surface)`, sombra --shadow-avatar, fondo
    --color-surface-muted (placeholder mientras carga la imagen de
@@ -149,9 +161,24 @@
    propio en la spec; `min-width: 0` es la necesidad MECÁNICA de que la
    columna 1fr pueda encogerse con un nombre largo (el nombre NO tiene
    elipsis en la spec: sin overflow hidden, simplemente no expande la
-   columna del grid). */
+   columna del grid).
+   T7 (Cambio F5, spec → Responsive "< md" y Colapsable: "la identidad NO
+   pasa por debajo: reserva con `padding-inline-end: calc()` de tokens en
+   < md si el nombre lo alcanza"): DECISIÓN del builder — el nombre SÍ puede
+   alcanzar la esquina a 375px (columna ≈ 227px desde x≈133; un nombre largo
+   llega a x≈360 y la franja del botón cubre y 0–26 con el nombre en
+   y≈15–48; por eso D1 midió solape, ahora con un objetivo de 26px en vez de
+   la tab de 164px). Reserva en la BASE (mobile-first) solo del ancho del
+   área táctil del disclosure + aire: `calc(var(--size-icon) + var(--space-4))`
+   = 18 + 16 = 34px ≥ 26px del botón + 2×offset del anillo de foco (4px), con
+   margen. A md–lg/xl NO aplica (filas md–lg/xl: identidad junto a un avatar
+   de 9rem en ≥768px y columna centrada en xl: el nombre no alcanza la
+   esquina; se corta en el media 768 con `0`, permitido por breakpoints.md —
+   el remedido lo fija F5, criterio (d)). Afecta solo al lado derecho: la
+   alineación al INICIO del bloque no cambia (fila "< md" del Cambio). */
 .identity {
   min-width: 0;
+  padding-inline-end: calc(var(--size-icon) + var(--space-4));
 }
 
 /* Nombre (Anatomía `p.name`; spec → Estilos y tokens, fila "Nombre" —
@@ -176,13 +203,18 @@
    componente). `grid-column: 2`: "redes DEBAJO DE LA IDENTIDAD" (filas < md
    y md–lg de la tabla Responsive — auto-placement las pondría en la
    columna 1 bajo el avatar); ignorado en xl donde el contenedor pasa a
-   flex. Resets de <ul> de UA (margin/padding/list-style con 0, permitidos:
-   necesidad mecánica). */
+   flex. T7 (Cambio F5, spec → Anatomía/Responsive): `justify-content:
+   center` — "redes centradas en el espacio disponible" en < xl (la fila
+   "Redes" de Estilos no fija alineación; es textual del Cambio); en xl el
+   `align-items: center` del media 1200 ya centra la lista y el centro
+   propio queda inocuo. Resets de <ul> de UA (margin/padding/list-style con
+   0, permitidos: necesidad mecánica). */
 .social {
   grid-column: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: var(--space-3);
   margin: 0;
   padding: 0;
@@ -225,46 +257,56 @@
   outline-offset: var(--focus-ring-offset);
 }
 
-/* CornerTab del disclosure (Anatomía; RF-3 y decisión 8=a). La clase se UNE
-   a la base de CornerTab vía su prop `className` (su API: "se une a la clase
-   base del <div> raíz"). FUERA del @media 1200 la clase NO pinta nada: la
-   tab es visible en todos los < xl (RF-3); solo el media xl la oculta
-   (abajo), igual que el patrón `.float` de CornerTab (la clase existe sin
-   regla base). */
+/* Botón de disclosure (T7 — Cambio F5 2026-10-08; Anatomía nueva: botón
+   icon-only DIRECTO, sin CornerTab; RF-3/RF-4/RF-10). FUERA del @media 1200
+   el botón es visible en todos los < xl (RF-3); solo el media xl lo oculta
+   (abajo, decisión 8=a: se monta siempre, sin render condicional por ancho).
 
-/* Botón Show/Hide Contacts (spec → Responsive, Colapsable, párrafo
-   "Botón": "Estilo del botón: sin fondo, color --color-accent-text,
-   font-size: var(--font-size-body) (ya escala por token); foco con el
-   anillo estándar (--focus-ring-*)" — textuales de la fila, verificación
-   por inspección/QA F5: los pseudo-estados no son asertables en jsdom, y
-   `aria-expanded`/texto alterno ya los cubren los tests de T4):
-   - `border: none; background: transparent`: implementa "sin fondo"
-     literal (resets de <button> de UA; criterio NavTabs `.tab`).
-   - `font-family: var(--font-family)`: los <button> no heredan la fuente
-     del body (necesidad MECÁNICA, criterio NavTabs/Button).
-   - `display: inline-flex; align-items: center; gap: var(--space-2)`: el
-     DOM pone texto e Icon adyacentes sin espacio; el gap de un token de
-     espaciado existente (fijo, no cambia por breakpoint) es la necesidad
-     MECÁNICA de separarlos (la spec no fija el valor; no se usa literal).
-   - `padding: 0`: el aire de la solapa lo da `padding-inline` de
-     CornerTab `.sm` (20px); el padding de UA del botón lo duplicaría (0
-     permitido).
-   - `color: var(--color-accent-text)`: par registrado 5.47 claro / 10.60
-     oscuro sobre `--color-surface-raised` de la tab (contrast.md; mismo
-     par auditado en NavTabs T4). */
-.disclosureButton {
+   Posición (spec → Colapsable, textual: "posicionado absoluto en la esquina
+   superior derecha del raíz"): `top: 0; right: 0` con `0` de posicionamiento
+   permitido por breakpoints.md; el anclaje lo da Box `.outer`
+    (`position: relative`, verificado en Box.module.css — declarada allí como
+    "ancla de CornerTab" en su T4; acá ancla este botón, sin clase extra en
+    el raíz de Sidebar). El color del glyph: par `accent-text` sobre `surface`
+    del aside, 5.87/12.06 — ver cabecera y contrast.md.
+
+   Estilo (fila "Botón de disclosure" de spec → Estados + párrafo "Botón" de
+   Colapsable): "sin fondo ni border (cero superficie propia)" →
+   `border: none; background: none` (resets de <button> de UA; criterio
+   NavTabs `.tab`; `none`/`transparent` no son colores literales — regla 1 de
+   DESIGN); `color: var(--color-accent-text)` (el chevron hereda el trazo:
+   Icon tone default `current` → `stroke="currentColor"`); foco con el anillo
+   estándar (`--focus-ring-*`, regla dura 7): `outline: none` en la BASE para
+   suprimir el outline UA en click de mouse y el anillo SOLO en
+   `:focus-visible` — mismo criterio de anillo único del ::after de
+   TestimonialCard (T4 F5), acá aplicado directo al botón. SIN
+   `cursor: pointer`: ni la tabla Estados ni Colapsable de ESTA spec lo
+   listan (criterio ThemeToggle/LanguageSwitcher).
+
+   Área táctil ≥24×24px (spec → Colapsable: "con padding... si hace falta
+   área táctil ≥24px con padding"): glyph `--size-icon` (18px por fallback de
+   `--icon-size`, tamaño default del Icon — verificación T4/T6: la tabla no
+   fija uno propio) + `padding: var(--space-1)` (4px por lado) = 26×26px ≥ 24
+   en todos los breakpoints; ningún literal nuevo. `inline-flex` + align/
+   justify center: necesidad MECÁNICA de centrar el único hijo (svg) en el
+   box del botón (criterio `.social a`). `font-*`/`gap` de la vieja
+   `.disclosureButton` se eliminan: el botón ya no tiene texto (RF-4: el
+   nombre lo da `aria-label`; Test 10). */
+.disclosure {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: 0;
+  justify-content: center;
+  padding: var(--space-1);
   border: none;
-  background: transparent;
-  font-family: var(--font-family);
-  font-size: var(--font-size-body);
+  background: none;
+  outline: none;
   color: var(--color-accent-text);
 }
 
-.disclosureButton:focus-visible {
+.disclosure:focus-visible {
   outline: var(--focus-ring-width) solid var(--color-focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
@@ -374,17 +416,25 @@
    docs/tokens/breakpoints.md). La separación y el resto escalan por tokens
    (--space-4 también da el column-gap; --sidebar-* y --font-size-* ya
    saltaron en tokens.css). A partir de acá la grilla base `auto 1fr` de
-   baseInfo NO cambia ("Igual", fila md–lg). */
+   baseInfo NO cambia ("Igual", fila md–lg).
+   T7: desde md la identidad NO reserva la esquina del disclosure (decisión
+   documentada en `.identity`: a ≥768px el nombre no alcanza la esquina);
+   `padding-inline-end: 0` es el `0` de reset permitido por
+   breakpoints.md dentro de un media de layout, y rige también en xl. */
 @media (min-width: 768px) {
   .contacts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .identity {
+    padding-inline-end: 0;
   }
 }
 
 /* xl (≥1200) — ÚNICO media de comportamiento xl del módulo (RF-3, decisión
    8=a CSS-only; RF-7). Sin `@media print` en todo el archivo (RF-10;
-   inspección). Nada ramifica en JS por ancho: el botón y la CornerTab se
-   montan siempre (T4) y acá dejan de ser visibles/operables. */
+   inspección). Nada ramifica en JS por ancho: el botón de disclosure (T7) se
+   monta siempre (T4) y acá deja de ser visible/operable. */
 @media (min-width: 1200px) {
   /* "Vertical y centrado" (fila xl de la tabla Responsive; Anatomía de
      foundations/layout.md): la grilla `auto 1fr` pasa a columna flex
@@ -421,23 +471,26 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* RF-3 (decisión 8=a, textual de la tabla Responsive/Colapsable: "en ≥ xl
-     un @media (min-width: 1200px) del propio módulo fuerza `display: block`
-     y oculta la CornerTab"):
-     - `.disclosureTab.disclosureTab` (0,2,0): selector compuesto CON LA MISMA
-       clase duplicada — único mecanismo que pisa el `display: flex` de la
-       clase base `.cornerTab` (OTRO módulo, mismo peso 0,1,0) por
-       ESPECIFICIDAD, sin depender del orden de los stylesheets
-       cross-módulo y sin `!important` (regla dura: el media debe pisar;
-       punto marcado en el review de T4). La tab queda "no visible ni
-       operable" (RF-3: el botón sigue montado, sin render condicional).
+  /* RF-3 (decisión 8=a, textual de la tabla Responsive/Colapsable en ≥ xl:
+     "un @media (min-width: 1200px) del propio módulo fuerza `display: block`
+     y oculta el botón de disclosure" — T7/Cambio F5):
+     - `.disclosure { display: none }`: en T7 el media y la clase base del
+       botón viven en el MISMO módulo (desaparece el problema cross-módulo
+       que obligaba al compuesto `.disclosureTab.disclosureTab` de T6 para
+       pisar el `display: flex` de CornerTab), así que la ocultación se
+       resuelve como el `margin-top` del avatar arriba: misma especificidad
+       (0,1,0) que la base `.disclosure` y ORDEN determinista dentro del
+       archivo (el media va después). Sin `!important`. El botón queda "no
+       visible ni operable" (RF-3: sigue montado, sin render condicional por
+       ancho); su `data-print-hide` es además el hook del contrato de
+       impresión (RF-10, decisión #104a).
      - `.additional.additionalCollapsed` (0,2,0) pisa el `display: none` de
        la clase de colapso (0,1,0) también por especificidad, sin depender
-        del orden (los dos selectores compuestos son el mecanismo limpio
+        del orden (el selector compuesto es el mecanismo limpio
        declarado en tasks.md → T4/T6). Expandido, la clase de colapso no
        está y el div es block por default: visible en ambos estados, que es
        exactamente "contactos siempre visibles". */
-  .disclosureTab.disclosureTab {
+  .disclosure {
     display: none;
   }
 
