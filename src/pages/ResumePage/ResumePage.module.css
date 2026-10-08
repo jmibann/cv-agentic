@@ -1,0 +1,65 @@
+/* ResumePage — módulo de estilos (specs/pages/ResumePage/spec.md → "Estilos y
+   tokens"; T4 cierra RF-3/RF-6, verificación por INSPECCIÓN + QA F5: jsdom no
+   computa). SOLO layout: cero estilos visuales, cero colores literales, cero
+   pseudo-estados/transiciones; toda medida es un token semántico de
+   tokens.css (--stack-gap, --layout-gap). El único @media del módulo
+   (min-width: 768px = md, docs/tokens/breakpoints.md — el literal dentro de la
+   query es el breakpoint aprobado, no una medida del cuerpo: los @media no
+   aceptan custom properties) cambia SOLO layout: columnas de la grilla y el
+   ancho del hijo único (RF-3).
+
+   Orden de cascada: no hay empates que dirimir por orden dentro del módulo
+   (cada selector gobierna un nodo distinto); el `.testimonials`-análogo de esta
+   página no existe: el par h2→contenido de skills lo resuelve el
+   `margin-bottom` del SectionTitle, como en servicios de AboutPage, sin
+   `margin-top: 0` propio. */
+
+/* Tabla → .page (RF-6): FLUJO DE BLOQUE NORMAL — sin `display: flex/grid` y
+   sin `overflow` distinto de visible: un contexto de formato propio angostaría
+   entero el raíz junto a la solapa flotante de NavTabs (CornerTab
+   placement="float") en vez de dejar fluir el h1 (los bloques internos que
+   vienen después — .columns, la <section> de skills — sí pueden ser grid/
+   flujo propio: la solapa ya terminó cuando empiezan). La regla fija la
+   separación vertical entre bloques hijos del raíz; skills queda a ancho
+   completo debajo por ser bloque en flujo normal (spec → Responsive). */
+.page > * + * {
+  margin-top: var(--stack-gap);
+}
+
+/* Tabla → .columns: apilada en < md (una columna implícita del grid); el
+   row-gap entre secciones y el column-gap entre columnas salen de los tokens
+   de stack/layout (mismos valores que AboutPage usa por separado, pero acá
+   dentro de UN grid → `row-gap`/`column-gap` explícitos). */
+.columns {
+  display: grid;
+  row-gap: var(--stack-gap);
+  column-gap: var(--layout-gap);
+}
+
+/* Tabla → .columns (≥ md, RF-6/RF-3): Education y Experience lado a lado, con
+   cada columna ocupando medio ancho exacto (`minmax(0, 1fr)` evita que el
+   contenido mínimo de una columna deforme la repartición). La cláusula de
+   RF-3 — "CUANDO en ≥ md queda una sola columna, ENTONCES la hace ocupar el
+   ancho completo (sin dejar hueco en la grilla)" — se implementa con el
+   selector estructural `.columns > *:only-child`:
+   - `*:only-child` (no `.section` ni clases): el hijo es una `<section>` de
+     ResumeSection cuya clase propia está HASHEAD en el módulo de ESA pieza y
+     no es alcanzable desde este módulo (CSS Modules no exporta los nombres
+     ajenos); el selector estructural no depende de ninguna clase y aplica
+     igual al `<section>` que Renderiza ResumeSection.
+   - Cuando hay DOS secciones, ninguna es `:only-child` → la cláusula no
+     interfiere con el split 50/50.
+   - Alternativa descartada: `.columns > .section:last-child:nth-child(1)`
+     (equivalente pero exige una clase de hijo que la página no pone y
+     oscurece el intento). Con un solo hijo en un grid de 2 columnas, la
+     auto-colocación lo dejaría en la columna 1 con hueco a la derecha:
+     `grid-column: 1 / -1` lo estira a todo el ancho. */
+@media (min-width: 768px) {
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .columns > *:only-child {
+    grid-column: 1 / -1;
+  }
+}

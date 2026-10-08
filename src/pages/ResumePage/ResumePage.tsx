@@ -11,12 +11,19 @@
 // `useLocale().t` (RF-5): la página no importa contenido, no hardcodea textos
 // (C2/C3) y NO ordena las entradas (el orden es el de los datos; el test 2
 // refuerza el orden observablemente).
-// Diferidos a sus tareas: módulo CSS con la tabla "Estilos y tokens"
-// (`.page`/`.columns`), unión de `className` al raíz y cierre
-// `expectNoA11yViolations` (T4) — por eso hoy las clases `page`/`columns` son
-// literales del markup, sin módulo todavía ("Hecho cuando" de T1; los asserts
-// de clases con el canon #99 llegan con T4, precedente AboutPage). `index.ts`
-// también llega en T4 (criterio AboutPage).
+// T4 hecha: `ResumePage.module.css` declara la tabla "Estilos y tokens" AL
+// PIE (RF-3/RF-6, por inspección: `.page` flujo de bloque con
+// `* + * { margin-top: var(--stack-gap) }` sin flex/grid/overflow; `.columns`
+// grid con row-gap --stack-gap / column-gap --layout-gap y el ÚNICO @media
+// (min-width: 768px, md) con 2 columnas + la cláusula RF-3
+// `.columns > *:only-child { grid-column: 1 / -1 }` para el hijo único —
+// selector estructural, sin depender de la clase hasheada de ResumeSection;
+// documentado en el módulo). Las clases se conectan vía `styles.x` (los tests
+// las afirman con el canon #99 `styles.x ?? "x"`); la unión de `className`
+// del consumidor al raíz usa el mecanismo canónico (filtro tipado de
+// undefined + join, base primero — precedente AboutPage T4). `index.ts`
+// re-exporta la superficie pública (ResumePage + ResumePageProps). Cero
+// colores literales, cero estilos visuales (RF-6).
 // T2 hecha: el bloque `.columns` se monta solo si AL MENOS UNA de las dos
 // colecciones tiene entradas (RF-2: "SI ambos están vacíos, no renderiza
 // .columns"; los guards por columna de T1 siguen, cada sección no aparece con
@@ -39,22 +46,32 @@ import { SectionTitle } from "../../components/SectionTitle";
 import { SkillList } from "../../components/SkillList";
 import { useCv, useLocale } from "../../providers/LocaleProvider";
 
-// API (spec → API): `className` se une a la clase `.page` del raíz (G-B). Se
-// declara ya porque es la superficie fija de la pieza; la unión se conecta en
-// T4 junto con el módulo CSS (la unión es el test 9, tarea T4).
+import styles from "./ResumePage.module.css";
+
+// API (spec → API): `className` se une a la clase `.page` del raíz (G-B); la
+// unión se conecta en T4 (test 9: base y externa COEXISTEN).
 export interface ResumePageProps {
   className?: string;
 }
 
-export function ResumePage(): ReactNode {
+export function ResumePage({ className }: ResumePageProps): ReactNode {
   // RF-5: único camino a los datos, los textos y el idioma (i18n.md → Hooks).
   // `locale` es el idioma activo del provider (NO `cv.locale`: ese es el
   // idioma del archivo JSON, spec → API).
   const { t, locale } = useLocale();
   const cv = useCv();
 
+  // T4 (G-B/#99, spec → API): unión canónica del raíz — array + filtro de
+  // undefined + join, base primero (precedente AboutPage/ServiceCard/Icon/Box,
+  // misma política del filtro tipado bajo `noUncheckedIndexedAccess`); sin
+  // `className` externa queda solo la base del módulo, con ella ambas
+  // COEXISTEN (test 9).
+  const rootClassName = [styles.page, className]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
   return (
-    <div className="page">
+    <div className={rootClassName}>
       {/* RF-1: el h1 se renderiza siempre, primero en el raíz (RF-6: flujo de
           bloque para que fluya junto a la solapa flotante de NavTabs). */}
       <SectionTitle as="h1" decorated>
@@ -68,7 +85,7 @@ export function ResumePage(): ReactNode {
           5 verifica las ausencias por rol; la no-montada del contenedor, por
           inspección del markup (raíz sin <div> hijo directo). */}
       {cv.education.length > 0 || cv.experience.length > 0 ? (
-        <div className="columns">
+        <div className={styles.columns}>
           {cv.education.length > 0 ? (
             <ResumeSection
               id="education"
