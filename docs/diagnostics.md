@@ -3,7 +3,7 @@
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
 los hashes de los commits relevantes. Última actualización: **2026-10-08**
-(cierre de F4; sin poda #98: el archivo queda bajo 150 líneas).
+(cierre de **F5 — fin del proceso**; sin poda #98: el archivo queda bajo 150 líneas).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
 `docs/memory.md` · decisiones #1–#98 → `docs/README.md` · QA de F5 →
@@ -41,13 +41,19 @@ de la entrada); el detalle queda en git.
 
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
-| F5 | QA visual: **pasadas 1–4 completas** (informe e hitos de resolución en `docs/qa-report.md`); queda solo el **Ctrl+P real** del usuario y el cierre de la puerta | F5 (cierre del usuario) |
+| Pendientes post-F5 (residuos) | **Contenido real**: al reemplazar el nombre de ejemplo en `src/content/cv.*.json`, re-observar 375px es/en el gap chevron↔nombre (spot-check midió 23px exactos con "Alex Rivera" — límite, sin defecto) · **deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
-| Seguimientos F3 (acumulados de piezas, registro fino en los `tasks.md` de cada pieza) | `cursor: pointer` en controles/bullet (no listado; ×2+NavTabs) · `.card`/`.inner` de TestimonialCard dirimido por orden de hoja (hardening `.card.card` opcional) · nativos del `<dialog>` (top layer, foco inicial/retorno, backdrop real) · pseudo-estados/animaciones sin computar en jsdom · superficies RF-4 SkillList / RF-6 Badge / RF-4 Overhead / RF-5 IconBox / RF-4 Separator (gap) → **verificadas en consumidores en F4** ✓ (queda el aspecto en navegador) · redondeo "9 filas"→10 en encabezado de `TestimonialDialog.test.tsx` · nota kit: `contrast.md` regla 6 no enumera ServiceCard (opcional). Los diferidos de no-BFC/orden tras skip-link/banner único/tabpanel/defs **se verificaron en F4** (inspección + tests 1/7/8/9/11/12) y salen de la fila | QA F5 |
-| Seguimientos F4 (registro fino en `specs/layout/AppLayout/tasks.md` y tasks de las páginas) | **resueltos en QA pasadas 3–4** (hooks print #104a, disclosure #104b, sticky/float/overflow/anillos/axe/contrastes verificados en vivo; F8 y favicon por decisión #105). **Quedan**: Ctrl+P real en papel (paginación/`@page`; `aside [download]` no ejercible con el contenido actual — CTA no definido) · deudas de forma: comentario inglés en `useHashTab.test.ts:143` y jerga "asiértan/asiértala" en comentarios de tests (transversal) — pase único solo si el usuario lo decide · `lang="es"` sin restaurar en AppLayout.test (nota para reordenamientos) · F1: typo "recalculera" y rastros viejos en su fila | Ctrl+P del usuario y decisión de pase de forma |
 
 ## Entradas
+
+### §XII · 2026-10-08 — Cierre de F5 (QA) — fin del proceso F1–F5
+
+- Qué: **F5 CERRADA**. Cuatro pasadas del reviewer con chrome-devtools MCP sobre la app servida por el usuario (#91) + verificación de **papel real por Ctrl+P del usuario: APROBADA** (6/6 criterios). La 1ª/2ª pasada detectaron el paquete #104 (B-2/B-3/M-1 print, D1 solape 375, D2/D3 anillos, D4 favicon), corregido íntegramente en 8 tareas nuevas repartidas en sus piezas (ControlsBar T3, CornerTab T5, TestimonialCard T4, Sidebar T7, AppLayout T7/T8, Foundation T13/T13b) y re-verificado en vivo en pasadas 3/4 + spot-check #105c. Decisiones del usuario: **#104** (mecánicas) y **#105** (visuales: favicon cerrado como está, **F8 CERRADO** — `9rem` definitivo sin captura; base `< md` `6.375rem` aplicada, commit del usuario `190c678`; chevron con acento semántico por tema). Cierre del proceso: **F1–F5 completas**, 27/27 specs `implementada`, proyecto entregado.
+- Checks: lint ✓ · typecheck ✓ · test **445/40** ✓ · build ✓ · validate:content ✓ · axe en navegador: **0 violaciones** (2×about/res × 2 idiomas) ✓ · contrastes del chevron: 5.87:1 claro / 12.06:1 oscuro ✓ (filas contrast.md 15/19/39) · zero overflow 375–1440 ✓ · sticky/float/dialog/teclado ✓ (informe completo con evidencia en `docs/qa-report.md`).
+- Decisiones: **#104** y **#105** → registro. Sin reglas nuevas de proceso.
+- Commits del paquete: `eaa4d01` `25e2ee4` `02a2756` `fac2fbe` `87edfd1` `74bafe2` `b93c510` (+ tests `c0492ac` `dc026d0` `7d602eb` `06bf088`); docs #104 `3b86937`, kit #104b `6109561`, qa-report `f2cb537` `5b9fce3`, #105 `5a9c240`, token `190c678` (usuario). Cierre de F4 en §XI. Menores de forma registradas en `tasks.md`/`qa-report.md`.
+- Abre: fila "Pendientes post-F5 (residuos)" (contenido real + re-observar gap 23px con nombre definitivo; deudas de forma opcionales). Cierra: filas F5/F3 y el resto de F4 de **Abiertos**. Proceso completo: queda del usuario el push (57+ commits) y el reemplazo del contenido de ejemplo.
 
 ### §XI · 2026-10-08 — Cierre de F4
 
