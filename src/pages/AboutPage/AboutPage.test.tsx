@@ -47,6 +47,18 @@ import { LocaleProvider } from "../../providers/LocaleProvider";
 
 import { AboutPage } from "./AboutPage";
 
+// Cierre a11y de T4 (constitución T4; helper de src/test/a11y.ts).
+import { expectNoA11yViolations } from "../../test/a11y";
+
+// El test importa el módulo CSS solo para fijar los nombres REALES de las
+// clases base (`page`/`intro`/`services`, resueltas por CSS Modules en
+// runtime) y asiértalas con el canon #99 `styles.x ?? "x"` — menor registrada
+// en la aprobación de T1 ("las aserciones deben afirmar las clases
+// .page/.intro con styles.x ?? 'x', no solo estructura") y el análogo de
+// .services. Precedente exacto: LanguageSwitcher.test.tsx
+// (`const languageSwitcherClass = styles.languageSwitcher ?? "languageSwitcher"`).
+import styles from "./AboutPage.module.css";
+
 // Valores esperados desde las FUENTES del kit (C3): el contenido que la página
 // debe mostrar sale de `useCv()` —el mismo `cvByLocale.en` que sirve el
 // provider— y el título de `uiEn.about.title` (el `t` del provider); el test
@@ -54,10 +66,30 @@ import { AboutPage } from "./AboutPage";
 const ABOUT_TITLE = uiEn.about.title;
 const ABOUT_PARAGRAPHS = cvByLocale.en.profile.about;
 
-const renderAboutPage = () =>
+// Clases base canon #99 (el módulo resuelve nombres hasheados en runtime; el
+// `?? "x"` cubre el escenario sin módulo en otras herramientas).
+const PAGE_CLASS = styles.page ?? "page";
+const INTRO_CLASS = styles.intro ?? "intro";
+const SERVICES_CLASS = styles.services ?? "services";
+
+// Render UNIFICADO de T4 (menor registrada en la aprobación de T3: "unificar
+// los armazones defs en los helpers de render"): monta `AccentGradientDefs` +
+// `HexAvatarDefs` en TODOS los escenarios — los hijos con `tone="gradient"`
+// (Icon de ServiceCard y comilla del carrusel) y los `HexAvatar` de las cards
+// existen desde T2/T3 y su contrato pide las defs compartidas; precedente
+// TestimonialCarousel/TestimonialCard.test.tsx). UPDATE DE ANDAMIAJE, no de
+// aserciones: ningún assert de T1/T2/T3 cambia por esto. Los defs van
+// DESPUÉS de `<AboutPage />` a propósito para que `container.firstElementChild`
+// —el criterio con el que el test 2 de T1 identifica el raíz— siga apuntando
+// al raíz de la página sin tocar ese test.
+// `className` es el parámetro del TEST 8 (unión G-B en el raíz); los demás
+// call-sites la dejan undefined (React omite el atributo).
+const renderAboutPage = (className?: string) =>
   render(
     <LocaleProvider>
-      <AboutPage />
+      <AboutPage className={className} />
+      <AccentGradientDefs />
+      <HexAvatarDefs />
     </LocaleProvider>,
   );
 
@@ -91,22 +123,27 @@ describe("AboutPage intro paragraphs (T1: RF-2 intro, Tests 2)", () => {
 
     // El bloque intro cuelga del raíz `div.page` (Anatomía: el ÚNICO `<div>`
     // hijo directo del raíz). T2b: el raíz y el bloque se identifican primero,
-    // de forma estructural y sin clase (el módulo CSS llega en T4), y recién
-    // ahí se consultan los `<p>` DENTRO de `.intro` (ver encabezado del
-    // archivo: el contrato de T1 es "un <p> por elemento de profile.about
-    // dentro de .intro"; desde T2 hay otros <p> en la página — ServiceCard —
-    // y la consulta global del container los contaría).
+    // de forma estructural (el `firstElementChild` sigue siendo el raíz porque
+    // el helper unificado monta los defs DESPUÉS), y recién ahí se consultan
+    // los `<p>` DENTRO de `.intro` (ver encabezado del archivo: el contrato de
+    // T1 es "un <p> por elemento de profile.about dentro de .intro"; desde T2
+    // hay otros <p> en la página — ServiceCard — y la consulta global del
+    // container los contaría). T4 conecta el módulo y agrega los asserts de
+    // clase con el canon #99 (menor de T1): la estructura de arriba queda
+    // intacta.
     const pageRoot = container.firstElementChild;
     if (pageRoot === null) {
       throw new Error("AboutPage debe renderizar el raíz div.page (Anatomía)");
     }
     expect(pageRoot.tagName).toBe("DIV");
+    expect(pageRoot).toHaveClass(PAGE_CLASS);
     const introBlocks = pageRoot.querySelectorAll(":scope > div");
     expect(introBlocks).toHaveLength(1);
     const intro = introBlocks[0];
     if (intro === undefined) {
       throw new Error("el raíz .page debe tener el bloque .intro como único div hijo directo (Anatomía)");
     }
+    expect(intro).toHaveClass(INTRO_CLASS);
 
     // Test 2 de la spec / RF-2: un `<p>` por elemento de `profile.about`, con
     // su texto y en orden, dentro de `.intro`.
@@ -216,16 +253,6 @@ beforeEach(() => {
 const SERVICES_TITLE = uiEn.about.services;
 const SERVICES = cvByLocale.en.services;
 
-// Render con el armazón de gradiente (no toca `renderAboutPage` de T1: ahí no
-// hay hijos con `tone="gradient"`).
-const renderAboutPageWithDefs = () =>
-  render(
-    <LocaleProvider>
-      <AccentGradientDefs />
-      <AboutPage />
-    </LocaleProvider>,
-  );
-
 describe("AboutPage services region (T2: RF-2 services, RF-5, Tests 3)", () => {
   it("renders a region named by t.about.services with one li-wrapped article per service inside a ul", () => {
     // Invariante del escenario (criterio T1): sin servicios en el kit el test
@@ -236,7 +263,7 @@ describe("AboutPage services region (T2: RF-2 services, RF-5, Tests 3)", () => {
       );
     }
 
-    renderAboutPageWithDefs();
+    renderAboutPage();
 
     // Test 3 / RF-5: `region` con nombre accesible `t.about.services`. El
     // nombre sale del `aria-labelledby` de la `<section>` hacia el `h2` con el
@@ -254,8 +281,10 @@ describe("AboutPage services region (T2: RF-2 services, RF-5, Tests 3)", () => {
     expect(region).toContainElement(heading);
 
     // RF-5: los servicios como `<ul>` (rol implícito `list`) con un `<li>`
-    // (`listitem`) por card.
+    // (`listitem`) por card. T4: la clase `.services` del módulo se verifica
+    // con el canon #99 (estructura de arriba intacta).
     const list = within(region).getByRole("list");
+    expect(list).toHaveClass(SERVICES_CLASS);
     const items = within(region).getAllByRole("listitem");
     expect(items).toHaveLength(SERVICES.length);
     for (const item of items) {
@@ -311,12 +340,7 @@ describe("AboutPage with empty services (T2: RF-2, Tests 5a, mocked provider)", 
       );
     }
 
-    render(
-      <LocaleProvider>
-        <AccentGradientDefs />
-        <AboutPage />
-      </LocaleProvider>,
-    );
+    renderAboutPage();
 
     // RF-2: "SI services está vacío, ENTONCES no renderiza su <section>" — ni
     // la región, ni el h2, ni el <ul> con <li> (la sección entera no se monta).
@@ -370,25 +394,16 @@ describe("AboutPage with empty services (T2: RF-2, Tests 5a, mocked provider)", 
 // commit lo ponen el test 4 (no hay h2 ni carrusel todavía) y el test 6 (la
 // región de testimonios en `es` tampoco existe; sus asserts de servicios/h1
 // ya pasan por T1/T2).
-// `className` NO se pasa aún en el carrusel: `styles.testimonials` llega con
-// el módulo en T4 (Anatomía → tabla "Estilos y tokens"); la hermandad
-// h2↔section se verifica por estructura.
+// `className` del carrusel: en T3 no se pasaba (el módulo no existía); T4
+// conecta `styles.testimonials` (`margin-top: 0`) al raíz del carrusel — su
+// efecto de espaciado se verifica por INSPECCIÓN del CSS (RF-4/RF-6: jsdom no
+// computa), no por assert propio; la hermandad h2↔section se verifica por
+// estructura.
 // ===========================================================================
 
 // Esperados desde las FUENTES del kit (C3).
 const TESTIMONIALS_TITLE = uiEn.about.testimonials;
 const TESTIMONIALS = cvByLocale.en.testimonials;
-
-// Render con los dos armazones de defs que requieren los hijos con gradient
-// y hexágonos de la página completa.
-const renderAboutPageWithAllDefs = () =>
-  render(
-    <LocaleProvider>
-      <AccentGradientDefs />
-      <HexAvatarDefs />
-      <AboutPage />
-    </LocaleProvider>,
-  );
 
 describe("AboutPage testimonials region is the carousel own section (T3: RF-2 testimonials, RF-3, Tests 4)", () => {
   it("renders the carousel section named by t.about.testimonials as direct sibling of its h2, fed with the raw t.testimonials templates", () => {
@@ -400,7 +415,7 @@ describe("AboutPage testimonials region is the carousel own section (T3: RF-2 te
       );
     }
 
-    renderAboutPageWithAllDefs();
+    renderAboutPage();
 
     // Test 4 / RF-2 (decisión 20): la región con nombre `t.about.testimonials`
     // es la `<section>` PROPIA del carrusel — no un wrapper de la página.
@@ -484,7 +499,7 @@ describe("AboutPage with empty testimonials (T3: RF-2, Tests 5b, mocked provider
       );
     }
 
-    renderAboutPageWithAllDefs();
+    renderAboutPage();
 
     // RF-2: "SI testimonials está vacío, ENTONCES no renderiza ni el h2 ni el
     // carrusel" (la región es la section del propio carrusel, que tampoco se
@@ -532,7 +547,7 @@ describe("AboutPage in Spanish locale (T3: Tests 6, real LocaleProvider seeded e
     // provider resuelve `uiEs` + `cvByLocale.es`. El afterEach de setup.ts
     // limpia `lang`/storage.
     document.documentElement.lang = "es";
-    renderAboutPageWithAllDefs();
+    renderAboutPage();
     expect(document.documentElement).toHaveAttribute("lang", "es");
 
     // Textos de UI desde uiEs (sin literales): h1 `about.title`, región de
@@ -584,5 +599,67 @@ describe("AboutPage in Spanish locale (T3: Tests 6, real LocaleProvider seeded e
         within(regionEs).getByRole("button", { name: openName }),
       ).toBeInTheDocument();
     }
+  });
+});
+
+// ===========================================================================
+// Tests de T4 (specs/pages/AboutPage/tasks.md) — RF-4 y RF-6 por INSPECCIÓN
+// del módulo (jsdom no computa estilos: la tabla "Estilos y tokens" se verifica
+// a mano + QA F5) y por tests: test 8 (unión `className` del consumidor en el
+// raíz `.page`, G-B) y test 7 (cierre `expectNoA11yViolations` en escenario
+// completo, un caso por idioma — criterio LanguageSwitcher T3/ThemeToggle T3:
+// un caso axe por forma). Además T4 conectó los asserts de clases
+// `.page`/`.intro`/`.services` con el canon #99 en los tests de T1/T2 (menor
+// registrada en la aprobación de T1) y unificó el andamiaje de render (defs en
+// todos los escenarios; update de helper, no de aserciones).
+// El módulo CSS no existe hasta `feat(AboutPage): T4`: el import canónico
+// (`import styles from "./AboutPage.module.css"`) pone TODO el archivo en
+// rojo en el commit de tests (resolución de import falla en colecta) — rojo
+// declarado, criterio "el repo está en rojo a propósito entre commits" (no es
+// un cierre on-arrival a explicar: el discrimen del cierre axe llega con el
+// módulo y la unión).
+// ===========================================================================
+
+describe("AboutPage className joining (T4: spec → API, G-B, Tests 8)", () => {
+  it("joins an external className to the base .page class on the page root, coexisting", () => {
+    const consumerClass = "app-tabpanel-about";
+
+    renderAboutPage(consumerClass);
+
+    // Test 8 de la spec / plan → Interfaz (#99): `className` se UNE a la clase
+    // base `.page` del raíz — COEXISTEN (la base del módulo y la del
+    // consumidor), no se reemplaza (precedente Box/Icon/Badge/LanguageSwitcher;
+    // rige la hoja de estilos, no el orden del atributo class). El raíz se
+    // localiza por el h1 (padre del h1 = raíz, RF-1/Anatomía, sin depender del
+    // orden de los defs del helper).
+    const h1 = screen.getByRole("heading", { level: 1, name: ABOUT_TITLE });
+    const pageRoot = h1.parentElement;
+    if (pageRoot === null) {
+      throw new Error("el h1 debe ser hijo del raíz .page (Anatomía)");
+    }
+    expect(pageRoot).toHaveClass(PAGE_CLASS);
+    expect(pageRoot).toHaveClass(consumerClass);
+  });
+});
+
+// --- T4 · Cierre a11y (constitución T4) — test 7 ----------------------------
+describe("AboutPage accessibility audit (T4: cierre, Tests 7)", () => {
+  it("has no accessibility violations with the full content in English", async () => {
+    // Escenario completo en: h1 + intro + región de servicios + h2 y carrusel
+    // (con dialog cerrado) + armazones defs del helper unificado.
+    const { container } = renderAboutPage();
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with the full content in Spanish", async () => {
+    // Segunda forma: locale es (semilla anti-flash del precedente test 6; el
+    // afterEach de setup.ts limpia lang/storage). Mismo árbol, textos y
+    // contenido en español.
+    document.documentElement.lang = "es";
+
+    const { container } = renderAboutPage();
+
+    await expectNoA11yViolations(container);
   });
 });
