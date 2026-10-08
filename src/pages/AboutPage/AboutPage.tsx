@@ -21,14 +21,23 @@
 // `labelledBy="about-testimonials-title"` (su `<section>` se nombra por el h2;
 // nunca `aria-label` propio) y `labels={carouselLabels}`: objeto literal con
 // las 5 claves CRUDAS de `t.testimonials` — la página NO importa ni llama
-// `format` (RF-3: quien interpola es el carrusel). SIN `className` todavía:
-// `styles.testimonials` (`margin-top: 0`) llega con el módulo en T4.
-// Diferidos a sus tareas: módulo CSS con el layout de la tabla "Estilos y
-// tokens" (`.page`/`.intro`/`.services`/`.testimonials`), unión de `className`
-// al raíz y cierre `expectNoA11yViolations` (T4) — por eso hoy las clases
-// `page`/`intro`/`services` son literales del markup, sin módulo todavía
-// ("Hecho cuando" de T1/T2, y la unión se asierta con `styles.x ?? "x"` en
-// T4, canon #99).
+// `format` (RF-3: quien interpola es el carrusel).
+// T4 hecha: `AboutPage.module.css` declara la tabla "Estilos y tokens" AL
+// PIE (RF-4/RF-6, por inspección: `.page` flujo de bloque con
+// `* + * { margin-top: var(--stack-gap) }` sin flex/grid/overflow; `.intro`
+// flex col gap --space-4 + `p { margin: 0 }`; `.services` grid --layout-gap
+// 1 col → 2 col en el ÚNICO @media (992, lg); `.testimonials { margin-top: 0 }`
+// pasado como `className` al raíz del carrusel) y las clases del raíz/bloques
+// se conectan vía `styles.x` (los tests las afirman con el canon #99
+// `styles.x ?? "x"`). La unión de `className` del consumidor al raíz
+// (G-B/test 8) usa el mecanismo canónico: array + filtro de undefined + join,
+// base primero (precedente ServiceCard/Icon/Box). `index.ts` re-exporta la
+// superficie pública (AboutPage + AboutPageProps).
+// Nota registrada (menor de T1, inspección al cerrar la pieza): `key={paragraph}`
+// en `.intro` usa el texto como clave — con duplicados reales React daría
+// warning de claves repetidas; la spec no habla de keys y no se cambia sin
+// indicación del reviewer (las claves de servicios/testimonios sí salen del
+// `id` garantizado por esquema).
 
 import type { ReactNode } from "react";
 
@@ -38,14 +47,15 @@ import { ServiceCard } from "../../components/ServiceCard";
 import { SectionTitle } from "../../components/SectionTitle";
 import { useCv, useLocale } from "../../providers/LocaleProvider";
 
-// API (spec → API): `className` se une a la clase `.page` del raíz (G-B). Se
-// declara ya porque es la superficie fija de la pieza; la unión se conecta en
-// T4 junto con el módulo CSS (los tests de unión son el test 8, tarea T4).
+import styles from "./AboutPage.module.css";
+
+// API (spec → API): `className` se une a la clase `.page` del raíz (G-B);
+// la unión se conecta en T4 (test 8: base y externa COEXISTEN).
 export interface AboutPageProps {
   className?: string;
 }
 
-export function AboutPage(): ReactNode {
+export function AboutPage({ className }: AboutPageProps): ReactNode {
   // RF-3: único camino a los datos y a los textos (i18n.md → Hooks; la página
   // es componente de página y puede usar estos hooks — excepción de C2
   // documentada en specs/README.md).
@@ -63,8 +73,17 @@ export function AboutPage(): ReactNode {
     close: t.testimonials.close,
   };
 
+  // T4 (G-B/#99, spec → API): unión canónica del raíz — array + filtro de
+  // undefined + join, base primero (precedente ServiceCard/Icon/Box); sin
+  // `className` externa queda solo la base del módulo, con ella ambas
+  // COEXISTEN (test 8). Bajo `noUncheckedIndexedAccess` la clase del módulo es
+  // `string | undefined`.
+  const rootClassName = [styles.page, className]
+    .filter((cls): cls is string => cls !== undefined)
+    .join(" ");
+
   return (
-    <div className="page">
+    <div className={rootClassName}>
       {/* RF-1: el h1 se renderiza siempre, primero en el raíz (RF-4: flujo de
           bloque para que fluya junto a la solapa flotante de NavTabs). */}
       <SectionTitle as="h1" decorated>
@@ -73,7 +92,7 @@ export function AboutPage(): ReactNode {
 
       {/* RF-2 (intro) + spec → Estados: sin párrafos no se monta .intro. */}
       {cv.profile.about.length > 0 ? (
-        <div className="intro">
+        <div className={styles.intro}>
           {cv.profile.about.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -91,7 +110,7 @@ export function AboutPage(): ReactNode {
           <SectionTitle as="h2" id="about-services-title">
             {t.about.services}
           </SectionTitle>
-          <ul className="services">
+          <ul className={styles.services}>
             {cv.services.map((service) => (
               // Clave por service.id: único por esquema (data/cv.schema.json),
               // a diferencia del texto de los párrafos de .intro.
@@ -108,7 +127,9 @@ export function AboutPage(): ReactNode {
           TestimonialCarousel, nombrada vía labelledBy; la página NO la
           envuelve). Nada se monta con cv.testimonials vacío (spec → Estados).
           Fragment: sin nodo wrapper intermedio, el DOM hijo del raíz es h2 y
-          section. className (styles.testimonials) se conecta en T4. */}
+          section. T4 conecta `styles.testimonials` (margin-top: 0) como
+          `className` del carrusel: el TestimonialCarousel la UNE a su clase
+          base del <section> raíz (G-B de su spec). */}
       {cv.testimonials.length > 0 ? (
         <>
           <SectionTitle as="h2" id="about-testimonials-title">
@@ -118,6 +139,7 @@ export function AboutPage(): ReactNode {
             testimonials={cv.testimonials}
             labels={carouselLabels}
             labelledBy="about-testimonials-title"
+            className={styles.testimonials}
           />
         </>
       ) : null}

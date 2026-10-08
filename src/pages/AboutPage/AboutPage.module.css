@@ -1,0 +1,70 @@
+/* AboutPage — módulo de estilos (specs/pages/AboutPage/spec.md → "Estilos y
+   tokens"; T4 cierra RF-4/RF-6, verificación por INSPECCIÓN + QA F5: jsdom no
+   computa). SOLO layout: cero estilos visuales, cero colores literales, cero
+   pseudo-estados/transiciones; toda medida es un token semántico de
+   tokens.css (--stack-gap, --space-4, --layout-gap). El único @media del
+   módulo cambia solo layout (grilla de columnas); el `992px` dentro de la
+   query es el literal del breakpoint lg aprobado en
+   docs/tokens/breakpoints.md (los @media no aceptan custom properties), no
+   una medida del cuerpo de la regla (convención de la raíz).
+
+   Orden de declaración = orden de cascada para especificidad igual: el
+   `.testimonials { margin-top: 0 }` va DESPUÉS de `.page > * + *` (ambas
+   (0,1,0)) para poder anularlo en el par hermano h2→carrusel. */
+
+/* Tabla → .page (RF-4): FLUJO DE BLOQUE NORMAL — sin `display: flex/grid` y
+   sin `overflow` distinto de visible: un contexto de formato propio angostaría
+   entero el raíz junto a la solapa flotante de NavTabs (CornerTab
+   placement="float") en vez de dejar fluir el h1; los hijos internos que
+   vienen después del h1 sí pueden ser flex/grid (las filas de servicios
+   empiezan cuando la solapa ya terminó). La regla fija la separación vertical
+   entre bloques hijos del raíz. */
+.page > * + * {
+  margin-top: var(--stack-gap);
+}
+
+/* Tabla → .intro: párrafos en columna con gap --space-4. El `margin: 0` del
+   <p> borra el margen de párrafo del UA (el espaciado interno lo gobierna el
+   gap). El `p` pelado en un CSS Module no se hash y filtraría al resto de la
+   app: se alcanza con el descendiente scoped a `.intro` (precedente
+   ServiceCard `.card p`, Sidebar `.contacts p`). */
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.intro p {
+  margin: 0;
+}
+
+/* Tabla → .services: grilla mobile-first de 1 columna (una pila) con gap
+   --layout-gap. `list-style: none` + `margin: 0` + `padding: 0` resetean el
+   <ul> del UA; SIN `role="list"`: el quirk Safari/VoiceOver se resuelve de
+   forma unificada en QA F5 (decisión de la Clarificación F4, ídem SkillList). */
+.services {
+  display: grid;
+  gap: var(--layout-gap);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Tabla → .services (≥ lg, RF-6): 1 columna pasa a 2. Único @media del
+   módulo; solo layout (ningún otro valor cambia con el breakpoint). */
+@media (min-width: 992px) {
+  .services {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Tabla → .testimonials (se pasa como `className` al raíz del carrusel —
+   decisión 20: el h2 "Testimonials" y el carrusel son hermanos directos de
+   .page): `margin-top: 0` neutraliza el `* + *` del raíz para ESTE par, cuyo
+   espacio título→contenido resuelve el `margin-bottom` del h2 (1.25rem,
+   foundations/layout.md → "Espaciado vertical"), el mismo valor que h2→ul en
+   servicios. Sin este 0, --stack-gap inflaría el par. Anula por orden
+   (especificidad igual, declaración posterior). */
+.testimonials {
+  margin-top: 0;
+}
