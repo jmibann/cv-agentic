@@ -8,6 +8,9 @@
 // `t.controls` (RF-3: al cambiar el idioma del provider, los hijos renuevan
 // sus nombres — la traducción vive en ui.{en,es}.ts, C3) y la `className`
 // del consumidor UNIDA a la clase base del raíz (G-B, API de la spec).
+// T3 hecha (RF-6, Cambio F5): el `<header>` raíz agrega el hook
+// `data-print-hide` del contrato de impresión (comentario en el return;
+// único cambio de markup — ningún atributo/estructura/estilo previo toca).
 // T2 hecha: el módulo fija los estilos por tokens de la tabla (RF-1
 // flex-end/--size-control/--z-controls, RF-5 cero texto propio, RF-6 gap por
 // --controls-gap sin @media) e `index.ts` re-exporta el componente y su tipo
@@ -50,6 +53,15 @@ export function ControlsBar({ className }: ControlsBarProps) {
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 
+  // T3 (RF-6, Cambio F5 2026-10-08, hallazgo B-2 de `docs/qa-report.md`,
+  // decisión #104): el raíz `<header>` renderiza el hook `data-print-hide`
+  // del contrato de impresión. `global.css` lo oculta en print con la
+  // variante compuesta `header[data-print-hide]` (0,1,1), que gana por
+  // especificidad a la clase hasheada del módulo (0,1,0) — el selector
+  // nativo `header` (0,0,1) solo perdía (B-2). La pieza NO declara
+  // `@media print` (spec → "No hacer"; lo ocultan los estilos
+  // compartidos). El atributo no es `aria-*`: estructura, roles y estilos
+  // del marcado de T1/T2 quedan intactos (precedente hermana CornerTab T5).
   // spec → Anatomía, literal: <header> > div role="group" > ThemeToggle +
   // LanguageSwitcher. El group se nombra con t.controls.label; ThemeToggle
   // recibe AMBOS labels (darkModeLabel/lightModeLabel — clave
@@ -58,7 +70,7 @@ export function ControlsBar({ className }: ControlsBarProps) {
   // propio <header> (RF-1 lo define en T2: justify-content: flex-end sobre
   // el único hijo del flujo, el group).
   return (
-    <header className={rootClassName}>
+    <header className={rootClassName} data-print-hide>
       <div role="group" aria-label={t.controls.label}>
         <ThemeToggle
           darkModeLabel={t.controls.darkMode}
