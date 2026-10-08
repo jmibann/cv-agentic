@@ -32,7 +32,7 @@
   - Nota para el cierre de pieza: `index.ts` re-exporta `CornerTab` y tipos (el
     plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
 
-- [ ] **T5. Hook `data-print-hide` en el raíz (Cambio F5 2026-10-08).** RF-7
+- [x] **T5. Hook `data-print-hide` en el raíz (Cambio F5 2026-10-08).** RF-7 — 25e2ee4 (APROBADA. Menores registradas: subjects con sufijo descriptivo (patrón F5 era a secas; prefijo parseable intacto, #102 OK); comentarios de test/tsx citan "variante compuesta div[data-print-hide]" cuando global.css usa el selector simple — cosmético, se alinea con AppLayout T7; fin de M-1 queda condicionado a T7 + re-pasada F5)
   - Hecho cuando: el `<div>` raíz renderiza `data-print-hide` junto a sus
     clases, en ambos `placement` (test estructural `toHaveAttribute`); ningún
     otro atributo/aria/estilo cambia; tests previos intactos; la re-pasada F5
