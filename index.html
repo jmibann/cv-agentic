@@ -34,6 +34,10 @@
     }
   })();
 </script>
+    <!-- D4 (hallazgo F5, T13): favicon SVG para evitar el 404 de /favicon.ico.
+         Va después del anti-flash porque el contrato de T4 (verificado por
+         src/test/anti-flash.test.ts) no admite ningún <link> antes del script. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
     <div id="root"></div>
