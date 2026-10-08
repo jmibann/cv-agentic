@@ -47,6 +47,25 @@ cv-agentic/
 └─ src/ · public/ · index.html · package.json   ← los crea la Fase 1
 ```
 
+## Mantenimiento (modo actual — desde 2026-10-08)
+
+El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (445 tests,
+build, validate:content, QA en navegador y en papel). Para reabrir trabajo, el
+flujo vive en la skill `sdd` y los agentes en `.opencode/agents/`:
+
+| Quiero… | Cómo |
+|---|---|
+| Actualizar el CV (textos, avatar, testimonios, `downloadCvUrl`) | Editar `src/content/cv.{en,es}.json` (formato fijo por `data/cv.schema.json`) → `npm run validate:content` + `npm test`. Con el nombre real definitivo: re-observar 375px es/en el gap chevron↔nombre (fila "Pendientes post-F5" de diagnostics). Encargo al `integrator` (dueño de `src/content/**`) |
+| Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
+| Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
+| Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
+| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#105: `docs/README.md` · QA final: `docs/qa-report.md` |
+
+Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
+(P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;
+commits TDD por tarea sin `--amend` ni push (push: solo vos); DoD = lint +
+typecheck + test por tarea, `build` al cerrar pieza/puerta.
+
 ## Por dónde empezar
 
 1. [docs/constitution.md](docs/constitution.md): las reglas no negociables

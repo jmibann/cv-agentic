@@ -111,6 +111,25 @@ Usuario ──► orchestrator
 El orden y las dependencias de los componentes están en
 [specs/README.md](../specs/README.md).
 
+## Modo mantenimiento (desde 2026-10-08)
+
+F1–F5 cerradas (ver §XII en `docs/diagnostics.md` y `docs/qa-report.md`). No
+quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
+con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`:
+
+| Tarea futura | Flujo | Dueño |
+|---|---|---|
+| Actualizar el CV (contenido bilingüe, avatar, `downloadCvUrl`) | sin spec nueva: encargo simple + `npm run validate:content` + `npm test`; si toca contrato, es Cambio | `integrator` (`src/content/**`) |
+| Modificar una pieza existente | `/sdd-change <cat>/<Name>` (spec con `ask` → plan → tareas → Tn) | su builder (F2/F3) o `integrator` (F4) |
+| Pieza/función nueva (BACKLOG) | `/sdd-spec` → `/sdd-plan <cat>/<Name>` → Tn (`/sdd-implement`) → `/sdd-validate` | según su carpeta |
+| Verificar en el sitio servido | `/sdd-validate` o una pasada corta priorizada (el presupuesto del reviewer se agota en pasadas amplias — lección F5) | `reviewer` (único con MCP de Chrome) |
+
+Cuentas de cada loop: marcar tareas + commitear docs (orchestrator), revisión
+independiente (reviewer), y **push siempre del usuario** (#91/#76: ningún agente
+sube ni toca `git config`). La memoria (`docs/memory.md`) se actualiza ante
+decisiones de reglas o al cerrar puertas de pieza suelta; el log, con su
+formato (#98).
+
 ## Comandos `/sdd-*`
 
 Atajos del flujo SDD en `.opencode/commands/`. Cada uno corre con un agente

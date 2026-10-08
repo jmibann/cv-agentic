@@ -1,7 +1,21 @@
 # Backlog
 
-Temas identificados y **deliberadamente postergados**. Ninguno bloquea las
-fases F1–F5. Cada ítem necesita decisión del usuario antes de implementarse.
+Sitio **entregado** (F1–F5 cerradas 2026-10-08; ver `docs/qa-report.md` y §XII
+de `docs/diagnostics.md`). Estos son los **temas identificados y deliberadamente
+postergados** para el loop de mantenimiento. Ninguno bloquea el sitio. Cada ítem
+necesita decisión del usuario antes de implementarse (flujo por tipo de tarea:
+"Modo mantenimiento" en `docs/agent-system.md`).
+
+## Primer mantenimiento (recomendado al tomar el control)
+
+- **Push** de las ~57+ commits locales (`git push`).
+- **Contenido real**: reemplazar `cv.example.*` por el CV real (textos, avatar,
+  testimonios con permiso de sus autores) → `npm run validate:content` + suite.
+  Con el nombre definitivo: **re-observar 375px es/en** el gap chevron↔nombre
+  (23px medidos con "Alex Rivera"; fila "Pendientes post-F5" de diagnostics).
+- **Opcional**: `profile.downloadCvUrl` (activa el CTA y ejercita la regla print
+  `aside [download]`, hoy latente); un pase de deudas de forma registrado en
+  Abiertos (comentario inglés `useHashTab.test.ts:143`, jerga "asiértan", F1/F2).
 
 ## Pendientes de contenido
 
@@ -12,8 +26,7 @@ fases F1–F5. Cada ítem necesita decisión del usuario antes de implementarse.
     que pasa a ser campo traducible).
   - Ubicación (`public/cv/…`), nombre de archivo, tamaño, y si abre en pestaña
     nueva o descarga.
-- **Contenido real.** Reemplazar `cv.example.*` por el CV real (textos,
-  avatar, testimonios con permiso de sus autores).
+- **Contenido real** → ver "Primer mantenimiento" (arriba).
 - **Imágenes.** Formato (`.webp`/`.avif`), tamaños para `srcset` del avatar y
   de los testimonios.
 
@@ -31,8 +44,9 @@ fases F1–F5. Cada ítem necesita decisión del usuario antes de implementarse.
 - **SEO por idioma.** Hoy el idioma no está en la URL (`/es/…`) y hay un solo
   `<title>`/meta description. Si importa el SEO en español: rutas por idioma,
   `hreflang`, metadatos por idioma y posiblemente prerender.
-- **Metadatos y Open Graph.** Título, descripción, imagen para compartir,
-  favicon/ícono de la app.
+- **Metadatos y Open Graph.** Título, descripción e imagen para compartir siguen
+  pendientes (un solo `<title>`/description). El favicon ya quedó resuelto en
+  F5: `public/favicon.svg` + `<link rel="icon">` (`b93c510`, decisión #105a).
 - **Deploy.** Plataforma (Netlify, Vercel, GitHub Pages…), dominio, CI.
 - **Test de contraste automatizado.** axe en jsdom no mide
   contraste; evaluar Playwright + axe en navegador real para QA automático

@@ -3,10 +3,11 @@
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
 los hashes de los commits relevantes. Última actualización: **2026-10-08**
-(cierre de **F5 — fin del proceso**; sin poda #98: el archivo queda bajo 150 líneas).
+(cierre de **F5 — fin del proceso; el repo pasó a modo mantenimiento**: flujo y
+dueños en "Modo mantenimiento" de `docs/agent-system.md`).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#98 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#105 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
