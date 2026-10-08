@@ -47,14 +47,28 @@ html:has(dialog[open]) {
  * specs/layout/AppLayout/spec.md → "Impresión" + foundations/layout.md →
  * "Impresión" (T5 de AppLayout; regla dura 3 de docs/DESIGN.md: todos los
  * @media print transversales viven ACÁ, ningún componente los replica).
- * El contrato habla en `data-*`/elementos nativos, NO en clases de CSS
- * Modules (los nombres de módulo se hashean y este archivo no puede
- * apuntarlos; los selectores nativos `header`, `[role="tablist"]` y
- * `aside button` son DELIBERADOS y forman parte del contrato — decisión del
- * usuario registrada en la spec —: `header` es el único <header> del
- * documento (ControlsBar, RF-2 probada por el test 1 de AppLayout),
- * `[role="tablist"]` es la fila de tabs de NavTabs/CornerTab y `aside
- * button` el botón Show/Hide Contacts del Sidebar.
+ * El contrato habla en `data-*`, NO en clases de CSS Modules (los nombres
+ * de módulo se hashean y este archivo no puede apuntarlos).
+ * **Actualización del Cambio F5 (decisión #104/#104a, tarea T7)**: los
+ * selectores nativos simples del contrato anterior perdían por
+ * especificidad — atributo/elemento (0,1,0) empata o pierde con la clase
+ * hasheada del módulo de la pieza (0,1,0) según el orden de las hojas —
+ * (hallazgos B-2 ControlsBar, B-3 disclosure del Sidebar y M-1 CornerTab
+ * de `docs/qa-report.md`: los controles y el botón se imprimían, la solapa
+ * quedaba como franja vacía). El contrato pasa a **hooks
+ * `data-print-hide`** que las piezas renderizan en su raíz según sus
+ * specs (Cambios: ControlsBar RF-6, CornerTab RF-7, Sidebar RF-4/RF-10) y
+ * a variantes compuestas elemento+atributo (0,1,1), que ganan SIEMPRE a la
+ * clase: `header[data-print-hide]` (ControlsBar — su `<header>` es el
+ * único del documento, RF-2), `div[data-print-hide]` (CornerTab: la tab
+ * entera, contenido y fondo) y `button[data-print-hide]` (disclosure del
+ * Sidebar). `aside [download]` es el hook nativo y deliberado del CTA
+ * "Download CV" (B-4/D4: el Button polimórfico con `href` renderiza `<a
+ * download>`). Estos selectores compuestos son DELIBERADOS y forman parte
+ * del contrato — decisión del usuario registrada en la spec →
+ * "Impresión" —. Su efectividad se confirma en la re-pasada F5 con la app
+ * servida (#91) y en un Ctrl+P manual del usuario: jsdom no computa
+ * `@media print` (#101), por eso no hay test de esta tarea.
  * LA PALETA DE IMPRESIÓN NO SE TOCA ACÁ: los colores literales están
  * prohibidos (regla dura 1); el papel claro con fondo blanco y sin sombras
  * lo reasigna tokens/tokens.css en su propio @media print (líneas ~437+), y
@@ -88,24 +102,50 @@ html:has(dialog[open]) {
     display: block;
   }
 
-  /* Ocultar la chrome de pantalla (foundations → "Impresión"): la barra de
-   * controles (banner), la fila de tabs y el skip link (cuyo contrato es el
-   * atributo propio data-print-hide en su raíz, spec → Impresión). */
-  header,
-  [role="tablist"],
-  [data-print-hide] {
+  /* Ocultar la chrome de pantalla (foundations → "Impresión"; contrato
+   * compuesto #104a, ver comentario del bloque). Cada variante
+   * elemento+atributo suma (0,1,1) y gana a la clase hasheada del módulo
+   * de la pieza, cosa que el simple (0,1,0) no lograba (B-2/B-3/M-1):
+   * - `header[data-print-hide]`: la barra de controles (ControlsBar).
+   * - `div[data-print-hide]`: la solapa COMPLETA (CornerTab: contenido y
+   *   fondo; M-1). Como NavTabs vive DENTRO de CornerTab, esto ya oculta
+   *   el tablist por ancestro.
+   * - `button[data-print-hide]`: el botón disclosure del Sidebar (B-3;
+   *   hook renderizado por su T7).
+   * - `[data-print-hide]` (simple): el skip link CONSERVA el selector
+   *   simple porque su módulo (AppLayout.module.css `.skipLink`) lo
+   *   oculta con `position: fixed` + `clip-path` y NUNCA declara
+   *   `display` — no hay clase con la que compita (documentado por
+   *   inspección en T7; también cubre cualquier raíz futura sin elemento
+   *   conocido).
+   * - `[role="tablist"]`: se MANTIENE como redundancia defensiva
+   *   (decisión del builder, permitida por el Hecho cuando de T7 y
+   *   documentada acá): hoy su único portador (NavTabs) cuelga de
+   *   `div[data-print-hide]`, así que ninguna regla depende de él y
+   *   borrarlo cambiaría el texto de foundations sin beneficio; si F5
+   *   prefiere eliminarlo, se decide con el usuario. */
+  header[data-print-hide],
+  div[data-print-hide],
+  button[data-print-hide],
+  [data-print-hide],
+  [role="tablist"] {
     display: none;
   }
 
-  /* Ocultar los botones del Sidebar (Show/Hide Contacts). NOTA PARA QA F5
-   * (reportada por el integrator en T5, no corregida acá por límites de la
-   * tarea — la spec es el contrato): el CTA "Download CV" del Sidebar usa el
-   * Button polimórfico CON `href`, que renderiza <a> (src/components/Button/
-   * Button.tsx T3, rama link línea ~115), así que ESTE selector del contrato
-   * no lo alcanza. El intent de foundations es ocultarlo también; si F5 lo
-   * confirma, hace falta un hook estable (decide el usuario/orchestrator:
-   * no se inventa selectores fuera del contrato ni se toca Sidebar). */
-  aside button {
+  /* CTA "Download CV" del Sidebar (B-4/D4 de qa-report, #104a). El
+   * `aside button` del contrato anterior SALE del bloque: el único
+   * <button> nativo del aside es hoy el disclosure — ya oculto arriba por
+   * `button[data-print-hide]` (su T7 renderiza el hook) — y el CTA nunca
+   * fue <button>: es el Button polimórfico CON `href`, que renderiza
+   * `<a download>` (src/components/Sidebar/Sidebar.tsx T5 +
+   * src/components/Button/Button.tsx rama link, `download` transmitido
+   * por su RF-8), por eso el selector viejo no lo alcanzaba. El atributo
+   * `download` es el hook NATIVO, deliberado y estable del CTA (viene de
+   * `profile.downloadCvUrl`; sin URL el CTA no se renderiza — RF-9):
+   * `aside` (0,0,1) + `[download]` (0,1,0) = (0,1,1), gana a la clase
+   * hasheada del módulo por especificidad. La raíz `<aside>` es la de
+   * Sidebar (Box `as="aside"`, único complementary del documento). */
+  aside [download] {
     display: none;
   }
 
