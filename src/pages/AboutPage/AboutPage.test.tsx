@@ -19,10 +19,17 @@
 // nivel + nombre accesible (`getByRole("heading", { level: 1, name })`), el
 // patrón literal del test 1 de la spec, y la unicidad con `getAllByRole`
 // longitud 1. Los `<p>` y el `div` de `.intro` no tienen rol ni nombre
-// accesible, así que se consultan estructuralmente desde `container`
-// (`querySelectorAll("p")`) y se asierta la pertenencia por el padre común —
-// criterio de selección estructural ya justificado en Timeline (`<time>`/`<p>`)
-// e Icon/Box/CornerTab (`container.querySelector`). Las clases `.page`/`.intro`
+// accesible, así que se consultan estructuralmente y se asierta la pertenencia
+// por el padre común — criterio de selección estructural ya justificado en
+// Timeline (`<time>`/`<p>`) e Icon/Box/CornerTab (`container.querySelector`).
+// T2b (ajuste APROBADO por el usuario tras la revisión de T1): la consulta de
+// párrafos del test 2 se ACOTA al bloque `.intro` (ya no es global al
+// `container`): desde T2 la página tiene otros `<p>` fuera de `.intro` (la
+// descripción de cada `ServiceCard`, `<p>` por spec aprobada) y el contrato
+// literal de T1 es "un `<p>` por cada elemento de `profile.about` DENTRO de
+// `.intro`" — cantidad, textos, orden, padre común único y raíz/h1 primer hijo
+// siguen asertados; no se debilita, se re-ubica al scope que la spec describe.
+// Las clases `.page`/`.intro`
 // del raíz y del bloque se verifican en T4 con el módulo (`styles.x ?? "x"`,
 // canon #99): en T1 el markup aún no tiene módulo y el contrato testeable es
 // la ESTRUCTURA (h1 primer hijo del raíz, párrafos agrupados en un único div
@@ -80,38 +87,42 @@ describe("AboutPage intro paragraphs (T1: RF-2 intro, Tests 2)", () => {
       );
     }
 
+    // El bloque intro cuelga del raíz `div.page` (Anatomía: el ÚNICO `<div>`
+    // hijo directo del raíz). T2b: el raíz y el bloque se identifican primero,
+    // de forma estructural y sin clase (el módulo CSS llega en T4), y recién
+    // ahí se consultan los `<p>` DENTRO de `.intro` (ver encabezado del
+    // archivo: el contrato de T1 es "un <p> por elemento de profile.about
+    // dentro de .intro"; desde T2 hay otros <p> en la página — ServiceCard —
+    // y la consulta global del container los contaría).
+    const pageRoot = container.firstElementChild;
+    if (pageRoot === null) {
+      throw new Error("AboutPage debe renderizar el raíz div.page (Anatomía)");
+    }
+    expect(pageRoot.tagName).toBe("DIV");
+    const introBlocks = pageRoot.querySelectorAll(":scope > div");
+    expect(introBlocks).toHaveLength(1);
+    const intro = introBlocks[0];
+    if (intro === undefined) {
+      throw new Error("el raíz .page debe tener el bloque .intro como único div hijo directo (Anatomía)");
+    }
+
     // Test 2 de la spec / RF-2: un `<p>` por elemento de `profile.about`, con
-    // su texto y en orden.
-    const paragraphs = Array.from(container.querySelectorAll("p"));
+    // su texto y en orden, dentro de `.intro`.
+    const paragraphs = Array.from(intro.querySelectorAll("p"));
     expect(paragraphs).toHaveLength(ABOUT_PARAGRAPHS.length);
     expect(paragraphs.map((paragraph) => paragraph.textContent)).toEqual(
       ABOUT_PARAGRAPHS,
     );
 
-    // "dentro de .intro" (Anatomía): todos los párrafos comparten UN único
-    // div padre (el bloque intro) — verificación estructural, sin depender de
-    // la clase (el módulo CSS llega en T4).
-    const firstParagraph = paragraphs[0];
-    if (firstParagraph === undefined) {
-      throw new Error("falta el primer <p> de .intro (Tests esperados 2)");
-    }
-    const intro = firstParagraph.parentElement;
-    if (intro === null) {
-      throw new Error("cada <p> de profile.about debe vivir dentro del bloque .intro (Anatomía)");
-    }
-    expect(intro.tagName).toBe("DIV");
+    // "dentro de .intro" (Anatomía): todos los párrafos comparten ese único
+    // div padre (el bloque intro).
     for (const paragraph of paragraphs) {
       expect(paragraph.parentElement).toBe(intro);
     }
 
-    // El bloque intro cuelga del raíz `div.page` y el `h1` es su PRIMER hijo
+    // El `h1` es el PRIMER hijo del raíz
     // (spec → Estilos y tokens: "El h1 es el primer hijo"; RF-1/RF-4: el h1
     // fluye junto a la solapa porque abre el raíz, no dentro de intro).
-    const pageRoot = intro.parentElement;
-    if (pageRoot === null) {
-      throw new Error(".intro debe ser hijo del raíz .page (Anatomía)");
-    }
-    expect(pageRoot.tagName).toBe("DIV");
     const heading = screen.getByRole("heading", { level: 1, name: ABOUT_TITLE });
     expect(heading.parentElement).toBe(pageRoot);
     expect(pageRoot.firstElementChild).toBe(heading);
