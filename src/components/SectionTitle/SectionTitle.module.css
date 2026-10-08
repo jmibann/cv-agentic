@@ -5,7 +5,7 @@
    → Decisiones: el componente es self-contained), .decorated con su ::after de
    barra de gradiente (RF-2) y .withIcon con el flex sobre el propio heading
    (RF-3; spec → "with icon": sin wrapper). Cero literales de px y cero @media
-   propios (RF-6: --font-size-h1/2/3 y --size-title-bar-*/--title-bar-offset
+   propios (RF-6: --font-size-h1/2/3 y --size-title-bar-* y --title-bar-offset
    escalan dentro de tokens/tokens.css; spec → Responsive). T5 conecta los
    márgenes RF-5 (margin-bottom de .h2/.h3 y de la combinación .h1.decorated;
    verificación por inspección: jsdom no computa márgenes) y la unión de
