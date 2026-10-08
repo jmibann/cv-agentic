@@ -15,7 +15,7 @@ Las correcciones #104 se implementaron, revisaron y verificaron en vivo:
 | D4 favicon 404 | Foundation T13/T13b `b93c510` (`/favicon.svg`, azul `#304cfd`) | PASADA 3-D: 200 `image/svg+xml`, cero petición al .ico, consola limpia |
 | Pendientes E de pasada 1/2 | — | PASADA 3-E1–E3 (overflow 1024/768; sticky OFF 1440×800 + último contacto; disclosure teclado 1024) y PASADA 4 (bullet 2 Enter→aria-current+scrollLeft 445; hover NavTabs = spec RF-5; axe 0 violaciones en×claro×about y es×oscuro×resume; contraste del chevron claro 5.87 / oscuro 12.06 ✓ contrast.md filas 15/19/39) |
 
-Suite tras todo: **445/40**, build ✅ validate:content ✅.
+Suite tras todo: **445/40**, build ✅ validate:content ✅. **Spot-check #105c (tras aplicar los tokens)**: avatar 102px exactos a 375 en ambos temas, gap chevron↔nombre 23px sin solape, md–lg (144px) y 1024 intactos, overflow 0 en 375/Resume/768/1024 → APROBADO. ⚠️ Nota: el gap de 23px queda justo con el nombre de ejemplo ("Alex Rivera"); **reconfirmar en 375 cuando `src/content/cv.*.json` tenga el nombre definitivo** (el contenido es editable por diseño; no es defecto de layout).
 
 ### Quedan en manos del usuario (no verificables por agentes)
 
