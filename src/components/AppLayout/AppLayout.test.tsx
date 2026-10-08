@@ -43,8 +43,9 @@
 // `document.getElementById(...) === null`: es el contrato de ausencia del
 // spec → No hacer.
 
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 import type { ReactNode } from "react";
 
 import { LocaleProvider } from "../../providers/LocaleProvider";
@@ -130,5 +131,198 @@ describe("AppLayout does not squat the tab ids (T1: spec → No hacer, Tests 9)"
     // ids de sección llevan prefijo `about-`/`resume-`, nunca pelados).
     expect(document.getElementById("about")).toBeNull();
     expect(document.getElementById("resume")).toBeNull();
+  });
+});
+
+// ===========================================================================
+// Tests de T2 (specs/layout/AppLayout/tasks.md) — RF-2, RF-3, RF-5: tests 2,
+// 3, 4 y 11 de la spec. El cableado (`useHashTab(TAB_IDS, "about")`, el guard
+// `isTabId`, la lista fija de 2 tabs y el `aria-labelledby={getTabId(active)}`
+// del panel) EXISTE desde T1: esta tarea es de VERIFICACIÓN y los cuatro
+// tests nacen VERDES on-arrival (decisión #101, declarado en el cuerpo del
+// commit; NO hay commit `feat` si ningún assert revela bug). Discrimen por
+// test si el cableado cambiara:
+//  - test 2 (arranque): si el default de `useHashTab` dejara de ser "about"
+//    o el panel montara la página equivocada, el `h1` buscado no existiría /
+//    caería fuera del tabpanel y el `aria-selected="true"` cambiaría de tab.
+//  - test 3 (hash pre-montaje): si AppLayout ignorara `location.hash` al
+//    montar (p. ej. un `useState("about")` fijo), el panel seguiría en About
+//    y el `h1` de Resume + `aria-labelledby="tab-resume"` fallarían.
+//  - test 4 (click): si el `onChange` de NavTabs no estrechara con `isTabId`
+//    y llamara `setActive` con un id inválido (o el guard de NavTabs
+//    destino≠activo se perdiera y emitiera de más), fallan el contenido del
+//    panel, el `toHaveBeenCalledTimes(1)` de `replaceState`, la URL terminada
+//    en `#resume` o el `pushState` cero.
+//  - test 11 (tablist invariante): si `tabs` dejara de ser la lista fija de
+//    `TAB_IDS` (orden, tamaño o ids `tab-*` de getTabId), fallan la longitud,
+//    el orden de ids/label y la coincidencia `aria-labelledby`↔tab activo
+//    antes y después del cambio.
+// Hash: se fija con el `history.replaceState` REAL ANTES de instalar el spy
+// (precedente useHashTab T2 test 9 — el spy mide solo las llamadas del
+// componente) y el `afterEach` de `src/test/setup.ts` limpia la URL entre
+// tests. Spies con call-through (`vi.spyOn` sin implementación: la
+// implementación original corre, así el hash CAMBIA de verdad y se asiértá
+// observablemente) + `mockRestore` propio de cada test (precedente exacto).
+// Clicks con `userEvent` sobre los tabs POR ROL + NOMBRE (`t.nav.*` de
+// uiEn — NavTabs los nombra con su label). La "unicidad del h1 visible" al
+// estilo RF-1/12 (`getAllByRole` longitud 1 con el inactivo bajo `hidden`)
+// se asiértá también acá como refuerzo local del escenario, pero su test
+// propio (12, simétrico) es de T4.
+// ===========================================================================
+
+describe("AppLayout starts on the About tab with no hash (T2: RF-2, Tests 2)", () => {
+  it("mounts the About page in the tabpanel and marks the about tab selected with no URL hash", () => {
+    // setup afterEach: el test arranca SIN hash (RF-2: hash ausente/inválido
+    // → default "about").
+    renderWithProviders(<AppLayout />);
+
+    // "Hecho cuando" de T2 (test 2 literal): el tab inicial es `about` y el
+    // panel muestra el `h1` de About — no el de Resume (la inactiva vive bajo
+    // `hidden`, fuera del árbol accesible: su `h1` no es alcanzable).
+    const panel = screen.getByRole("tabpanel");
+    expect(panel).toHaveAttribute("id", "main-panel");
+    expect(panel).toContainElement(
+      screen.getByRole("heading", { level: 1, name: uiEn.about.title }),
+    );
+    expect(
+      screen.queryByRole("heading", { level: 1, name: uiEn.resume.title }),
+    ).not.toBeInTheDocument();
+
+    // El tab about está seleccionado y el panel lo nombra (RF-5: el vínculo
+    // apunta siempre a un tab existente).
+    expect(screen.getByRole("tab", { name: uiEn.nav.about })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(panel).toHaveAttribute("aria-labelledby", "tab-about");
+
+    // Sin hash en la URL (el default NO se escribe en la URL al montar:
+    // useHashTab solo replaceState-a en setActiveId, RF-2 de su spec).
+    expect(window.location.hash).toBe("");
+  });
+});
+
+describe("AppLayout honors #resume before mounting (T2: RF-2, Tests 3)", () => {
+  it("starts on Resume when location.hash is #resume prior to render", () => {
+    // Hash fijado con el replaceState REAL antes del render (no hay spy
+    // instalado; precedente useHashTab T2 "el hash se fija antes de crear el
+    // spy"). El afterEach de setup.ts lo limpia después.
+    window.history.replaceState(null, "", "#resume");
+
+    renderWithProviders(<AppLayout />);
+
+    // RF-2: `location.hash === "#resume"` antes de montar → arranca en Resume.
+    const panel = screen.getByRole("tabpanel");
+    expect(panel).toContainElement(
+      screen.getByRole("heading", { level: 1, name: uiEn.resume.title }),
+    );
+    expect(
+      screen.queryByRole("heading", { level: 1, name: uiEn.about.title }),
+    ).not.toBeInTheDocument();
+    expect(panel).toHaveAttribute("aria-labelledby", "tab-resume");
+    expect(screen.getByRole("tab", { name: uiEn.nav.resume })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+  });
+});
+
+describe("AppLayout tab change swaps panel, labelledby and hash (T2: RF-3, Tests 4)", () => {
+  it("clicking the Resume tab renders the Resume h1, relabels the panel and replaceState to #resume without pushState", async () => {
+    const user = userEvent.setup();
+
+    // URL base limpia con el replaceState REAL y DESPUÉS se instalan los
+    // spies de call-through (el spy mide solo las llamadas del componente;
+    // precedente useHashTab T2 test 9). pushState también se espía para
+    // asiértar cero llamadas (RF-3: "sin agregar historial").
+    window.history.replaceState(null, "", "/");
+    const replaceState = vi.spyOn(window.history, "replaceState");
+    const pushState = vi.spyOn(window.history, "pushState");
+
+    try {
+      renderWithProviders(<AppLayout />);
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+
+      await user.click(screen.getByRole("tab", { name: uiEn.nav.resume }));
+
+      // RF-3: el panel muestra la página correspondiente al tab activado…
+      const panel = screen.getByRole("tabpanel");
+      expect(panel).toContainElement(
+        screen.getByRole("heading", { level: 1, name: uiEn.resume.title }),
+      );
+
+      // …actualiza `aria-labelledby` al tab activo…
+      expect(panel).toHaveAttribute("aria-labelledby", "tab-resume");
+
+      // …y sincroniza la URL: UNA llamada a replaceState con URL terminada
+      // en #resume (puede resolverse a absoluta en jsdom — criterio
+      // useHashTab T2: mirar el tercer argumento con regex) y CERO pushState.
+      expect(replaceState).toHaveBeenCalledTimes(1);
+      const firstCall = replaceState.mock.calls[0];
+      if (firstCall === undefined) {
+        throw new Error(
+          "replaceState sin llamadas registradas (no debería: toHaveBeenCalledTimes(1) ya pasó)",
+        );
+      }
+      expect(firstCall[2]).toMatch(/#resume$/);
+      expect(pushState).not.toHaveBeenCalled();
+      // El call-through real dejó el hash observablemente cambiado.
+      expect(window.location.hash).toBe("#resume");
+
+      // Refuerzo del criterio RF-1 tras el cambio: sigue habiendo UN único
+      // h1 accesible (la About pasó al bloque `hidden`).
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    } finally {
+      replaceState.mockRestore();
+      pushState.mockRestore();
+    }
+  });
+});
+
+describe("AppLayout tablist invariant (T2: RF-5, Tests 11)", () => {
+  it("keeps exactly two tabs in About→Resume order whose ids match the panel aria-labelledby before and after switching", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AppLayout />);
+
+    const tablist = screen.getByRole("tablist", { name: uiEn.nav.label });
+    const tabs = within(tablist).getAllByRole("tab");
+
+    // RF-5 / test 11: la lista es SIEMPRE la de `TAB_IDS`: exactamente 2,
+    // ids con el prefijo `tab-` de getTabId y en orden About→Resume (labels
+    // de `t.nav` en el mismo orden). Un `items=[]` (NavTabs RF-7 → null) o
+    // un reorder romperían ambos asserts.
+    expect(tabs).toHaveLength(2);
+    const firstTab = tabs[0];
+    const secondTab = tabs[1];
+    if (firstTab === undefined || secondTab === undefined) {
+      throw new Error("el tablist debe tener exactamente dos tabs (RF-5)");
+    }
+    expect(tabs.map((tab) => tab.id)).toEqual(["tab-about", "tab-resume"]);
+    expect(tabs.map((tab) => tab.textContent)).toEqual([
+      uiEn.nav.about,
+      uiEn.nav.resume,
+    ]);
+
+    const panel = screen.getByRole("tabpanel");
+
+    // ANTES del cambio: el único `aria-selected="true"` es About y el panel
+    // lo nombra con SU id exacto (coincidencia por referencia, no literal).
+    expect(firstTab).toHaveAttribute("aria-selected", "true");
+    expect(secondTab).toHaveAttribute("aria-selected", "false");
+    expect(panel.getAttribute("aria-labelledby")).toBe(firstTab.id);
+    // …y el id referenciado existe en el documento y ES ese tab (RF-5:
+    // nunca apunta a un tab inexistente).
+    expect(document.getElementById(firstTab.id)).toBe(firstTab);
+
+    // Cambio de tab (click en el inactivo)…
+    await user.click(secondTab);
+
+    // …DESPUÉS: la invariante se mantiene con el otro activo.
+    const tabsAfter = within(tablist).getAllByRole("tab");
+    expect(tabsAfter).toHaveLength(2);
+    expect(tabsAfter[0]).toHaveAttribute("aria-selected", "false");
+    expect(tabsAfter[1]).toHaveAttribute("aria-selected", "true");
+    expect(panel.getAttribute("aria-labelledby")).toBe(secondTab.id);
+    expect(document.getElementById(secondTab.id)).toBe(secondTab);
   });
 });
