@@ -12,12 +12,17 @@
 // (C2/C3) y NO ordena las entradas (el orden es el de los datos; el test 2
 // refuerza el orden observablemente).
 // Diferidos a sus tareas: skills (`<section aria-labelledby>` + `SkillList`,
-// RF-4, T3), mock con `end: null` y columnas vacías (T2), módulo CSS con la
-// tabla "Estilos y tokens" (`.page`/`.columns`), unión de `className` al raíz
-// y cierre `expectNoA11yViolations` (T4) — por eso hoy las clases `page`/
-// `columns` son literales del markup, sin módulo todavía ("Hecho cuando" de
-// T1; los asserts de clases con el canon #99 llegan con T4, precedente
-// AboutPage). `index.ts` también llega en T4 (criterio AboutPage).
+// RF-4, T3), módulo CSS con la tabla "Estilos y tokens" (`.page`/`.columns`),
+// unión de `className` al raíz y cierre `expectNoA11yViolations` (T4) — por
+// eso hoy las clases `page`/`columns` son literales del markup, sin módulo
+// todavía ("Hecho cuando" de T1; los asserts de clases con el canon #99 llegan
+// con T4, precedente AboutPage). `index.ts` también llega en T4 (criterio
+// AboutPage).
+// T2 hecha: el bloque `.columns` se monta solo si AL MENOS UNA de las dos
+// colecciones tiene entradas (RF-2: "SI ambos están vacíos, no renderiza
+// .columns"; los guards por columna de T1 siguen, cada sección no aparece con
+// su conjunto vacío). `presentLabel` ya viajaba desde T1 (RF-7) y su test 4
+// con mock lo fija.
 
 import type { ReactNode } from "react";
 
@@ -47,35 +52,38 @@ export function ResumePage(): ReactNode {
         {t.resume.title}
       </SectionTitle>
 
-      {/* Anatomía: .columns con las dos secciones. La condición por colección
-          es la RF-2 de la página ("no aparece su columna"); ResumeSection
-          además devuelve null con entries=[] (su RF-1) — el guard de la página
-          deja el intento de montaje explícito en el llamado y la rama vacía
-          testeable en T2. */}
-      <div className="columns">
-        {cv.education.length > 0 ? (
-          <ResumeSection
-            id="education"
-            title={t.resume.education}
-            icon="book-open"
-            entries={cv.education}
-            locale={locale}
-            timelineIdPrefix="edu"
-            presentLabel={t.timeline.present}
-          />
-        ) : null}
-        {cv.experience.length > 0 ? (
-          <ResumeSection
-            id="experience"
-            title={t.resume.experience}
-            icon="briefcase"
-            entries={cv.experience}
-            locale={locale}
-            timelineIdPrefix="exp"
-            presentLabel={t.timeline.present}
-          />
-        ) : null}
-      </div>
+      {/* Anatomía: .columns con las dos secciones. RF-2 en sus dos ramas:
+          cada columna no aparece si SU conjunto está vacío (guards por
+          sección, T1) y el contenedor .columns tampoco se monta si AMBOS están
+          vacíos (T2: "SI ambos están vacíos, no renderiza .columns"). El test
+          5 verifica las ausencias por rol; la no-montada del contenedor, por
+          inspección del markup (raíz sin <div> hijo directo). */}
+      {cv.education.length > 0 || cv.experience.length > 0 ? (
+        <div className="columns">
+          {cv.education.length > 0 ? (
+            <ResumeSection
+              id="education"
+              title={t.resume.education}
+              icon="book-open"
+              entries={cv.education}
+              locale={locale}
+              timelineIdPrefix="edu"
+              presentLabel={t.timeline.present}
+            />
+          ) : null}
+          {cv.experience.length > 0 ? (
+            <ResumeSection
+              id="experience"
+              title={t.resume.experience}
+              icon="briefcase"
+              entries={cv.experience}
+              locale={locale}
+              timelineIdPrefix="exp"
+              presentLabel={t.timeline.present}
+            />
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
