@@ -43,9 +43,9 @@
 ```
 ┌──────────────────────────────────── ControlsBar ─ [☀] [EN|ES] ┐
 ┌───────────────────────────────────────────────────╭──────────────┐
-│ ┌──────┐  Nombre                                  │ Show Contacts│  ← CornerTab (button)
-│ │avatar│  [Rol]                                   ╰──────────────┤
-│ └──────┘  (redes)                                                │
+│ ┌──────┐  Nombre                                        ⌄         │  ← botón (chevron, Cambio F5 #104b)
+│ │avatar│  [Rol]                                             ╰─────┤
+│ └──────┘  (redes centradas)                                        │
 │ ─────────────────────── (colapsable) ─────────────────────────── │
 │ ✉ EMAIL        ☎ PHONE          ← 2 columnas ≥768, 1 columna <768 │
 │ [ Download CV ] (solo si existe downloadCvUrl)                   │
@@ -159,7 +159,7 @@ h2 Skills → SkillList (chips) a ancho completo
 
 El CV debe imprimirse limpio en A4/Letter:
 
-- Ocultar: ControlsBar, CornerTab/NavTabs, botón "Show Contacts", Download CV,
+- Ocultar: ControlsBar, CornerTab/NavTabs, el chevron de contactos del Sidebar, Download CV,
   skip link, bullets del carrusel y el dialog.
 - Testimonios: **todos apilados, con el texto completo** (detalle en
   `specs/content/TestimonialCarousel/spec.md` → "Impresión").

@@ -17,9 +17,13 @@
   - Oscuro: dorado `#fadd7f → #f6c16f` (sólido `#fadd7f`).
 - **Tipografía liviana con títulos firmes.** Poppins 300 en el cuerpo,
   600 en títulos, 500 en tabs, nombre e ítems de Timeline.
-- **Solapas en las esquinas.** La navegación y el "Show Contacts" son
-  pestañas (`CornerTab`) pegadas a la esquina superior derecha de su card:
-  fondo apenas elevado, borde fino y radio asimétrico (0 / 20 / 0 / 32).
+- **Solapas en las esquinas.** La navegación es una pestaña (`CornerTab`)
+  pegada a la esquina superior derecha de su card: fondo apenas elevado,
+  borde fino y radio asimétrico (0 / 20 / 0 / 32). El "Show Contacts" del
+  Sidebar **no** es solapa: es un chevron dorado (`--color-accent-text`)
+  sin fondo, pegado a la esquina (Cambio F5 #104b — la solapa con fondo
+  solapaba el nombre a 375px; la identidad y la jerarquía tipográfica
+  quedan intactas).
 - **Tintes, no líneas.** Los bloques internos se separan por fondo
   (`surface-muted`) antes que por bordes. Las líneas (Timeline, Separator)
   son de 1px y decorativas.
