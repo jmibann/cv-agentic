@@ -124,15 +124,21 @@
 }
 
 /* Tabla → Botón estirado (RF-1, patrón stretched-link): reset del <button>
-   (`position: static; background: none; border: 0`) + `cursor: pointer`.
-   `static` es deliberado: su propio box queda en la última fila del flex (sin
-   contenido, no aporta alto) y el `::after` —única superficie pintada— se
-   ancla en `.card` (`position: relative`), cubriendo la tarjeta entera sin
-   capturar nada por encima. */
+   (`position: static; background: none; border: 0; outline: none`) +
+   `cursor: pointer`. `static` es deliberado: su propio box queda en la última
+   fila del flex (sin contenido, no aporta alto) y el `::after` —única
+   superficie pintada— se ancla en `.card` (`position: relative`), cubriendo la
+   tarjeta entera sin capturar nada por encima. `outline: none` es el Cambio F5
+   2026-10-08 de RF-5 (hallazgo D3 de docs/qa-report.md): el anillo propio del
+   UA sobre el box vacío del botón duplicaba un anillo de 2px ajeno al kit; el
+   único anillo visible es el del `::after` (regla dura 7 de docs/DESIGN.md).
+   Verificación: inspección de esta regla + confirmación visual en la
+   re-pasada F5 (#101: jsdom no computa outline, no hay test). */
 .stretched {
   position: static;
   background: none;
   border: 0;
+  outline: none;
   cursor: pointer;
 }
 
