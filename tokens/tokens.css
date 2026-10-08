@@ -198,7 +198,7 @@
   /* ------------------------------------------------------------------
      TAMAÑOS DE COMPONENTE
      ------------------------------------------------------------------ */
-  --size-avatar-sidebar: 7.5rem;     /* → 9rem (≥768) → 11.25rem (≥1200) */
+  --size-avatar-sidebar: 6.375rem;   /* → 9rem (≥768) → 11.25rem (≥1200); base −15% por #104b/#105c (F5) */
   --size-avatar-border: 5px;         /* → 6px (≥768) */
   --size-icon-box: 3rem;
   --size-icon: 1.125rem;
@@ -333,7 +333,7 @@
     --box-padding: 1.875rem;
     --font-size-name: 1.6875rem;   /* 27px */
     --font-size-badge: 0.8125rem;  /* 13px */
-    --size-avatar-sidebar: 9rem;   /* PROVISIONAL: se fija en la QA visual de F5 comparando con la captura de referencia */
+    --size-avatar-sidebar: 9rem;   /* DEFINITIVO (F8 cerrado, decisión del usuario #105b 2026-10-08): aceptado sin captura de referencia; QA midió proporciones OK en 1024/1440 */
     --size-avatar-border: 6px;
     --radius-avatar-sidebar: var(--radius-32);
     --sidebar-name-gap: 0.875rem;
