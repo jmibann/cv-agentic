@@ -1,6 +1,6 @@
 # Tareas — AppLayout
 
-- [ ] **T1. Esqueleto de composición y landmarks.** RF-1, RF-6
+- [x] **T1. Esqueleto de composición y landmarks.** RF-1, RF-6 — fd46fd6 (APROBADA. Test 7 por conteo de etiquetas = a prueba de duplicados con otro id (legítimo RF-6). Menor para T5: los literales de clase se reemplazan por `styles.*` sin cambiar estructura + assert de unión `className` en `div.container`)
   - Hecho cuando: `AppLayout.test.tsx` cubre tests 1, 7 y 9 de la spec: landmarks `banner`/`complementary`/`main` con `getAllByRole("banner")` longitud 1; exactamente un `linearGradient#accent-gradient`, un `clipPath#hex-avatar-outer` y un `clipPath#hex-avatar-inner`; ningún elemento con `id="about"` ni `id="resume"`; `AppLayout.tsx` monta la Anatomía completa (defs ×1, skip link con `data-print-hide`, container+className, ControlsBar, grid, Sidebar con labels de `t.sidebar.*`+`t.contact`, main>Box>NavTabs>stack con tabpanel `#main-panel` y bloque `data-print-only` `hidden`, páginas About/Resume según estado con `useHashTab(TAB_IDS, "about")`); verde tras `feat(AppLayout): T1`.
 
 - [ ] **T2. Navegación por hash con guard y tablist invariante.** RF-2, RF-3, RF-5
