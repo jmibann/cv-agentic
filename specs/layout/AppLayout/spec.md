@@ -136,10 +136,14 @@ AppLayout solo decide cuál renderizar en el tabpanel según el tab activo
     (ver `specs/pages/*.md` → "Estilos y tokens").
 - **Skip link:** visualmente oculto hasta recibir foco; con foco aparece
   arriba a la izquierda con fondo `--color-surface`, texto `--color-accent-text`,
-  radio `--radius-8`, `--shadow-control` y `z-index: var(--z-skip)` (30: por
+  radio `--radius-8`, `--shadow-control`, `z-index: var(--z-skip)` (30: por
   encima de `--z-controls` —el token es nuevo en `tokens.css`, decisión de
   Clarificación F4—; el skip link enfocado debe ganar el apilamiento siempre,
-  y `--z-controls` documenta específicamente la capa de ControlsBar).
+  y `--z-controls` documenta específicamente la capa de ControlsBar) y **con el
+  anillo estándar del kit** (`--focus-ring-*` en `:focus`; Cambio F5, hallazgo
+  D2: el botón era enfocable vía `:focus` programático/click y el `:focus-visible`
+  no lo garantiza siempre — regla dura 7 de `docs/DESIGN.md`: un único anillo.
+  Verificación: inspección del CSS + QA F5).
 - Foco del tabpanel: anillo estándar (`--focus-ring-*`) solo con `:focus-visible`.
 
 ## Estados
@@ -176,13 +180,7 @@ nombres de módulo se hashean y `global.css` no puede apuntarlos):
 - Todos los `@media print` transversales viven en `src/styles/global.css`
   (regla dura 3 de `docs/DESIGN.md`); la paleta de impresión ya la reasigna
   `tokens/tokens.css`. Ninguna pieza F2/F3 se edita.
-- Los selectores de elemento/rol nativo para ocultar piezas ya implementadas
-  son **deliberados y forman parte del contrato**, no accidentes de
-  estructura: `header` (ControlsBar: único `<header>` del documento),
-  `[role="tablist"]` (NavTabs/CornerTab), `aside button` (Show Contacts /
-  Download CV de Sidebar). El skip link se oculta con `[data-print-hide]` en
-  su raíz. `TestimonialDialog` y `TestimonialCarousel` ya resuelven su
-  impresión en sus propios módulos (excepción documentada G-D-1).
+- Los selectores para ocultar piezas de otras piezas son **deliberados y forman parte del contrato**. **Actualización del Cambio F5 2026-10-08** (hallazgos B-2/B-3/M-1 de `docs/qa-report.md`): los nativos `header`, `[role="tablist"]` y `aside button` **perdían por especificidad** contra las clases hasheadas de los CSS Modules (los controles y el botón se imprimían; la solapa quedaba como franja vacía). El contrato pasa a **hooks `data-print-hide`** en las raíces de las piezas (attribute (0,1,0) + elemento (0,1,1) gana siempre a la clase): `global.css` oculta `header[data-print-hide]` (ControlsBar), `div[data-print-hide]` (CornerTab — la tab entera, contenido y fondo) y `button[data-print-hide]` (disclosure del Sidebar), además de `[data-print-hide]` del skip link (este ya funcionaba: el módulo no le fija `display`) y `aside [download]` (el CTA Download CV, `<a>` polimórfico de `Button`: el atributo `download` es el hook nativo, estable y único del CTA — deliberado). Las piezas afectadas renderizan el atributo según sus specs (Cambios en ControlsBar RF-6, CornerTab RF-7, Sidebar RF-4/RF-10). `TestimonialDialog` y `TestimonialCarousel` ya resuelven su impresión en sus propios módulos (excepción documentada G-D-1).
 - La expansión forzada de contactos de Sidebar y el resto de la lista de
   `foundations/layout.md` → "Impresión" las implementa el integrator en la
   tarea de impresión de F4 y las verifica **QA F5** con la app servida

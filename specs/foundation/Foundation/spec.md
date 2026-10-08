@@ -58,6 +58,7 @@ Estructura que crea F1 en la raíz (no es un componente visual):
 package.json · package-lock.json · .nvmrc (24) · .gitignore
 index.html                  ← `<html lang="en">` + meta theme-color #eceef4
                               + script anti-flash inline en <head> (foundations/theming.md, tal cual)
+                              + `<link rel="icon" type="image/svg+xml" href="/favicon.svg">` (Cambio F5 2026-10-08, hallazgo D4: el navegador pedía /favicon.ico → 404)
 vite.config.ts              ← plugin react + resolve.alias @data/*
 tsconfig.json               ← único; strict, noUnusedLocals, noUnusedParameters,
                               noUncheckedIndexedAccess, moduleResolution "bundler",
@@ -68,6 +69,9 @@ eslint.config.js            ← flat: typescript-eslint (strict), react-hooks,
                               que prohíbe #[0-9a-fA-F]{3,8}\b|rgb(|hsl( en .tsx
 public/images/              ← placeholders: avatar.svg y testimonials/{maria,john,lena}.svg
                               (silueta neutra, sin texto ni marcas, viewBox cuadrado)
+public/favicon.svg          ← hexágono simple de marca (form factor de HexAvatar,
+                              `--color-accent` #ffb729 sobre transparente, viewBox cuadrado;
+                              Cambio F5 — asset, no código de app)
 src/main.tsx                ← importa ../tokens/tokens.css (única importación, ruta
                               relativa), @fontsource/poppins/{300,400,500,600}.css,
                               src/styles/global.css; monta ThemeProvider > LocaleProvider > App

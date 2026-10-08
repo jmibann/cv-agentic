@@ -161,8 +161,7 @@ T3b (deuda L1 detectada en su review).
     `ajv/dist/runtime/ucs2length.js` al bundle (runtime-helper de ajv
     standalone; decide el usuario en la puerta F1).
 
-- [x] **T12. Cambio F3 (previo a ControlsBar/T1 y Timeline/T2): `formatPeriodEndpoint` exportado + `controls.lightMode`.** RF-8 (+ Tests esperados de la spec actualizada) — Cambio aprobado en la Clarificación F3 (decisiones 1=a y 12=a, puerta de Plan F3) — 29b063f
-  - Hecho cuando: `src/i18n/formatPeriod.ts` exporta
+- [x] **T12. Cambio F3 (previo a ControlsBar/T1 y Timeline/T2): `formatPeriodEndpoint` exportado + `controls.lightMode`.** RF-8 (+ Tests esperados de la spec actualizada) — Cambio aprobado en la Clarificación F3 (decisiones 1=a y 12=a, puerta de Plan F3) — 29b063f  - Hecho cuando: `src/i18n/formatPeriod.ts` exporta
     `formatPeriodEndpoint(value, locale): string` (la actual `formatEndpoint`
     privada, ahora exportada; `formatPeriod` queda con la misma firma y
     comportamiento, sus tests F1 pasan sin tocar); pasan los nuevos tests de
@@ -172,3 +171,6 @@ T3b (deuda L1 detectada en su review).
     `foundations/i18n.md` (tabla de claves y "Fechas y períodos") ya documenta
     ambos (editado por el orchestrator en esta misma decisión); lint +
     typecheck + test verdes. No toca nada más de F1.
+
+- [ ] **T13. Favicon SVG (Cambio F5 2026-10-08, hallazgo D4 de `docs/qa-report.md`).** spec → Anatomía (`index.html` + `public/favicon.svg`)
+  - Hecho cuando: `index.html` incluye `<link rel="icon" type="image/svg+xml" href="/favicon.svg">` en el `<head>` (junto al theme-color, antes del script anti-flash donde corresponda); `public/favicon.svg` existe: hexágono de 64×64 viewBox, fill `#ffb729` (el literal del asset, coherente con `--color-accent`; SVG público no es CSS de app), sin texto; `src/test/anti-flash.test.ts` (o el test que lee `index.html`) agrega la aserción del link + existencia del archivo (con `fs` como hace con tokens.css); consola sin 404 en la re-pasada F5; lint/typecheck/test/build verdes.

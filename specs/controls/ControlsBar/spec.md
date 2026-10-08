@@ -14,7 +14,7 @@ parte inferior del espacio `--gutter-top` y se ve igual en todos los breakpoints
 - RF-3: CUANDO cambia el idioma de la interfaz, ENTONCES EL SISTEMA actualiza los labels traducidos de ThemeToggle y LanguageSwitcher.
 - RF-4: ControlsBar debe quedar entre lo primero del orden de tabulación, inmediatamente después del skip link: **restricción de uso a nivel de página** — el DOM order lo garantiza AppLayout (su spec); no es verificable en la unidad de ControlsBar (la pieza no conoce el skip link). La verifica el reviewer en F4.
 - RF-5: EL SISTEMA no declara en su módulo ningún color de texto sobre `--color-bg` ni usa `--color-text-muted` (la pieza no renderiza texto propio; el texto que muestra viene de sus hijos, que traen sus tokens). Verificación: inspección del CSS.
-- RF-6: EL SISTEMA se muestra igual en todos los breakpoints: solo el `gap` escala, con token y sin `@media` propios. Verificación: inspección del CSS. En **impresión** la ocultan los estilos compartidos (G-D: la pieza no declara `@media print`).
+- RF-6: EL SISTEMA se muestra igual en todos los breakpoints: solo el `gap` escala, con token y sin `@media` propios. Verificación: inspección del CSS. En **impresión** la oculta el contrato `data-*` (G-D; Cambio F5 2026-10-08): el `<header>` raíz renderiza **`data-print-hide`** — `global.css` lo oculta con `[data-print-hide]` porque el selector nativo `header` perdía por especificidad contra la clase del módulo (hallazgo B-2 de `docs/qa-report.md`). La pieza no declara `@media print`.
 
 ## Anatomía
 
@@ -80,6 +80,7 @@ Igual en todos los tamaños; solo el `gap` escala, por token (`--controls-gap`).
 - Renderiza un `banner` que contiene un `group` con nombre traducido.
 - Contiene el ThemeToggle y el LanguageSwitcher (por rol y nombre).
 - Al cambiar el idioma a `es`, los labels de los controles cambian al español.
+- El `<header>` raíz renderiza `data-print-hide` (Cambio F5: hook del contrato de impresión; test estructural simple).
 - `expectNoA11yViolations` sin violaciones.
 
 (Los tests envuelven con `ThemeProvider` **y** `LocaleProvider` — los hijos

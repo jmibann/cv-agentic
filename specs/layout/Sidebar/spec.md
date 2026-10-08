@@ -11,30 +11,34 @@ contactos colapsables en tamaños menores.
 
 - RF-1: EL SISTEMA renderiza un landmark `<aside>` con `aria-label` traducido que contiene avatar, nombre, rol, redes, contactos y la descarga del CV.
 - RF-2: CUANDO existe `profile.downloadCvUrl`, ENTONCES EL SISTEMA muestra el link "Download CV" con el atributo `download`; SI no existe, ENTONCES no renderiza ese botón.
-- RF-3: CUANDO el viewport es menor que xl, ENTONCES EL SISTEMA agrupa los contactos tras un botón disclosure (`aria-expanded` + `aria-controls`); SI el viewport es xl o mayor, ENTONCES los contactos están siempre visibles y la CornerTab del disclosure queda **oculta solo por CSS** (mecanismo CSS-only, decisión 8=a: `@media (min-width: 1200px)` en el módulo del Sidebar fuerza `display: block` en `.additional` y oculta la CornerTab; el botón sigue montado pero no visible ni operable — no hay render condicional por ancho). Nota de coherencia: la visibilidad "en todos los breakpoints" de CornerTab RF-4 aplica al componente consigo mismo; aquí es el consumidor quien lo oculta por responsive, como NavTabs/Sidebar ya hacen.
-- RF-4: CUANDO el usuario expande los contactos, ENTONCES EL SISTEMA alterna el texto `showContacts` / `hideContacts` y rota el chevron 180° (chevron = `Icon name="chevron-down"` decorativo con clase de rotación en el módulo: `transform`, `--duration-base`).
+- RF-3: CUANDO el viewport es menor que xl, ENTONCES EL SISTEMA agrupa los contactos tras un botón disclosure (`aria-expanded` + `aria-controls`); SI el viewport es xl o mayor, ENTONCES los contactos están siempre visibles y el botón de disclosure queda **oculto solo por CSS** (mecanismo CSS-only, decisión 8=a: `@media (min-width: 1200px)` en el módulo del Sidebar fuerza `display: block` en `.additional` y oculta el botón; el botón sigue montado pero no visible ni operable — no hay render condicional por ancho). *Cambio F5 2026-10-08: el disclosure ya no usa CornerTab (ver Anatomía); la nota de coherencia con CornerTab RF-4 queda sin objeto acá.*
+- RF-4: CUANDO el usuario expande los contactos, ENTONCES EL SISTEMA alterna el **nombre accesible** del botón (`aria-label` = `showContacts` / `hideContacts`; el botón es icon-only desde el Cambio F5 2026-10-08, ver "Botón de disclosure" más abajo) y rota el chevron 180° (chevron = `Icon name="chevron-down"` decorativo con clase de rotación en el módulo: `transform`, `--duration-base`).
 - RF-5: EL SISTEMA deriva el `href` de cada contacto con `getContactHref`: prioridad al `href` explícito; `email` → `mailto:`, `phone` → `tel:` sin `+` salvo el inicial, `whatsapp` → `https://wa.me/` solo dígitos y `location` → sin link; SI tras la limpieza `phone` o `whatsapp` no conserva dígitos, ENTONCES el resultado es `undefined` y el valor se muestra como texto.
 - RF-6: EL SISTEMA abre en pestaña nueva con `target="_blank"` y `rel="noopener noreferrer"` **únicamente** los links externos: los de redes sociales y los de contacto derivados explícitamente como URL (p. ej. `href` de sitio, y `whatsapp` vía `https://wa.me/…`, decisión 10); `mailto:` y `tel:` se abren **sin** `target` ni `rel`. Cada link de red lleva `aria-label` igual al nombre de la marca.
 - RF-7: EL SISTEMA aplica el layout de la pieza por breakpoint (grilla en tamaños menores a xl, vertical y centrado en xl, con el avatar sobresaliendo) usando tokens, sin medidas literales en `@media`. El **sticky** con alto ≥ 900px lo aplica AppLayout sobre `.aside` (no es verificable en la pieza; lo verifica el reviewer en F4/F5).
 - RF-8: EL SISTEMA recibe todos los datos por props (`profile`, `contact`, `social`, `labels`) y no consume `useCv()` ni el hook de idioma.
 - RF-9: SI `contact` viene vacío, ENTONCES EL SISTEMA no renderiza la lista de contactos; SI `social` viene vacío, ENTONCES no renderiza la lista de redes; SI no hay contactos **ni** `downloadCvUrl`, ENTONCES tampoco renderiza el `Separator` (contraparte EARS del Test 8; un `.additional` sin contenido no deja huérfano el separador).
-- RF-10: ENTONCES en impresión los contactos quedan siempre expandidos y el botón Show/Hide se oculta: es responsabilidad de los **estilos compartidos** (G-D; `foundations/layout.md` → Impresión), no del Sidebar, que no declara `@media print`. Para que puedan cumplirlo, el colapso de `.additional` se hace por **clase del módulo** (nunca `style` inline) y el contenedor del disclosure es alcanzable (`id="sidebar-contacts"`).
+- RF-10: ENTONCES en impresión los contactos quedan siempre expandidos y el botón Show/Hide se oculta: es responsabilidad de los **estilos compartidos** (G-D; `foundations/layout.md` → Impresión), no del Sidebar, que no declara `@media print`. Para que puedan cumplirlo, el colapso de `.additional` se hace por **clase del módulo** (nunca `style` inline) y el contenedor del disclosure es alcanzable (`id="sidebar-contacts"`). La raíz del botón de disclosure renderiza el hook `data-print-hide` (Cambio F5; `button[data-print-hide]` de `global.css` lo oculta ganando la especificidad a la clase del módulo — hallazgo B-3).
 
 ## Anatomía
 
 ```html
 <Box variant="outer" as="aside" aria-label="Profile">
-  <CornerTab size="sm">                        <!-- montada siempre; oculta por CSS en ≥ xl (RF-3) -->
-    <button aria-expanded="false" aria-controls="sidebar-contacts">Show Contacts ⌄</button>
-  </CornerTab>
+  <!-- Cambio F5 2026-10-08: el disclosure ya NO usa CornerTab (la tab con fondo
+       `surface-raised` solapaba el nombre a 375px — hallazgo D1 de qa-report).
+       Botón icon-only absoluto en la esquina superior derecha del raíz, sin
+       fondo; `data-print-hide` = hook del contrato de impresión (#103). -->
+  <button class="disclosure" data-print-hide aria-label="Show Contacts" aria-expanded="false" aria-controls="sidebar-contacts">
+    <Icon name="chevron-down" aria-hidden="true" />   <!-- decora; rota 180° expandido; `aria-label` alterna show/hide (RF-4) -->
+  </button>
 
   <div class="baseInfo">
     <figure class="avatar"><img src alt /></figure>
-    <div class="identity">
+    <div class="identity">                            <!-- < md / md–lg: alineado al inicio, junto al avatar (Cambio F5) -->
       <p class="name">Alex Rivera</p>
       <Badge>Frontend Developer</Badge>
     </div>
-    <ul class="social" aria-label="Social profiles">
+    <ul class="social" aria-label="Social profiles">  <!-- < xl: centrado en el espacio disponible (Cambio F5) -->
       <li><a href="…" aria-label="GitHub" target="_blank" rel="noopener noreferrer"><BrandIcon network="github" /></a></li>
     </ul>
   </div>
@@ -135,16 +139,16 @@ IconBox + bloque de texto. Valor en `--color-heading`,
 |---|---|
 | Link de red social | reposo `--color-text-muted`; hover/foco `--color-accent-text`; foco con anillo estándar |
 | Link de contacto | sin subrayado; subrayado en hover/foco; foco con anillo estándar |
-| Botón Show/Hide Contacts | `aria-expanded` false/true; chevron rota 180° al expandir; foco con anillo estándar |
+| Botón de disclosure | `aria-expanded` false/true; `aria-label` alterna `showContacts`/`hideContacts`; chevron rota 180° al expandir; foco con anillo estándar |
 | Download CV | estados de `Button` |
 
 ## Responsive
 
 | Viewport | Layout |
 |---|---|
-| **< md (768)** | Grilla `auto 1fr`: avatar (7.5rem) a la izquierda; nombre y badge a la derecha; redes debajo de la identidad. Contactos colapsados; al expandir, **1 columna**. |
-| **md – lg (768–1199)** | Igual, avatar 9rem (**provisional**: se ajusta el token en la QA visual de F5), texto más grande. Contactos expandidos en **2 columnas**. |
-| **xl (≥ 1200)** | Vertical y centrado. Avatar 11.25rem **sobresaliendo** arriba (`margin-top: calc(var(--size-avatar-sidebar) * -0.71)`, ≈ −8rem; fórmula compartida con `foundations/layout.md`), nombre/badge/redes centrados, contactos **siempre visibles** en 1 columna, **sin** CornerTab ni botón. Sticky solo con alto de pantalla ≥ 900px (lo aplica AppLayout). |
+| **< md (768)** | Grilla `auto 1fr`: avatar (**6.375rem** — −15% del valor previo 7.5rem, Cambio F5 2026-10-08 por solapamiento medido a 375px; el token base `--size-avatar-sidebar` queda en manos del usuario en `tokens.css`) a la izquierda; **nombre y headline desplazados a la izquierda, junto al avatar** (bloque de identidad alineado al inicio, sin reserves de columna bajo la esquina superior derecha); redes debajo de la identidad. Contactos colapsados; al expandir, **1 columna**. |
+| **md – lg (768–1199)** | Igual, avatar 9rem (**provisional**: se ajusta el token en la QA visual de F5), texto más grande; identidad pegada al avatar como en < md. Contactos colapsados por defecto; al expandir, en **2 columnas**. |
+| **xl (≥ 1200)** | Vertical y centrado. Avatar 11.25rem **sobresaliendo** arriba (`margin-top: calc(var(--size-avatar-sidebar) * -0.71)`, ≈ −8rem; fórmula compartida con `foundations/layout.md`), nombre/badge/redes centrados, contactos **siempre visibles** en 1 columna, botón de disclosure **oculto por CSS** (decisión 8=a; antes "sin CornerTab ni botón" — Cambio F5). Sticky solo con alto de pantalla ≥ 900px (lo aplica AppLayout). |
 
 Colapsable (< xl):
 - Estado local `expanded` con default `false` **en todos los < xl** (decisión 11:
@@ -153,12 +157,9 @@ Colapsable (< xl):
 - `.additional` oculto con una **clase del módulo** (`display: none`, nunca
   `style` inline: los estilos compartidos de impresión deben poder forzar la
   expansión — RF-10); en ≥ xl un `@media (min-width: 1200px)` del propio módulo
-  fuerza `display: block` y oculta la CornerTab (CSS-only, RF-3 / decisión 8=a).
-- Botón: `aria-expanded`, `aria-controls="sidebar-contacts"`; el texto alterna
-  `showContacts` / `hideContacts`; el chevron rota 180° cuando está expandido
-  (`transform`, `--duration-base`). Estilo del botón: sin fondo, color
-  `--color-accent-text`, `font-size: var(--font-size-body)` (ya escala por token);
-  foco con el anillo estándar (`--focus-ring-*`).
+  fuerza `display: block` y oculta el botón de disclosure (CSS-only, RF-3 /
+  decisión 8=a).
+- Botón de disclosure (**Cambio F5 2026-10-08**: icon-only, sin CornerTab ni fondo): `aria-expanded`, `aria-controls="sidebar-contacts"`, `aria-label` que alterna `showContacts` / `hideContacts` (el nombre accesible reemplaza al texto visible); el chevron (`Icon name="chevron-down"`, decorativo `aria-hidden`) rota 180° cuando está expandido (`transform`, `--duration-base`). Estilo: **sin fondo ni border** (cero superficie propia), color `--color-accent-text` (el dorado del kit; par registrado en `docs/tokens/contrast.md` sobre la superficie del `aside` — verificar el par exacto en la tarea), tamaño del glyph por tokens (`--size-icon` default o `calc()` de tokens si hace falta área táctil ≥24px con padding), posicionado **absoluto en la esquina superior derecha del raíz** (el `aside`/Box aporta el `position: relative`; la identidad **no** pasa por debajo: reserva con `padding-inline-end: calc()` de tokens en < md si el nombre lo alcanza). Foco con el anillo estándar (`--focus-ring-*`). En ≥ xl se oculta solo por CSS (`display: none`, decisión 8=a: sigue montado, no operable). Raíz con `data-print-hide` (contrato de impresión #103; verificado estructuralmente).
 
 ## Accesibilidad
 
@@ -176,7 +177,7 @@ Colapsable (< xl):
 2. Muestra nombre, headline (Badge) y el avatar con su alt.
 3. Un link por red con `aria-label` de la marca, `href` correcto, `target="_blank"` y `rel="noopener noreferrer"`.
 4. Un ítem por contacto con su label traducido; email/phone/whatsapp son links con el href de `getContactHref`; location no es link. `mailto:`/`tel:` **sin** `target`/`rel`; el link whatsapp (o un `href` explícito de sitio) con `target="_blank"` + `rel="noopener noreferrer"` (RF-6).
-5. Botón de contactos: `aria-expanded="false"` inicial; click → `"true"` y texto `hideContacts`; `aria-controls` apunta a un elemento existente.
+5. Botón de contactos: `aria-expanded="false"` inicial; click → `"true"` y **nombre accesible** `hideContacts` (Cambio F5: icon-only + `aria-label`; `getByRole("button", { name: labels.showContacts })`); `aria-controls` apunta a un elemento existente.
 6. Con `downloadCvUrl`: link "Download CV" con ese `href` y atributo `download`. Sin `downloadCvUrl`: no existe.
 7. `getContactHref` (tabla de casos): `href` explícito tiene prioridad;
    `"alex@example.com"` → `mailto:alex@example.com`;
@@ -185,6 +186,7 @@ Colapsable (< xl):
    location → `undefined`; phone sin dígitos → `undefined`.
 8. `contact` y `social` vacíos: no renderiza listas vacías; sin contactos **y** sin CV tampoco renderiza el `Separator` (RF-9).
 9. `expectNoA11yViolations` sin violaciones (colapsado y expandido).
+10. (Cambio F5) El botón de disclosure es icon-only: sin texto visible, con `data-print-hide` en su raíz, `aria-hidden` en el glyph y **sin** CornerTab en el DOM del `<aside>` (el hook existía solo para esto).
 
 (jsdom no aplica `@media`: los tests verifican el comportamiento del
 disclosure, no la visibilidad por breakpoint; eso se verifica en QA visual.)

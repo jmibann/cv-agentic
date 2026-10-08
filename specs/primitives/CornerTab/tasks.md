@@ -31,3 +31,10 @@
     `feat(CornerTab): T4`.
   - Nota para el cierre de pieza: `index.ts` re-exporta `CornerTab` y tipos (el
     plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
+
+- [ ] **T5. Hook `data-print-hide` en el raíz (Cambio F5 2026-10-08).** RF-7
+  - Hecho cuando: el `<div>` raíz renderiza `data-print-hide` junto a sus
+    clases, en ambos `placement` (test estructural `toHaveAttribute`); ningún
+    otro atributo/aria/estilo cambia; tests previos intactos; la re-pasada F5
+    confirma que en print la tab desaparece completa (fin del hallazgo M-1:
+    franja vacía con fondo/borde); verde tras `feat(CornerTab): T5`.

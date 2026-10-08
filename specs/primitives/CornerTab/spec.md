@@ -16,6 +16,7 @@ posición; el contenido y el comportamiento los pone quien la usa.
 - RF-4: EL SISTEMA mantiene la tab visible en todos los breakpoints de **pantalla**; en impresión se oculta con los estilos compartidos (`foundations/layout.md`): CornerTab **no** declara `@media print` propio.
 - RF-5: EL SISTEMA pinta siempre el borde `1px solid var(--color-border)`: en oscuro separa `surface-raised` de `surface` (sin borde quedaría en 1.14:1; regla 4 de `docs/tokens/contrast.md`). Verificación: inspección del CSS (axe no mide contraste en jsdom).
 - RF-6: EL SISTEMA no agrega roles ni atributos `aria-*` a la tab; los estados de hover y foco pertenecen a su contenido.
+- RF-7: EL SISTEMA renderiza el atributo `data-print-hide` en el `<div>` raíz de la tab, en ambos `placement` (Cambio F5 2026-10-08, hallazgo M-1 de `docs/qa-report.md`: en impresión debe desaparecer la tab **completa** — el `[role="tablist"]` interno ya se ocultaba, el envoltorio con fondo/borde no). El atributo no es `aria-*` (RF-6 sigue vigente): es el hook del contrato de impresión #103; toda CornerTab es cromo de navegación y `foundations/layout.md` → Impresión manda ocultar "CornerTab/NavTabs". Verificación: test estructural.
 
 ## Anatomía
 
@@ -101,6 +102,7 @@ Sin rol propio (es un contenedor visual). No debe tener `aria-*`.
 - `size="sm"` / `"md"` aplican clases distintas; default `md` (aserción con el criterio de CSS Modules de la fase).
 - `placement="float"` aplica su clase; default `overlay` no la aplica.
 - El raíz no tiene atributo `role` **ni ningún `aria-*`**.
+- (Cambio F5) El `<div>` raíz renderiza `data-print-hide` en ambos `placement` (test estructural).
 - `expectNoA11yViolations` sin violaciones.
 
 ## No hacer
