@@ -69,9 +69,10 @@ eslint.config.js            ← flat: typescript-eslint (strict), react-hooks,
                               que prohíbe #[0-9a-fA-F]{3,8}\b|rgb(|hsl( en .tsx
 public/images/              ← placeholders: avatar.svg y testimonials/{maria,john,lena}.svg
                               (silueta neutra, sin texto ni marcas, viewBox cuadrado)
-public/favicon.svg          ← hexágono simple de marca (form factor de HexAvatar,
-                              `--color-accent` #ffb729 sobre transparente, viewBox cuadrado;
-                              Cambio F5 — asset, no código de app)
+public/favicon.svg          ← hexágono simple de marca (form factor de HexAvatar, pointy-top;
+                              fill del azul de acento del kit — literal `#304cfd`, el valor de
+                              `--color-accent` (tokens.css:97); un asset público no es CSS de app;
+                              sobre transparente, viewBox cuadrado 64×64; Cambio F5 — D4)
 src/main.tsx                ← importa ../tokens/tokens.css (única importación, ruta
                               relativa), @fontsource/poppins/{300,400,500,600}.css,
                               src/styles/global.css; monta ThemeProvider > LocaleProvider > App
