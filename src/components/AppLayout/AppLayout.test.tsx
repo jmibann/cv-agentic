@@ -50,7 +50,9 @@ import type { ReactNode } from "react";
 
 import { LocaleProvider } from "../../providers/LocaleProvider";
 import { ThemeProvider } from "../../providers/ThemeProvider";
+import { cvByLocale } from "../../content";
 import { uiEn } from "../../i18n/ui.en";
+import { uiEs } from "../../i18n/ui.es";
 
 import { AppLayout } from "./AppLayout";
 
@@ -397,5 +399,222 @@ describe("AppLayout skip link focuses the panel without touching the hash (T3: R
     expect(document.activeElement).toBe(panel);
     // El hash sigue sin tocar: ni "" → "#main-panel" en ninguna activación.
     expect(window.location.hash).toBe("");
+  });
+});
+
+// ===========================================================================
+// Tests de T4 (specs/layout/AppLayout/tasks.md) — RF-7 y RF-8 (capa DOM):
+// tests 5, 6 y 12 de la spec.
+//  - Test 5 (RF-7, camino INTEGRADO): el cambio de idioma se dispara con
+//    `user.click` SOBRE EL LANGUAGE SWITCHER REAL del ControlsBar montado
+//    (opción "Español", nombre fijo NO traducido — spec LanguageSwitcher →
+//    "No hacer"), no por semilla de `lang`: el espíritu del RF es que la
+//    UI completa reacciona sin recargar. AppLayout no implementa nada del
+//    idioma (lo fijan los providers, que viven por encima); el test fija el
+//    camino: tabs (roles + nombres de `ui.es`), título del panel activo
+//    (`h1` con `uiEs.about.title`) y contenido (párrafo de `cv.es`) en un
+//    mismo render vivo.
+//  - Test 6 (RF-7 tema): click al ThemeToggle por rol+nombre del label en
+//    tema claro (`t.controls.darkMode` de uiEn) → `data-theme="dark"` en
+//    `<html>` (el setup mockea matchMedia con matches:false → arranca
+//    "light"). La persistencia y el toggle son de ThemeProvider (F1/F3, ya
+//    testeados); acá solo el camino integrado.
+//  - Test 12 (RF-8, simétrico): DOS `it`, uno por tab activo (la spec pide
+//    la simetría explícitamente). Con `about` en el tabpanel: la página
+//    inactiva (Resume) vive en el bloque hermano `data-print-only` con
+//    `hidden` (atributo presente y .hidden true), `data-print-page="resume"`,
+//    FUERA del tabpanel y ambos cuelgan de la raíz común
+//    `[data-print-stack]` (primero el panel, después el inactivo → el orden
+//    About/Resume del print). `getAllByRole("heading", { level: 1 })`
+//    longitud 1 (el `h1` de la inactiva existe en el DOM — se verifica por
+//    texto estructural, accesibilidad excluida por `hidden`). Y cada página
+//    montada UNA sola vez: escaneo GLOBAL de ids del documento sin
+//    duplicados + presencia una vez de `#about-services-title` (activa) y
+//    `#resume-skills-title` (inactiva). Simétrico sembrando `#resume` antes
+//    de montar (criterio test 3).
+// Todo el stack/inactivo está cableado desde T1: los cuatro `it` se espera
+// que nazcan VERDES on-arrival (#101, declarado en el cuerpo del commit; sin
+// commit `feat` salvo bug). Discrimen por test: test 5 rompe si AppLayout
+// congelara `t`/`cv` (render una vez, p. ej. leyendo el módulo de contenido
+// directo en vez de `useCv()`) o si el camino ControlsBar→provider no
+// re-renderizara el árbol; test 6 rompe si el ThemeToggle perdiera conexión
+// con su provider o si AppLayout montara un segundo provider de tema; test
+// 12 rompe si la inactiva se montara DENTRO del tabpanel (aparecería como
+// region/h1 accesible y duplicaría el h1 visible), si perdiera `hidden`
+// (el `getAllByRole(h1)` pasaría a 2), si el `data-print-page` no espejara
+// el tab inverso, o si alguna página se montara dos veces (el escaneo de
+// ids y los querySelectorAll("#…") lo cazan). El escaneo anti-duplicado es
+// la barrera que la decisión A4 de la spec puso contra el
+// `duplicate-id-aria` de axe.
+// ===========================================================================
+
+// Escaneo GLOBAL de "no hay ids duplicados en el documento" (RF-8: cada
+// página montada una sola vez): se recolecta el `id` de todo elemento que lo
+// lleva y se compara la cantidad con la de valores distintos. Un Set sobre la
+// lista de ids colapsa exactamente las duplicaciones.
+const expectNoDuplicateIds = (): void => {
+  const ids = Array.from(
+    document.querySelectorAll<HTMLElement>("[id]"),
+  ).map((element) => element.id);
+  expect(new Set(ids).size).toBe(ids.length);
+};
+
+describe("AppLayout re-renders in Spanish through the real switcher (T4: RF-7, Tests 5)", () => {
+  it("clicking the LanguageSwitcher Español option retabs, retitles and retexts the content in es without reloading", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AppLayout />);
+
+    // Camino integrado: el control vivo del ControlsBar (nombre fijo
+    // "Español", NO traducido — spec LanguageSwitcher → "No hacer").
+    await user.click(screen.getByRole("button", { name: "Español" }));
+
+    // Sin recargar: el MISMO documento cambió (no hay remount — los roles
+    // siguen presentes con nombres nuevos).
+    // Tabs con textos de `ui.es` (t.nav).
+    expect(
+      screen.getByRole("tab", { name: uiEs.nav.about }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("tab", { name: uiEs.nav.resume }),
+    ).toBeInTheDocument();
+    // El tabpanel activo sigue siendo About, ahora con `h1` de `ui.es`.
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { level: 1, name: uiEs.about.title }),
+    ).toBeInTheDocument();
+    // Un texto de `cv.es` (contenido, no interfaz): el primer párrafo del
+    // perfil español, renderizado por el AboutPage activo vía `useCv()`.
+    expect(
+      screen.getByText(cvByLocale.es.profile.about[0] ?? ""),
+    ).toBeInTheDocument();
+    // …y ningún texto del inglés activo queda en el tabpanel accesible: el
+    // `h1` inglés "About Me" ya no es alcanzable.
+    expect(
+      screen.queryByRole("heading", { level: 1, name: uiEn.about.title }),
+    ).not.toBeInTheDocument();
+    // Invariante de landmarks durante el cambio (RF-1 sigue vivo tras el
+    // re-render): banner único y complementary renombrado por `ui.es`.
+    expect(screen.getAllByRole("banner")).toHaveLength(1);
+    expect(
+      screen.getByRole("complementary", { name: uiEs.sidebar.region }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe("AppLayout theme change reaches html data-theme (T4: RF-7, Tests 6)", () => {
+  it("clicking the ThemeToggle sets data-theme=dark on <html> through the mounted provider path", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AppLayout />);
+
+    // Arranca claro (semilla default del provider: sin `data-theme` ni
+    // preferencia del sistema — matchMedia mockeada matches:false → light).
+    // El toggle en claro se nombra con el modo AL QUE VA (ThemeToggle RF-3):
+    // `t.controls.darkMode` de uiEn ("Dark mode").
+    expect(document.documentElement.dataset.theme).not.toBe("dark");
+    await user.click(
+      screen.getByRole("button", { name: uiEn.controls.darkMode }),
+    );
+
+    // El camino integrado: AppLayout no implementa nada del tema; el
+    // ThemeProvider (por encima, montado por el helper) aplica `data-theme`
+    // al <html> — spec → Tests 6 literal.
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    // El documento sigue íntegro (no hubo recarga: el panel conserva su h1).
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+  });
+});
+
+describe("AppLayout inactive page lives hidden outside the tabpanel (T4: RF-8, Tests 12)", () => {
+  // Escenario About activo (default, sin hash): la INACTIVA es Resume.
+  it("with about active, mounts Resume hidden in the data-print-only sibling with data-print-page=resume and a single accessible h1, no duplicate ids", () => {
+    renderWithProviders(<AppLayout />);
+
+    const panel = screen.getByRole("tabpanel");
+    // El tabpanel espeja el tab activo en el contrato de impresión.
+    expect(panel).toHaveAttribute("data-print-page", "about");
+
+    // El bloque hermano `data-print-only` con la página inactiva…
+    const printOnly = document.querySelector("[data-print-only]");
+    if (printOnly === null) {
+      throw new Error(
+        "debe existir el bloque hermano data-print-only con la página inactiva (RF-8)",
+      );
+    }
+    expect(printOnly.tagName).toBe("DIV");
+    expect(printOnly.hasAttribute("hidden")).toBe(true);
+    expect(printOnly).toHaveAttribute("data-print-page", "resume");
+
+    // …FUERA del tabpanel (no es su descendiente)…
+    expect(panel.contains(printOnly)).toBe(false);
+    // …y ambos cuelgan de la raíz común [data-print-stack], el panel PRIMERO
+    // (el orden About→Resume del print sale de ahí + el order en global.css).
+    const stack = printOnly.parentElement;
+    expect(stack).not.toBeNull();
+    expect(stack?.hasAttribute("data-print-stack")).toBe(true);
+    expect(stack?.firstElementChild).toBe(panel);
+    expect(stack?.lastElementChild).toBe(printOnly);
+
+    // La página inactiva ESTÁ montada (una sola copia, en el bloque oculto):
+    // su `h1` de Resume existe como nodo, aunque NO es accesible (hidden).
+    const hiddenResumeH1 = printOnly.querySelector("h1");
+    expect(hiddenResumeH1).not.toBeNull();
+    expect(hiddenResumeH1?.textContent).toBe(uiEn.resume.title);
+
+    // Accesibilidad: un único `h1` VISIBLE por vez (RF-1 criterio: RTL excluye
+    // el subárbol oculto) y es el de About.
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { level: 1, name: uiEn.about.title }),
+    ).toBeInTheDocument();
+
+    // Cada página montada UNA vez: presencia exacta de ids característicos de
+    // la activa y de la inactiva (una sola copia en el documento)…
+    expect(document.querySelectorAll("#about-services-title")).toHaveLength(1);
+    expect(document.querySelectorAll("#resume-skills-title")).toHaveLength(1);
+    // …y escaneo global anti-duplicación (la barrera del duplicate-id-aria
+    // de la decisión A4).
+    expectNoDuplicateIds();
+  });
+
+  // Escenario Resume activo (hash #resume sembrado ANTES de montar, criterio
+  // test 3): la INACTIVA es About. Simétrico.
+  it("with resume active, mounts About hidden in the data-print-only sibling with data-print-page=about and a single accessible h1, no duplicate ids", () => {
+    window.history.replaceState(null, "", "#resume");
+    renderWithProviders(<AppLayout />);
+
+    const panel = screen.getByRole("tabpanel");
+    expect(panel).toHaveAttribute("data-print-page", "resume");
+
+    const printOnly = document.querySelector("[data-print-only]");
+    if (printOnly === null) {
+      throw new Error(
+        "debe existir el bloque hermano data-print-only con la página inactiva (RF-8, simétrico)",
+      );
+    }
+    expect(printOnly.hasAttribute("hidden")).toBe(true);
+    expect(printOnly).toHaveAttribute("data-print-page", "about");
+    expect(panel.contains(printOnly)).toBe(false);
+
+    const stack = printOnly.parentElement;
+    expect(stack?.hasAttribute("data-print-stack")).toBe(true);
+    expect(stack?.firstElementChild).toBe(panel);
+    expect(stack?.lastElementChild).toBe(printOnly);
+
+    // La inactiva About montada una sola vez, oculta: su `h1` existe en el
+    // DOM sin ser accesible.
+    const hiddenAboutH1 = printOnly.querySelector("h1");
+    expect(hiddenAboutH1?.textContent).toBe(uiEn.about.title);
+
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+    expect(
+      screen.getByRole("heading", { level: 1, name: uiEn.resume.title }),
+    ).toBeInTheDocument();
+
+    // Ids característicos: los de Resume en el tabpanel y los de About en el
+    // bloque oculto, cada uno exactamente una vez…
+    expect(document.querySelectorAll("#resume-skills-title")).toHaveLength(1);
+    expect(document.querySelectorAll("#about-services-title")).toHaveLength(1);
+    // …y escaneo global.
+    expectNoDuplicateIds();
   });
 });
