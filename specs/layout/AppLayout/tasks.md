@@ -26,4 +26,4 @@
   - Nota: esta tarea hace verdaderos los comentarios de ControlsBar/CornerTab que ya anticipaban el selector compuesto.
 
 - [ ] **T8. Anillo estándar en el skip link enfocado (Cambio F5, D2, #104c).** estilos
-  - Hecho cuando: `.skipLink:focus-visible` del módulo de AppLayout aplica el anillo estándar (`outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--color-focus-ring-offset... no: var(--focus-ring-offset)`) junto a su reveal actual — la QA midió el anillo UA; ningún otro estado/cambio visual; inspección + confirmación en la re-pasada F5 (no hay test jsdom de computed styles — #101). Verde tras `feat(AppLayout): T8` (commit único si no hay discriminante test).
+  - Hecho cuando: `.skipLink:focus-visible` del módulo de AppLayout aplica el anillo estándar (`outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset)`) junto a su reveal actual — la QA midió el anillo UA; ningún otro estado/cambio visual; inspección + confirmación en la re-pasada F5 (no hay test jsdom de computed styles — #101). Verde tras `feat(AppLayout): T8` (commit único si no hay discriminante test).
