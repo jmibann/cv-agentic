@@ -326,3 +326,76 @@ describe("AppLayout tablist invariant (T2: RF-5, Tests 11)", () => {
     expect(document.getElementById(secondTab.id)).toBe(secondTab);
   });
 });
+
+// ===========================================================================
+// Test de T3 (specs/layout/AppLayout/tasks.md) — RF-4: test 8 de la spec. El
+// skip link con `href="#main-panel"` + `onClick={focusPanel}`
+// (preventDefault + panelRef.focus()) EXISTE desde T1: la verificación nace
+// VERDE on-arrival (#101, declarado en el cuerpo del commit; sin commit
+// `feat` salvo que el assert revele un bug). Discrimen: si `focusPanel`
+// perdiera el `preventDefault`, el click nativo del `<a>` navegaría y
+// escribiría `#main-panel` en la URL (y en jsdom el hash cambiaría o el foco
+// no llegaría al panel); si perdiera el `.focus()`, `document.activeElement`
+// seguiría siendo el skip link; si el link dejara de ser el primer elemento
+// enfocable del documento (p. ej. un nodo enfocable antes, o quitarle el
+// `href`), el `user.tab()` desde el body caería en otro lado; si el tabpanel
+// perdiera `tabIndex={0}` (ya cableado en T1), jsdom/HTML no lo harían
+// enfocable por programa y el foco no aterrizaría.
+// Trampas jsdom conocidas: los `<svg>` de las defs preceden al skip link en
+// el DOM pero son `focusable="false"` + `aria-hidden` (decorativos, contrato
+// de Icon/HexAvatar T1) → no rompen el "primer enfocable"; `focus()` sobre el
+// tabpanel exige el `tabIndex 0` nativo del div (cableado T1). Enter sobre
+// `<a>`: user-event dispara el click por la activación nativa del keydown
+// (behavior Enter sobre elementos con action) — se prueba; si la plataforma
+// no lo simulase, la activación por teclado en navegador real pasa por el
+// MISMO onClick ya cubierto por el click.
+// ===========================================================================
+
+describe("AppLayout skip link focuses the panel without touching the hash (T3: RF-4, Tests 8)", () => {
+  it("is the first focusable element and on click moves focus to #main-panel leaving location.hash untouched", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AppLayout />);
+
+    // El skip link por ROL + NOMBRE accesible (`t.skipToContent` de la fuente
+    // del kit, C3) y su respaldo sin JS: `href="#main-panel"` en el markup
+    // (spec → Anatomía: el href queda pese al handler — sin JS el navegador
+    // navega al panel; con JS el handler lo neutraliza para conservar el
+    // hash del tab).
+    const skipLink = screen.getByRole("link", { name: uiEn.skipToContent });
+    expect(skipLink).toHaveAttribute("href", "#main-panel");
+    // Contrato de impresión (spec → Impresión): se oculta con
+    // `data-print-hide` en su raíz — el atributo viaja desde T1.
+    expect(skipLink).toHaveAttribute("data-print-hide");
+
+    // "El primer elemento enfocable del documento": Tab desde el body aterriza
+    // en el skip link (las defs svg que lo preceden en el DOM son
+    // focusable=false y no cuentan; ControlsBar y el resto vienen después).
+    await user.tab();
+    expect(skipLink).toHaveFocus();
+
+    // El tabpanel aún NO tiene foco (el handler no corrió).
+    const panel = screen.getByRole("tabpanel");
+    expect(document.activeElement).not.toBe(panel);
+
+    // Activación por click: RF-4 — el foco pasa al tabpanel `#main-panel` y
+    // `location.hash` NO cambia (preventDefault neutraliza la navegación del
+    // href; ni aparece #main-panel). Default del escenario: hash "" (el
+    // afterEach de setup lo deja limpio).
+    await user.click(skipLink);
+    expect(document.activeElement).toBe(panel);
+    expect(panel).toHaveAttribute("id", "main-panel");
+    expect(window.location.hash).toBe("");
+
+    // Activación por teclado (Enter sobre el link enfocado → mismo camino:
+    // el click nativo dispara el onClick con preventDefault). Se re-enfoca
+    // el skip link programáticamente (el foco está en el panel tras el
+    // click; el contrato testeable es el HANDLER, no la navegación de Tab
+    // completa).
+    skipLink.focus();
+    expect(skipLink).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(document.activeElement).toBe(panel);
+    // El hash sigue sin tocar: ni "" → "#main-panel" en ninguna activación.
+    expect(window.location.hash).toBe("");
+  });
+});
