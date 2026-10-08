@@ -5,6 +5,6 @@
 
 - [x] **T2. Estilos por tokens y cierre a11y.** RF-1, RF-5, RF-6 — 94696bf
 
-- [ ] **T3. Hook de impresión `data-print-hide` en el `<header>` raíz.** RF-6 (Cambio F5 2026-10-08)
+- [x] **T3. Hook de impresión `data-print-hide` en el `<header>` raíz.** RF-6 (Cambio F5 2026-10-08) — eaa4d01 (APROBADA. Menores: subject `c0492ac` con sufijo (patrón a secas; no enmendable); los comentarios de test/tsx describen el estado FUTURO de global.css (compuesto `header[data-print-hide]`) — lo cierra AppLayout T7, que es la corrección real de especificidad; hasta T7 el `(0,1,0)` simple empata con la clase del módulo)
   - Hecho cuando: el `<header>` raíz renderiza el atributo `data-print-hide` (test estructural: `expect(banner).toHaveAttribute("data-print-hide")` — el hook existe para que `header[data-print-hide]` de `global.css` gane por especificidad a la clase del módulo, hallazgo B-2 de `docs/qa-report.md`); ningún otro atributo/estructura/estilo cambia; los tests previos intactos; lint/typecheck/test verdes tras `feat(ControlsBar): T3`.
   - Hecho cuando: el módulo fija `display: flex; justify-content: flex-end; align-items: center; height: var(--size-control); gap: var(--controls-gap); position: relative; z-index: var(--z-controls);`, cero declaraciones de texto/color de texto propio, cero `@media` (inspección); el archivo termina con `expectNoA11yViolations`; `index.ts` re-exporta `ControlsBar` (y tipos si los hubiera); lint + typecheck + test verdes tras `feat(ControlsBar): T2`.
