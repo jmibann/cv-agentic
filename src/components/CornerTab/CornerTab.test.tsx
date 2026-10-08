@@ -228,6 +228,47 @@ describe("CornerTab placement float class (T3: RF-3)", () => {
   });
 });
 
+// Tests de T5 (specs/primitives/CornerTab/tasks.md) — RF-7 (Cambio F5
+// 2026-10-08, hallazgo M-1 de `docs/qa-report.md`): el `<div>` raíz renderiza
+// el hook `data-print-hide` del contrato de impresión #103/#104 **junto a sus
+// clases**, en ambos `placement` (spec → "Tests esperados": "test estructural";
+// "Hecho cuando" de T5). `global.css` lo oculta con la variante compuesta
+// `div[data-print-hide]` (AppLayout T7): en impresión la tab desaparece
+// completa —envoltorio con fondo/borde incluido— y no queda la franja vacía.
+// El atributo NO es `aria-*` (RF-6 sigue vigente: el escaneo de atributos de
+// T1 filtra solo el prefijo `aria-`, así que este hook no lo rompe). Se cubre
+// el default `overlay` (omitido = overlay, spec → API; el `overlay` explícito
+// se comporta igual según T3) y `float` (el hook rige en ambos placement por
+// RF-7). La query del raíz es la misma estructural justificada en T1 (el `<div>`
+// no tiene rol ni nombre accesible por RF-6); las clases se asiertean con el
+// patrón P2 canónico #99 ya definido arriba (`cornerTabClass`/`floatClass`).
+// Rojo on-arrival legítimo: el atributo aún no está en el markup del raíz.
+describe("CornerTab print hook on the root (T5: RF-7)", () => {
+  it("renders data-print-hide alongside its classes on the root div in both placements", () => {
+    // overlay (default omitido): el hook viaja junto a la clase base.
+    const { container: overlayContainer } = render(
+      <CornerTab>Experience</CornerTab>,
+    );
+
+    const overlayRoot = overlayContainer.querySelector("div");
+    expect(overlayRoot).not.toBeNull();
+    expect(overlayRoot).toHaveAttribute("data-print-hide");
+    expect(overlayRoot).toHaveClass(cornerTabClass);
+
+    // float: mismo hook (RF-7: "en ambos placement"), junto a la base y la
+    // clase float (nada del markup de clases cambia con el atributo).
+    const { container: floatContainer } = render(
+      <CornerTab placement="float">Experience</CornerTab>,
+    );
+
+    const floatRoot = floatContainer.querySelector("div");
+    expect(floatRoot).not.toBeNull();
+    expect(floatRoot).toHaveAttribute("data-print-hide");
+    expect(floatRoot).toHaveClass(cornerTabClass);
+    expect(floatRoot).toHaveClass(floatClass);
+  });
+});
+
 // Tests de T4 (specs/primitives/CornerTab/tasks.md) — cierre del archivo
 // (constitución T4; spec → "Tests esperados": "expectNoA11yViolations sin
 // violaciones"; "Hecho cuando" de T4: "archivo termina con
