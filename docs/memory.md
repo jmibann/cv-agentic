@@ -2,13 +2,14 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XII) y `docs/README.md` (#1–#105).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XIII) y `docs/README.md` (#1–#105).
 
-## Estado actual (2026-10-08)
+## Estado actual (2026-11-06)
 
-- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; suite **445/40**,
+- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; suite **446/40**,
   lint/typecheck/build/validate:content ✅; QA F5 en 4 pasadas (navegador) + **Ctrl+P real
-  aprobado** (veredicto en `docs/qa-report.md`; hitos §XI–§XII en diagnostics).
+  aprobado** (veredicto en `docs/qa-report.md`; hitos §XI–§XIII en diagnostics).
+  Mantenimiento 2026-11-06: bug-fix ControlsBar T4 (`.group` flex + gap token; sin spec/API/ARIA).
 - Reglas del proceso que quedaron probadas y valen para el mantenimiento: cross-check 1:1
   RF↔Tests antes de la revisión completa; ajuste de asserts de tarea previa → solo con
   aprobación explícita y scope más angosto; verificación pura sin `feat` con on-arrival

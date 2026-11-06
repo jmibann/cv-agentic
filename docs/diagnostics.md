@@ -2,9 +2,9 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
-los hashes de los commits relevantes. Última actualización: **2026-10-08**
-(cierre de **F5 — fin del proceso; el repo pasó a modo mantenimiento**: flujo y
-dueños en "Modo mantenimiento" de `docs/agent-system.md`).
+los hashes de los commits relevantes. Última actualización: **2026-11-06**
+(mantenimiento: bug-fix de alineación en ControlsBar T4; el proceso F1–F5 sigue
+cerrado — ver §XII; flujo y dueños en "Modo mantenimiento" de `docs/agent-system.md`).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
 `docs/memory.md` · decisiones #1–#105 → `docs/README.md` · QA de F5 →
@@ -47,6 +47,13 @@ de la entrada); el detalle queda en git.
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XIII · 2026-11-06 — Mantenimiento: bug-fix ControlsBar T4 (alineación)
+- Qué: el `div[role="group"]` interno de ControlsBar pasó a ser el contenedor flex (`.group`: `display:flex; align-items:center; gap:var(--controls-gap)`); se eliminó el `gap` inerte del `<header>` (único hijo flex: el group). Corrige la alineación por baseline que bajaba ThemeToggle respecto de LanguageSwitcher; sin cambio de API, ARIA ni spec (el usuario lo clasificó como bug-fix).
+- Checks: lint ✓ · typecheck ✓ · test **446/40** ✓ · build ✓ · QA visual 375/768/1024/1440 × claro/oscuro × en/es: mismo top/bottom y gap 8/12px, sin overflow ✓.
+- Decisiones: ninguna nueva (mantenimiento).
+- Commits: `d65ac7a` (test) · `9f9de59` (fix) · `f97562d` (T4 en tasks) · `a12dfb7` (T4 aprobada).
+- Abre: nada; cierra: nada.
 
 ### §XII · 2026-10-08 — Cierre de F5 (QA) — fin del proceso F1–F5
 

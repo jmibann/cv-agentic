@@ -6,6 +6,10 @@
 > validate:content verdes. Entrada de cierre: §XII en `docs/diagnostics.md`.
 > Residuos no bloqueantes → fila "Pendientes post-F5".
 
+> **Mantenimiento post-F5 (2026-11-06):** bug-fix ControlsBar T4 (alineación
+> ThemeToggle/LanguageSwitcher con `.group` flex + gap por token); suite 446/40,
+> build ✅. Detalle: §XIII en `docs/diagnostics.md`.
+
 ## RESOLUCIÓN (pasadas 3–4, tras el paquete #104)
 
 Las correcciones #104 se implementaron, revisaron y verificaron en vivo:
