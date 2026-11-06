@@ -71,7 +71,12 @@ export function ControlsBar({ className }: ControlsBarProps) {
   // el único hijo del flujo, el group).
   return (
     <header className={rootClassName} data-print-hide>
-      <div role="group" aria-label={t.controls.label}>
+      {/* T4 (bug-fix de alineación, RF-1/RF-6): el group interno es el
+          contenedor flex real — flex + align-items: center + gap por token
+          viven en `styles.group`. Sin layout propio, sus hijos `inline-flex`
+          (ThemeToggle y LanguageSwitcher) se alineaban por baseline y el gap
+          del header era inerte (único hijo flex). Rol y nombre intactos. */}
+      <div role="group" aria-label={t.controls.label} className={styles.group}>
         <ThemeToggle
           darkModeLabel={t.controls.darkMode}
           lightModeLabel={t.controls.lightMode}

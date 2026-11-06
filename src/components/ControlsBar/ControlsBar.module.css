@@ -19,11 +19,10 @@
    - Layout (fila "Layout"): display: flex con justify-content: flex-end y
      align-items: center — los controles quedan alineados a la derecha y
      fuera de las cards (RF-1; el único hijo del flujo es el group, spec →
-     Anatomía). El gap escala SOLO por token (RF-6): --controls-gap =
-     var(--space-2) (8px) < 580 → var(--space-3) (12px) ≥ 580
-     (tokens.css líneas 265 y 318; el @media vive en tokens.css, nunca acá
-     — docs/tokens/breakpoints.md: un componente jamás redefine una medida
-     en su propio @media).
+     Anatomía). El gap NO vive acá: el header tiene un solo hijo flex (el
+     group), así que un gap en el header sería inerte. El gap real está en
+     `.group` (ver abajo), que es el contenedor flex de ThemeToggle y
+     LanguageSwitcher (T4, bug-fix de alineación).
    - Alto (fila "Alto"): height --size-control (2.5rem, tokens.css línea
      206 —ThemeToggle/LanguageSwitcher; no escala por breakpoint).
    - Capa (fila "Capa"): position: relative con z-index --z-controls (20,
@@ -37,7 +36,22 @@
   justify-content: flex-end;
   align-items: center;
   height: var(--size-control);
-  gap: var(--controls-gap);
   position: relative;
   z-index: var(--z-controls);
+}
+
+/* T4: el `div[role="group"]` interno es el contenedor flex real de los dos
+   controles. Antes era `display: block`, de modo que ThemeToggle y
+   LanguageSwitcher (ambos `inline-flex`) se alineaban por baseline y el botón
+   de tema quedaba unos píxeles más abajo; además el gap del header no tenía
+   efecto. Con `display: flex` + `align-items: center` ambos quedan centrados
+   en la misma fila y el gap entre ellos escala SOLO por token (RF-6):
+   --controls-gap = var(--space-2) (8px) < 580 → var(--space-3) (12px) ≥ 580
+   (tokens.css líneas 265 y 318; el @media vive en tokens.css, nunca acá —
+   docs/tokens/breakpoints.md: un componente jamás redefine una medida en su
+   propio @media). */
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--controls-gap);
 }
