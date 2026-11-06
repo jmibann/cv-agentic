@@ -76,6 +76,7 @@ const ENGLISH_LABEL = "English";
 const SPANISH_LABEL = "Español";
 
 const controlsBarClass = styles.controlsBar ?? "controlsBar";
+const groupClass = styles.group ?? "group";
 
 function renderBar() {
   return render(
@@ -197,6 +198,26 @@ describe("ControlsBar print hook on the root banner (T3: RF-6)", () => {
     // "Hecho cuando" de T3 (literal): el <header> raíz expone el hook para
     // que header[data-print-hide] de global.css gane a la clase del módulo.
     expect(screen.getByRole("banner")).toHaveAttribute("data-print-hide");
+  });
+});
+
+// Test de T4 (specs/controls/ControlsBar/tasks.md) — bug-fix de alineación
+// (RF-1, RF-6): el `div[role="group"]` interno es el contenedor flex real de
+// ThemeToggle y LanguageSwitcher. Antes de T4 el group era `display: block`
+// (sin clase), así que los dos `inline-flex` se alineaban por baseline y el gap
+// del header era inerte (su único hijo flex era el group). TEST ESTRUCTURAL
+// DE REGRESIÓN: fija que el group exterior lleve la clase del módulo donde vive
+// el layout flex (`styles.group`, patrón canónico #99, sin `!` ni `as`).
+describe("ControlsBar controls group flex container (T4: RF-1, RF-6)", () => {
+  // extra: guard de regresión estructural del contenedor flex del bug-fix T4
+  // (la lista de "Tests esperados" de la spec no incluye un test de layout).
+  // La alineación final (mismo top/bottom) y el gap efectivo se verifican por
+  // inspección CSS + QA visual (#101), porque jsdom no calcula layout.
+  it("applies the group class to the inner named group", () => {
+    renderBar();
+
+    const group = screen.getByRole("group", { name: GROUP_LABEL_EN });
+    expect(group).toHaveClass(groupClass);
   });
 });
 
