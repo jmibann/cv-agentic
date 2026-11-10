@@ -105,20 +105,23 @@
    falta una regla vacía adicional.
    Dentro del @media solo cambios de posicionamiento/float (layout) y medidas
    que son tokens, calc() de tokens o 0 (docs/tokens/breakpoints.md → Reglas;
-   plan → Decisiones): position: relative y z-index: auto salen del absoluto y
-   del apilamiento (resolución R-2 del plan: descartado conservar --z-raised,
-   apilaría en el flujo sin necesidad; `auto` es keyword, no un literal
-   numérico); los márgenes negativos de calc() sobre --box-padding compensan
-   el padding del Box para que la tab siga pegada a la esquina (excepción de
-   margen ya documentada en la cabecera del módulo) y --space-6 da el aire
-   entre el h1 y la tab (spec → Responsive, bloque textual `.float`, replicado
-   aquí literalmente).
+   plan → Decisiones): position: relative saca a la tab del absoluto;
+   z-index: var(--z-raised) la apila por encima del h1 posicionado que fluye
+   al lado (resolución R-2 del plan, actualizada por el Cambio 2026-11-10:
+   el h1 de SectionTitle.decorated, position: relative, fluye al lado y con
+   z-index: auto su caja tapaba la mitad inferior del tab y se quedaba con
+   los clicks; apilar la tab lo evita y el h1 sigue siendo seleccionable, sin
+   pointer-events: none); los márgenes negativos de calc() sobre --box-padding
+   compensan el padding del Box para que la tab siga pegada a la esquina
+   (excepción de margen ya documentada en la cabecera del módulo) y --space-6
+   da el aire entre el h1 y la tab (spec → Responsive, bloque textual
+   `.float`, replicado aquí literalmente).
    RF-4: ningún @media print propio — en impresión la oculta el estilo
    compartido de foundations/layout.md (plan → Decisiones, resolución R-1). */
 @media (min-width: 992px) {
   .float {
     position: relative; /* sale del absoluto; sigue anclada a la esquina */
-    z-index: auto; /* en el flujo no apila (RF-3) */
+    z-index: var(--z-raised); /* por encima del h1 posicionado que fluye al lado (RF-3) */
     float: right;
     margin-top: calc(var(--box-padding) * -1);
     margin-right: calc(var(--box-padding) * -1);
