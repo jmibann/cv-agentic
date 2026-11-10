@@ -11,3 +11,14 @@
 
 - [x] **T4. Estilos por tokens y cierre a11y.** RF-5, RF-6 — 3701aa9 (nota: la tarea decía `inline-flex` para el tablist; la spec fija `display: flex` — gana la spec, registrado en la revisión)
   - Hecho cuando: el módulo fija tablist (`inline-flex`, `gap: var(--nav-tab-gap)`), tab (tipografía `--font-size-nav`/`--font-weight-medium`, `--color-text`, `padding-block: var(--space-2)`, `white-space: nowrap`, `cursor: pointer`, sin fondo/borde), inactivo `opacity: 0.8` + `text-decoration: underline 2px transparent; text-underline-offset: 0.375rem`, hover 100% + `text-decoration-color: currentColor`, activo `--color-accent-text` sin subrayado, `focus-visible` anillo estándar + `--radius-8`, transiciones `color/opacity/text-decoration-color` `--duration-base var(--ease-standard)`, cero `@media` (los estados visuales: inspección; `aria-selected` por test); el archivo termina con `expectNoA11yViolations` (con tabpanel de armazón y con `items=[]` no aplica render); `index.ts` re-exporta `NavTabs`, `getTabId` y tipos; lint + typecheck + test verdes tras `feat(NavTabs): T4`.
+
+- [ ] **T5. Hit area completo y transición de tema (Cambio 2026-11-10).** RF-5, RF-6
+  - Hecho cuando: `.tablist` usa `align-items: stretch; align-self: stretch;`;
+    `.tab` usa `display: flex; align-items: center;` y ocupa el alto completo
+    (60px ≥992 / 48px <992); `:first-child`/`:last-child` llevan
+    `padding-inline` + margen negativo de `--corner-tab-padding-inline` para que
+    el padding exterior sea clickeable sin mover el texto; el gap sigue sin ser
+    clickeable; la transición del tab es `opacity` + `text-decoration-color`
+    (sin `color`), de modo que el cambio de tema no arrastra el acento anterior;
+    la verificación visual en browser confirma clicks en la mitad inferior y en
+    el padding exterior; tests previos intactos; verde tras `fix(NavTabs): T5`.

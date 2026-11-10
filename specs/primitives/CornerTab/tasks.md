@@ -38,3 +38,10 @@
     otro atributo/aria/estilo cambia; tests previos intactos; la re-pasada F5
     confirma que en print la tab desaparece completa (fin del hallazgo M-1:
     franja vacía con fondo/borde); verde tras `feat(CornerTab): T5`.
+
+- [ ] **T6. `.float` por encima del `h1` posicionado (Cambio 2026-11-10).** RF-3
+  - Hecho cuando: en `@media (min-width: 992px)`, `.float` fija
+    `z-index: var(--z-raised)` (no `auto`); la inspección del CSS confirma que
+    el `h1` posicionado de `SectionTitle.decorated` queda debajo y que el tab
+    recibe clicks en su mitad inferior; no se usa `pointer-events: none` en el
+    `h1`; tests previos intactos; verde tras `fix(CornerTab): T6`.

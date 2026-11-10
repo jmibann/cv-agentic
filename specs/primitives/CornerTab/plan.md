@@ -21,8 +21,11 @@ Ninguno: mapa `placement`/`size` → clases.
 ## Decisiones
 
 - RF-1 rige **solo en overlay**; `.float` fija `position: relative` +
-  `z-index: auto` (resolución R-2). *Descartado:* conservar `--z-raised` en
-  float (apilaría en el flujo sin necesidad).
+  `z-index: var(--z-raised)` (resolución R-2). El `h1` posicionado del panel
+  fluye al lado y su caja tapaba la mitad inferior del tab con `auto`; el
+  apilamiento es necesario para que el tab reciba los clicks. *Descartado:*
+  `pointer-events: none` en el `h1` (rompe la selección de texto) y dejar
+  `auto` (el `h1` sigue interceptando).
 - Impresión: **ningún `@media print` propio** — la oculta el estilo compartido
   de `layout.md`/`global.css` (resolución R-1). *Descartado:* que el módulo se
   oculte a sí mismo (viola la regla de CSS global y duplica la fuente).
@@ -40,4 +43,5 @@ atributos); children visibles. P1: posicionamiento, z-index, float ≥ 992, bord
 y no-print → inspección del CSS + QA cuando la usen NavTabs/Sidebar (F3).
 Cierre `expectNoA11yViolations`. `npm test`.
 
-Cobertura: T1→RF-1,RF-6 · T2→RF-2 · T3→RF-3 · T4→RF-4,RF-5,RF-6.
+Cobertura: T1→RF-1,RF-6 · T2→RF-2 · T3→RF-3 · T4→RF-4,RF-5,RF-6 ·
+T6→RF-3 (Cambio 2026-11-10: `.float` por encima del `h1` posicionado).

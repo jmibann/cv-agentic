@@ -94,20 +94,29 @@ tener `id="about"` ni `id="resume"`**. Los tabs usan `getTabId` (`tab-about`,
 | Parte | Valor |
 |---|---|
 | Contenedor | `CornerTab size="md" placement="float"` (absoluta < lg, flotante ≥ lg) |
-| tablist | `display: flex; align-items: center; gap: var(--nav-tab-gap);` (24px < 992 → 40px) |
-| tab | Sin fondo ni borde; `font-size: var(--font-size-nav); font-weight: var(--font-weight-medium); color: var(--color-text); padding-block: var(--space-2); white-space: nowrap; cursor: pointer;` |
+| tablist | `display: flex; align-items: stretch; align-self: stretch; gap: var(--nav-tab-gap);` (24px < 992 → 40px) |
+| tab | Sin fondo ni borde; `display: flex; align-items: center; font-size: var(--font-size-nav); font-weight: var(--font-weight-medium); color: var(--color-text); padding-block: var(--space-2); white-space: nowrap; cursor: pointer;` |
+| tab primero/último | `padding-inline` de `--corner-tab-padding-inline` en el borde exterior + margen negativo equivalente: el padding exterior queda dentro del `<button>` sin mover el texto |
 | tab inactivo | `opacity: 0.8` (4.92:1 claro / 7.96:1 oscuro sobre `surface-raised`, registrado en `docs/tokens/contrast.md`); `text-decoration: underline 2px transparent; text-underline-offset: 0.375rem;` |
 | tab inactivo hover | `opacity: 1;` `text-decoration-color: currentColor` (aparece el subrayado) |
 | tab activo (`[aria-selected="true"]`) | `opacity: 1; color: var(--color-accent-text);` sin subrayado, sin cambio en hover |
 | Focus-visible | `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); border-radius: var(--radius-8);` |
-| Transición | `color`, `opacity` y `text-decoration-color` en `var(--duration-base) var(--ease-standard)` |
+| Transición | `opacity` y `text-decoration-color` en `var(--duration-base) var(--ease-standard)`; el `color` cambia al instante (sin arrastrar el acento del tema anterior) |
 
 El hover no usa `--color-heading`: en claro es igual a `--color-text` y el
 cambio no se vería. Usa opacidad + subrayado, que funcionan igual en ambos temas.
 
+El `<button>` ocupa toda el área visual de la solapa, incluido el padding
+exterior: el tablist y los botones se estiran a la altura de la `CornerTab`
+(60px ≥ 992 / 48px < 992) y el padding de `:first-child`/`:last-child` se
+compensa con margen negativo para no mover el texto. El gap entre tabs
+(40px/24px) no es clickeable. El subrayado del hover es `text-decoration` (no
+un pseudo-elemento), así que no intercepta clicks.
+
 Medidas de referencia (tamaño completo, ≥ lg): alto 60px, padding horizontal
 32px, separación entre ítems 40px, texto 16px/500. En < lg: alto 48px, padding
-20px, separación 24px, texto 14px/500. Todo resuelto por tokens.
+20px, separación 24px, texto 14px/500. Todo resuelto por tokens. El padding
+horizontal exterior es parte del hit area del botón; el gap queda fuera.
 
 El activo se distingue **por color** (acento vs texto) con contrastes
 ≥ 5.47:1 en ambos temas; además `aria-selected` lo expone a tecnologías de asistencia.
@@ -125,7 +134,7 @@ El activo se distingue **por color** (acento vs texto) con contrastes
 
 | Viewport | Comportamiento |
 |---|---|
-| ≥ lg (992) | Tab tamaño completo y **flotante** (`placement="float"`): el `h1` del panel fluye a su izquierda usando el ancho real de la tab, sin reservas fijas. **Dependencia de contrato (CornerTab → float):** el contenido que sigue al tab en el tramo que convive con ella **no** puede crear contexto de formato propio (flex/grid/`overflow`≠visible/`flow-root`); lo garantiza AppLayout y lo verifica el reviewer en F4/F5. |
+| ≥ lg (992) | Tab tamaño completo y **flotante** (`placement="float"`): el `h1` del panel fluye a su izquierda usando el ancho real de la tab, sin reservas fijas. **Dependencia de contrato (CornerTab → float):** el contenido que sigue al tab en el tramo que convive con ella **no** puede crear contexto de formato propio (flex/grid/`overflow`≠visible/`flow-root`); lo garantiza AppLayout y lo verifica el reviewer en F4/F5. La solapa flotante debe quedar por encima del `h1` posicionado: `CornerTab .float` usa `z-index: var(--z-raised)`; con `auto`, el `h1` intercepta los clicks de la mitad inferior. |
 | < lg | Tab compacta, **siempre visible**, anclada a la derecha. El `h1` del panel va debajo (AppLayout agrega el espacio). |
 
 No hay hamburguesa, drawer ni overlay en ningún tamaño. "Con 2 ítems entra en 320px" es verificación de **QA F5** (no de test ni inspección).
@@ -134,6 +143,8 @@ No hay hamburguesa, drawer ni overlay en ningún tamaño. "Con 2 ítems entra en
 
 - `role="tablist"` con `aria-label` y `aria-orientation="horizontal"`.
 - `role="tab"` en `<button type="button">`, con `id`, `aria-selected`, `aria-controls`.
+- El `<button role="tab">` ocupa toda el área visual de la solapa (incluido el
+  padding exterior); el gap entre tabs no es clickeable.
 - Tabpanel con `aria-labelledby` = id del tab activo y `tabIndex=0`
   (el panel empieza con texto, no con un control).
 
@@ -152,9 +163,16 @@ No hay hamburguesa, drawer ni overlay en ningún tamaño. "Con 2 ítems entra en
 11. **No existe** ningún botón de menú (`queryByRole("button", { name: /menu|menú/i })` es null).
 12. `expectNoA11yViolations` sin violaciones (renderizado junto a un tabpanel con el id correcto).
 
+La superficie clickeable completa y el apilamiento sobre el `h1` se verifican
+por inspección del CSS + QA visual (jsdom no computa layout ni hit-testing,
+#101).
+
 ## No hacer
 
 - No usar `<a href="#about">` para los tabs (la semántica elegida es tablist).
 - No renderizar ambos paneles ocultos con `hidden` salvo en `@media print`
   (lo resuelve AppLayout).
 - No reintroducir el botón hamburguesa ni el estado abierto/cerrado.
+- No resolver el solapamiento con el `h1` usando `pointer-events: none` en el
+  `h1` (rompe la selección de texto); se resuelve con `z-index` en
+  `CornerTab .float`.

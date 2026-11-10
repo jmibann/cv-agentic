@@ -12,7 +12,7 @@ posición; el contenido y el comportamiento los pone quien la usa.
 
 - RF-1: CUANDO `placement` es `"overlay"` (default), ENTONCES EL SISTEMA lo posiciona en absoluto en la esquina superior derecha del Box contenedor, con `z-index: var(--z-raised)`. Verificación: inspección + QA al usarla en F3/F4 (jsdom no computa posición).
 - RF-2: CUANDO recibe `size`, ENTONCES EL SISTEMA aplica la variante `sm` o `md` (default `md`).
-- RF-3: CUANDO recibe `placement="float"` y el viewport es ≥ 992px, ENTONCES EL SISTEMA la saca del posicionamiento absoluto (y del apilamiento: `z-index: auto`) y la flota a la derecha para que el contenido siguiente fluya a su lado; SI el viewport es < 992px, ENTONCES permanece absoluta.
+- RF-3: CUANDO recibe `placement="float"` y el viewport es ≥ 992px, ENTONCES EL SISTEMA la saca del posicionamiento absoluto (con `z-index: var(--z-raised)` para quedar por encima del `h1` posicionado que fluye al lado) y la flota a la derecha para que el contenido siguiente fluya a su lado; SI el viewport es < 992px, ENTONCES permanece absoluta.
 - RF-4: EL SISTEMA mantiene la tab visible en todos los breakpoints de **pantalla**; en impresión se oculta con los estilos compartidos (`foundations/layout.md`): CornerTab **no** declara `@media print` propio.
 - RF-5: EL SISTEMA pinta siempre el borde `1px solid var(--color-border)`: en oscuro separa `surface-raised` de `surface` (sin borde quedaría en 1.14:1; regla 4 de `docs/tokens/contrast.md`). Verificación: inspección del CSS (axe no mide contraste en jsdom).
 - RF-6: EL SISTEMA no agrega roles ni atributos `aria-*` a la tab; los estados de hover y foco pertenecen a su contenido.
@@ -78,7 +78,7 @@ Ninguno propio. Los estados de hover/foco son del contenido (tabs, botón).
   ```css
   .float {
     position: relative;          /* sale del absoluto; sigue anclada a la esquina */
-    z-index: auto;               /* en el flujo no apila (RF-3) */
+    z-index: var(--z-raised);    /* por encima del h1 posicionado que fluye al lado */
     float: right;
     margin-top: calc(var(--box-padding) * -1);
     margin-right: calc(var(--box-padding) * -1);
@@ -91,6 +91,12 @@ Ninguno propio. Los estados de hover/foco son del contenido (tabs, botón).
   crear un contexto de formato propio (flex, grid, `overflow` ≠ visible,
   `display: flow-root`) en el tramo que convive con la tab; si no, se
   angosta entero en vez de fluir (ver `specs/pages/*.md`).
+
+  La solapa flota por encima del `h1` posicionado del panel: con
+  `z-index: auto`, la caja del `h1` (`SectionTitle.decorated`,
+  `position: relative`) se pintaba encima de la mitad inferior del tab y se
+  quedaba con los clicks. El `h1` sigue siendo seleccionable; **no** se usa
+  `pointer-events: none`.
 
 ## Accesibilidad
 
