@@ -1,4 +1,5 @@
-/* NavTabs — specs/layout/NavTabs/spec.md → Estilos y tokens (T4; RF-5, RF-6).
+/* NavTabs — specs/layout/NavTabs/spec.md → Estilos y tokens (T4; T5,
+   Cambio 2026-11-10: hit area completo y transición de tema; RF-5, RF-6).
    Dos clases: `.tablist` (fila "tablist" de la tabla) y `.tab` (filas "tab",
    "tab inactivo", "tab inactivo hover", "tab activo", "Focus-visible" y
    "Transición"), aplicadas desde el tsx sobre el div del tablist y cada
@@ -15,41 +16,53 @@
    por inspección del CSS + QA F5 — jsdom no computa estilos, #101—. Los
    estados visuales completos — inactivo 80%, hover con subrayado, activo en
    acento —: inspección; `aria-selected` se verifica por test desde T1
-   (RF-5).) Sin margen externo (docs/DESIGN.md → Do/Don't): el espacio entre
-   tabs es el `gap` del padre (.tablist) y el padding horizontal vive en la
-   CornerTab contenedora (spec → Anatomía); la tabla del tab solo fija
-   `padding-block: var(--space-2)`. Literales de medida permitidos (fijos,
-   definidos textualmente por la tabla de la spec; criterio aprobado en
-   Separator T2 / CornerTab T4 / LanguageSwitcher T3): `2px` del grosor del
-   subrayado (fila "tab inactivo": "underline 2px") y `0.375rem` del offset
-   (misma fila: "text-underline-offset: 0.375rem"); los `0` de resets son
-   permitidos por breakpoints.md. */
+   (RF-5).) Sin margen externo de espaciado (docs/DESIGN.md → Do/Don't): el
+   espacio entre tabs es el `gap` del padre (.tablist); los únicos márgenes
+   del módulo son los negativos de `:first-child`/`:last-child`, que
+   compensan el padding exterior movido al botón (Cambio 2026-11-10, hit
+   area; spec → Estilos y tokens) y no separan ítems. La tabla del tab fija
+   `padding-block: var(--space-2)` y `padding-inline: 0`; el padding
+   horizontal exterior (--corner-tab-padding-inline) entra en el hit area
+   del `<button>` en `:first-child`/`:last-child` (abajo). Literales de
+   medida permitidos (fijos, definidos textualmente por la tabla de la spec;
+   criterio aprobado en Separator T2 / CornerTab T4 / LanguageSwitcher T3):
+   `2px` del grosor del subrayado (fila "tab inactivo": "underline 2px") y
+   `0.375rem` del offset (misma fila: "text-underline-offset: 0.375rem");
+   los `0` de resets son permitidos por breakpoints.md. */
 
-/* Fila "tablist" de la tabla (literal): display: flex; align-items: center;
-   gap: var(--nav-tab-gap). El gap es el token responsive de la pieza
-   (tokens.css → medidas internas de NavTabs: 1.5rem → 2.5rem ≥992; la
-   cabecera). La CornerTab contenedora ya centra en vertical por su "Layout
-   interno", pero la tabla fija align-items también en el tablist: se
-   replica literalmente (necesidad declarada por la spec, no invento). */
+/* Fila "tablist" de la tabla (literal): display: flex; align-items: stretch;
+   align-self: stretch; gap: var(--nav-tab-gap). El gap es el token responsive
+   de la pieza (tokens.css → medidas internas de NavTabs: 1.5rem → 2.5rem
+   ≥992; la cabecera). El Cambio 2026-11-10 (hit area; spec → Estilos y
+   tokens) reemplaza el centrado vertical por el estiramiento: el tablist y
+   cada botón toman la altura de la CornerTab (--size-nav-tab-height: 48px →
+   60px ≥992) para que toda la solapa sea clickeable. El gap entre tabs sigue
+   sin ser clickeable (ningún hijo lo cubre). */
 .tablist {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  align-self: stretch;
   gap: var(--nav-tab-gap);
 }
 
-/* Fila "tab" de la tabla: sin fondo ni borde; font-size --font-size-nav,
-   font-weight --font-weight-medium, color --color-text, padding-block
-   --space-2, white-space: nowrap, cursor: pointer. El cursor: pointer lo fija
-   la fila de la spec literal (suma al acumulado F5 "cursor: pointer en
-   controles" registrado en docs/memory.md para la QA visual).
+/* Fila "tab" de la tabla: sin fondo ni borde; display: flex; align-items:
+   center; font-size --font-size-nav, font-weight --font-weight-medium,
+   color --color-text, padding-block --space-2, white-space: nowrap,
+   cursor: pointer. El display flex + align-items center centran el texto en
+   el alto completo del botón (Cambio 2026-11-10: el botón se estira con el
+   tablist a la altura de la CornerTab). El cursor: pointer lo fija la fila
+   de la spec literal (suma al acumulado F5 "cursor: pointer en controles"
+   registrado en docs/memory.md para la QA visual).
    Resets de stylesheet UA del <button> (necesidad MECÁNICA, criterio
    LanguageSwitcher T3 / Button T6: permiten que los valores de la tabla se
    vean; `border: none` y `background: transparent` implementan el "Sin fondo
    ni borde" literal de la fila, con el mismo mecanismo de LS/Button):
    - padding-inline: 0 — la tabla solo fija padding-block; la herencia UA
      inflaría la separación entre ítems que la spec asigna AL gap del tablist
-     ("separación entre ítems 40px" ≥lg = --nav-tab-gap; 24px <lg) y el
-     padding horizontal de la solapa; 0 es permitido (breakpoints.md).
+     ("separación entre ítems 40px" ≥lg = --nav-tab-gap; 24px <lg). El
+     padding horizontal EXTERIOR de la solapa se agrega SOLO en
+     `:first-child`/`:last-child` (abajo; hit area, Cambio 2026-11-10). 0 es
+     permitido (breakpoints.md).
    - font-family: var(--font-family) — los <button> no heredan la fuente del
      body; sin esto la fila (--font-size-nav/--font-weight-medium, Poppins)
      no resolvería en el tab (idéntico a LS T3/Button T6).
@@ -57,12 +70,16 @@
    claro / 11.57 oscuro ✅ (docs/tokens/contrast.md; con la opacidad del
    inactivo, abajo).
    Transición (fila "Transición"; plan → Decisiones fija duration/easing
-   G-E): SOLO color, opacity y text-decoration-color, declarada en la base
-   para que anime también la vuelta del hover (propiedades concretas, nunca
-   transition: all — DESIGN → Do/Don't). */
+   G-E; Cambio 2026-11-10): SOLO opacity y text-decoration-color, declarada
+   en la base para que anime también la vuelta del hover (propiedades
+   concretas, nunca transition: all — DESIGN → Do/Don't). `color` queda
+   FUERA: el cambio de tema del texto es instantáneo y no arrastra el acento
+   anterior (spec → Transición). */
 .tab {
   border: none;
   background: transparent;
+  display: flex;
+  align-items: center;
   padding-block: var(--space-2);
   padding-inline: 0;
   font-family: var(--font-family);
@@ -72,9 +89,28 @@
   white-space: nowrap;
   cursor: pointer;
   transition:
-    color var(--duration-base) var(--ease-standard),
     opacity var(--duration-base) var(--ease-standard),
     text-decoration-color var(--duration-base) var(--ease-standard);
+}
+
+/* Cambio 2026-11-10 (hit area; spec → fila "tab primero/último"): el padding
+   horizontal exterior de la solapa pasa a ser parte del <button> en los
+   extremos, con un margen negativo equivalente para no mover el texto. Así
+   toda el área visual de la CornerTab es clickeable (incluida la mitad
+   inferior) y el padding exterior ya no vive solo en la CornerTab. El margen
+   negativo no es espaciado entre ítems: compensa exactamente ese padding.
+   --corner-tab-padding-inline escala en tokens.css (20px → 2rem ≥992), así
+   que no hay @media propio; `calc(var(--corner-tab-padding-inline) * -1)` es
+   un calc() de token, permitido por breakpoints.md. El gap del tablist
+   (entre tabs) NO se toca: sigue sin ser clickeable. */
+.tab:first-child {
+  margin-inline-start: calc(var(--corner-tab-padding-inline) * -1);
+  padding-inline-start: var(--corner-tab-padding-inline);
+}
+
+.tab:last-child {
+  margin-inline-end: calc(var(--corner-tab-padding-inline) * -1);
+  padding-inline-end: var(--corner-tab-padding-inline);
 }
 
 /* Fila "tab inactivo" (selector de atributo, no clase de variante: el
