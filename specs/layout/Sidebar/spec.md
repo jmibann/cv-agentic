@@ -71,6 +71,7 @@ export interface SidebarLabels {
   showContacts: string;    // "Show Contacts"
   hideContacts: string;    // "Hide Contacts"
   downloadCv: string;      // "Download CV"
+  avatarAlt: string;       // "Portrait of Alex Rivera" — derivado de profile.name + plantilla i18n
   contact: Record<ContactItem["type"], string>;  // Email, Phone, WhatsApp, Location
 }
 
@@ -168,13 +169,13 @@ Colapsable (< xl):
   (`BRAND_NAMES`); abren en pestaña nueva con `rel="noopener noreferrer"`.
 - Contactos: el label (Overhead) y el valor están en el mismo `li`; email,
   teléfono y WhatsApp son links; ubicación es texto.
-- Alt del avatar desde `profile.avatar.alt`.
+- Alt del avatar desde `labels.avatarAlt`: AppLayout lo deriva de `profile.name` con la plantilla `t.sidebar.avatarAlt` (`format`); la pieza no compone textos (RF-8).
 - Botón de contactos: patrón **disclosure** (`aria-expanded` + `aria-controls`).
 
 ## Tests esperados
 
 1. `getByRole("complementary", { name: labels.region })`.
-2. Muestra nombre, headline (Badge) y el avatar con su alt.
+2. Muestra nombre, headline (Badge) y el avatar con el alt de `labels.avatarAlt`.
 3. Un link por red con `aria-label` de la marca, `href` correcto, `target="_blank"` y `rel="noopener noreferrer"`.
 4. Un ítem por contacto con su label traducido; email/phone/whatsapp son links con el href de `getContactHref`; location no es link. `mailto:`/`tel:` **sin** `target`/`rel`; el link whatsapp (o un `href` explícito de sitio) con `target="_blank"` + `rel="noopener noreferrer"` (RF-6).
 5. Botón de contactos: `aria-expanded="false"` inicial; click → `"true"` y **nombre accesible** `hideContacts` (Cambio F5: icon-only + `aria-label`; `getByRole("button", { name: labels.showContacts })`); `aria-controls` apunta a un elemento existente.

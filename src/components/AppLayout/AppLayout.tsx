@@ -52,6 +52,7 @@ import { useCv, useLocale } from "../../providers/LocaleProvider";
 import { AboutPage } from "../../pages/AboutPage";
 import { ResumePage } from "../../pages/ResumePage";
 import { useHashTab } from "../../lib/useHashTab";
+import { format } from "../../i18n/format";
 
 import { AccentGradientDefs } from "../Icon";
 import { HexAvatarDefs } from "../HexAvatar";
@@ -110,13 +111,16 @@ export function AppLayout({ className }: AppLayoutProps): ReactNode {
 
   // Mapeo explícito spec → Anatomía: todas las claves de `foundations/i18n.md`
   // de la interfaz quedan usadas (`t.contact` viaja completo para los labels
-  // por tipo de contacto del Sidebar).
+  // por tipo de contacto del Sidebar). `avatarAlt` se compone acá con la
+  // plantilla i18n y el nombre del idioma activo: el alt sigue a
+  // `cv.profile.name` sin guardarse en el contenido (Cambio 2026-11-10).
   const sidebarLabels: SidebarLabels = {
     region: t.sidebar.region,
     social: t.sidebar.social,
     showContacts: t.sidebar.showContacts,
     hideContacts: t.sidebar.hideContacts,
     downloadCv: t.sidebar.downloadCv,
+    avatarAlt: format(t.sidebar.avatarAlt, { name: cv.profile.name }),
     contact: t.contact,
   };
 

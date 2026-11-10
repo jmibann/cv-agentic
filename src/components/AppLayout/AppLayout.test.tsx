@@ -521,6 +521,29 @@ describe("AppLayout re-renders in Spanish through the real switcher (T4: RF-7, T
   });
 });
 
+describe("AppLayout derives the avatar alt from profile.name (T9: Cambio 2026-11-10)", () => {
+  it("names the sidebar avatar in English and keeps following the name after switching to Spanish", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<AppLayout />);
+
+    // El alt ya no vive en el contenido (`Image.alt` se eliminó): AppLayout lo
+    // compone con `format(t.sidebar.avatarAlt, { name: cv.profile.name })`, así
+    // que sigue al `profile.name` de cada idioma.
+    expect(
+      screen.getByRole("img", { name: "Portrait of Alex Rivera" }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Español" }));
+
+    expect(
+      screen.getByRole("img", { name: "Retrato de Alex Rivera" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", { name: "Portrait of Alex Rivera" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("AppLayout theme change reaches html data-theme (T4: RF-7, Tests 6)", () => {
   it("clicking the ThemeToggle sets data-theme=dark on <html> through the mounted provider path", async () => {
     const user = userEvent.setup();

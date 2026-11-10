@@ -92,7 +92,7 @@ import { expectNoA11yViolations } from "../../test/a11y";
 const PROFILE: Profile = {
   name: "Alex Rivera",
   headline: "Frontend Developer",
-  avatar: { src: "/images/avatar.svg", alt: "Portrait of Alex Rivera" },
+  avatar: { src: "/images/avatar.png" },
   about: ["Example bio paragraph for the About panel."],
 };
 
@@ -115,6 +115,7 @@ const LABELS: SidebarLabels = {
   showContacts: "Show Contacts",
   hideContacts: "Hide Contacts",
   downloadCv: "Download CV",
+  avatarAlt: "Portrait of Alex Rivera",
   contact: {
     email: "Email",
     phone: "Phone",
@@ -149,7 +150,7 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
     expect(region.tagName).toBe("ASIDE");
 
     // RF-1: el landmark CONTENIENE avatar, nombre, rol (Badge) y redes.
-    within(region).getByRole("img", { name: PROFILE.avatar.alt });
+    within(region).getByRole("img", { name: LABELS.avatarAlt });
     within(region).getByText(PROFILE.name);
     within(region).getByText(PROFILE.headline);
     within(region).getByRole("list", { name: LABELS.social });
@@ -177,8 +178,8 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
   it("renders the avatar img with its alt and without width, height or decoding attributes", () => {
     renderSidebar();
 
-    // Tests 2 + spec → Accesibilidad: alt desde `profile.avatar.alt`.
-    const avatar = screen.getByRole("img", { name: PROFILE.avatar.alt });
+    // Tests 2 + spec → Accesibilidad: alt desde `labels.avatarAlt`.
+    const avatar = screen.getByRole("img", { name: LABELS.avatarAlt });
     expect(avatar).toHaveAttribute("src", PROFILE.avatar.src);
 
     // Decisión 9 (spec → Estilos y tokens): el tamaño es del token

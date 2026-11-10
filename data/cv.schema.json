@@ -111,17 +111,11 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "src",
-        "alt"
+        "src"
       ],
       "properties": {
         "src": {
           "$ref": "#/definitions/PublicPath"
-        },
-        "alt": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Texto alternativo (traducible)."
         }
       }
     },

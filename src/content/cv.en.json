@@ -5,8 +5,7 @@
     "name": "Alex Rivera",
     "headline": "Frontend Developer",
     "avatar": {
-      "src": "/images/avatar.svg",
-      "alt": "Portrait of Alex Rivera"
+      "src": "/images/avatar.png"
     },
     "about": [
       "I'm a frontend developer based in Buenos Aires, focused on building accessible, fast and maintainable interfaces with React and TypeScript.",

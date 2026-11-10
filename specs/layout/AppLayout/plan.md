@@ -51,6 +51,11 @@ mapeados de `t.sidebar.*` + `t.contact` (spec → Anatomía).
 - **Contenido en/es**: no es tarea nueva — el contenido bilingüe existe desde
   F1; F4 lo verifica con los tests 5 (AboutPage) / 7 (ResumePage) y el test 10
   de AppLayout en ambos idiomas.
+- **Alt del avatar derivado (Cambio 2026-11-10):** `avatarAlt` se compone en
+  AppLayout con `format(t.sidebar.avatarAlt, { name: cv.profile.name })` y viaja
+  en `sidebarLabels`; el Sidebar no compone textos (RF-8 de su spec). *Descartado:*
+  guardar `alt` en el JSON (se desincroniza al cambiar el nombre) y
+  `alt={profile.name}` (pierde "Portrait of"/"Retrato de").
 
 ## Estrategia de tests
 
@@ -66,4 +71,4 @@ precondición de `useHashTab` RF-5; el 11 asserts del tablist (2 tabs, orden,
 
 Cobertura: T1→RF-1,RF-6 · T2→RF-2,RF-3,RF-5 (+guard A1) · T3→RF-4 ·
 T4→RF-7,RF-8 (capa DOM) · T5→RF-8 (print, inspección) + estilos/`--z-skip` +
-cierre a11y · T6→integración (`App.tsx`).
+cierre a11y · T6→integración (`App.tsx`) · T9→alt del avatar derivado (en/es).

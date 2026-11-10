@@ -17,6 +17,7 @@ export const uiEn = {
     showContacts: "Show Contacts",
     hideContacts: "Hide Contacts",
     downloadCv: "Download CV",
+    avatarAlt: "Portrait of {name}",
     social: "Social profiles",
   },
   contact: { email: "Email", phone: "Phone", whatsapp: "WhatsApp", location: "Location" },

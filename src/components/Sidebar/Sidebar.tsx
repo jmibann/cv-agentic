@@ -120,6 +120,8 @@ export interface SidebarLabels {
   hideContacts: string;
   /** Texto del CTA de descarga ("Download CV") — lo usa el `Button` de T5. */
   downloadCv: string;
+  /** Alt del avatar ("Portrait of Alex Rivera"): derivado de `profile.name` por AppLayout con la plantilla i18n (la pieza no compone textos — RF-8). */
+  avatarAlt: string;
   /** Label traducido por tipo de contacto (lo usa T3). */
   contact: Record<ContactItem["type"], string>;
 }
@@ -240,11 +242,12 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
             Estilos y tokens): SIN atributos HTML `width`/`height` ni
             `decoding` explícito — el tamaño es del token
             `--size-avatar-sidebar` (CSS, T6: `.avatar` lo dimensiona y escala
-            por breakpoint vía el token; el valor base del tramo < md lo fija
-            el usuario en `tokens.css` — Cambio F5, T7) y en xl sobresale de la card. El
-            alt llega desde `profile.avatar.alt` (spec → Accesibilidad). */}
+             por breakpoint vía el token; el valor base del tramo < md lo fija
+             el usuario en `tokens.css` — Cambio F5, T7) y en xl sobresale de la card. El
+             alt llega desde `labels.avatarAlt` (spec → Accesibilidad; AppLayout
+             lo deriva de `profile.name` con `format`). */}
         <figure className={styles.avatar}>
-          <img src={profile.avatar.src} alt={profile.avatar.alt} />
+          <img src={profile.avatar.src} alt={labels.avatarAlt} />
         </figure>
 
         {/* Identidad (Anatomía): el nombre es `<p>` con estilo propio — el

@@ -102,10 +102,6 @@ export interface Profile {
 }
 export interface Image {
   src: PublicPath;
-  /**
-   * Texto alternativo (traducible).
-   */
-  alt: string;
 }
 export interface ContactItem {
   id: Id;

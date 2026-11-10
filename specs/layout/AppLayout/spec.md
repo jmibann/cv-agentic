@@ -47,6 +47,7 @@ const sidebarLabels: SidebarLabels = {
   showContacts: t.sidebar.showContacts,
   hideContacts: t.sidebar.hideContacts,
   downloadCv: t.sidebar.downloadCv,
+  avatarAlt: format(t.sidebar.avatarAlt, { name: cv.profile.name }),
   contact: t.contact,             // { email, phone, whatsapp, location }
 };
 
@@ -84,6 +85,9 @@ return (
   "NavTabs con `items` vacío → `null`" solo aplica a NavTabs aislado).
 - **Labels del Sidebar:** mapeo explícito de `t.sidebar.*` y `t.contact`
   (arriba). Todas las claves de UI de `foundations/i18n.md` quedan usadas.
+  `avatarAlt` se compone acá con `format(t.sidebar.avatarAlt, { name: cv.profile.name })`:
+  el alt del avatar sigue al `profile.name` de cada idioma y el Sidebar no
+  compone textos (RF-8 de su spec).
 - **Skip link sin tocar la URL:** `focusPanel` hace `event.preventDefault()`
   y `panelRef.current?.focus()`. El `href="#main-panel"` queda como respaldo
   sin JS. Así el hash conserva `#about` / `#resume` y el link compartible no

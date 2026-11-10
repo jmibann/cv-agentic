@@ -19,6 +19,7 @@ export const uiEs = {
     showContacts: "Mostrar contactos",
     hideContacts: "Ocultar contactos",
     downloadCv: "Descargar CV",
+    avatarAlt: "Retrato de {name}",
     social: "Perfiles sociales",
   },
   contact: {
