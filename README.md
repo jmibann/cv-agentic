@@ -4,7 +4,7 @@ Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-11-06)
+## Estado actual (2026-11-11)
 
 | Qué | Estado |
 |---|---|
@@ -27,7 +27,9 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **F4 Integración** (hooks/useHashTab, pages/AboutPage, pages/ResumePage, layout/AppLayout + contenido es/en + impresión) | ✅ **CERRADA (2026-10-08)**: las 4 specs `Estado: implementada` (17 tareas; `build` ✅ post-reparo `7e07fcc`). `App.tsx` definitivo sobre AppLayout; impresión fijada por contrato `data-*` + `global.css` con orden About→Resume estable (**decisión #103**; token nuevo `--z-skip` en `tokens.css`). Los heredados de F3 se verificaron: skip-link→ControlsBar ✓ test 8, banner único ✓ test 1, defs ×1 ✓ test 7, tabpanel único e ids sin duplicar ✓ tests 9/12 + escaneo anti-`duplicate-id`, no-BFC ✓ inspección, superficies RF-4 de primitivas en consumidores ✓. Hitos: guard `isTabId` sin tocar NavTabs, ajustes T2b/T3b con aprobación explícita, 3 verificaciones puras sin `feat` (#101), reparo comment-only de F2 (`*/` en comentario). Entrada de cierre: §XI en `docs/diagnostics.md`. **Seguimientos F4** (impresión real, sticky/float/contrastes…) → fila nueva en **Abiertos** → F5 |
 | **F5 QA** | ✅ **CERRADA (2026-10-08) — fin del proceso F1–F5**: 4 pasadas del reviewer con chrome-devtools MCP sobre la app servida + **Ctrl+P real aprobado por el usuario** (6/6 criterios de papel). Primera pasada detectó el paquete **#104** (print B-2/B-3/M-1, D1 solape 375, D2/D3 anillos, D4 favicon) → 8 tareas nuevas en sus piezas, todas aprobadas y re-verificadas en vivo; decisiones visuales **#105** (favicon cerrado, **F8 cerrado** `9rem` definitivo, base `< md` `6.375rem`, chevron con acento semántico). Informe con evidencia: `docs/qa-report.md`; cierre: §XII en diagnostics. **27/27 specs `implementada`, suite 445/40, build ✅.** Residuos no bloqueantes → fila "Pendientes post-F5" (contenido real + deudas de forma opcionales) |
 | **Mantenimiento (2026-11-06)** | ✅ **Bug-fix ControlsBar T4**: ThemeToggle y LanguageSwitcher alineados en una fila flex con `.group` (`display: flex; align-items: center; gap: var(--controls-gap)`); se eliminó el `gap` inerte del `<header>`. Sin cambio de API/ARIA/spec. Suite **446/40**, lint/typecheck/build ✅; QA visual 375/768/1024/1440 × claro/oscuro × en/es ✅. Commits `d65ac7a`/`9f9de59`; T4 en `specs/controls/ControlsBar/tasks.md`. |
-| Post-entrega (del usuario) | Push de las 57+ commits locales · reemplazar el contenido de ejemplo de `src/content/cv.{en,es}.json` (con nombre real, re-observar 375px es/en el gap chevron↔nombre: 23px medidos con "Alex Rivera") · opcionales: `downloadCvUrl` (ejercita `aside [download]`), pase de deudas de forma, StrictMode/F1-F2 (filas propias en Abiertos) |
+| **Deploy GitHub Pages (2026-11-11)** | 🟡 **Implementado en working tree, commit pendiente** (el orchestrator no puede stagear `src/**`): `vite.config.ts` usa base `/cv-agentic/` solo con `DEPLOY_TARGET=gh-pages` (local/Vercel siguen en `/`); `src/utils/assetUrl.ts` antepone `BASE_URL` a assets públicos y deja intactas las URLs externas. `HexAvatar` y `Sidebar` ya lo usan. Sin cambio de UI/API. lint/typecheck/test **447/40**/build ✅. |
+| **Motion (2026-11-11)** | 🟡 **Propuesta aprobada, implementación NO iniciada**: `specs/motion/proposal.md` fija tokens, tabs (alternativa B), grid del Sidebar, supresión de transiciones al cambiar tema, reduced motion y dialog; incluye el Cambio de contenido previo. Falta aprobar specs/planes/tareas y recibir el CV real. |
+| Post-entrega / próximos trabajos (2026-11-11) | Commitear el fix de deploy (`src/utils/assetUrl.ts`, HexAvatar, Sidebar, `vite.config.ts`) · push de los commits locales · reemplazar el contenido de ejemplo de `src/content/cv.{en,es}.json` con el CV real en/es + assets (re-observar 375px el gap chevron↔nombre: 23px medidos con "Alex Rivera") · OK para ajustar los tests de AboutPage con `testimonials: []` · aprobar specs/planes/tareas de motion · opcionales: `downloadCvUrl` (ejercita `aside [download]`), deudas de forma, StrictMode/F1-F2 |
 | F2 → seguimientos abiertos | Combo hover+focus del Button (el `outline` gana siempre; la spec no fija el combo) → **F5** · Badge RF-6 ("no dentro de `Box inner`") se verifica en los consumidores → **F3/F4** (SkillList/Sidebar) · Overhead RF-4 (nunca sobre `--color-bg` en claro) se verifica en los consumidores → **F3/F4** (Sidebar) · IconBox RF-5 (no dentro de `Box variant="inner"`) se verifica en los consumidores → **F3/F4** (Sidebar/ResumeSection) · `--button-small-padding-*` literales: promover a token si se repite en otro componente |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
@@ -41,7 +43,7 @@ cv-agentic/
 ├─ docs/              documentación (constitution, README completo, DESIGN, BACKLOG, diagnostics, agent-system.md, tokens/)
 ├─ tokens/            tokens.css (lo importa la app)
 ├─ foundations/       tipografía · layout · movimiento · theming · i18n
-├─ specs/             una carpeta por pieza (<categoria>/<Name>/spec.md)
+├─ specs/             una carpeta por pieza (<categoria>/<Name>/spec.md) + motion/proposal.md
 ├─ data/              esquema JSON del CV (fuente de verdad) + ejemplos
 ├─ .opencode/         agents/ (los 5 agentes), skills/sdd/, commands/ (/sdd-*)
 ├─ opencode.json      config de OpenCode (MCP de Chrome DevTools, solo para el reviewer)
@@ -50,10 +52,11 @@ cv-agentic/
 
 ## Mantenimiento (modo actual — desde 2026-10-08)
 
-El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (446 tests,
-build, validate:content, QA en navegador y en papel; último mantenimiento:
-bug-fix ControlsBar T4, 2026-11-06). Para reabrir trabajo, el
-flujo vive en la skill `sdd` y los agentes en `.opencode/agents/`:
+El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (447 tests,
+build, validate:content, QA en navegador y en papel; últimos trabajos:
+bug-fix ControlsBar T4 y base de deploy para GitHub Pages —esta última con
+commit pendiente—, 2026-11-11). Para reabrir trabajo, el flujo vive en la skill
+`sdd` y los agentes en `.opencode/agents/`:
 
 | Quiero… | Cómo |
 |---|---|
@@ -61,7 +64,7 @@ flujo vive en la skill `sdd` y los agentes en `.opencode/agents/`:
 | Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
 | Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
 | Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
-| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#105: `docs/README.md` · QA final: `docs/qa-report.md` |
+| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#108: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
 Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
 (P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;

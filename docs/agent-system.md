@@ -115,7 +115,11 @@ El orden y las dependencias de los componentes están en
 
 F1–F5 cerradas (ver §XII en `docs/diagnostics.md` y `docs/qa-report.md`). No
 quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
-con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`:
+con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`. Trabajo abierto al
+2026-11-11: base de deploy para GitHub Pages cerrada (§XIV); **motion** aprobado
+pero sin implementar (`specs/motion/proposal.md`) y **Cambio de contenido**
+bloqueado por el CV real y el OK a los tests de AboutPage (#106–#108; tabla
+**Abiertos** de diagnostics):
 
 | Tarea futura | Flujo | Dueño |
 |---|---|---|

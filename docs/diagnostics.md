@@ -2,13 +2,14 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
-los hashes de los commits relevantes. Última actualización: **2026-11-06**
-(mantenimiento: bug-fix de alineación en ControlsBar T4; el proceso F1–F5 sigue
-cerrado — ver §XII; flujo y dueños en "Modo mantenimiento" de `docs/agent-system.md`).
+los hashes de los commits relevantes. Última actualización: **2026-11-11**
+(mantenimiento: base de deploy para GitHub Pages + `assetUrl()` y propuesta de
+motion aprobada; el proceso F1–F5 sigue cerrado — ver §XII; flujo y dueños en
+"Modo mantenimiento" de `docs/agent-system.md`).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#105 → `docs/README.md` · QA de F5 →
-`docs/qa-report.md`.
+`docs/memory.md` · decisiones #1–#108 → `docs/README.md` · QA de F5 →
+`docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
 archivo.
@@ -42,11 +43,21 @@ de la entrada); el detalle queda en git.
 
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
-| Pendientes post-F5 (residuos) | **Contenido real**: al reemplazar el nombre de ejemplo en `src/content/cv.*.json`, re-observar 375px es/en el gap chevron↔nombre (spot-check midió 23px exactos con "Alex Rivera" — límite, sin defecto) · **deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
+| Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
+| Contenido real (post-entrega) | Aprobado (#108): CV real en `src/content/cv.{en,es}.json` + assets; `testimonials: []`; contact sin teléfono/WhatsApp; quitar solo el test "copia fiel" y validar examples; ajustar tests AboutPage (OK pendiente). Al aplicar, re-observar 375px el gap chevron↔nombre (23px con "Alex Rivera") | Cambio de contenido, al recibir el archivo |
+| Motion (post-entrega) | Propuesta aprobada (#106) en `specs/motion/proposal.md`; falta aprobar specs/planes/tareas y luego implementar tokens, tabs B, Sidebar grid, `data-theme-switching`, reduced motion, dialog y Separator. No se toca código antes de esa puerta | Puerta de Plan+Tareas / Cambio |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XIV · 2026-11-11 — Mantenimiento: deploy GitHub Pages + propuesta de motion
+
+- Qué: se verificó y documentó el trabajo local de **base de despliegue**: `vite.config.ts` usa `/cv-agentic/` solo con `DEPLOY_TARGET=gh-pages`, y `src/utils/assetUrl.ts` centraliza el prefijo de `BASE_URL` para assets de `/public` (lo usan HexAvatar y Sidebar); el código queda **pendiente de commit** porque el orchestrator no puede stagear `src/**`. Se registró la **propuesta de motion aprobada** (`specs/motion/proposal.md`): tokens, tabs B, grid del Sidebar, `data-theme-switching`, reduced motion, dialog y Separator; implementación **no iniciada**. Se registró el **Cambio de contenido** previo (#108): CV real en/es, `testimonials: []`, contact sin teléfono/WhatsApp y ajuste de tests pendiente de OK.
+- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ (1989 módulos) · validate:content ✓.
+- Decisiones: **#106** (motion), **#107** (base/assets) y **#108** (contenido) → `docs/README.md`.
+- Commits: `pendiente` (código de deploy; el orchestrator no puede stagear `src/**` por permisos) · docs: este commit.
+- Abre: filas "Contenido real (post-entrega)" y "Motion (post-entrega)" en **Abiertos**; cierra: nada.
 
 ### §XIII · 2026-11-06 — Mantenimiento: bug-fix ControlsBar T4 (alineación)
 - Qué: el `div[role="group"]` interno de ControlsBar pasó a ser el contenedor flex (`.group`: `display:flex; align-items:center; gap:var(--controls-gap)`); se eliminó el `gap` inerte del `<header>` (único hijo flex: el group). Corrige la alineación por baseline que bajaba ThemeToggle respecto de LanguageSwitcher; sin cambio de API, ARIA ni spec (el usuario lo clasificó como bug-fix).
@@ -71,44 +82,11 @@ de la entrada); el detalle queda en git.
 - Commits: specs `implementada` `ac65f1f` `6d8d0d5` `2984844` `730d9ce`; Clarificación aplicada `b42c4ab`; plan/tasks fase `dc05e3b`; tokens `--z-skip` `b2563f0` (usuario); feats clave `7e0f45c` `ab13f31` `ceb9c12` (hook) `8f47cb4` (AboutPage T4) `977a320` (ResumePage T4) `0fe9c9c`/`127cff7` (AppLayout T5/T6); reparo `7e07fcc`. Notas de forma: `730d9ce` marcó T6 **y** spec en un solo commit bajo subject "T6 approved"; `bc040d2` subject con sufijo español (#102, no enmendable); `127cff7` sin cuerpo.
 - Abre: fila "Seguimientos F4" en **Abiertos**; cierra: items F4-verification de la fila "Seguimientos F3" (no-BFC, skip-link→ControlsBar, banner único, defs ×1, unicidad tabpanel, superficies RF-4 de primitivas en consumidores). **Siguiente: F5** — QA completa con app servida por el usuario (#91; pedir `npm run dev` y URL), informe en `docs/qa-report.md` (#85).
 
-### §X · 2026-10-07 — Cierre de F3
-
-- Qué: **F3 Compuestos cerrada (12/12)**: ThemeToggle, LanguageSwitcher, ControlsBar, NavTabs, Sidebar, Timeline, ResumeSection, SkillList, ServiceCard, TestimonialCard, TestimonialDialog y TestimonialCarousel con spec `Estado: implementada`. Por pieza: Clarificación→Plan/Tareas de fase (aprobados `bdfa58c` tras la ronda de hallazgos G-A…G-E/1–21), revisión por tarea + revisión completa + `build` ✅. Hitos de proceso: **Foundation T12** (Cambio `formatPeriodEndpoint` + `controls.lightMode`), extensión **#100** a `"getTabId"` (aprobada por el usuario, `0df3855`), ajustes de aserción entre tareas **con aprobación explícita** (Sidebar `4ff4424`; Carousel T5 `b6efae7`), **Cambio de accesibilidad opción A** (Test 12 inviable con `li[role=group]` por `aria-allowed-role`+`list` de axe → modelo div de slides; cerrado en verde **sin** desactivar reglas ni tocar `src/test/`), 2 puertas de pieza RECHAZADAS r1→APROBADAS r2 (NavTabs: Test esperado #11 caído del reparto; TestimonialDialog T1: effect de presencia con dep `[open]`), y regla nueva **#102** (L2: subject EN, cuerpo ES sin acentos). Lecciones fijadas: cross-check 1:1 de "Tests esperados" antes de dictar revisión completa; sin archivos scratch (no hay `rm` en allowlists).
-- Checks: lint ✓ · typecheck ✓ · test **395/36** ✓ · build ✓ por pieza y al cerrar (spec final `6b871e1`).
-- Decisiones: #99/#100 (ext. "getTabId")/#101 (ext. commit único `test` sin `feat`: ThemeToggle T2)/**#102** → registro. Ninguna regla nueva además de #102.
-- Commits: specs `implementada` ×12 `35083ef` `3da32b9` `ddfd1f7` `d63d1b1` `82017f1` `3b457f3` `ef78c22` `bf26962` `0388366` `3ce10df` `37711dc` `6b871e1`; Cambio Carousel `d535895`; T12 `29b063f`.
-- Abre: fila "Seguimientos F3" en **Abiertos**; cierra: nada propio (F8 y F5 siguen; deudas F1/F2 permanecen según sus filas).
+### 2026-10-07 · Cierre de F3 · #99–#102 · `git show 7f52303:docs/diagnostics.md`
 
 ### 2026-10-06 · Decisión #102 — L2: subject inglés, cuerpo español sin acentos · #102 · `git show 3da32b9:docs/diagnostics.md`
 
-### §IX · 2026-10-06 — Cierre de F2
-
-- Qué: **F2 Primitivas cerrada (11/11)**: Icon, BrandIcon, Box, Button, Badge,
-  Overhead, IconBox, SectionTitle, Separator, CornerTab y HexAvatar con spec
-  `Estado: implementada`. Por pieza: revisión por tarea + revisión completa +
-  `build` ✅. Mecanismos aplicados: #99 (aserción P2), #100 (`BRAND_NAMES`),
-  #101 extendido en la práctica (verdes on-arrival declarados en Button T6,
-  Badge T3, Overhead T3/T4, SectionTitle T3/T5, Separator T3, CornerTab T4,
-  HexAvatar T3/T4; **commit único `feat` sin `test`** cuando no hay nada
-  discriminate-testable: IconBox T3). Decisiones de delegación registradas en
-  las notas de `tasks.md` (gaps de reparto de `index.ts` en todas y de
-  `className` en CornerTab T1, `31adfb5`). El reviewer validó `display: block`
-  en HexAvatar T2 como necesidad mecánica fiel (no Cambio) y recálculo propio
-  de la geometría de "Forma" en T1. Las restricciones de uso de primitivas
-  (Badge RF-6, Overhead RF-4, IconBox RF-5, Separator RF-4 gap, CornerTab
-  no-BFC y float ≥992, combo hover+focus Button, Safari/H-8, F8) se verifican
-  en F3/F4/F5 según sus specs.
-- Checks: lint ✓ · typecheck ✓ · test **236/236 (22 archivos)** ✓ · build ✓
-  por pieza y al cerrar (HEAD `1a0ec18`, árbol limpio).
-- Decisiones: ninguna nueva de regla en esta puerta; #99/#100/#101 ya
-  registrados (entradas podadas abajo; detalle en git). Deudas menores F2 →
-  tabla **Abiertos**.
-- Commits: specs `implementada` ×11 `ee9ee34` `765834a` `aaab301` `76c348d`
-  `1962e3f` `b2783f6` `cc2cb0d` `ac47b8e` `d21b3aa` `3a6da02` `1a0ec18`; feats
-  de HexAvatar `09c9e03` `9137a67` `bcfe9ec` `b0b2b2c`; docs de estado por
-  pieza (`d0da569` … `c5a7879`).
-- Abre: fila "Deudas menores de F2" en **Abiertos**; cierra: nada propio — la
-  fila de deudas de F1 se **reevaluó** y permanece; F8 y F5 siguen abiertos.
+### 2026-10-06 · Cierre de F2 · #99–#101 · `git show 2c086fb:docs/diagnostics.md`
 
 ### 2026-10-05 · Decisión #101 — tareas solo-inspección: rojo no exigible · #101 · `git show 81ef2ff:docs/diagnostics.md`
 

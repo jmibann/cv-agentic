@@ -2,27 +2,24 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XIII) y `docs/README.md` (#1–#105).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XIV) y `docs/README.md` (#1–#108).
 
-## Estado actual (2026-11-06)
+## Estado actual (2026-11-11)
 
-- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; suite **446/40**,
-  lint/typecheck/build/validate:content ✅; QA F5 en 4 pasadas (navegador) + **Ctrl+P real
-  aprobado** (veredicto en `docs/qa-report.md`; hitos §XI–§XIII en diagnostics).
-  Mantenimiento 2026-11-06: bug-fix ControlsBar T4 (`.group` flex + gap token; sin spec/API/ARIA).
-- Reglas del proceso que quedaron probadas y valen para el mantenimiento: cross-check 1:1
-  RF↔Tests antes de la revisión completa; ajuste de asserts de tarea previa → solo con
-  aprobación explícita y scope más angosto; verificación pura sin `feat` con on-arrival
-  declarado por test (#101); `build` con grafo completo destapa bugs que lint/test no ven
-  (frenar y escalar al dueño del archivo); `vi.hoisted`+`importOriginal` delegando en lo
-  real para variantes de contenido; print por hooks `data-*` + `global.css` con compuestos
-  `(0,1,1)` (#103 revisado por #104); la emulación print no valida paginación → papel real
-  lo mira el usuario; pasadas de QA cortas y priorizadas (el reviewer agota presupuesto).
-- **Pendientes del usuario (loop de mantenimiento)**: `git push` (57+ commits locales) ·
-  contenido real en `src/content/cv.{en,es}.json` (→ re-observar 375px es/en el gap
-  chevron↔nombre: 23px justos con "Alex Rivera"; `profile.downloadCvUrl` opcional ejercita
-  `aside [download]`) · opcionales: pase de deudas de forma (`useHashTab.test.ts:143`,
-  jerga "asiértan", F1/F2 — ver Abiertos de diagnostics).
+- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; suite **447/40**,
+  lint/typecheck/build/validate:content ✅; QA F5 en 4 pasadas + **Ctrl+P real aprobado**
+  (`docs/qa-report.md`; §XI–§XIII). Mantenimiento 2026-11-11: base Vite para GitHub Pages
+  + `assetUrl()` (**código en working tree; commit pendiente**).
+- **Motion aprobado, NO implementado** (`specs/motion/proposal.md`): tokens `base 0.2`,
+  `slow 0.3`, `exit 0.22`, `stagger 0.03` + `ease-enter/exit`; tabs B (fade+translateX,
+  `key` remonta y resetea carrusel/dialog); Sidebar grid `0fr→1fr`; `data-theme-switching`;
+  reduced motion instantáneo; dialog `--ease-enter`; Separator vía `within()`. Falta
+  aprobar specs/planes/tareas.
+- **Cambio de contenido aprobado, bloqueado**: CV real en/es + assets; `testimonials: []`;
+  contact sin teléfono/WhatsApp; quitar solo el test "copia fiel" y validar examples;
+  ajuste de tests AboutPage pendiente de OK.
+- **Pendientes del usuario**: commitear el fix de deploy; push; archivo CV; OK tests
+  AboutPage; aprobar specs motion; opcionales `downloadCvUrl`, deudas de forma, StrictMode/F1-F2.
 
 ## Reglas no negociables para cualquier tarea futura
 
@@ -38,7 +35,7 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XIII) y `docs/READM
   ES **sin tildes**; `feat`/`fix` no tocan tests; `test` solo agrega) → `feat(<Name>): Tn`;
   identidad `git -c user.name="jmiban" commit`; sin `--amend`/`--no-verify`/push;
   `git add` con rutas explícitas y `git diff --cached --name-only` antes (un subagente
-  puede dejar staged ajeno). Docs los commitea el orchestrator, código no.
+  puede dejar staged ajeno). Docs los commitea el orchestrator; el código, sus builders.
 - Cierre de cualquier tarea: lint + typecheck + test verdes (build al cerrar pieza/puerta,
   #80). Máx. 3 rondas fix↔verify y frenar con salida exacta.
 - `allowExportNames` de `react-refresh` (#96/#100): `useTheme`/`useLocale`/`useCv`,
@@ -49,5 +46,7 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XIII) y `docs/READM
 - Stack fijo: React+TS+Vite, CSS Modules, solo tokens semánticos, sin `any`/casts/
   `@ts-ignore`; mobile-first 580/768/992/1200; textos desde `useLocale()`/`useCv()`
   (páginas/AppLayout); fuera de alcance: lo de `docs/DESIGN.md` y `docs/BACKLOG.md`.
+- Assets públicos: usar `assetUrl()`; `vite.config.ts` aplica base `/cv-agentic/` solo con
+  `DEPLOY_TARGET=gh-pages` (local/Vercel en `/`).
 - Verificar estado real antes de afirmar (`git status`/`git log` frescos; salidas pueden
   llegar rezagadas en sesiones largas).
