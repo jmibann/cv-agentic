@@ -2,154 +2,208 @@
   "$schema": "../../data/cv.schema.json",
   "locale": "en",
   "profile": {
-    "name": "Alex Rivera",
-    "headline": "Frontend Developer",
+    "name": "Juan Manuel Ibáñez",
+    "headline": "Frontend Engineer",
     "avatar": {
       "src": "/images/avatar.png"
     },
     "about": [
-      "I'm a frontend developer based in Buenos Aires, focused on building accessible, fast and maintainable interfaces with React and TypeScript.",
-      "I enjoy turning complex requirements into simple, well-tested components, and working closely with designers to keep products consistent across devices."
-    ]
+      "Frontend Engineer with 7+ years building React/TypeScript products for US and European clients across healthtech, e-commerce and travel. I've owned payment, compliance and analytics features end-to-end, driven design-system and build-tool migrations, and led code reviews focused on type safety and hook correctness.",
+      "I have a track record building multi-brand component architectures — a shared library serving five Gap Inc. brands and a React Native codebase powering three branded mental-health apps — with a strong focus on accessibility and testing.",
+      "Before software, I was an Electronics Engineer (UTN) working with medical imaging and radiotherapy equipment, and I hold an MBA. Today I build agentic AI workflows with the Claude API and MCP — this site was delivered by a 5-agent, spec- and test-driven development system I designed."
+    ],
+    "downloadCvUrl": "/cv/Juan-Manuel-Ibanez-CV.pdf"
   },
   "contact": [
     {
       "id": "email",
       "type": "email",
-      "value": "alex@example.com"
-    },
-    {
-      "id": "phone",
-      "type": "phone",
-      "value": "+54 11 5555-0100"
-    },
-    {
-      "id": "whatsapp",
-      "type": "whatsapp",
-      "value": "+54 9 11 5555-0100"
+      "value": "jmiban@gmail.com"
     },
     {
       "id": "location",
       "type": "location",
-      "value": "Buenos Aires, Argentina"
+      "value": "Buenos Aires, Argentina (GMT-3)"
     }
   ],
   "social": [
     {
       "id": "github",
       "network": "github",
-      "url": "https://github.com/example"
+      "url": "https://github.com/jmibann"
     },
     {
       "id": "linkedin",
       "network": "linkedin",
-      "url": "https://www.linkedin.com/in/example"
-    },
-    {
-      "id": "x",
-      "network": "x",
-      "url": "https://x.com/example"
+      "url": "https://www.linkedin.com/in/juanmanuelibanez"
     }
   ],
   "services": [
     {
-      "id": "web-apps",
-      "title": "Web Applications",
-      "description": "Single-page apps with React and TypeScript, from architecture to deployment.",
+      "id": "react-typescript",
+      "title": "React & TypeScript",
+      "description": "Production frontends with strict TypeScript, server-state management and well-tested custom hooks.",
       "icon": "code"
     },
     {
-      "id": "ui-systems",
+      "id": "design-systems",
       "title": "Design Systems",
-      "description": "Reusable, themeable component libraries driven by design tokens.",
+      "description": "Multi-brand component architectures, design tokens, theming and design-system migrations.",
       "icon": "layout"
     },
     {
       "id": "accessibility",
       "title": "Accessibility",
-      "description": "WCAG-compliant interfaces that work with keyboards and screen readers.",
+      "description": "WCAG and WAI-ARIA patterns, keyboard and focus management, automated axe-core audits.",
       "icon": "shield"
     },
     {
-      "id": "performance",
-      "title": "Performance",
-      "description": "Audits and fixes for load time, rendering and Core Web Vitals.",
-      "icon": "gauge"
+      "id": "ai-workflows",
+      "title": "AI-Assisted Development",
+      "description": "Agentic workflows with the Claude API and MCP, with human-in-the-loop quality gates.",
+      "icon": "server"
     }
   ],
   "education": [
     {
-      "id": "uba-cs",
-      "title": "B.Sc. in Computer Science",
-      "organization": "University of Buenos Aires",
-      "start": "2012",
-      "end": "2017",
-      "description": "Focus on software engineering, algorithms and human-computer interaction."
+      "id": "anthropic-certs",
+      "title": "Claude API, MCP & Claude Code certifications (10)",
+      "organization": "Anthropic",
+      "start": "2025",
+      "end": "2026",
+      "description": "Building with the Claude API, MCP: Advanced Topics, Claude Code in Action, Introduction to Subagents, Introduction to Agent Skills and five more."
     },
     {
-      "id": "a11y-cert",
-      "title": "Web Accessibility Specialist",
-      "organization": "Online certification",
-      "start": "2020-03",
-      "end": "2020-09",
-      "description": "Accessible design patterns, ARIA and assistive-technology testing."
+      "id": "plataforma5",
+      "title": "Full Stack Developer, JavaScript",
+      "organization": "Plataforma 5 (Coding Bootcamp)",
+      "start": "2018",
+      "end": "2018",
+      "description": "600+ hour immersive program: React, Redux, Node.js/Express, PostgreSQL, MongoDB, TDD, RESTful APIs and Scrum, with a capstone practicum at Endava."
+    },
+    {
+      "id": "uade-mba",
+      "title": "Master of Business Administration (MBA)",
+      "organization": "Universidad Argentina de la Empresa (UADE)",
+      "start": "2016",
+      "end": "2018",
+      "description": "Business management, strategy and finance."
+    },
+    {
+      "id": "utn-electronics",
+      "title": "Electronics Engineering",
+      "organization": "Universidad Tecnológica Nacional (UTN)",
+      "start": "2004",
+      "end": "2014",
+      "description": "Research on nonlinear dynamical systems (Chua oscillator) in MATLAB and C, resulting in a publication. Member of GDAIA, an autonomous agents research group."
     }
   ],
   "experience": [
     {
-      "id": "acme",
-      "title": "Senior Frontend Developer",
-      "organization": "Acme Corp",
-      "start": "2021-02",
+      "id": "cv-agentic",
+      "title": "AI-Built Bilingual Portfolio (this site)",
+      "organization": "Independent project",
+      "start": "2026-07",
       "end": null,
-      "description": "Lead the component library and the migration of legacy views to React and TypeScript."
+      "description": "Designed a 5-agent development system (Claude API, MCP, OpenCode) that delivered this React 19 / TypeScript / Vite site via spec- and test-driven development: 24 WCAG-compliant components, 445 tests with axe-core audits, human-in-the-loop gates and automated visual QA via Chrome DevTools MCP."
     },
     {
-      "id": "globex",
+      "id": "making-sense",
       "title": "Frontend Developer",
-      "organization": "Globex",
-      "start": "2017-06",
-      "end": "2021-01",
-      "description": "Built customer-facing dashboards and introduced automated testing to the team."
+      "organization": "Making Sense · Client: Vetsource",
+      "start": "2023-10",
+      "end": "2026-07",
+      "description": "Owned the frontend for a major US bank's ACH integration and in-clinic card payments, the Analytics & Reports module and veterinary compliance flows. Drove the MUI → Kibble design-system and Vite migrations, added Datadog metrics and Playwright E2E coverage, and led code reviews focused on type safety and hook correctness."
+    },
+    {
+      "id": "konexio",
+      "title": "React Developer (Contractor)",
+      "organization": "Konexio · Client: lastminute.com",
+      "start": "2023-03",
+      "end": "2023-10",
+      "description": "Refactored legacy React/TypeScript components during a major UX/UI redesign of the booking platform, preserving functional parity, within a distributed team across time zones."
+    },
+    {
+      "id": "nisum",
+      "title": "Frontend Developer",
+      "organization": "Nisum Latam · Client: Gap Inc.",
+      "start": "2021-07",
+      "end": "2023-03",
+      "description": "Enhanced a shared React/TypeScript component library serving five e-commerce brands (Gap, Gap Factory, Old Navy, Banana Republic, Athleta), implementing brand-specific variants while keeping the architecture consistent, and presented feature demos to client teams."
+    },
+    {
+      "id": "mobomo",
+      "title": "Frontend Developer",
+      "organization": "Mobomo · Client: Apogee",
+      "start": "2020-10",
+      "end": "2021-07",
+      "description": "Built the web MVP of a student self-service platform from scratch with React, TypeScript, Tailwind CSS and React Query, and defined API contracts and mock-data strategies so web, mobile and backend teams could work in parallel."
+    },
+    {
+      "id": "endava-joyages",
+      "title": "Full Stack Developer",
+      "organization": "Endava · Client: ACAP Health Consulting",
+      "start": "2019-08",
+      "end": "2020-10",
+      "description": "Built a cross-platform React Native app with a shared component architecture powering three branded mental-health apps, and migrated it from Expo to the bare workflow to support push notifications and native libraries."
+    },
+    {
+      "id": "endava-talent",
+      "title": "Full Stack Developer",
+      "organization": "Endava · Internal Talent Platform",
+      "start": "2019-01",
+      "end": "2019-08",
+      "description": "Delivered end-to-end features (React + Node.js) for Endava's internal recruiting platform: candidate profiles, interview tracking, internal CVs and scoring."
+    },
+    {
+      "id": "philips",
+      "title": "Field Service Engineer",
+      "organization": "Philips Healthcare",
+      "start": "2015-10",
+      "end": "2018-06",
+      "description": "Maintenance and troubleshooting of radiography, fluoroscopy and angiography systems."
+    },
+    {
+      "id": "vidt",
+      "title": "Junior Maintenance Engineer",
+      "organization": "Vidt Centro Médico",
+      "start": "2015-02",
+      "end": "2015-09",
+      "description": "Maintenance of Varian linear accelerators; coordinated a Varian Trilogy System installation."
+    },
+    {
+      "id": "hp",
+      "title": "Regulations Engineer",
+      "organization": "Hewlett-Packard",
+      "start": "2013-07",
+      "end": "2015-02",
+      "description": "International product certifications (UL, TÜV Rheinland, IRAM, S-Mark, Intertek) across Argentina and Chile."
     }
   ],
   "skills": [
     "React",
     "TypeScript",
+    "JavaScript (ES6+)",
+    "React Query",
+    "Zustand",
+    "Redux",
+    "React Native",
     "Vite",
+    "Material UI",
+    "Tailwind CSS",
     "CSS Modules",
+    "Formik & Yup",
     "Vitest",
-    "Testing Library",
-    "Accessibility",
+    "Jest",
+    "React Testing Library",
+    "Playwright",
+    "Accessibility (WCAG, ARIA)",
+    "Design Systems",
+    "i18n",
+    "Node.js",
+    "Claude API",
+    "MCP",
     "Git"
   ],
-  "testimonials": [
-    {
-      "id": "t-maria",
-      "author": "María González",
-      "role": "Product Manager, Acme Corp",
-      "avatar": {
-        "src": "/images/testimonials/maria.svg"
-      },
-      "text": "Alex consistently delivered high-quality work and made complex features feel simple for our users."
-    },
-    {
-      "id": "t-john",
-      "author": "John Smith",
-      "role": "Design Lead, Globex",
-      "avatar": {
-        "src": "/images/testimonials/john.svg"
-      },
-      "text": "A reliable partner for designers: Alex cares about details, accessibility and consistency across the product."
-    },
-    {
-      "id": "t-lena",
-      "author": "Lena Fischer",
-      "role": "Engineering Manager, Acme Corp",
-      "avatar": {
-        "src": "/images/testimonials/lena.svg"
-      },
-      "text": "Alex raised the bar for testing on the team and mentored others with patience and clarity."
-    }
-  ]
+  "testimonials": []
 }

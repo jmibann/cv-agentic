@@ -2,154 +2,208 @@
   "$schema": "../../data/cv.schema.json",
   "locale": "es",
   "profile": {
-    "name": "Alex Rivera",
-    "headline": "Desarrollador Frontend",
+    "name": "Juan Manuel Ibáñez",
+    "headline": "Frontend Engineer",
     "avatar": {
       "src": "/images/avatar.png"
     },
     "about": [
-      "Soy desarrollador frontend en Buenos Aires y me especializo en construir interfaces accesibles, rápidas y mantenibles con React y TypeScript.",
-      "Me gusta convertir requisitos complejos en componentes simples y bien testeados, y trabajar junto a diseño para que el producto sea consistente en todos los dispositivos."
-    ]
+      "Frontend Engineer con más de 7 años construyendo productos en React/TypeScript para clientes de Estados Unidos y Europa en healthtech, e-commerce y turismo. Fui responsable end-to-end de funcionalidades de pagos, compliance y analítica, impulsé migraciones de design system y de herramientas de build, y lideré code reviews enfocadas en type safety y uso correcto de hooks.",
+      "Tengo experiencia construyendo arquitecturas de componentes multimarca —una librería compartida para cinco marcas de Gap Inc. y una base de código React Native que dio vida a tres apps de salud mental— con foco fuerte en accesibilidad y testing.",
+      "Antes del software fui Ingeniero Electrónico (UTN) y trabajé con equipamiento de diagnóstico por imágenes y radioterapia; además tengo un MBA. Hoy construyo flujos de IA agéntica con la Claude API y MCP: este sitio lo desarrolló un sistema de 5 agentes, guiado por specs y tests, que diseñé yo."
+    ],
+    "downloadCvUrl": "/cv/Juan-Manuel-Ibanez-CV.pdf"
   },
   "contact": [
     {
       "id": "email",
       "type": "email",
-      "value": "alex@example.com"
-    },
-    {
-      "id": "phone",
-      "type": "phone",
-      "value": "+54 11 5555-0100"
-    },
-    {
-      "id": "whatsapp",
-      "type": "whatsapp",
-      "value": "+54 9 11 5555-0100"
+      "value": "jmiban@gmail.com"
     },
     {
       "id": "location",
       "type": "location",
-      "value": "Buenos Aires, Argentina"
+      "value": "Buenos Aires, Argentina (GMT-3)"
     }
   ],
   "social": [
     {
       "id": "github",
       "network": "github",
-      "url": "https://github.com/example"
+      "url": "https://github.com/jmibann"
     },
     {
       "id": "linkedin",
       "network": "linkedin",
-      "url": "https://www.linkedin.com/in/example"
-    },
-    {
-      "id": "x",
-      "network": "x",
-      "url": "https://x.com/example"
+      "url": "https://www.linkedin.com/in/juanmanuelibanez"
     }
   ],
   "services": [
     {
-      "id": "web-apps",
-      "title": "Aplicaciones web",
-      "description": "Aplicaciones de una sola página con React y TypeScript, desde la arquitectura hasta el despliegue.",
+      "id": "react-typescript",
+      "title": "React y TypeScript",
+      "description": "Frontends productivos con TypeScript estricto, manejo de server state y custom hooks bien testeados.",
       "icon": "code"
     },
     {
-      "id": "ui-systems",
-      "title": "Sistemas de diseño",
-      "description": "Bibliotecas de componentes reutilizables y con temas, basadas en design tokens.",
+      "id": "design-systems",
+      "title": "Design Systems",
+      "description": "Arquitecturas de componentes multimarca, design tokens, theming y migraciones de design system.",
       "icon": "layout"
     },
     {
       "id": "accessibility",
       "title": "Accesibilidad",
-      "description": "Interfaces que cumplen WCAG y funcionan con teclado y lectores de pantalla.",
+      "description": "Patrones WCAG y WAI-ARIA, navegación por teclado y manejo de foco, auditorías automáticas con axe-core.",
       "icon": "shield"
     },
     {
-      "id": "performance",
-      "title": "Rendimiento",
-      "description": "Auditorías y mejoras de tiempo de carga, renderizado y Core Web Vitals.",
-      "icon": "gauge"
+      "id": "ai-workflows",
+      "title": "Desarrollo asistido por IA",
+      "description": "Flujos agénticos con la Claude API y MCP, con quality gates y validación humana.",
+      "icon": "server"
     }
   ],
   "education": [
     {
-      "id": "uba-cs",
-      "title": "Licenciatura en Ciencias de la Computación",
-      "organization": "Universidad de Buenos Aires",
-      "start": "2012",
-      "end": "2017",
-      "description": "Orientación en ingeniería de software, algoritmos e interacción humano-computadora."
+      "id": "anthropic-certs",
+      "title": "Certificaciones en Claude API, MCP y Claude Code (10)",
+      "organization": "Anthropic",
+      "start": "2025",
+      "end": "2026",
+      "description": "Building with the Claude API, MCP: Advanced Topics, Claude Code in Action, Introduction to Subagents, Introduction to Agent Skills y cinco más."
     },
     {
-      "id": "a11y-cert",
-      "title": "Especialista en Accesibilidad Web",
-      "organization": "Certificación online",
-      "start": "2020-03",
-      "end": "2020-09",
-      "description": "Patrones de diseño accesible, ARIA y pruebas con tecnologías de asistencia."
+      "id": "plataforma5",
+      "title": "Full Stack Developer, JavaScript",
+      "organization": "Plataforma 5 (Coding Bootcamp)",
+      "start": "2018",
+      "end": "2018",
+      "description": "Programa intensivo de más de 600 horas: React, Redux, Node.js/Express, PostgreSQL, MongoDB, TDD, APIs RESTful y Scrum, con práctica profesional final en Endava."
+    },
+    {
+      "id": "uade-mba",
+      "title": "Maestría en Dirección de Empresas (MBA)",
+      "organization": "Universidad Argentina de la Empresa (UADE)",
+      "start": "2016",
+      "end": "2018",
+      "description": "Gestión de negocios, estrategia y finanzas."
+    },
+    {
+      "id": "utn-electronics",
+      "title": "Ingeniería Electrónica",
+      "organization": "Universidad Tecnológica Nacional (UTN)",
+      "start": "2004",
+      "end": "2014",
+      "description": "Investigación sobre sistemas dinámicos no lineales (oscilador de Chua) en MATLAB y C, con una publicación como resultado. Integrante de GDAIA, grupo de investigación en agentes autónomos."
     }
   ],
   "experience": [
     {
-      "id": "acme",
-      "title": "Desarrollador Frontend Senior",
-      "organization": "Acme Corp",
-      "start": "2021-02",
+      "id": "cv-agentic",
+      "title": "Portfolio bilingüe construido con IA (este sitio)",
+      "organization": "Proyecto independiente",
+      "start": "2026-07",
       "end": null,
-      "description": "Lidero la biblioteca de componentes y la migración de vistas legacy a React y TypeScript."
+      "description": "Diseñé un sistema de desarrollo de 5 agentes (Claude API, MCP, OpenCode) que construyó este sitio en React 19 / TypeScript / Vite con desarrollo guiado por specs y tests: 24 componentes accesibles según WCAG, 445 tests con auditorías de axe-core, validaciones humanas en cada etapa y QA visual automatizado con Chrome DevTools MCP."
     },
     {
-      "id": "globex",
-      "title": "Desarrollador Frontend",
-      "organization": "Globex",
-      "start": "2017-06",
-      "end": "2021-01",
-      "description": "Desarrollé dashboards para clientes e introduje testing automatizado en el equipo."
+      "id": "making-sense",
+      "title": "Frontend Developer",
+      "organization": "Making Sense · Cliente: Vetsource",
+      "start": "2023-10",
+      "end": "2026-07",
+      "description": "Responsable del frontend de la integración ACH con un importante banco de EE. UU. y de los pagos con tarjeta en clínica, del módulo Analytics & Reports y de los flujos de compliance veterinario. Impulsé la migración de MUI a Kibble y a Vite, sumé métricas en Datadog y cobertura E2E con Playwright, y lideré code reviews enfocadas en type safety y uso correcto de hooks."
+    },
+    {
+      "id": "konexio",
+      "title": "React Developer (Contractor)",
+      "organization": "Konexio · Cliente: lastminute.com",
+      "start": "2023-03",
+      "end": "2023-10",
+      "description": "Refactoricé componentes legacy en React/TypeScript durante un rediseño UX/UI integral de la plataforma de reservas, manteniendo la paridad funcional, dentro de un equipo distribuido en varias zonas horarias."
+    },
+    {
+      "id": "nisum",
+      "title": "Frontend Developer",
+      "organization": "Nisum Latam · Cliente: Gap Inc.",
+      "start": "2021-07",
+      "end": "2023-03",
+      "description": "Mejoré una librería compartida de componentes React/TypeScript usada por cinco marcas de e-commerce (Gap, Gap Factory, Old Navy, Banana Republic, Athleta): implementé variantes por marca manteniendo una arquitectura consistente y presenté demos de funcionalidades a los equipos del cliente."
+    },
+    {
+      "id": "mobomo",
+      "title": "Frontend Developer",
+      "organization": "Mobomo · Cliente: Apogee",
+      "start": "2020-10",
+      "end": "2021-07",
+      "description": "Construí desde cero el MVP web de una plataforma de autogestión para estudiantes con React, TypeScript, Tailwind CSS y React Query, y definí contratos de API y estrategias de datos mock para que los equipos web, mobile y backend trabajaran en paralelo."
+    },
+    {
+      "id": "endava-joyages",
+      "title": "Full Stack Developer",
+      "organization": "Endava · Cliente: ACAP Health Consulting",
+      "start": "2019-08",
+      "end": "2020-10",
+      "description": "Construí una app multiplataforma en React Native con una arquitectura de componentes compartida que dio vida a tres apps de salud mental con marca propia, y la migré de Expo al bare workflow para soportar push notifications y librerías nativas."
+    },
+    {
+      "id": "endava-talent",
+      "title": "Full Stack Developer",
+      "organization": "Endava · Plataforma interna de talento",
+      "start": "2019-01",
+      "end": "2019-08",
+      "description": "Desarrollé funcionalidades end-to-end (React + Node.js) para la plataforma interna de reclutamiento de Endava: perfiles de candidatos, seguimiento de entrevistas, CVs internos y puntajes."
+    },
+    {
+      "id": "philips",
+      "title": "Field Service Engineer",
+      "organization": "Philips Healthcare",
+      "start": "2015-10",
+      "end": "2018-06",
+      "description": "Mantenimiento y diagnóstico de fallas de equipos de radiografía, fluoroscopía y angiografía."
+    },
+    {
+      "id": "vidt",
+      "title": "Ingeniero de Mantenimiento Junior",
+      "organization": "Vidt Centro Médico",
+      "start": "2015-02",
+      "end": "2015-09",
+      "description": "Mantenimiento de aceleradores lineales Varian; coordiné la instalación de un sistema Varian Trilogy."
+    },
+    {
+      "id": "hp",
+      "title": "Ingeniero de Normativas",
+      "organization": "Hewlett-Packard",
+      "start": "2013-07",
+      "end": "2015-02",
+      "description": "Certificaciones internacionales de productos (UL, TÜV Rheinland, IRAM, S-Mark, Intertek) en Argentina y Chile."
     }
   ],
   "skills": [
     "React",
     "TypeScript",
+    "JavaScript (ES6+)",
+    "React Query",
+    "Zustand",
+    "Redux",
+    "React Native",
     "Vite",
+    "Material UI",
+    "Tailwind CSS",
     "CSS Modules",
+    "Formik & Yup",
     "Vitest",
-    "Testing Library",
-    "Accesibilidad",
+    "Jest",
+    "React Testing Library",
+    "Playwright",
+    "Accesibilidad (WCAG, ARIA)",
+    "Design Systems",
+    "i18n",
+    "Node.js",
+    "Claude API",
+    "MCP",
     "Git"
   ],
-  "testimonials": [
-    {
-      "id": "t-maria",
-      "author": "María González",
-      "role": "Product Manager, Acme Corp",
-      "avatar": {
-        "src": "/images/testimonials/maria.svg"
-      },
-      "text": "Alex entregó siempre trabajo de alta calidad e hizo que funcionalidades complejas resultaran simples para nuestros usuarios."
-    },
-    {
-      "id": "t-john",
-      "author": "John Smith",
-      "role": "Design Lead, Globex",
-      "avatar": {
-        "src": "/images/testimonials/john.svg"
-      },
-      "text": "Un gran aliado para diseño: a Alex le importan los detalles, la accesibilidad y la consistencia en todo el producto."
-    },
-    {
-      "id": "t-lena",
-      "author": "Lena Fischer",
-      "role": "Engineering Manager, Acme Corp",
-      "avatar": {
-        "src": "/images/testimonials/lena.svg"
-      },
-      "text": "Alex elevó el estándar de testing del equipo y acompañó a otros con paciencia y claridad."
-    }
-  ]
+  "testimonials": []
 }
