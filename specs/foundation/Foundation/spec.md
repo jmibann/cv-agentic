@@ -11,8 +11,10 @@ aprobadas de `docs/README.md` y `data/`.
 Armar el proyecto único en la raíz (Vite + React + TS + ESLint + Vitest con
 axe-core), con los tokens y la fuente autohosteada conectados, los providers de
 tema e idioma, el script anti-flash, el i18n de interfaz y las fechas, y el
-contenido inicial de ejemplo validado contra `data/cv.schema.json`. Sin esto no
-existe dónde escribir un componente ni cómo testearlo.
+contenido validado contra `data/cv.schema.json` (Foundation arrancó con el
+contenido de ejemplo; hoy porta el **CV real** y los ejemplos de `data/` quedan
+como fixture de schema/tests — decisión #109). Sin esto no existe dónde escribir
+un componente ni cómo testearlo.
 
 ## Requisitos (EARS)
 
@@ -67,8 +69,13 @@ tsconfig.json               ← único; strict, noUnusedLocals, noUnusedParamete
 eslint.config.js            ← flat: typescript-eslint (strict), react-hooks,
                               react-refresh; --max-warnings 0; no-restricted-syntax
                               que prohíbe #[0-9a-fA-F]{3,8}\b|rgb(|hsl( en .tsx
-public/images/              ← placeholders: avatar.svg y testimonials/{maria,john,lena}.svg
-                              (silueta neutra, sin texto ni marcas, viewBox cuadrado)
+public/images/              ← avatar.png (foto real del sitio) y
+                              testimonials/{maria,john,lena}.svg (silueta neutra, sin texto
+                              ni marcas, viewBox cuadrado). Los de testimonios el sitio ya
+                              no los muestra (`testimonials: []`), pero **se conservan**:
+                              los referencia el fixture `data/cv.example.{en,es}.json`.
+                              No borrarlos. (El `avatar.svg` original quedó obsoleto en
+                              `861fb9a` y se retiró en `63f6665` — #109)
 public/favicon.svg          ← hexágono simple de marca (form factor de HexAvatar, pointy-top;
                               fill del azul de acento del kit — literal `#304cfd`, el valor de
                               `--color-accent` (tokens.css:97); un asset público no es CSS de app;
@@ -86,9 +93,13 @@ src/providers/LocaleProvider.tsx   ← spec foundations/i18n.md (useLocale + use
 src/i18n/ui.en.ts · ui.es.ts       ← todas las claves de foundations/i18n.md
 src/i18n/format.ts · formatPeriod.ts
 src/content/cv.en.json · cv.es.json · index.ts · content.test.ts · schema.test.ts
-                              ← los dos JSON se crean COPIANDO data/cv.example.{en,es}.json
-                              y declaran "$schema": "../../data/cv.schema.json" (contrato
-                              revisable al cerrar la pieza; foundation.md p.10)
+                              ← contenido real en/es, ambos declarando
+                              "$schema": "../../data/cv.schema.json" y pasando
+                              `validateCv` (RF-7). `data/cv.example.{en,es}.json`
+                              queda en `data/` como fixture de schema/tests: no se
+                              copia al sitio ni se edita para que coincida con el
+                              CV real (decisión #109; originalmente "se crean
+                              COPIANDO data/cv.example…", foundation.md p.10)
 src/test/setup.ts           ← jest-dom/vitest, afterEach(cleanup) explícito, mocks
                               (matchMedia, ResizeObserver, scrollTo, showModal/close
                               si jsdom no los trae), afterEach que limpia
@@ -178,8 +189,11 @@ crean a mano.
   iniciales de `theme-color` (`#eceef4` / `#151517`), excepción de la regla
   dura 1 de `docs/DESIGN.md`, verificada por test contra `--palette-light-bg` /
   `--palette-dark-bg` (decisión #60).
-- Placeholders en `public/images/`: son contenido de ejemplo, no estilos. Los
-  ejemplos no traen `downloadCvUrl`, así que no se crea ningún PDF.
+- Imágenes en `public/images/`: son contenido, no estilos. `avatar.png` es la foto
+  real del sitio; los `testimonials/*.svg` se conservan como fixture del ejemplo
+  `data/cv.example.{en,es}.json` aunque el sitio no los muestre (`testimonials: []`).
+  El contenido real sí trae `downloadCvUrl`: el PDF vive en `public/cv/…` y se sirve
+  con `assetUrl` para respetar el `base` de despliegue (#107, decisión #109).
 - Sin `@media` nuevos en F1: los breakpoints viven en `tokens.css`
   (`docs/tokens/breakpoints.md`).
 
@@ -259,6 +273,10 @@ Fuente: `foundations/theming.md`, `foundations/i18n.md`,
   `2018`→`2017` inválido, `2017-06`→`2017-05` inválido.
 - **Contenido inválido** (`content.test.ts`): el validador rechaza mes `99`,
   red desconocida y campo extra (casos en memoria).
+- **Ejemplos del kit** (`content.test.ts`, decisión #109): `validateCv` acepta
+  `data/cv.example.en.json` y `data/cv.example.es.json` (siguen siendo schema-valid
+  aunque el sitio ya no los use como contenido). **No** se pide que
+  `cv.{en,es}.json` sean copia de los ejemplos: ese caso se eliminó con #108/#109.
 - **Esquema al día** (`schema.test.ts`): las listas de `@data/constants` son
   iguales a los `enum` del esquema y `data/cv.types.generated.ts` está al día
   (regenerarlo en memoria y comparar).

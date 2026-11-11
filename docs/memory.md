@@ -2,26 +2,24 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XV) y `docs/README.md` (#1–#108).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XV) y `docs/README.md` (#1–#109).
 
 ## Estado actual (2026-11-11)
 
-- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; suite **447/40**,
-  lint/typecheck/build/validate:content ✅; QA F5 en 4 pasadas + **Ctrl+P real aprobado**
-  (`docs/qa-report.md`; §XI–§XIII). Mantenimiento 2026-11-11: base Vite + `assetUrl()`
-  (`c2d4232`/`5f6c0a6`) y **CV real** (`63f6665`; §XV).
-- **CV real cargado y validado**: `src/content/cv.{en,es}.json` con `testimonials: []`,
-  contact sin teléfono/WhatsApp y PDF en `public/cv/`; avatar actualizado y `avatar.svg`
-  retirado. Tests adaptados sin debilitar (fixtures + valores derivados); commits
-  `3855eb0` `befb0db` `63f6665`.
-- **Motion aprobado, NO implementado** (`specs/motion/proposal.md`): tokens `base 0.2`,
-  `slow 0.3`, `exit 0.22`, `stagger 0.03` + `ease-enter/exit`; tabs B (fade+translateX,
-  `key` remonta y resetea carrusel/dialog); Sidebar grid `0fr→1fr`; `data-theme-switching`;
-  reduced motion instantáneo; dialog `--ease-enter`; Separator vía `within()`. Falta
-  aprobar specs/planes/tareas.
-- **Pendientes del usuario**: push; QA visual 375px con el nombre real (gap chevron↔nombre);
-  decidir traducción de `headline`/cargos en `cv.es.json`; aprobar specs motion;
-  opcionales deudas de forma, StrictMode/F1-F2.
+- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; QA F5 en 4
+  pasadas + **Ctrl+P real aprobado** (`docs/qa-report.md`). Suite **447/40** y
+  lint/typecheck/build/validate:content ✅.
+- **Mantenimiento 2026-11-11 cerrado (§XIV/§XV)**: base Vite + `assetUrl()` en avatar
+  y CTA (`c2d4232`/`5f6c0a6`); **CV real** con assets (`63f6665`): `testimonials: []`,
+  contact sin teléfono/WhatsApp, PDF en `public/cv/`, `avatar.png` real, `avatar.svg`
+  retirado; tests adaptados sin debilitar (`3855eb0`/`befb0db`). La spec de Foundation
+  se alineó con el contenido (**#109**); `headline`/cargos de `cv.es.json` quedan **en
+  inglés por decisión editorial del usuario** (no re-reportarlo como hallazgo).
+- **Motion aprobado, NO implementado**: contrato en `specs/motion/proposal.md` (#106);
+  falta aprobar specs/planes/tareas.
+- **Pendientes del usuario**: push; QA visual (4 breakpoints × temas × en/es; re-medir
+  el gap chevron↔nombre con "Juan Manuel Ibáñez"); aprobar specs motion; los 4
+  hallazgos de auditoría (`deploy.yml` ×3 y registro de la categoría `motion`).
 
 ## Reglas no negociables para cualquier tarea futura
 
@@ -35,9 +33,9 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XV) y `docs/README.
   es solo del reviewer).
 - Commits: unidad = 1 tarea; `test(<Name>): Tn` (subject a secas, #102: subject EN, cuerpo
   ES **sin tildes**; `feat`/`fix` no tocan tests; `test` solo agrega) → `feat(<Name>): Tn`;
-  identidad `git -c user.name="jmiban" commit`; sin `--amend`/`--no-verify`/push;
-  `git add` con rutas explícitas y `git diff --cached --name-only` antes (un subagente
-  puede dejar staged ajeno). Docs los commitea el orchestrator; el código, sus builders.
+  identidad `git -c user.name="jmiban" commit`; sin `--amend`/`--no-verify`/push; `git add`
+  con rutas explícitas + `git diff --cached --name-only` antes (un subagente puede dejar
+  staged ajeno). Docs los commitea el orchestrator; el código, sus builders.
 - Cierre de cualquier tarea: lint + typecheck + test verdes (build al cerrar pieza/puerta,
   #80). Máx. 3 rondas fix↔verify y frenar con salida exacta.
 - `allowExportNames` de `react-refresh` (#96/#100): `useTheme`/`useLocale`/`useCv`,

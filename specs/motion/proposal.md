@@ -646,9 +646,10 @@ por el CV real, en ambos idiomas, sin tocar el esquema.
 > de §5.5 — contenido real en/es, `testimonials: []`, contact sin teléfono/WhatsApp,
 > PDF y avatar en `public/`, tests adaptados (`3855eb0` `befb0db` `63f6665`) y CTA
 > con `assetUrl` (`5f6c0a6`); suite **447/40**, `validate:content` y `build` ✅.
-> Falta: **paso 5** (alinear la spec/plan/tasks de Foundation, §5.4 — requiere
-> aprobación explícita del usuario), **paso 8** (QA visual con la app servida por el
-> usuario, #91) y **paso 9** (los Cambios de motion, tras aprobar specs/planes/tareas).
+> Hecho además el **paso 5**: la spec/plan/tasks de Foundation se alinearon con el
+> contenido real, aprovadas por el usuario como **decisión #109** (`docs/README.md`).
+> Falta: **paso 8** (QA visual con la app servida por el usuario, #91) y **paso 9**
+> (los Cambios de motion, tras aprobar specs/planes/tareas).
 
 ### 5.1 Datos y assets
 
@@ -731,8 +732,11 @@ it("validates both example files against the schema", () => {
 
 ### 5.4 Impacto en la spec de Foundation
 
-**Pendiente de aprobación del usuario** (P2/#75/#94: nadie edita `spec.md` sin OK
-explícito; el texto de abajo es la propuesta, no algo ya aplicado).
+**Aprovado por el usuario y aplicado (decisión #109).** Queda el texto de la
+propuesta como registro; lo ejecutado es exactamente esto, con dos correcciones que
+pidió el usuario: los `testimonials/*.svg` **se conservan** (los usa el fixture
+`data/cv.example.{en,es}.json`) y el Cambio se registró como **#109**, referenciado
+en §XV y en la nota de T9.
 
 - Propósito (línea 14): “contenido inicial de ejemplo validado” → “contenido real
   validado (los ejemplos de `data/` quedan como fixture de schema/tests)”.
@@ -759,8 +763,8 @@ explícito; el texto de abajo es la propuesta, no algo ya aplicado).
    de ambos ejemplos) (`befb0db`).
 4. ✅ Ajustar `AboutPage.test.tsx` para el escenario `testimonials: []` (§5.2)
    (`befb0db`).
-5. ⏳ **Actualizar la spec/plan/tasks de Foundation (§5.4) con aprobación del
-   usuario** — único paso de documentación que falta.
+5. ✅ Actualizar la spec/plan/tasks de Foundation (§5.4) con aprobación del
+   usuario → **decisión #109**.
 6. ✅ Copiar assets a `public/…`; rutas con `assetUrl`/base, incluido el CTA
    (`63f6665` + `5f6c0a6`).
 7. ✅ `npm run validate:content`, `npm test` (447/40), `npm run build`.

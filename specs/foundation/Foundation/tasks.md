@@ -125,8 +125,15 @@ T3b (deuda L1 detectada en su review).
 
 - [x] **T9. Contenido inicial validado: `cv.{en,es}.json` + `index.ts` + `content.test.ts`.** RF-7 — 59efc8d (+ reparo L2 c42e33d)
   - Nota para el cierre de pieza: `59efc8d` incluyó la corrección del **productor** del generado (`build-validator.ts`: shim de interop CJS/ESM `{ default: raw.default ?? raw }` + regeneración por script de `validate-cv.generated.js`) porque T9 es el primer consumidor runtime bajo Vitest; dictamen del reviewer: corrección legítima, determinismo y `.d.ts` intactos. Rastro pedido por el reviewer: registrarla en memoria/diagnostics al cerrar F1 (junto con la deuda `07eead6` de T8).
-  - Hecho cuando: `cv.en.json`/`cv.es.json` son copia de
-    `data/cv.example.{en,es}.json` con `"$schema": "../../data/cv.schema.json"`;
+  - **Nota de Cambio (#109, 2026-11-11):** el criterio "son copia de
+    `data/cv.example.{en,es}.json`" quedó reemplazado por **contenido real en/es
+    validado**. Es el Cambio de contenido **#108** (aprobado por el usuario antes de
+    ejecutarse), aplicado en `63f6665` (contenido + assets) y `befb0db` (tests: fuera
+    el caso de copia fiel, agregada la validación de ambos ejemplos). El resto del
+    "Hecho cuando" sigue vigente y la pieza sigue `implementada`.
+  - Hecho cuando: `cv.en.json`/`cv.es.json` traen el contenido en/es y declaran
+    `"$schema": "../../data/cv.schema.json"` (al fechar la tarea eran copia de
+    `data/cv.example.{en,es}.json`; ver nota #109);
     `src/content/index.ts` expone `cvByLocale: Record<Locale, CvData>` tras
     `load()` que lanza con `validateCv.errors` si el JSON es inválido; pasan
     los tests: paridad de ids/orden por colección y campos no traducibles
