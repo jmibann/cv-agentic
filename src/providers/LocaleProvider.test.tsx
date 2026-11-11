@@ -9,13 +9,14 @@ import userEvent from "@testing-library/user-event";
 import { type ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { cvByLocale } from "../content";
+
 import { LocaleProvider, useCv, useLocale } from "./LocaleProvider";
 
-// Sonda de test: expone el idioma del contexto, un texto de `t` y el headline
-// de `useCv()` como texto, y dos botones que llaman `setLocale` (queries por
-// rol y nombre accesible). El headline difiere por idioma en el contenido de
-// ejemplo ("Frontend Developer" / "Desarrollador Frontend"), así que prueba
-// que useCv() conmuta de verdad.
+// Sonda de test: expone el idioma del contexto, un texto de `t` y el primer
+// párrafo de `perfil.about` de `useCv()` como texto, y dos botones que llaman
+// `setLocale` (queries por rol y nombre accesible). Ese párrafo difiere entre
+// en y es en el contenido real, así que prueba que useCv() conmuta de verdad.
 function Probe(): ReactNode {
   const { locale, setLocale, t } = useLocale();
   const cv = useCv();
@@ -23,7 +24,7 @@ function Probe(): ReactNode {
     <div>
       <p>{`locale: ${locale}`}</p>
       <p>{`t: ${t.resume.title}`}</p>
-      <p>{`cv: ${cv.profile.headline}`}</p>
+      <p>{`cv: ${cv.profile.about[0] ?? ""}`}</p>
       <button type="button" onClick={(): void => setLocale("es")}>
         set es
       </button>
@@ -56,7 +57,9 @@ describe("LocaleProvider", () => {
 
     expect(screen.getByText("locale: es")).toBeInTheDocument();
     expect(screen.getByText("t: Currículum")).toBeInTheDocument();
-    expect(screen.getByText("cv: Desarrollador Frontend")).toBeInTheDocument();
+    expect(
+      screen.getByText(`cv: ${cvByLocale.es.profile.about[0] ?? ""}`),
+    ).toBeInTheDocument();
     expect(document.documentElement).toHaveAttribute("lang", "es");
   });
 
@@ -65,21 +68,27 @@ describe("LocaleProvider", () => {
     const user = userEvent.setup();
     renderProbe("en");
     expect(screen.getByText("t: Resume")).toBeInTheDocument();
-    expect(screen.getByText("cv: Frontend Developer")).toBeInTheDocument();
+    expect(
+      screen.getByText(`cv: ${cvByLocale.en.profile.about[0] ?? ""}`),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "set es" }));
     expect(document.documentElement).toHaveAttribute("lang", "es");
     expect(localStorage.getItem("cv:locale")).toBe("es");
     expect(screen.getByText("locale: es")).toBeInTheDocument();
     expect(screen.getByText("t: Currículum")).toBeInTheDocument();
-    expect(screen.getByText("cv: Desarrollador Frontend")).toBeInTheDocument();
+    expect(
+      screen.getByText(`cv: ${cvByLocale.es.profile.about[0] ?? ""}`),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "set en" }));
     expect(document.documentElement).toHaveAttribute("lang", "en");
     expect(localStorage.getItem("cv:locale")).toBe("en");
     expect(screen.getByText("locale: en")).toBeInTheDocument();
     expect(screen.getByText("t: Resume")).toBeInTheDocument();
-    expect(screen.getByText("cv: Frontend Developer")).toBeInTheDocument();
+    expect(
+      screen.getByText(`cv: ${cvByLocale.en.profile.about[0] ?? ""}`),
+    ).toBeInTheDocument();
   });
 
   it("changes the locale in memory when localStorage throws", async () => {
