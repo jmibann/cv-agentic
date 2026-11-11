@@ -637,10 +637,18 @@ hace `getByRole("separator")` (el Separator no tiene rol por contrato).
 
 ---
 
-## 5. Cambio de contenido previo (aprobado, pendiente de datos)
+## 5. Cambio de contenido previo (aprobado; datos recibidos y aplicados el 2026-11-11)
 
 **Objetivo:** reemplazar el contenido de ejemplo de `src/content/cv.{en,es}.json`
 por el CV real, en ambos idiomas, sin tocar el esquema.
+
+> **Estado de ejecución (§XV en `docs/diagnostics.md`).** Hecho: pasos 1–4, 6 y 7
+> de §5.5 — contenido real en/es, `testimonials: []`, contact sin teléfono/WhatsApp,
+> PDF y avatar en `public/`, tests adaptados (`3855eb0` `befb0db` `63f6665`) y CTA
+> con `assetUrl` (`5f6c0a6`); suite **447/40**, `validate:content` y `build` ✅.
+> Falta: **paso 5** (alinear la spec/plan/tasks de Foundation, §5.4 — requiere
+> aprobación explícita del usuario), **paso 8** (QA visual con la app servida por el
+> usuario, #91) y **paso 9** (los Cambios de motion, tras aprobar specs/planes/tareas).
 
 ### 5.1 Datos y assets
 
@@ -665,9 +673,10 @@ El usuario pasa el contenido real en un archivo. Debe traer, por idioma:
 - `public/images/avatar.*` (foto real; el contenido actual usa
   `/images/avatar.png`).
 - Si hay `downloadCvUrl`: PDF en `public/cv/...` (o URL https). El link debe
-  funcionar con el `base` de despliegue; el `assetUrl` agregado localmente solo
-  cubre `HexAvatar`/Sidebar, **no** el `href` del CTA. Verificar antes de
-  publicar en GitHub Pages.
+  funcionar con el `base` de despliegue. El `href` del CTA quedó cubierto por
+  `assetUrl` en `5f6c0a6` (antes solo `HexAvatar`/avatar); el PDF está en
+  `public/cv/Juan-Manuel-Ibanez-CV.pdf`. **Pendiente:** comprobarlo en la URL real
+  de GitHub Pages tras el push/deploy (fuera del alcance de los agentes).
 - Sin testimonios reales no hay avatares de testimonios que agregar.
 
 ### 5.2 Verificación de la sección de testimonios vacía
@@ -682,8 +691,8 @@ El usuario pasa el contenido real en un archivo. Debe traer, por idioma:
   exige.
 - No hay que tocar código de producción por `testimonials: []`.
 
-**Pero los tests de `AboutPage.test.tsx` asumen contenido no vacío y hay que
-ajustarlos:**
+**Pero los tests de `AboutPage.test.tsx` asumían contenido no vacío (ajustados en
+`befb0db`, con fixture local no vacío tomado de `data/cv.example.{en,es}.json`):**
 
 | Test | Problema con `testimonials: []` | Ajuste propuesto |
 |---|---|---|
@@ -698,7 +707,7 @@ de test (o en un helper de test) sin tocar `src/content`.
 
 ### 5.3 Cambio al test de contenido (Foundation)
 
-Aprobado:
+Aprobado y **aplicado en `befb0db`**:
 
 - **Quitar solo** el caso “copia fiel” de `src/content/content.test.ts:101-106`
   (`keeps every other field identical to data/cv.example.{en,es}.json`).
@@ -722,30 +731,49 @@ it("validates both example files against the schema", () => {
 
 ### 5.4 Impacto en la spec de Foundation
 
-- Anatomía: “los dos JSON se crean COPIANDO data/cv.example…” → “contenido real
-  validado; los ejemplos quedan en `data/` para tests”.
-- Tests esperados: reemplazar “copia fiel” por “el contenido real valida y
-  mantiene paridad/orden”; agregar la validación de ambos ejemplos.
+**Pendiente de aprobación del usuario** (P2/#75/#94: nadie edita `spec.md` sin OK
+explícito; el texto de abajo es la propuesta, no algo ya aplicado).
+
+- Propósito (línea 14): “contenido inicial de ejemplo validado” → “contenido real
+  validado (los ejemplos de `data/` quedan como fixture de schema/tests)”.
+- Anatomía (línea 89): “los dos JSON se crean COPIANDO data/cv.example…” →
+  “contenido real en/es validado; `data/cv.example.{en,es}.json` queda en `data/`
+  como fixture de tests”.
+- Estilos (líneas 181-182): los placeholders `avatar.svg`/`testimonials/*.svg` ya
+  no son los del sitio: `public/images/avatar.png` (foto real) y
+  `public/cv/Juan-Manuel-Ibanez-CV.pdf`.
+- Tests esperados: la lista actual **no pedía la copia fiel** (pide paridad, orden
+  de fechas, rechazos y esquema al día, todos vigentes); se agrega la validación de
+  ambos ejemplos del kit contra el esquema.
 - RF-7 no cambia (solo datos validados).
 - “No hacer”: no editar los ejemplos para que coincidan con el CV real.
+- En `plan.md` (fila T9) y `tasks.md` (T9 “Hecho cuando”) hay que cambiar “copia de
+  `data/cv.example…`” por “contenido real validado”, dejando constancia del Cambio.
 
 ### 5.5 Plan del Cambio de contenido
 
-1. Recibir del usuario el archivo con el CV real en/es y los assets.
-2. Actualizar `cv.en.json` y `cv.es.json` manteniendo `$schema`, `locale`,
-   ids/orden y campos no traducibles.
-3. Ajustar `content.test.ts` (quitar solo el test de copia; agregar validación
-   de ambos ejemplos).
-4. Ajustar `AboutPage.test.tsx` para el escenario `testimonials: []` (§5.2).
-5. Actualizar la spec de Foundation (Anatomía/Tests/No hacer) con aprobación.
-6. Copiar assets a `public/…`; verificar rutas con `assetUrl`/base.
-7. `npm run validate:content`, `npm test`, `npm run build`.
-8. QA visual: Sidebar (avatar/contactos/CTA), About (servicios; sin sección de
-   testimonios), Resume (education/experience/skills), ambos idiomas y temas.
-9. Recién después, arrancar los Cambios de motion.
+1. ✅ Recibir del usuario el archivo con el CV real en/es y los assets.
+2. ✅ Actualizar `cv.en.json` y `cv.es.json` manteniendo `$schema`, `locale`,
+   ids/orden y campos no traducibles (`63f6665`).
+3. ✅ Ajustar `content.test.ts` (quitar solo el test de copia; agregar validación
+   de ambos ejemplos) (`befb0db`).
+4. ✅ Ajustar `AboutPage.test.tsx` para el escenario `testimonials: []` (§5.2)
+   (`befb0db`).
+5. ⏳ **Actualizar la spec/plan/tasks de Foundation (§5.4) con aprobación del
+   usuario** — único paso de documentación que falta.
+6. ✅ Copiar assets a `public/…`; rutas con `assetUrl`/base, incluido el CTA
+   (`63f6665` + `5f6c0a6`).
+7. ✅ `npm run validate:content`, `npm test` (447/40), `npm run build`.
+8. ⏳ QA visual: Sidebar (avatar/contactos/CTA), About (servicios; sin sección de
+   testimonios), Resume (education/experience/skills), ambos idiomas y temas —
+   requiere que el usuario sirva la app (#91). Re-observar el gap
+   chevron↔nombre a 375px con el nombre real.
+9. ⏳ Recién después, arrancar los Cambios de motion.
 
-**Tareas (Tn) propuestas:** T1 datos + assets; T2 tests/spec; T3 validación +
-QA. No se escriben todavía en `tasks.md` hasta la aprobación.
+**Tareas (Tn):** los pasos 1–4 y 6–7 se ejecutaron como **mantenimiento
+post-entrega autorizado por el usuario** (§XV), no como Tn de una spec; por eso no
+hay tasks nuevas que marcar. Lo que queda (paso 5) es un **Cambio** de la spec de
+Foundation y se trata con su propia aprobación.
 
 ---
 
