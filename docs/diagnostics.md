@@ -3,8 +3,8 @@
 Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
 los hashes de los commits relevantes. Última actualización: **2026-11-11**
-(mantenimiento: base de deploy para GitHub Pages + `assetUrl()` y propuesta de
-motion aprobada; el proceso F1–F5 sigue cerrado — ver §XII; flujo y dueños en
+(mantenimiento: base de deploy + `assetUrl()`, CV real y propuesta de motion
+aprobada; el proceso F1–F5 sigue cerrado — ver §XII; flujo y dueños en
 "Modo mantenimiento" de `docs/agent-system.md`).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
@@ -44,20 +44,28 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Contenido real (post-entrega) | Aprobado (#108): CV real en `src/content/cv.{en,es}.json` + assets; `testimonials: []`; contact sin teléfono/WhatsApp; quitar solo el test "copia fiel" y validar examples; ajustar tests AboutPage (OK pendiente). Al aplicar, re-observar 375px el gap chevron↔nombre (23px con "Alex Rivera") | Cambio de contenido, al recibir el archivo |
+| Verificación post-contenido | CV real cargado (§XV). Falta QA visual 375px con el nombre real (gap chevron↔nombre; el spot-check previo usó "Alex Rivera"), decidir si `headline`/cargos de `cv.es.json` se traducen al español y, si el usuario lo pide, actualizar las referencias históricas a `avatar.svg` en `docs/README.md`/spec. Menores: `public/**/.DS_Store` (gitignored; Vite los copia a `dist/`) | Decisión del usuario / próxima pasada visual |
 | Motion (post-entrega) | Propuesta aprobada (#106) en `specs/motion/proposal.md`; falta aprobar specs/planes/tareas y luego implementar tokens, tabs B, Sidebar grid, `data-theme-switching`, reduced motion, dialog y Separator. No se toca código antes de esa puerta | Puerta de Plan+Tareas / Cambio |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
 
+### §XV · 2026-11-11 — Contenido real, tests y CTA de descarga
+
+- Qué: se cargó el **CV real bilingüe** en `src/content/cv.{en,es}.json` con `testimonials: []`, contact sin teléfono/WhatsApp y `downloadCvUrl` al PDF; se actualizó `public/images/avatar.png` y se retiró `avatar.svg`; se agregó `public/cv/Juan-Manuel-Ibanez-CV.pdf`. Tests adaptados sin debilitar: `LocaleProvider` usa `profile.about[0]`, `AppLayout` deriva el alt, `AboutPage` usa fixtures no vacíos (tests 4/6) y vacío (5b), y `content.test` conserva schema/paridad/orden/rechazos y valida ambos examples; solo se quitó la "copia fiel" (#108). El CTA del `Sidebar` usa `assetUrl(profile.downloadCvUrl)` (#107).
+- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ (1989 módulos) · validate:content ✓ · reviewer **APROBADO**.
+- Decisiones: **#108 ejecutada** y **#107 extendida** al CTA; sin decisión nueva.
+- Commits: `3855eb0` (test Foundation) · `befb0db` (tests de contenido) · `63f6665` (contenido/assets) · `5f6c0a6` (CTA).
+- Abre: fila "Verificación post-contenido"; cierra: "Contenido real (post-entrega)".
+
 ### §XIV · 2026-11-11 — Mantenimiento: deploy GitHub Pages + propuesta de motion
 
-- Qué: se verificó y documentó el trabajo local de **base de despliegue**: `vite.config.ts` usa `/cv-agentic/` solo con `DEPLOY_TARGET=gh-pages`, y `src/utils/assetUrl.ts` centraliza el prefijo de `BASE_URL` para assets de `/public` (lo usan HexAvatar y Sidebar); el código queda **pendiente de commit** porque el orchestrator no puede stagear `src/**`. Se registró la **propuesta de motion aprobada** (`specs/motion/proposal.md`): tokens, tabs B, grid del Sidebar, `data-theme-switching`, reduced motion, dialog y Separator; implementación **no iniciada**. Se registró el **Cambio de contenido** previo (#108): CV real en/es, `testimonials: []`, contact sin teléfono/WhatsApp y ajuste de tests pendiente de OK.
+- Qué: se verificó y documentó la **base de despliegue**: `vite.config.ts` usa `/cv-agentic/` solo con `DEPLOY_TARGET=gh-pages`, y `src/utils/assetUrl.ts` centraliza el prefijo de `BASE_URL` para assets de `/public` (lo usan HexAvatar y Sidebar). Se registró la **propuesta de motion aprobada** (`specs/motion/proposal.md`): tokens, tabs B, grid del Sidebar, `data-theme-switching`, reduced motion, dialog y Separator; implementación **no iniciada**. Se registró el **Cambio de contenido** previo (#108): CV real en/es, `testimonials: []`, contact sin teléfono/WhatsApp y ajuste de tests.
 - Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ (1989 módulos) · validate:content ✓.
 - Decisiones: **#106** (motion), **#107** (base/assets) y **#108** (contenido) → `docs/README.md`.
-- Commits: `pendiente` (código de deploy; el orchestrator no puede stagear `src/**` por permisos) · docs: este commit.
-- Abre: filas "Contenido real (post-entrega)" y "Motion (post-entrega)" en **Abiertos**; cierra: nada.
+- Commits: `c2d4232` (base/assets) · `5f6c0a6` (CTA) · docs `3496bb7`; ejecución del contenido en §XV.
+- Abre: fila "Motion (post-entrega)"; cierra: nada (contenido se cerró en §XV).
 
 ### §XIII · 2026-11-06 — Mantenimiento: bug-fix ControlsBar T4 (alineación)
 - Qué: el `div[role="group"]` interno de ControlsBar pasó a ser el contenedor flex (`.group`: `display:flex; align-items:center; gap:var(--controls-gap)`); se eliminó el `gap` inerte del `<header>` (único hijo flex: el group). Corrige la alineación por baseline que bajaba ThemeToggle respecto de LanguageSwitcher; sin cambio de API, ARIA ni spec (el usuario lo clasificó como bug-fix).
@@ -72,7 +80,7 @@ de la entrada); el detalle queda en git.
 - Checks: lint ✓ · typecheck ✓ · test **445/40** ✓ · build ✓ · validate:content ✓ · axe en navegador: **0 violaciones** (2×about/res × 2 idiomas) ✓ · contrastes del chevron: 5.87:1 claro / 12.06:1 oscuro ✓ (filas contrast.md 15/19/39) · zero overflow 375–1440 ✓ · sticky/float/dialog/teclado ✓ (informe completo con evidencia en `docs/qa-report.md`).
 - Decisiones: **#104** y **#105** → registro. Sin reglas nuevas de proceso.
 - Commits del paquete: `eaa4d01` `25e2ee4` `02a2756` `fac2fbe` `87edfd1` `74bafe2` `b93c510` (+ tests `c0492ac` `dc026d0` `7d602eb` `06bf088`); docs #104 `3b86937`, kit #104b `6109561`, qa-report `f2cb537` `5b9fce3`, #105 `5a9c240`, token `190c678` (usuario). Cierre de F4 en §XI. Menores de forma registradas en `tasks.md`/`qa-report.md`.
-- Abre: fila "Pendientes post-F5 (residuos)" (contenido real + re-observar gap 23px con nombre definitivo; deudas de forma opcionales). Cierra: filas F5/F3 y el resto de F4 de **Abiertos**. Proceso completo: queda del usuario el push (57+ commits) y el reemplazo del contenido de ejemplo.
+- Abre: fila "Pendientes post-F5 (residuos)" (re-observar gap 23px con nombre definitivo; deudas de forma opcionales). Cierra: filas F5/F3 y el resto de F4 de **Abiertos**. Proceso completo: queda del usuario el push (57+ commits); el reemplazo del contenido se completó en §XV.
 
 ### §XI · 2026-10-08 — Cierre de F4
 

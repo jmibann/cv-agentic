@@ -2,24 +2,26 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XIV) y `docs/README.md` (#1–#108).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XV) y `docs/README.md` (#1–#108).
 
 ## Estado actual (2026-11-11)
 
 - **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; suite **447/40**,
   lint/typecheck/build/validate:content ✅; QA F5 en 4 pasadas + **Ctrl+P real aprobado**
-  (`docs/qa-report.md`; §XI–§XIII). Mantenimiento 2026-11-11: base Vite para GitHub Pages
-  + `assetUrl()` (**código en working tree; commit pendiente**).
+  (`docs/qa-report.md`; §XI–§XIII). Mantenimiento 2026-11-11: base Vite + `assetUrl()`
+  (`c2d4232`/`5f6c0a6`) y **CV real** (`63f6665`; §XV).
+- **CV real cargado y validado**: `src/content/cv.{en,es}.json` con `testimonials: []`,
+  contact sin teléfono/WhatsApp y PDF en `public/cv/`; avatar actualizado y `avatar.svg`
+  retirado. Tests adaptados sin debilitar (fixtures + valores derivados); commits
+  `3855eb0` `befb0db` `63f6665`.
 - **Motion aprobado, NO implementado** (`specs/motion/proposal.md`): tokens `base 0.2`,
   `slow 0.3`, `exit 0.22`, `stagger 0.03` + `ease-enter/exit`; tabs B (fade+translateX,
   `key` remonta y resetea carrusel/dialog); Sidebar grid `0fr→1fr`; `data-theme-switching`;
   reduced motion instantáneo; dialog `--ease-enter`; Separator vía `within()`. Falta
   aprobar specs/planes/tareas.
-- **Cambio de contenido aprobado, bloqueado**: CV real en/es + assets; `testimonials: []`;
-  contact sin teléfono/WhatsApp; quitar solo el test "copia fiel" y validar examples;
-  ajuste de tests AboutPage pendiente de OK.
-- **Pendientes del usuario**: commitear el fix de deploy; push; archivo CV; OK tests
-  AboutPage; aprobar specs motion; opcionales `downloadCvUrl`, deudas de forma, StrictMode/F1-F2.
+- **Pendientes del usuario**: push; QA visual 375px con el nombre real (gap chevron↔nombre);
+  decidir traducción de `headline`/cargos en `cv.es.json`; aprobar specs motion;
+  opcionales deudas de forma, StrictMode/F1-F2.
 
 ## Reglas no negociables para cualquier tarea futura
 
