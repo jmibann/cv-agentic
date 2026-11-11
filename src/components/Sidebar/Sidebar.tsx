@@ -105,6 +105,7 @@ import type { ContactItem, Profile, SocialLink } from "@data/cv.types.generated"
 import styles from "./Sidebar.module.css";
 
 import { getContactHref } from "./getContactHref";
+import { assetUrl } from "../../utils/assetUrl";
 
 // API exacta de spec → API. `SidebarLabels`: textos de interfaz ya
 // traducidos (C3: los produce LocaleProvider/AppLayout; la pieza no consume
@@ -247,7 +248,7 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
              alt llega desde `labels.avatarAlt` (spec → Accesibilidad; AppLayout
              lo deriva de `profile.name` con `format`). */}
         <figure className={styles.avatar}>
-          <img src={profile.avatar.src} alt={labels.avatarAlt} />
+          <img src={assetUrl(profile.avatar.src)} alt={labels.avatarAlt} />
         </figure>
 
         {/* Identidad (Anatomía): el nombre es `<p>` con estilo propio — el

@@ -7,6 +7,7 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [react()],
+  base: process.env.DEPLOY_TARGET === "gh-pages" ? "/cv-agentic/" : "/",
   resolve: {
     // Alias @data/* → data/* (decisión #42), el mismo de tsconfig.json;
     // también lo usa Vitest.

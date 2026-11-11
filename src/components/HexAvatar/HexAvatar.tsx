@@ -17,6 +17,7 @@
 // del módulo), `className` unida al `wrap` (spec → API) y `index.ts` con los
 // re-exports (HexAvatar, HexAvatarDefs y tipos).
 
+import { assetUrl } from "../../utils/assetUrl";
 import styles from "./HexAvatar.module.css";
 
 // API (spec → API), declarada COMPLETA en T1 con el diferido marcado
@@ -130,7 +131,7 @@ export function HexAvatar({ src, alt = "", className }: HexAvatarProps) {
   return (
     <span className={rootClassName}>
       <span className={styles.border}>
-        <img className={styles.image} src={src} alt={alt} />
+        <img className={styles.image} src={assetUrl(src)} alt={alt} />
       </span>
     </span>
   );
