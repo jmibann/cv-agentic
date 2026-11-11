@@ -35,8 +35,9 @@
 // (Icon RF-6); la rotación (`transform` + `--duration-base`) es CSS: en jsdom
 // solo se observa la clase.
 //
-// T5 hecha: CTA de descarga (RF-2; Anatomía) — `Button href={downloadCvUrl}
-// download icon="download" fullWidth` con el label `labels.downloadCv`,
+// T5 hecha: CTA de descarga (RF-2; Anatomía) — `Button
+// href={assetUrl(downloadCvUrl)} download icon="download" fullWidth` con el
+// label `labels.downloadCv`,
 // renderizado SOLO si `profile.downloadCvUrl` existe, al final de
 // `.additional` después de la lista de contactos. Sin clases nuevas (el margen
 // `--sidebar-cta-gap` es T6; `fullWidth` del Button ya da el ancho) y sin
@@ -366,8 +367,10 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
 
         {/* T5 (RF-2; Anatomía): CTA de descarga SOLO si existe
             `profile.downloadCvUrl` (SI no existe, ENTONCES no se renderiza el
-            botón). Primitiva F2 exacta de la Anatomía: `Button href
-            download icon="download" fullWidth` — `download={true}` transmite
+            botón). Primitiva F2 exacta de la Anatomía: `Button
+            href={assetUrl(profile.downloadCvUrl)} download icon="download"
+            fullWidth` — `assetUrl` antepone el base de Vite a la ruta pública
+            del PDF (GitHub Pages); `download={true}` transmite
             el atributo `download` (Button RF-8), `icon` es `Icon` sin `label`
             → decorativo con su tone default `current` (Button.tsx T4/Icon
             RF-4: sin gradiente, no requieren defs), y `fullWidth` da el ancho
@@ -381,7 +384,7 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
             lo que separa contactos↔CTA. */}
         {profile.downloadCvUrl !== undefined && (
           <Button
-            href={profile.downloadCvUrl}
+            href={assetUrl(profile.downloadCvUrl)}
             download
             icon="download"
             fullWidth
