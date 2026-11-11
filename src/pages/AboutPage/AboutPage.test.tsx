@@ -45,6 +45,13 @@ import { uiEn } from "../../i18n/ui.en";
 import { uiEs } from "../../i18n/ui.es";
 import { LocaleProvider } from "../../providers/LocaleProvider";
 
+// Fixtures de testimonios no vacíos: el contenido real del CV ya no trae
+// testimonios (`testimonials: []`), pero el carrusel sigue cubierto con los
+// ejemplos válidos del kit (mismo formato, validados por content.test.ts).
+import exampleEn from "@data/cv.example.en.json";
+import exampleEs from "@data/cv.example.es.json";
+import type { Testimonial } from "@data/cv.types.generated";
+
 import { AboutPage } from "./AboutPage";
 
 // Cierre a11y de T4 (constitución T4; helper de src/test/a11y.ts).
@@ -210,11 +217,16 @@ interface CvHarness {
   emptyServices: boolean;
   // T3 (test 5b): mismo mecanismo para vaciar `testimonials`.
   emptyTestimonials: boolean;
+  // Fixture local no vacío para el carrusel (tests 4 y 6): el contenido real
+  // puede traer `testimonials: []` y los tests no deben depender de que el CV
+  // real venga con testimonios.
+  testimonialsFixture: Testimonial[] | null;
 }
 
 const cvHarness = vi.hoisted((): CvHarness => ({
   emptyServices: false,
   emptyTestimonials: false,
+  testimonialsFixture: null,
 }));
 
 vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
@@ -224,8 +236,9 @@ vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
     ...actual,
     // Desarmado (default): delega en el `useCv` REAL del contexto del
     // LocaleProvider de verdad; armado: mismo cv real con la colección vacía
-    // del flag activo. `useLocale`/`LocaleProvider` se conservan vía el spread
-    // de `actual` (precedente LanguageSwitcher).
+    // del flag activo o con el fixture de testimonios. `useLocale`/
+    // `LocaleProvider` se conservan vía el spread de `actual` (precedente
+    // LanguageSwitcher).
     useCv: () => {
       const cv = actual.useCv();
       if (cvHarness.emptyServices) {
@@ -233,6 +246,9 @@ vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
       }
       if (cvHarness.emptyTestimonials) {
         return { ...cv, testimonials: [] };
+      }
+      if (cvHarness.testimonialsFixture !== null) {
+        return { ...cv, testimonials: cvHarness.testimonialsFixture };
       }
       return cv;
     },
@@ -246,6 +262,7 @@ vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
 beforeEach(() => {
   cvHarness.emptyServices = false;
   cvHarness.emptyTestimonials = false;
+  cvHarness.testimonialsFixture = null;
 });
 
 // Esperados desde las FUENTES del kit (C3): el título de `uiEn.about.services`
@@ -403,17 +420,17 @@ describe("AboutPage with empty services (T2: RF-2, Tests 5a, mocked provider)", 
 
 // Esperados desde las FUENTES del kit (C3).
 const TESTIMONIALS_TITLE = uiEn.about.testimonials;
-const TESTIMONIALS = cvByLocale.en.testimonials;
+// Fixtures no vacíos de los ejemplos del kit: el CV real trae
+// `testimonials: []`, pero el carrusel se sigue verificando con datos.
+const TESTIMONIALS_FIXTURE_EN: Testimonial[] = exampleEn.testimonials;
+const TESTIMONIALS_FIXTURE_ES: Testimonial[] = exampleEs.testimonials;
 
 describe("AboutPage testimonials region is the carousel own section (T3: RF-2 testimonials, RF-3, Tests 4)", () => {
   it("renders the carousel section named by t.about.testimonials as direct sibling of its h2, fed with the raw t.testimonials templates", () => {
-    // Invariante del escenario (criterio T1/T2): sin testimonios en el kit el
-    // test sería vacío y no discriminaría nada; se frena y se reporta.
-    if (TESTIMONIALS.length === 0) {
-      throw new Error(
-        "el contenido de ejemplo del kit debe traer testimonios en cv.testimonials (test 4 de la spec no puede correr vacío)",
-      );
-    }
+    // El carrusel se cubre con el fixture no vacío del ejemplo EN del kit
+    // (mismo formato que valida el schema), sin depender del CV real.
+    const testimonials = TESTIMONIALS_FIXTURE_EN;
+    cvHarness.testimonialsFixture = testimonials;
 
     renderAboutPage();
 
@@ -461,17 +478,17 @@ describe("AboutPage testimonials region is the carousel own section (T3: RF-2 te
     // CARRUSEL interpolando existen en el DOM (si la página hubiera
     // pre-interpolado o mandado cualquier otra cosa, estos nombres no
     // clavarían). Un `group` por testimonio con "{current} of {total}".
-    for (let index = 0; index < TESTIMONIALS.length; index += 1) {
+    for (let index = 0; index < testimonials.length; index += 1) {
       const slideName = uiEn.testimonials.slideLabel
         .replace("{current}", String(index + 1))
-        .replace("{total}", String(TESTIMONIALS.length));
+        .replace("{total}", String(testimonials.length));
       expect(within(region).getByRole("group", { name: slideName })).toBeInTheDocument();
     }
 
     // Y el botón "read more" de cada card nombrado con la plantilla `readMore`
-    // interpolada por el carrusel con el author de `cvByLocale.en` (prueba de
+    // interpolada por el carrusel con el author del fixture EN (prueba de
     // que la plantilla viajó cruda y el contenido lo canaliza `useCv()`).
-    for (const testimonial of TESTIMONIALS) {
+    for (const testimonial of testimonials) {
       const openName = uiEn.testimonials.readMore.replace(
         "{author}",
         testimonial.author,
@@ -491,13 +508,9 @@ describe("AboutPage with empty testimonials (T3: RF-2, Tests 5b, mocked provider
   });
 
   it("renders no testimonials h2 nor carousel region and keeps the unique h1 when testimonials is empty", () => {
-    // Freno anti-test-vacío (criterio 5a): si el kit no trajera testimonios,
-    // la variante con [] no discriminaría nada.
-    if (TESTIMONIALS.length === 0) {
-      throw new Error(
-        "el contenido de ejemplo del kit debe traer testimonios para que el escenario vacío (test 5b) discrimine",
-      );
-    }
+    // El escenario vacío no depende del contenido real (que ya trae
+    // `testimonials: []`): el mock fuerza la colección vacía. La cobertura de
+    // datos no vacíos vive en el test 4, con el fixture EN.
 
     renderAboutPage();
 
@@ -513,7 +526,9 @@ describe("AboutPage with empty testimonials (T3: RF-2, Tests 5b, mocked provider
     // Sin slides (groups) ni cards de testimonio (articles nombradas por el
     // author); los articles de SERVICIOS quedan, no se cuentan acá.
     expect(screen.queryAllByRole("group")).toHaveLength(0);
-    for (const testimonial of TESTIMONIALS) {
+    // Los autores del fixture EN son el conjunto de referencia: ninguno debe
+    // aparecer como card (los articles de SERVICIOS quedan, no se cuentan acá).
+    for (const testimonial of TESTIMONIALS_FIXTURE_EN) {
       expect(
         screen.queryByRole("article", { name: testimonial.author }),
       ).not.toBeInTheDocument();
@@ -530,17 +545,20 @@ describe("AboutPage with empty testimonials (T3: RF-2, Tests 5b, mocked provider
 
 describe("AboutPage in Spanish locale (T3: Tests 6, real LocaleProvider seeded es)", () => {
   it("shows the ui.es interface strings and the cv.es content when the active locale is es", () => {
-    // Invariante: el cv.es del kit trae servicios y testimonios (los asserts
-    // por array no pueden correr vacíos).
+    // Invariante: el cv.es del kit trae about y servicios (los asserts por
+    // array no pueden correr vacíos). Los testimonios se aportan con el
+    // fixture ES del ejemplo: el CV real trae `testimonials: []`.
     if (
       cvByLocale.es.services.length === 0 ||
-      cvByLocale.es.testimonials.length === 0 ||
       cvByLocale.es.profile.about.length === 0
     ) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer about, services y testimonials en cv.es para el test 6",
+        "el contenido del kit debe traer about y services en cv.es para el test 6",
       );
     }
+
+    const esTestimonials = TESTIMONIALS_FIXTURE_ES;
+    cvHarness.testimonialsFixture = esTestimonials;
 
     // Semilla anti-flash (precedente LanguageSwitcher T2/T3): `lang="es"` en
     // <html> ANTES del render; `readInitialLocale` lee solo ese atributo y el
@@ -579,9 +597,8 @@ describe("AboutPage in Spanish locale (T3: Tests 6, real LocaleProvider seeded e
     }
 
     // Y el carrusel arma sus nombres con las plantillas de `uiEs` y el
-    // contenido de `cv.es` (todo el viaje pasó crudo por `carouselLabels`):
+    // contenido del fixture ES (todo el viaje pasó crudo por `carouselLabels`):
     // "1 de 3"-style por slide y readMore con el author.
-    const esTestimonials = cvByLocale.es.testimonials;
     for (let index = 0; index < esTestimonials.length; index += 1) {
       const slideName = uiEs.testimonials.slideLabel
         .replace("{current}", String(index + 1))

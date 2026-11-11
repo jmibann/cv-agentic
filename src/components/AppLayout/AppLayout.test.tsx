@@ -51,6 +51,7 @@ import type { ReactNode } from "react";
 import { LocaleProvider } from "../../providers/LocaleProvider";
 import { ThemeProvider } from "../../providers/ThemeProvider";
 import { cvByLocale } from "../../content";
+import { format } from "../../i18n/format";
 import { uiEn } from "../../i18n/ui.en";
 import { uiEs } from "../../i18n/ui.es";
 
@@ -74,6 +75,16 @@ import styles from "./AppLayout.module.css";
 // Nombre del landmark `complementary` desde la FUENTE del kit (C3): el
 // AppLayout lo pasa por `labels.region` de `t.sidebar`.
 const SIDEBAR_REGION = uiEn.sidebar.region;
+
+// Alt del avatar derivado de las FUENTES (C3): AppLayout lo compone con
+// `format(t.sidebar.avatarAlt, { name: cv.profile.name })`, así que el test no
+// hardcodea el nombre del contenido real.
+const AVATAR_ALT_EN = format(uiEn.sidebar.avatarAlt, {
+  name: cvByLocale.en.profile.name,
+});
+const AVATAR_ALT_ES = format(uiEs.sidebar.avatarAlt, {
+  name: cvByLocale.es.profile.name,
+});
 
 // Clase base del `div.container` canon #99 (el módulo resuelve el nombre
 // hasheado en runtime; el `?? "container"` cubre herramientas sin CSS
@@ -528,18 +539,19 @@ describe("AppLayout derives the avatar alt from profile.name (T9: Cambio 2026-11
 
     // El alt ya no vive en el contenido (`Image.alt` se eliminó): AppLayout lo
     // compone con `format(t.sidebar.avatarAlt, { name: cv.profile.name })`, así
-    // que sigue al `profile.name` de cada idioma.
+    // que sigue al `profile.name` de cada idioma. Los nombres esperados se
+    // derivan (no se hardcodean) del contenido real de cada locale.
     expect(
-      screen.getByRole("img", { name: "Portrait of Alex Rivera" }),
+      screen.getByRole("img", { name: AVATAR_ALT_EN }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Español" }));
 
     expect(
-      screen.getByRole("img", { name: "Retrato de Alex Rivera" }),
+      screen.getByRole("img", { name: AVATAR_ALT_ES }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("img", { name: "Portrait of Alex Rivera" }),
+      screen.queryByRole("img", { name: AVATAR_ALT_EN }),
     ).not.toBeInTheDocument();
   });
 });

@@ -92,17 +92,18 @@ function withExtraField(cv: CvData): unknown {
   return { ...cv, uncampoquennadieniepide: true };
 }
 
-describe("cv.{en,es}.json (copies of the data/ examples)", () => {
+describe("cv.{en,es}.json content files (RF-7)", () => {
   it("declares the shared schema path in both locales", () => {
     expect(enContent.$schema).toBe(SCHEMA_REF);
     expect(esContent.$schema).toBe(SCHEMA_REF);
   });
 
-  it("keeps every other field identical to data/cv.example.{en,es}.json", () => {
-    // Copia fiel: única diferencia admitida es `$schema` (más profundo
-    // porque el JSON vive ahora en src/content/).
-    expect(enContent).toEqual({ ...exampleEn, $schema: SCHEMA_REF });
-    expect(esContent).toEqual({ ...exampleEs, $schema: SCHEMA_REF });
+  it("validates both kit examples against the shared schema", () => {
+    // El contenido real ya no es una copia de los ejemplos del kit; los
+    // ejemplos siguen siendo la fuente de fixtures válidos para los tests.
+    // Ambos deben cumplir el mismo validador que usa `load()`.
+    expect(validateCv(exampleEn)).toBe(true);
+    expect(validateCv(exampleEs)).toBe(true);
   });
 });
 
