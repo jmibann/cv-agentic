@@ -69,6 +69,7 @@ export interface TestimonialCardProps {
 | Card | `Box variant="inner" as="article"` (fondo `surface-muted` del Box) con clase propia `.card` que ajusta: `position: relative; display: flex; flex-direction: column; border-radius: var(--radius-16); padding: var(--testimonial-padding); height: 100%;` (16px < 580 → 30/30/24px). **Sin `margin-top`**. Decisión 17: la superficie es Box inner, no una card a mano. |
 | Avatar | `HexAvatar` con `margin-top: calc(var(--testimonial-avatar-offset) * -1);` (sube 40px < 580 → 60px) |
 | Encabezado | `display: grid; grid-template-columns: auto 1fr; column-gap: 0.9375rem; align-items: end; margin-bottom: 0.75rem;` (avatar en la columna 1, nombre y rol en la 2; sin márgenes negativos) |
+| Identidad | bloque con nombre y rol: `padding-inline-end: calc(2rem + var(--testimonial-quote-inset-inline));` — reserva el ancho de la comilla (`--icon-size` 2rem) más su distancia al borde, para que nombre y rol nunca queden debajo de ella (Cambio 2026-11-12, decisión #112: con nombres reales de 3 palabras la comilla pisaba el nombre a 375 y 768px) |
 | Nombre | h3: `--font-size-h3`; `margin: 0;` |
 | Rol | `color: var(--color-text-muted); margin: 0;` |
 | Extracto | `display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0;` |
