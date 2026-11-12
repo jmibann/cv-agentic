@@ -116,12 +116,14 @@ El orden y las dependencias de los componentes están en
 F1–F5 cerradas (ver §XII en `docs/diagnostics.md` y `docs/qa-report.md`). No
 quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
 con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`. Trabajo abierto al
-2026-11-11: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109) y
-**QA visual aprobada** (§XVI) cerrados; queda el push/deploy, los 4 hallazgos de
-auditoría (`deploy.yml` y el registro de la categoría `motion` — **los resuelve el
-usuario, sin ampliar permisos de los agentes**) y el **motion**,
-aprobado pero sin implementar (`specs/motion/proposal.md`; #106–#109 en la tabla
-**Abiertos** de diagnostics):
+2026-11-12: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109),
+**QA visual aprobada** (§XVI) y **CI** (§XVII: Node 26 LTS desde `.nvmrc`, #110;
+`lint` → `test` → `build` antes de publicar, #111) cerrados; queda el push/deploy, el
+registro de la categoría `motion` (último hallazgo de auditoría — **lo resuelve el
+usuario, sin ampliar permisos de los agentes**) y el **motion**, aprobado pero sin
+implementar (`specs/motion/proposal.md`; tabla **Abiertos** de diagnostics).
+El workflow `.github/workflows/deploy.yml` lo mantiene el usuario (ningún agente lo
+edita). Tareas futuras:
 
 | Tarea futura | Flujo | Dueño |
 |---|---|---|

@@ -2,12 +2,11 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XVI) y `docs/README.md` (#1–#109).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XVII) y `docs/README.md` (#1–#111).
 
-## Estado actual (2026-11-11)
+## Estado actual (2026-11-12)
 
-- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; QA F5 (4
-  pasadas + **Ctrl+P real aprobado**). Suite **447/40**; lint/typecheck/build ✅.
+- **ENTREGADO — F1–F5 cerradas**: 27/27 `implementada`; QA F5 + Ctrl+P real ✅; suite **447/40**.
 - **Mantenimiento 2026-11-11 cerrado (§XIV–§XVI)**: base Vite + `assetUrl()`
   (`c2d4232`/`5f6c0a6`); **CV real** + assets (`63f6665`) con `testimonials: []` y sin
   teléfono/WhatsApp; tests adaptados sin debilitar (`3855eb0`/`befb0db`); spec de
@@ -15,9 +14,10 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XVI) y `docs/README
   — no re-reportarla). **QA visual APROBADA (§XVI)**: gap chevron↔nombre a 375px con el
   nombre real = **72.84px**, sin solapes ni overflow (informe: `qa-report.md`).
 - **Motion aprobado, NO implementado**: contrato en `specs/motion/proposal.md` (#106); falta aprobar specs/planes/tareas.
-- **Pendientes del usuario**: push + verificar en GitHub Pages (base `/cv-agentic/`:
-  avatar, PDF, fuente, consola); los 4 hallazgos de auditoría, que **resuelve él sin
-  ampliar permisos**; aprobar specs motion → filas **Abiertos**.
+- **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre
+  `lint` → `test` → `build` y no publica si algo falla (#111). Commits `cf28268`/`35dbf2d`.
+- **Pendientes del usuario**: push + verificar Actions y GitHub Pages (base `/cv-agentic/`);
+  registrar la categoría `motion` (último hallazgo, **del usuario**); aprobar specs motion.
 
 ## Reglas no negociables para cualquier tarea futura
 

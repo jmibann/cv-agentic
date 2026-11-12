@@ -1,21 +1,17 @@
 # Diagnóstico — registro de puertas y auditorías
 
-Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
-**una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
-los hashes de los commits relevantes. Última actualización: **2026-11-11**
-(mantenimiento: base de deploy + `assetUrl()`, CV real con su Cambio de spec
-(#109) y **QA visual aprobada** (§XVI); la propuesta de motion sigue sin implementar.
-El proceso F1–F5 sigue cerrado — ver §XII; flujo y dueños en "Modo mantenimiento"
-de `docs/agent-system.md`).
+Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
+cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
+Última actualización: **2026-11-12** (CI: Node 26 LTS + quality gates, §XVII).
+El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
+de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#109 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#111 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
-archivo. **Tamaño actual: 146 líneas** — recordatorio tomado del usuario: si el
-próximo cierre pasa de 150, se aplica la poda **#98** (§I–§X a una línea cada una,
-hash de creación mediante; el detalle queda en el git).
+archivo. Tope: **150 líneas** (poda #98).
 
 ## Plantilla de entrada
 
@@ -28,8 +24,7 @@ hash de creación mediante; el detalle queda en el git).
 - Abre: <nuevos>; cierra: <los que resuelve esta entrada> (actualizá la tabla **Abiertos**).
 ```
 
-Las entradas van **más reciente arriba**. El consolidado vive en la tabla
-**Abiertos**.
+Entradas: **más reciente arriba**; el consolidado vive en la tabla **Abiertos**.
 
 ## Mantenimiento (decisión #98)
 
@@ -47,12 +42,19 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Auditoría pendiente: CI y registro de specs | Cuatro hallazgos del usuario (2026-11-11), verificados en el repo, **sin corregir** porque tocan archivos fuera del alcance de los agentes: (1) `.github/workflows/deploy.yml:28` usa `node-version: lts/*` en vez de `node-version-file: .nvmrc` (Node 24 LTS); (2) el workflow **no corre `lint` ni `test`** antes de publicar (solo `npm ci` + `npm run build`); (3) `deploy.yml:36` conserva la línea comentada `# VITE_API_URL`, que no aplica al sitio (D2); (4) la categoría `motion` de `specs/` no está registrada en `AGENTS.md:16` ni en `specs/README.md` (que en `:117-118` solo excepciona `specs/README.md` como `.md` suelto, y `specs/motion/proposal.md` existe desde `2886109`). **Dueño: el usuario** (2026-11-11): los resuelve directamente y **no se amplían los permisos** de los agentes; al commitearlos, el orchestrator cierra esta fila con el hash. Descartado sin acción: `public/**/.DS_Store` (gitignored y el CI construye desde un checkout limpio) | Usuario; cierre por el orchestrator al recibir el hash |
+| Auditoría pendiente: registro de specs | Queda **1 de 4** hallazgos del usuario (2026-11-11): la categoría `motion` de `specs/` no está registrada en `AGENTS.md:16` ni en `specs/README.md` (que en `:117-118` solo excepciona `specs/README.md` como `.md` suelto; `specs/motion/proposal.md` existe desde `2886109`). Los hallazgos 1–3 (`deploy.yml`) se cerraron en §XVII. **Dueño: el usuario**, sin ampliar permisos de los agentes. Descartado sin acción: `public/**/.DS_Store` (gitignored; el CI construye desde un checkout limpio) | Usuario; cierre con el hash del commit |
 | Motion (post-entrega) | Propuesta aprobada (#106) en `specs/motion/proposal.md`; falta aprobar specs/planes/tareas y luego implementar tokens, tabs B, Sidebar grid, `data-theme-switching`, reduced motion, dialog y Separator. No se toca código antes de esa puerta | Puerta de Plan+Tareas / Cambio |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XVII · 2026-11-12 — CI: Node 26 LTS y quality gates en el deploy
+- Qué: el usuario resolvió los hallazgos 1–3 de la auditoría. **Node 26 LTS** ("Lithium", LTS desde 26.13.0): `.nvmrc` `24`→`26`, `@types/node` `^26`, y `deploy.yml` lee `node-version-file: .nvmrc` en vez de `lts/*` (S5, `AGENTS.md`, tabla de entorno y `spec.md:60` de Foundation alineados; #45 y T1 quedan como historia). **Quality gates**: el deploy corre `lint` → `test` → `build` y no publica si algo falla; se quitó la línea comentada `VITE_API_URL` (D2).
+- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · validate:content ✓ · YAML del workflow parseado ✓.
+- Decisiones: **#110** (Node 26 + `.nvmrc` en CI) y **#111** (quality gates) → `docs/README.md`.
+- Commits: `cf28268` (Node 26) · `35dbf2d` (lint/test en el deploy).
+- Abre: nada. Cierra: hallazgos 1–3 de "Auditoría pendiente" (queda el 4: categoría `motion`).
 
 ### §XVI · 2026-11-11 — QA visual post-contenido (pasada enfocada)
 

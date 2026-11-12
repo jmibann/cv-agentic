@@ -4,7 +4,7 @@ Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-11-11)
+## Estado actual (2026-11-12)
 
 | Qué | Estado |
 |---|---|
@@ -29,8 +29,9 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **Mantenimiento (2026-11-06)** | ✅ **Bug-fix ControlsBar T4**: ThemeToggle y LanguageSwitcher alineados en una fila flex con `.group` (`display: flex; align-items: center; gap: var(--controls-gap)`); se eliminó el `gap` inerte del `<header>`. Sin cambio de API/ARIA/spec. Suite **446/40**, lint/typecheck/build ✅; QA visual 375/768/1024/1440 × claro/oscuro × en/es ✅. Commits `d65ac7a`/`9f9de59`; T4 en `specs/controls/ControlsBar/tasks.md`. |
 | **Deploy GitHub Pages (2026-11-11)** | ✅ `vite.config.ts` usa base `/cv-agentic/` solo con `DEPLOY_TARGET=gh-pages` (local/Vercel siguen en `/`); `src/utils/assetUrl.ts` antepone `BASE_URL` a assets públicos y deja intactas las URLs externas. `HexAvatar` y el CTA de descarga del `Sidebar` lo usan. Commits `c2d4232` y `5f6c0a6`; suite **447/40**, lint/typecheck/build ✅. |
 | **CV real (2026-11-11)** | ✅ **Cargado y validado**: `src/content/cv.{en,es}.json` con el CV real, `testimonials: []`, contact sin teléfono/WhatsApp y `downloadCvUrl` al PDF; avatar actualizado y `avatar.svg` retirado; tests adaptados con fixtures y expectativas derivadas del contenido. Commits `3855eb0` `befb0db` `63f6665`; `validate:content`/build ✅. Spec/plan/tasks de Foundation alineados con el contenido real y `headline`/cargos de `cv.es.json` en inglés por decisión editorial (decisión **#109**). **QA visual APROBADA (§XVI)**: grilla 375–1440 × temas × idiomas sin overflow ni solapes y gap chevron↔nombre a 375px con el nombre real = **72.84px** (→ `docs/qa-report.md`). |
+| **CI y Node 26 (2026-11-12)** | ✅ **Node 26 LTS** (`.nvmrc` `26`, `@types/node` `^26`; constitución S5 y entorno aprobado actualizados, **#110**) y `deploy.yml` lee `node-version-file: .nvmrc`. **Quality gates** en el deploy: `lint` → `test` → `build`; si algo falla no se publica (**#111**); sin la línea `VITE_API_URL`. Commits `cf28268` y `35dbf2d`; suite **447/40**, lint/typecheck/build ✅. Detalle: §XVII. |
 | **Motion (2026-11-11)** | 🟡 **Propuesta aprobada, implementación NO iniciada**: `specs/motion/proposal.md` fija tokens, tabs (alternativa B), grid del Sidebar, supresión de transiciones al cambiar tema, reduced motion y dialog. Falta aprobar specs/planes/tareas. |
-| Post-entrega / próximos trabajos (2026-11-11) | Push de los commits locales y deploy (lo hacés vos; la QA visual ya pasó en `localhost:5173`, falta ejercitar el `base` real de GitHub Pages → resultado a registrar con el hash) · **4 hallazgos de auditoría: los resolvés vos directamente, sin ampliar permisos de los agentes** (`deploy.yml`: `node-version: lts/*` en vez de `node-version-file: .nvmrc`; sin `lint`/`test` antes de publicar; línea comentada `VITE_API_URL` que no aplica; la categoría `motion` de `specs/` no registrada en `AGENTS.md`/`specs/README.md`) · aprobar specs/planes/tareas de motion · opcionales: deudas de forma, StrictMode/F1-F2 |
+| Post-entrega / próximos trabajos (2026-11-12) | Push de los commits locales (lo hacés vos) y verificar el deploy: en Actions, "Setup Node" en 26.13.x y los pasos `lint`/`test` en verde; en el sitio, el `base` real de GitHub Pages (avatar, PDF, fuente, consola) → resultado a registrar con el hash · **1 hallazgo de auditoría pendiente, lo resolvés vos**: registrar la categoría `motion` de `specs/` en `AGENTS.md`/`specs/README.md` · aprobar specs/planes/tareas de motion · opcionales: deudas de forma, StrictMode/F1-F2 |
 | F2 → seguimientos abiertos | Combo hover+focus del Button (el `outline` gana siempre; la spec no fija el combo) → **F5** · Badge RF-6 ("no dentro de `Box inner`") se verifica en los consumidores → **F3/F4** (SkillList/Sidebar) · Overhead RF-4 (nunca sobre `--color-bg` en claro) se verifica en los consumidores → **F3/F4** (Sidebar) · IconBox RF-5 (no dentro de `Box variant="inner"`) se verifica en los consumidores → **F3/F4** (Sidebar/ResumeSection) · `--button-small-padding-*` literales: promover a token si se repite en otro componente |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
@@ -55,7 +56,8 @@ cv-agentic/
 
 El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (447 tests,
 build, validate:content, QA en navegador y en papel; últimos trabajos:
-bug-fix ControlsBar T4, base de deploy para GitHub Pages y CV real, 2026-11-11).
+bug-fix ControlsBar T4, base de deploy para GitHub Pages y CV real, 2026-11-11;
+Node 26 LTS y quality gates en el deploy, 2026-11-12).
 Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 `.opencode/agents/`:
 
@@ -65,7 +67,7 @@ Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 | Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
 | Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
 | Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
-| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#109: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
+| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#111: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
 Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
 (P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;
