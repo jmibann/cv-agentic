@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-12** (CI §XVII; testimonios reales §XVIII).
+Última actualización: **2026-11-12** (CI §XVII; testimonios §XVIII–§XIX).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#112 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#113 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -49,6 +49,13 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### §XIX · 2026-11-12 — TestimonialCard: avatar anclado arriba
+- Qué: auditoría en navegador de la alineación de los hexágonos: con `align-items: end` el avatar bajaba con cada línea de nombre/rol, no sobresalía en ningún ancho y quedaba desalineado entre cards (50px a 768, 25px a 1440). Cambio aprobado (T6): `.header` → `align-items: start` y reserva exacta de la comilla con el token nuevo `--testimonial-quote-reserve` (2.2rem → 2rem ≥580). Sin clamp del rol (decisión del usuario).
+- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · navegador 375/580/768/1024/1440 × claro/oscuro × en/es: avatar −24/−30px idéntico en las 3 cards, 0 invasión de la comilla, sin overflow, dialog OK, consola limpia.
+- Decisiones: **#113** → `docs/README.md`.
+- Commits: `390bb06` (spec/T6) · `24faf70` (fix + token).
+- Abre: nada. Cierra: nada (§XV compactada a una línea por el tope de 150).
+
 ### §XVIII · 2026-11-12 — Testimonios reales + Cambio de TestimonialCard
 - Qué: 3 testimonios reales en `cv.{en,es}.json` (revierte el `testimonials: []` de #108; textos literales en su idioma original, errores incluidos por decisión del usuario; siluetas neutras como avatar). La QA en navegador detectó que la comilla pisaba nombres largos (20px a 375, 10px a 768) → Cambio aprobado: `.identity` reserva `calc(2rem + --testimonial-quote-inset-inline)` (T5). Re-QA: 0 invasión en 375/580/768/1024/1440 × claro/oscuro × en/es, sin overflow, dialog OK, consola limpia (el único error fue de HMR al editar el JSON; desaparece al recargar).
 - Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · validate:content ✓ · build ✓.
@@ -72,13 +79,7 @@ de la entrada); el detalle queda en git.
 - Registra: informe completo con evidencia en `docs/qa-report.md` ("Pasada enfocada post-contenido real").
 - Abre: nada nuevo. Cierra: fila "Verificación post-contenido" de **Abiertos**.
 
-### §XV · 2026-11-11 — Contenido real, tests y CTA de descarga
-
-- Qué: se cargó el **CV real bilingüe** en `src/content/cv.{en,es}.json` con `testimonials: []`, contact sin teléfono/WhatsApp y `downloadCvUrl` al PDF; se actualizó `public/images/avatar.png` y se retiró `avatar.svg`; se agregó `public/cv/Juan-Manuel-Ibanez-CV.pdf`. Tests adaptados sin debilitar: `LocaleProvider` usa `profile.about[0]`, `AppLayout` deriva el alt, `AboutPage` usa fixtures no vacíos (tests 4/6) y vacío (5b), y `content.test` conserva schema/paridad/orden/rechazos y valida ambos examples; solo se quitó la "copia fiel" (#108). El CTA del `Sidebar` usa `assetUrl(profile.downloadCvUrl)` (#107). Cerrado el paso 5 del plan del Cambio: la spec/plan/tasks de Foundation se alinearon con el contenido real (**#109**, aprobado por el usuario).
-- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ (1989 módulos) · validate:content ✓ · reviewer **APROBADO**.
-- Decisiones: **#108 ejecutada**, **#107 extendida** al CTA y **#109** (parche de la spec/plan/tasks de Foundation aprobado por el usuario + decisión editorial: `headline`/cargos de `cv.es.json` quedan en inglés) → `docs/README.md`.
-- Commits: `3855eb0` (test Foundation) · `befb0db` (tests de contenido) · `63f6665` (contenido/assets) · `5f6c0a6` (CTA) · `aa9d310` (proposal de motion) · `6826436` (parche #109).
-- Abre: fila "Auditoría pendiente: CI y registro de specs" (4 hallazgos del usuario); la de "Verificación post-contenido" se cerró en §XVI. Cierra: "Contenido real (post-entrega)".
+### 2026-11-11 · §XV — Contenido real, tests y CTA de descarga · #107–#109 · `git show 0c5c54b:docs/diagnostics.md`
 
 ### 2026-11-11 · §XIV — Deploy GitHub Pages + propuesta de motion · #106–#108 · `git show 3496bb7:docs/diagnostics.md`
 
