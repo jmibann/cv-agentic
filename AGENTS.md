@@ -13,7 +13,7 @@ cv-agentic/
 ├─ docs/                      constitution, README completo, DESIGN, BACKLOG, diagnostics, memory, agent-system.md, qa-report (F5), tokens/ (breakpoints, contraste)
 ├─ tokens/                    tokens.css (lo importa la app)
 ├─ foundations/               tipografía, layout, movimiento, theming, i18n
-├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (foundation, primitives, controls, layout, content, pages, hooks)
+├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (foundation, primitives, controls, layout, content, pages, hooks) + motion/proposal.md(propuesta transversal, no pieza)
 ├─ data/                      cv.schema.json (fuente de verdad), constants.ts, ejemplos JSON y *.generated.* (alias @data)
 ├─ .opencode/agents/          los 5 agentes (orchestrator, foundation, component-builder, integrator, reviewer)
 ├─ .opencode/skills/sdd/      skill del flujo SDD (SKILL.md)
