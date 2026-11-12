@@ -1,8 +1,8 @@
 # AGENTS.md — cv-agentic
 
 Sitio CV personal. **Proyecto único** (un solo `package.json`, sin
-workspaces): el kit de diseño y la app conviven en la raíz. **Node 24 LTS**
-(`.nvmrc`); versiones según `docs/README.md` → "Entorno y dependencias aprobadas".
+workspaces): el kit de diseño y la app conviven en la raíz. **Node 26 LTS**
+(`.nvmrc`, que también lee el CI); versiones según `docs/README.md` → "Entorno y dependencias aprobadas".
 
 ## Estructura
 

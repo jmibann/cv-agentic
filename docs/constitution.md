@@ -10,7 +10,7 @@ Cada regla indica cómo verificarla.
 - **S2** Un solo proyecto: un `package.json`, un `tsconfig.json`, sin workspaces ni herramientas de build extra. *Verificar:* raíz del repo.
 - **S3** Estilos = CSS Modules + `tokens/tokens.css`. Sin CSS-in-JS, Tailwind ni kits de UI. *Verificar:* grep `styled-components|@emotion|tailwind`.
 - **S4** Sin router, librería de estado global ni backend. Estado = estado de React + contextos de tema e idioma. *Verificar:* lista de dependencias.
-- **S5** Node 24 LTS (`.nvmrc`), TypeScript `~6.0`, `^` dentro de la versión mayor documentada, `package-lock.json` commiteado. *Verificar:* `package.json`.
+- **S5** Node 26 LTS (`.nvmrc`, también para el CI), TypeScript `~6.0`, `^` dentro de la versión mayor documentada, `package-lock.json` commiteado. *Verificar:* `package.json`.
 
 ## 2. Spec antes que código
 - **P1** No hay código sin spec en `specs/` o `foundations/`. *Verificar:* cada `src/components/<Name>/` tiene su `specs/**/<Name>/spec.md`.

@@ -84,10 +84,11 @@ import type { CvData, Locale } from "@data/cv.types.generated";
 
 ## Entorno y dependencias aprobadas
 
-**Node 24 LTS** (`.nvmrc`: `24`; `engines.node`: `"^22.12.0 || >=24"`).
+**Node 26 LTS** (`.nvmrc`: `26`; el CI lo lee con `node-version-file`, #110;
+`engines.node`: `"^22.12.0 || >=24"`).
 Piso real de las herramientas (npm, 2026-10-02): Vitest 5 `^22.12.0 || ^24.0.0
 || >=26`, ESLint 10 `^20.19.0 || ^22.13.0 || >=24`, jsdom 30 `^22.22.2 ||
-^24.15.0 || >=26.0.0` — el piso efectivo lo fija jsdom y lo cubre `.nvmrc: 24`.
+^24.15.0 || >=26.0.0` — el piso efectivo lo fija jsdom y lo cubre `.nvmrc: 26`.
 **Política de versiones:**
 rango `^` dentro de la versión mayor de esta tabla (TypeScript con `~`, ver
 abajo) y `package-lock.json` commiteado. Subir una versión mayor es una
@@ -103,7 +104,7 @@ decisión del usuario. Verificado contra el registro de npm el 2026-10-01.
 | Build | `@vitejs/plugin-react` | `^6` |
 | Build | `typescript` | **`~6.0`** — no `^`: TypeScript 7 es incompatible con `typescript-eslint` (que soporta `<6.1`) |
 | Tipos | `@types/react`, `@types/react-dom` | `^19` |
-| Tipos | `@types/node` (para `vite.config.ts`) | `^24` |
+| Tipos | `@types/node` (para `vite.config.ts`) | `^26` |
 | Lint | `eslint` | `^10` |
 | Lint | `typescript-eslint` | `^8` |
 | Lint | `eslint-plugin-react-hooks` | `^7` |
@@ -239,3 +240,4 @@ lint declaran compatibilidad con ESLint 10.
 | 107 | Base de despliegue y assets públicos (2026-11-11) | GitHub Pages: `vite.config.ts` aplica `base: "/cv-agentic/"` solo con `DEPLOY_TARGET=gh-pages`; local y Vercel quedan en `/`. Nuevo `src/utils/assetUrl.ts` antepone `import.meta.env.BASE_URL` a rutas de `/public` y deja intactas las URLs externas (`http(s)://`, `//`, `data:`). `HexAvatar` y el CTA de descarga del `Sidebar` lo usan. Regla para trabajo futuro: todo asset público pasa por `assetUrl()`, nunca por una ruta absoluta literal. Sin cambio de API/UI; lint/typecheck/test 447/40/build ✅. Commits `c2d4232` (base/avatar) y `5f6c0a6` (CTA `downloadCvUrl`) |
 | 108 | Cambio de contenido previo a motion (2026-11-11) | El usuario aporta el CV real en `src/content/cv.{en,es}.json` (con assets) antes de los Cambios de motion. Alcance aprobado: `testimonials: []` (la sección ya se oculta en `AboutPage.tsx:133` y `TestimonialCarousel.tsx:263`); `contact[]` sin teléfono ni WhatsApp (solo email/ubicación); quitar **solo** el caso "copia fiel" de `content.test.ts:101-106`, conservar `$schema` y agregar validación de `data/cv.example.{en,es}.json` contra el esquema. Los tests de AboutPage que asumen testimonios no vacíos (4 `:409`, 5b `:486`, 6 `:531`) requieren ajuste. **Ejecutado 2026-11-11** (§XV): CV real y assets cargados; tests adaptados con fixtures (4/6 no vacíos, 5b vacío); suite 447/40/build ✅; commits `3855eb0` `befb0db` `63f6665`. Queda la QA visual 375px. La traducción de `headline`/cargos en `cv.es.json` quedó zanjada en **#109** |
 | 109 | Alineación de la spec de Foundation con el contenido real + decisión editorial (2026-11-11) | Parche **aprobado por el usuario** (paso 5 de §5.5 del proposal de motion) en `specs/foundation/Foundation/`, con dos correcciones suyas al texto propuesto. **Propósito:** Foundation arrancó con contenido de ejemplo y hoy porta el CV real; los ejemplos quedan como fixture. **Anatomía:** `public/images/avatar.png` (foto real) + `testimonials/{maria,john,lena}.svg` **conservados** porque los referencia `data/cv.example.{en,es}.json`; el sitio ya no los muestra (`testimonials: []`) — *no borrarlos*. `avatar.svg` ya estaba obsoleto desde `861fb9a` (F4) y se retiró en `63f6665`. **Estilos:** las imágenes son contenido, no estilos; el sitio trae `downloadCvUrl`, con el PDF en `public/cv/…` servido por `assetUrl` (#107). **Tests esperados:** nuevo caso "Ejemplos del kit" (`validateCv` acepta ambos ejemplos) y queda explícito que **no** se exige que el contenido del sitio sea copia de los ejemplos. **`plan.md`** fila T9 y **`tasks.md`** T9 con nota de Cambio citando `63f6665`/`befb0db`. `Estado` sigue `implementada`; **sin cambios de código** (suite 447/40 y build intactos). **Decisión editorial (zanjada: no volver a reportarla como hallazgo):** `profile.headline` y los cargos de `experience` de `cv.es.json` **quedan en inglés** ("Frontend Engineer", títulos reales) por fidelidad al cargo real/LinkedIn y compatibilidad ATS; el esquema lo permite y la paridad en/es del test no se ve afectada. |
+| 110 | Node 26 LTS y versión única para el CI (2026-11-12) | Aprobado por el usuario (opción B, hallazgo 1 de la auditoría de 2026-11-11). Node 26 es LTS ("Lithium") desde 26.13.0 (2026-10-28). `.nvmrc` pasa de `24` a `26`; `.github/workflows/deploy.yml` deja `node-version: lts/*` y usa `node-version-file: .nvmrc` (una sola fuente de verdad: local y CI usan la misma mayor); `@types/node` pasa a `^26`. Se actualizan S5 de `docs/constitution.md`, `AGENTS.md`, la tabla de entorno y `specs/foundation/Foundation/spec.md:60`. `engines.node` no cambia. La decisión #45 y `tasks.md` de T1 quedan como registro histórico (Node 24 al momento de F1). |

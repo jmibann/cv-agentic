@@ -57,7 +57,7 @@ RF propio). La coincidencia exacta de `package.json` con la tabla de
 Estructura que crea F1 en la raíz (no es un componente visual):
 
 ```
-package.json · package-lock.json · .nvmrc (24) · .gitignore
+package.json · package-lock.json · .nvmrc (26, #110) · .gitignore
 index.html                  ← `<html lang="en">` + meta theme-color #eceef4
                               + script anti-flash inline en <head> (foundations/theming.md, tal cual)
                               + `<link rel="icon" type="image/svg+xml" href="/favicon.svg">` (Cambio F5 2026-10-08, hallazgo D4: el navegador pedía /favicon.ico → 404)
