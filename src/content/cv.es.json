@@ -205,5 +205,33 @@
     "MCP",
     "Git"
   ],
-  "testimonials": []
+  "testimonials": [
+    {
+      "id": "t-maria-grael",
+      "author": "María Angélica Grael",
+      "role": "Strategic HR Business Partner, Independiente",
+      "avatar": {
+        "src": "/images/testimonials/maria.svg"
+      },
+      "text": "Juan Manuel es una persona orientada al cliente, que empatiza con facilidad con los demás para entender con claridad sus necesidades y objetivos. Por mi experiencia, es alguien capaz de hacer un análisis integral de una situación que se presenta por partes. Es un profesional orientado a cumplir objetivos de largo plazo. Lo recomiendo ampliamente."
+    },
+    {
+      "id": "t-pablo-tigani",
+      "author": "Pablo Tigani",
+      "role": "Director de Hacer.com.ar · Analista económico, financiero, político y de negocios",
+      "avatar": {
+        "src": "/images/testimonials/john.svg"
+      },
+      "text": "Ibañez, ha sido un alumno destacado del MBA. Su capacidad de asimilación de conocimientos y flexibilidad mental, lo constituyen en un potencial ejecutivo de los mas altos niveles de la pirámide. Es joven y su adaptabilidad y entrenamiento, lo proyectan muy alto."
+    },
+    {
+      "id": "t-diego-harari",
+      "author": "Diego Rafael Harari",
+      "role": "Senior Software Engineer · React / React Native, España",
+      "avatar": {
+        "src": "/images/testimonials/lena.svg"
+      },
+      "text": "Juan es un gran compañero de equipo y un desarrollador muy enfocado; es muy agradable trabajar con él. Logró resolver muchas funcionalidades complejas en su trabajo como desarrollador."
+    }
+  ]
 }

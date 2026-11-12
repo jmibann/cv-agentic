@@ -205,5 +205,33 @@
     "MCP",
     "Git"
   ],
-  "testimonials": []
+  "testimonials": [
+    {
+      "id": "t-maria-grael",
+      "author": "María Angélica Grael",
+      "role": "Strategic HR Business Partner, Independent",
+      "avatar": {
+        "src": "/images/testimonials/maria.svg"
+      },
+      "text": "Juan Manuel is a customer oriented person that can easy emphasize with others in order to clearly understand needs and goals. As from my experience, his is someone that can make an overall analysis of the situation presented in parts. It is a professional oriented to accomplish long-term goals. I highly recommend him."
+    },
+    {
+      "id": "t-pablo-tigani",
+      "author": "Pablo Tigani",
+      "role": "Director at Hacer.com.ar · Economic, Financial, Political and Business Analyst",
+      "avatar": {
+        "src": "/images/testimonials/john.svg"
+      },
+      "text": "Ibáñez was an outstanding MBA student. His ability to absorb knowledge and his mental flexibility make him a potential executive at the highest levels of the organizational pyramid. He is young, and his adaptability and training set him on a very promising path."
+    },
+    {
+      "id": "t-diego-harari",
+      "author": "Diego Rafael Harari",
+      "role": "Senior Software Engineer · React / React Native, Spain",
+      "avatar": {
+        "src": "/images/testimonials/lena.svg"
+      },
+      "text": "Juan is a great team player and a very focused developer, very nice to work with him. He could manage to solve a lot of complicated features of the work as a developer."
+    }
+  ]
 }
