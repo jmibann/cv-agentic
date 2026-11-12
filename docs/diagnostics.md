@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-12** (CI §XVII; testimonios §XVIII–§XIX; Resume en una columna §XX).
+Última actualización: **2026-11-12** (CI §XVII; testimonios §XVIII–§XIX; Resume en una columna §XX; favicon §XXI).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#114 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#115 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -49,6 +49,13 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### §XXI · 2026-11-12 — Favicon tipo app y título real
+- Qué: a pedido del usuario (el hexágono liso se veía como un "cubito" genérico y la pestaña decía `cv-agentic`), propuesta de 3 favicons; elegida la **C**: cuadrado redondeado `#304cfd` con hexágono en trazo blanco y monograma JM en paths (sin depender de fuentes). Se agrega `apple-touch-icon.png` 180×180 (mismo diseño a sangre, generado desde el SVG) y el título pasa a `Juan Manuel Ibáñez · Frontend Engineer`. Cambio de spec de Foundation (T14; reabre #105a con motivo concreto). T14b corrige el test rojo (Vite reescribía `new URL("….png", import.meta.url)`), sin tocar aserciones.
+- Checks: lint ✓ · typecheck ✓ · test **448/40** ✓ · build ✓ (con base `/cv-agentic/` ambos links salen prefijados) · navegador: título OK, `/favicon.svg` y `/apple-touch-icon.png` 200, consola limpia.
+- Decisiones: **#115** → `docs/README.md`.
+- Commits: `a0d7b5f` (spec/T14) · `3b4db39` + `516621a` (tests) · `9ebcca4` (feat).
+- Abre: nada. Cierra: nada (§XVII compactada a una línea por el tope de 150).
+
 ### §XX · 2026-11-12 — ResumePage en una sola columna, Experience primero
 - Qué: a pedido del usuario (las dos columnas con timeline desde 768px eran difíciles de leer), Resume pasa a una sola columna en todos los anchos: Experience arriba, Education debajo, Skills al final. Preview previa en navegador con CSS inyectado; Cambio de spec aprobado (RF-3 reescrito, RF-2/RF-6, Anatomía, Estilos, Responsive y test 2). T5: orden invertido en el DOM (no `order` de CSS: lectura y foco = visual) y `.columns` sin `@media` ni `:only-child`. Única aserción cambiada: el orden de las regiones en el test 2, autorizada por el cambio de spec.
 - Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · navegador 375/768/1334: una columna, Experience primero, sin overflow, consola limpia.
@@ -70,12 +77,7 @@ de la entrada); el detalle queda en git.
 - Commits: `b0f19bc` (spec/T5) · `11d5edc` (fix T5) · `7f7cbe3` (contenido).
 - Abre: nada. Cierra: nada (§XIII–§XIV compactadas a una línea para respetar el tope de 150).
 
-### §XVII · 2026-11-12 — CI: Node 26 LTS y quality gates en el deploy
-- Qué: el usuario resolvió los hallazgos 1–3 de la auditoría. **Node 26 LTS** ("Lithium", LTS desde 26.13.0): `.nvmrc` `24`→`26`, `@types/node` `^26`, y `deploy.yml` lee `node-version-file: .nvmrc` en vez de `lts/*` (S5, `AGENTS.md`, tabla de entorno y `spec.md:60` de Foundation alineados; #45 y T1 quedan como historia). **Quality gates**: el deploy corre `lint` → `test` → `build` y no publica si algo falla; se quitó la línea comentada `VITE_API_URL` (D2).
-- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · validate:content ✓ · YAML del workflow parseado ✓.
-- Decisiones: **#110** (Node 26 + `.nvmrc` en CI) y **#111** (quality gates) → `docs/README.md`.
-- Commits: `cf28268` (Node 26) · `35dbf2d` (lint/test en el deploy).
-- Abre: nada. Cierra: hallazgos 1–3 de "Auditoría pendiente" (queda el 4: categoría `motion`).
+### 2026-11-12 · §XVII — CI: Node 26 LTS y quality gates en el deploy · #110–#111 · `git show a9849b7:docs/diagnostics.md`
 
 ### 2026-11-11 · §XVI — QA visual post-contenido (pasada enfocada) · — · `git show bbb70b9:docs/diagnostics.md`
 
