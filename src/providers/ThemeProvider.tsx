@@ -3,12 +3,16 @@
 // preferencia), RF-4 (meta theme-color sincronizado), RF-5 (storage que lanza
 // no rompe). El estado inicial NO se recalcula: lo dejó resuelto el script
 // anti-flash en `data-theme` (index.html).
+// T16 (Cambio motion #106) agrega RF-9: supresión de transiciones durante el
+// cambio de tema (data-theme-switching + doble requestAnimationFrame).
 
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -55,6 +59,11 @@ function readStoredTheme(): Theme | null {
 export function ThemeProvider({ children }: ThemeProviderProps): ReactNode {
   const [theme, setThemeState] = useState<Theme>(readInitialTheme);
 
+  // RF-9: distingue el montaje inicial de los cambios interactivos
+  // (plan #106 §decisión 1). El primer paint ya lo resolvió el anti-flash,
+  // así que ahí no se suprime nada; el flag se levanta en el primer efecto.
+  const mountedRef = useRef(false);
+
   // setTheme: actualiza el estado y guarda la elección (fin del seguimiento
   // del sistema, RF-3). Si storage lanza, el cambio queda solo en memoria (RF-5).
   const setTheme = useCallback((next: Theme): void => {
@@ -74,8 +83,23 @@ export function ThemeProvider({ children }: ThemeProviderProps): ReactNode {
   // de prefers-color-scheme (theming.md): fija data-theme en <html> y luego
   // sincroniza <meta name="theme-color"> con --color-bg leído después de
   // aplicar data-theme. Así el meta nunca queda desincronizado (RF-4).
-  useEffect(() => {
+  // RF-9 (plan #106 §decisión 1): es useLayoutEffect y en el MISMO commit
+  // agrega `data-theme-switching` ANTES de escribir el nuevo data-theme, para
+  // que la regla global de src/styles/global.css (`:root[data-theme-switching]
+  // *`, (0,2,0), sin `!important`) corte las transiciones de color del cambio.
+  // La remoción va tras doble requestAnimationFrame (§decisión 2); el cleanup
+  // corre al desmontar Y al re-entrar el efecto (segundo cambio rápido):
+  // cancela el frame pendiente y remueve el atributo sin dejar estado huérfano.
+  useLayoutEffect(() => {
     const root = document.documentElement;
+    const interactive = mountedRef.current;
+    mountedRef.current = true;
+    let frameId: number | null = null;
+
+    if (interactive) {
+      root.dataset.themeSwitching = "";
+    }
+
     root.dataset.theme = theme;
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta !== null) {
@@ -84,6 +108,22 @@ export function ThemeProvider({ children }: ThemeProviderProps): ReactNode {
         window.getComputedStyle(root).getPropertyValue("--color-bg"),
       );
     }
+
+    if (interactive) {
+      frameId = requestAnimationFrame(() => {
+        frameId = requestAnimationFrame(() => {
+          frameId = null;
+          root.removeAttribute("data-theme-switching");
+        });
+      });
+    }
+
+    return () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId);
+      }
+      root.removeAttribute("data-theme-switching");
+    };
   }, [theme]);
 
   // RF-3: mientras no exista preferencia guardada, los cambios del sistema

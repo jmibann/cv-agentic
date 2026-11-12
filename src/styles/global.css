@@ -42,6 +42,20 @@ html:has(dialog[open]) {
   overflow: hidden;
 }
 
+/* Supresión de transiciones al cambiar de tema (RF-9, T16 del Cambio motion
+ * #106): ThemeProvider agrega data-theme-switching a <html> antes de aplicar
+ * el nuevo data-theme y lo quita tras dos frames. El selector :root +
+ * atributo + universal mide (0,2,0) y GANA a los selectores de módulo como
+ * `.social a` / `.contacts a` (0,1,1): html[data-theme-switching] * empataría
+ * con ellos y perdería por orden de carga (global.css se importa antes que
+ * los componentes). Sin `!important` (spec → No hacer). Rige solo cambios
+ * interactivos: el anti-flash de index.html no se toca (plan §decisión 6). */
+:root[data-theme-switching] *,
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after {
+  transition: none;
+}
+
 /* ---------------------------------------------------------------------------
  * IMPRESIÓN (`@media print`) — contrato transversal de
  * specs/layout/AppLayout/spec.md → "Impresión" + foundations/layout.md →
