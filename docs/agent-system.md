@@ -118,7 +118,8 @@ quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
 con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`. Trabajo abierto al
 2026-11-11: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109) y
 **QA visual aprobada** (§XVI) cerrados; queda el push/deploy, los 4 hallazgos de
-auditoría (`deploy.yml` y el registro de la categoría `motion`) y el **motion**,
+auditoría (`deploy.yml` y el registro de la categoría `motion` — **los resuelve el
+usuario, sin ampliar permisos de los agentes**) y el **motion**,
 aprobado pero sin implementar (`specs/motion/proposal.md`; #106–#109 en la tabla
 **Abiertos** de diagnostics):
 

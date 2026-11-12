@@ -12,12 +12,12 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XVI) y `docs/README
   (`c2d4232`/`5f6c0a6`); **CV real** + assets (`63f6665`) con `testimonials: []` y sin
   teléfono/WhatsApp; tests adaptados sin debilitar (`3855eb0`/`befb0db`); spec de
   Foundation alineada (**#109**; `headline`/cargos en inglés por decisión editorial
-  — no re-reportarla). **QA visual APROBADA (§XVI)**: gap chevron↔nombre a 375px con
-  "Juan Manuel Ibáñez" = **72.84px**, sin solapes ni overflow (informe: `qa-report.md`).
-- **Motion aprobado, NO implementado**: contrato en `specs/motion/proposal.md` (#106);
-  falta aprobar specs/planes/tareas.
-- **Pendientes del usuario**: push; aprobar specs motion; los 4 hallazgos de auditoría
-  (`deploy.yml` ×3 y registro de la categoría `motion`) → fila **Abiertos**.
+  — no re-reportarla). **QA visual APROBADA (§XVI)**: gap chevron↔nombre a 375px con el
+  nombre real = **72.84px**, sin solapes ni overflow (informe: `qa-report.md`).
+- **Motion aprobado, NO implementado**: contrato en `specs/motion/proposal.md` (#106); falta aprobar specs/planes/tareas.
+- **Pendientes del usuario**: push + verificar en GitHub Pages (base `/cv-agentic/`:
+  avatar, PDF, fuente, consola); los 4 hallazgos de auditoría, que **resuelve él sin
+  ampliar permisos**; aprobar specs motion → filas **Abiertos**.
 
 ## Reglas no negociables para cualquier tarea futura
 
