@@ -17,7 +17,7 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XXI) y `docs/README
 - **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre
   `lint` → `test` → `build` y no publica si algo falla (#111). Commits `cf28268`/`35dbf2d`.
 - **Pendientes del usuario**: push + verificar Actions y GitHub Pages (base `/cv-agentic/`);
-  aprobar specs motion. (Hallazgo "registrar `motion`" cerrado 2026-11-12: `AGENTS.md` + `specs/README.md`.)
+  aprobar specs motion. (Hallazgo "registrar `motion`" cerrado 2026-11-12: `specs/README.md` `a783d69` + `AGENTS.md` `c04f13d`.)
 
 ## Reglas no negociables para cualquier tarea futura
 

@@ -49,11 +49,11 @@ de la entrada); el detalle queda en git.
 ## Entradas
 
 ### §XXII · 2026-11-12 — Saneado de documentación (hallazgo de auditoría cerrado)
-- Qué: saneado 1–4 aprobado por el usuario: (1) conteos obsoletos 27→**28 specs** (27 de componentes + Foundation) en README y memoria; (2) suite actual **448** en el modo mantenimiento del README; (3) la categoría `motion` queda registrada en `specs/README.md` (nota bajo el índice + excepción a la regla de `.md` sueltos; **falta el equivalente en `AGENTS.md`**, bloqueado por los permisos de edición del orchestrator → queda pendiente su cierre parcial con tu edición o permiso) — sale la fila "Auditoría pendiente: registro de specs" de **Abiertos**; (4) §XI y §XII compactadas a una línea (tope #98; hashes de creación `133b1e8`/`31d8f27`). Sin cambios de código ni specs de pieza.
+- Qué: saneado 1–4 aprobado por el usuario: (1) conteos obsoletos 27→**28 specs** (27 de componentes + Foundation) en README y memoria; (2) suite actual **448** en el modo mantenimiento del README; (3) la categoría `motion` registrada en `specs/README.md` (nota bajo el índice + excepción a la regla de `.md` sueltos) y en `AGENTS.md:16` (edición manual del usuario: `AGENTS.md` no está en los permisos de `edit`/`git add` del orchestrator) — sale la fila "Auditoría pendiente: registro de specs" de **Abiertos**; (4) §XI y §XII compactadas a una línea (tope #98; hashes de creación `133b1e8`/`31d8f27`). Sin cambios de código ni specs de pieza.
 - Checks: lint ✓ · typecheck ✓ · test **448/40** ✓.
 - Decisiones: ninguna nueva (cierra el hallazgo 4 de la auditoría del usuario 2026-11-11).
-- Commits: docs(state) de este saneado (ver `git log`).
-- Abre: mini-hallazgo nuevo: edición de `AGENTS.md` sin permiso de `edit` para el orchestrator (¿ampliar permisos o sigue siendo trabajo del usuario?). Cierra: fila "Auditoría pendiente: registro de specs" (parcial, ver arriba).
+- Commits: `a783d69` (docs del saneado) · `c04f13d` (AGENTS.md, usuario).
+- Abre: nada. Cierra: fila "Auditoría pendiente: registro de specs" (completo).
 
 ### §XXI · 2026-11-12 — Favicon tipo app y título real
 - Qué: a pedido del usuario (el hexágono liso se veía como un "cubito" genérico y la pestaña decía `cv-agentic`), propuesta de 3 favicons; elegida la **C**: cuadrado redondeado `#304cfd` con hexágono en trazo blanco y monograma JM en paths (sin depender de fuentes). Se agrega `apple-touch-icon.png` 180×180 (mismo diseño a sangre, generado desde el SVG) y el título pasa a `Juan Manuel Ibáñez · Frontend Engineer`. Cambio de spec de Foundation (T14; reabre #105a con motivo concreto). T14b corrige el test rojo (Vite reescribía `new URL("….png", import.meta.url)`), sin tocar aserciones.
