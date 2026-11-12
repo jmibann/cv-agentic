@@ -186,8 +186,10 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
     expect(columns).toHaveClass(COLUMNS_CLASS);
     expect(experienceRegion.parentElement).toBe(columns);
     expect(columns.children).toHaveLength(2);
-    expect(columns.firstElementChild).toBe(educationRegion);
-    expect(columns.lastElementChild).toBe(experienceRegion);
+    // T5 (#114, cambio de spec aprobado): una sola columna con Experience
+    // primero; el orden es del DOM (lectura y foco = orden visual).
+    expect(columns.firstElementChild).toBe(experienceRegion);
+    expect(columns.lastElementChild).toBe(educationRegion);
 
     // El bloque .columns cuelga del raíz `div.page` y el `h1` sigue siendo su
     // PRIMER hijo (RF-1/RF-6: flujo de bloque para que el h1 fluya junto a la
