@@ -2,24 +2,22 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XV) y `docs/README.md` (#1–#109).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XVI) y `docs/README.md` (#1–#109).
 
 ## Estado actual (2026-11-11)
 
-- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; QA F5 en 4
-  pasadas + **Ctrl+P real aprobado** (`docs/qa-report.md`). Suite **447/40** y
-  lint/typecheck/build/validate:content ✅.
-- **Mantenimiento 2026-11-11 cerrado (§XIV/§XV)**: base Vite + `assetUrl()` en avatar
-  y CTA (`c2d4232`/`5f6c0a6`); **CV real** con assets (`63f6665`): `testimonials: []`,
-  contact sin teléfono/WhatsApp, PDF en `public/cv/`, `avatar.png` real, `avatar.svg`
-  retirado; tests adaptados sin debilitar (`3855eb0`/`befb0db`). La spec de Foundation
-  se alineó con el contenido (**#109**); `headline`/cargos de `cv.es.json` quedan **en
-  inglés por decisión editorial del usuario** (no re-reportarlo como hallazgo).
+- **PROYECTO ENTREGADO — F1–F5 cerradas**: 27/27 specs `implementada`; QA F5 (4
+  pasadas + **Ctrl+P real aprobado**). Suite **447/40**; lint/typecheck/build ✅.
+- **Mantenimiento 2026-11-11 cerrado (§XIV–§XVI)**: base Vite + `assetUrl()`
+  (`c2d4232`/`5f6c0a6`); **CV real** + assets (`63f6665`) con `testimonials: []` y sin
+  teléfono/WhatsApp; tests adaptados sin debilitar (`3855eb0`/`befb0db`); spec de
+  Foundation alineada (**#109**; `headline`/cargos en inglés por decisión editorial
+  — no re-reportarla). **QA visual APROBADA (§XVI)**: gap chevron↔nombre a 375px con
+  "Juan Manuel Ibáñez" = **72.84px**, sin solapes ni overflow (informe: `qa-report.md`).
 - **Motion aprobado, NO implementado**: contrato en `specs/motion/proposal.md` (#106);
   falta aprobar specs/planes/tareas.
-- **Pendientes del usuario**: push; QA visual (4 breakpoints × temas × en/es; re-medir
-  el gap chevron↔nombre con "Juan Manuel Ibáñez"); aprobar specs motion; los 4
-  hallazgos de auditoría (`deploy.yml` ×3 y registro de la categoría `motion`).
+- **Pendientes del usuario**: push; aprobar specs motion; los 4 hallazgos de auditoría
+  (`deploy.yml` ×3 y registro de la categoría `motion`) → fila **Abiertos**.
 
 ## Reglas no negociables para cualquier tarea futura
 

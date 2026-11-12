@@ -4,8 +4,9 @@ Log mínimo del proyecto (decisiones **#86** y **#98**): el orchestrator agrega
 **una entrada** por cada cierre de puerta F y por cada decisión de reglas, con
 los hashes de los commits relevantes. Última actualización: **2026-11-11**
 (mantenimiento: base de deploy + `assetUrl()`, CV real con su Cambio de spec
-(#109) y propuesta de motion aprobada; el proceso F1–F5 sigue cerrado — ver §XII;
-flujo y dueños en "Modo mantenimiento" de `docs/agent-system.md`).
+(#109) y **QA visual aprobada** (§XVI); la propuesta de motion sigue sin implementar.
+El proceso F1–F5 sigue cerrado — ver §XII; flujo y dueños en "Modo mantenimiento"
+de `docs/agent-system.md`).
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
 `docs/memory.md` · decisiones #1–#109 → `docs/README.md` · QA de F5 →
@@ -44,21 +45,29 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Verificación post-contenido | CV real cargado y spec de Foundation alineada (#109, §XV). Falta **QA visual** con la app servida por el usuario (#91): Sidebar (avatar, contactos, CTA de descarga del PDF), About **sin** sección de testimonios y Resume, en 375/768/1024/1440 × claro/oscuro × en/es, y **re-medir el gap chevron↔nombre a 375px con "Juan Manuel Ibáñez"** (los 23px aprobados se midieron con "Alex Rivera"); si no cumple, se reporta como hallazgo y **no se corrige sin OK del usuario**. Menor: `public/**/.DS_Store` (gitignored; Vite los copia a `dist/`) | Próxima pasada del reviewer |
-| Auditoría pendiente: CI y registro de specs | Cuatro hallazgos del usuario (2026-11-11), verificados en el repo, **sin corregir** porque tocan archivos fuera del alcance de los agentes: (1) `.github/workflows/deploy.yml:28` usa `node-version: lts/*` en vez de `node-version-file: .nvmrc` (Node 24 LTS); (2) el workflow **no corre `lint` ni `test`** antes de publicar (solo `npm ci` + `npm run build`); (3) `deploy.yml:36` conserva la línea comentada `# VITE_API_URL`, que no aplica al sitio (D2); (4) la categoría `motion` de `specs/` no está registrada en `AGENTS.md:16` ni en `specs/README.md` (que en `:117-118` solo excepciona `specs/README.md` como `.md` suelto, y `specs/motion/proposal.md` existe desde `2886109`) | Decisión del usuario (edición directa suya o ampliación de permisos) |
+| Auditoría pendiente: CI y registro de specs | Cuatro hallazgos del usuario (2026-11-11), verificados en el repo, **sin corregir** porque tocan archivos fuera del alcance de los agentes: (1) `.github/workflows/deploy.yml:28` usa `node-version: lts/*` en vez de `node-version-file: .nvmrc` (Node 24 LTS); (2) el workflow **no corre `lint` ni `test`** antes de publicar (solo `npm ci` + `npm run build`); (3) `deploy.yml:36` conserva la línea comentada `# VITE_API_URL`, que no aplica al sitio (D2); (4) la categoría `motion` de `specs/` no está registrada en `AGENTS.md:16` ni en `specs/README.md` (que en `:117-118` solo excepciona `specs/README.md` como `.md` suelto, y `specs/motion/proposal.md` existe desde `2886109`). Menor sin acción: `public/**/.DS_Store` (gitignored; Vite los copia a `dist/`) | Decisión del usuario (edición directa suya o ampliación de permisos) |
 | Motion (post-entrega) | Propuesta aprobada (#106) en `specs/motion/proposal.md`; falta aprobar specs/planes/tareas y luego implementar tokens, tabs B, Sidebar grid, `data-theme-switching`, reduced motion, dialog y Separator. No se toca código antes de esa puerta | Puerta de Plan+Tareas / Cambio |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
 
+### §XVI · 2026-11-11 — QA visual post-contenido (pasada enfocada)
+
+- Qué: el reviewer verificó en vivo (app servida por el usuario en `http://localhost:5173/`, #91) el resultado del contenido real: Sidebar con avatar real y `alt` derivado, contactos solo email/ubicación, CTA del PDF con `href="/cv/Juan-Manuel-Ibanez-CV.pdf"` → 200 `application/pdf`, About/Resume **sin** sección de testimonios, Resume con los counts reales (4/10/23) y periodos en/es, cero placeholders de ejemplo, grilla 375/768/1024/1440 × claro/oscuro × en/es sin overflow ni solapes y consola limpia. **Medición crítica**: gap chevron↔nombre a 375px con "Juan Manuel Ibáñez" = **72.84px** en los 4 cruces (3× los 23px de la referencia con "Alex Rivera") → cierra la nota pendiente de #105c. Fueron dos pasadas: la 1ª agotó el límite de pasos sin renderizar la Resume EN; la 2ª, enfocada, la cerró.
+- Veredicto: **APROBADO**, sin hallazgos que corregir. No se tocó código (el usuario pidió solo reporte).
+- Checks de la pasada: grilla 16/16 con `scrollWidth === clientWidth`; HEAD del PDF 200; counts 4/10/23 en es y en; barrido de placeholders `[]`; consola sin errores ni warnings.
+- Decisiones: ninguna nueva. Se reafirman #108 (testimonios vacíos, sin teléfono/WhatsApp) y **#109** (headline/cargos en inglés; los `testimonials/*.svg` **se conservan** como fixture de `data/cv.example.{en,es}.json` → la sugerencia de limpiarlos **no se aplica**).
+- Registra: informe completo con evidencia en `docs/qa-report.md` ("Pasada enfocada post-contenido real").
+- Abre: nada nuevo. Cierra: fila "Verificación post-contenido" de **Abiertos**.
+
 ### §XV · 2026-11-11 — Contenido real, tests y CTA de descarga
 
-- Qué: se cargó el **CV real bilingüe** en `src/content/cv.{en,es}.json` con `testimonials: []`, contact sin teléfono/WhatsApp y `downloadCvUrl` al PDF; se actualizó `public/images/avatar.png` y se retiró `avatar.svg`; se agregó `public/cv/Juan-Manuel-Ibanez-CV.pdf`. Tests adaptados sin debilitar: `LocaleProvider` usa `profile.about[0]`, `AppLayout` deriva el alt, `AboutPage` usa fixtures no vacíos (tests 4/6) y vacío (5b), y `content.test` conserva schema/paridad/orden/rechazos y valida ambos examples; solo se quitó la "copia fiel" (#108). El CTA del `Sidebar` usa `assetUrl(profile.downloadCvUrl)` (#107). Cerrado el paso 5 del plan del Cambio: la spec/plan/tasks de Foundation se alinearon con el contenido real (**#109**, aprovado por el usuario).
+- Qué: se cargó el **CV real bilingüe** en `src/content/cv.{en,es}.json` con `testimonials: []`, contact sin teléfono/WhatsApp y `downloadCvUrl` al PDF; se actualizó `public/images/avatar.png` y se retiró `avatar.svg`; se agregó `public/cv/Juan-Manuel-Ibanez-CV.pdf`. Tests adaptados sin debilitar: `LocaleProvider` usa `profile.about[0]`, `AppLayout` deriva el alt, `AboutPage` usa fixtures no vacíos (tests 4/6) y vacío (5b), y `content.test` conserva schema/paridad/orden/rechazos y valida ambos examples; solo se quitó la "copia fiel" (#108). El CTA del `Sidebar` usa `assetUrl(profile.downloadCvUrl)` (#107). Cerrado el paso 5 del plan del Cambio: la spec/plan/tasks de Foundation se alinearon con el contenido real (**#109**, aprobado por el usuario).
 - Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ (1989 módulos) · validate:content ✓ · reviewer **APROBADO**.
 - Decisiones: **#108 ejecutada**, **#107 extendida** al CTA y **#109** (parche de la spec/plan/tasks de Foundation aprobado por el usuario + decisión editorial: `headline`/cargos de `cv.es.json` quedan en inglés) → `docs/README.md`.
-- Commits: `3855eb0` (test Foundation) · `befb0db` (tests de contenido) · `63f6665` (contenido/assets) · `5f6c0a6` (CTA) · `aa9d310` (proposal de motion actualizado).
-- Abre: filas "Verificación post-contenido" (QA visual con "Juan Manuel Ibáñez") y "Auditoría pendiente: CI y registro de specs"; cierra: "Contenido real (post-entrega)".
+- Commits: `3855eb0` (test Foundation) · `befb0db` (tests de contenido) · `63f6665` (contenido/assets) · `5f6c0a6` (CTA) · `aa9d310` (proposal de motion) · `6826436` (parche #109).
+- Abre: fila "Auditoría pendiente: CI y registro de specs" (4 hallazgos del usuario); la de "Verificación post-contenido" se cerró en §XVI. Cierra: "Contenido real (post-entrega)".
 
 ### §XIV · 2026-11-11 — Mantenimiento: deploy GitHub Pages + propuesta de motion
 

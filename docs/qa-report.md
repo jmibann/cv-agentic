@@ -10,6 +10,40 @@
 > ThemeToggle/LanguageSwitcher con `.group` flex + gap por token); suite 446/40,
 > build ✅. Detalle: §XIII en `docs/diagnostics.md`.
 
+## Pasada enfocada post-contenido real (2026-11-11) — APROBADO
+
+App servida por el usuario en `http://localhost:5173/` (#91), reviewer con
+chrome-devtools MCP, **solo lectura** (el usuario pidió no corregir nada sin su OK).
+Cubre la verificación pedida por #108/#109 tras `63f6665`. Fueron **dos pasadas**: la
+primera agotó el límite de pasos sin renderizar la Resume en inglés; la segunda,
+enfocada en ese hueco, lo cerró.
+
+| Cheque | Evidencia | Resultado |
+|---|---|---|
+| Grilla 375/768/1024/1440 × claro/oscuro × en/es | `scrollWidth === clientWidth` en los 16 estados; sin solapes | ✅ |
+| **Gap chevron↔nombre a 375px con "Juan Manuel Ibáñez"** | Range rects del texto real (nombre en 2 líneas: l1 r=260, l2 r=206) vs borde izquierdo del botón: **72.84px en los 4 cruces idioma×tema** (el SVG: 76.84px). Referencias: 245.78px en 768 y 501.78px en 1024 | ✅ cero solape y sin invasión; **3×** la holgura de los 23px de #105c → cierra la nota de "queda justo con el nombre de ejemplo" |
+| Sidebar: avatar real | `complete: true`, 412×512, `src="/images/avatar.png"`, `alt` "Portrait of Juan Manuel Ibáñez" / "Retrato de …" (sale de `ui.{en,es}.sidebar.avatarAlt` + `profile.name`) | ✅ |
+| CTA del PDF | `<a download href="/cv/Juan-Manuel-Ibanez-CV.pdf">` en ambos idiomas; HEAD → **200 `application/pdf`** (en dev `BASE_URL`="/"; el `base` de GH Pages no se ejercita acá) | ✅ |
+| About/Resume **sin** testimonios (`testimonials: []`) | Ningún `h2`/región/carrusel de testimonios en es/en; los únicos matches de `testimonial` en `innerHTML` son variables de `tokens.css` | ✅ (#108) |
+| Resume con contenido real | Education 4 · Experience 10 · Skills 23, **mismos counts en es y en**; periodos EN `"Jul 2026 — Present"` / `"Oct 2023 — Jul 2026"` y ES `"jul 2026 — Actualidad"`; `lang` correcto; barrido `[áéíóúñ¿¡]` sobre la UI en inglés = 0 | ✅ |
+| Cero placeholders de ejemplo | Búsqueda de "Alex Rivera" / "Maria" / "John" / "Lena" / `testimonials/` en `innerText` **y** `innerHTML` → `[]` en es y en | ✅ |
+| CornerTab vs `h1` (768/1440) | 768: la tab queda arriba del h1; 1440: texto del h1 (x 458–590) vs tab (x 1130–1349) → sin intersección por `Range` y el panel no se angosta (861px con y sin tab). *Nota, no defecto:* el **box** de bloque del `h1` ocupa todo el ancho del panel, por eso un rect genérico sí intersecta; lo que prescribe la spec es el flujo del texto | ✅ |
+| Foco, disclosure y anti-flash | Anillo estándar por teclado 2px `rgb(48,76,253)` offset 2px (`--focus-ring-*`); chevron rota 180° (`matrix(-1,0,0,-1)`); recarga en es/oscuro → `data-theme=dark` + `lang=es` + `theme-color=#151517` desde el primer frame | ✅ |
+| Consola | Sin errores ni warnings tras cada navegación con recarga completa | ✅ |
+
+**No son hallazgos (decisiones cerradas, para que no vuelvan a aparecer):** el
+`headline` y los cargos en inglés dentro de `cv.es.json` (**#109**, decisión editorial
+del usuario); la ausencia de testimonios y de teléfono/WhatsApp (**#108**); y los
+`public/images/testimonials/*.svg` que siguen en disco, que **se conservan a propósito**
+porque los usa el fixture `data/cv.example.{en,es}.json` (**#109**) — la sugerencia del
+reviewer de limpiarlos **no se aplica**. Menor sin acción: `public/**/.DS_Store`
+(gitignored; Vite los copia a `dist/`).
+
+**Sin verificar:** vista de impresión y sticky 1440×800 (cubiertos en F5 y por el
+Ctrl+P real del usuario; nada de eso cambió desde entonces); axe en navegador (0
+violaciones en F5 y la suite con `expectNoA11yViolations` sigue verde 447/40); el
+`base` real de GitHub Pages (`DEPLOY_TARGET=gh-pages` + deploy), en manos del usuario.
+
 ## RESOLUCIÓN (pasadas 3–4, tras el paquete #104)
 
 Las correcciones #104 se implementaron, revisaron y verificaron en vivo:
@@ -25,7 +59,7 @@ Las correcciones #104 se implementaron, revisaron y verificaron en vivo:
 | D4 favicon 404 | Foundation T13/T13b `b93c510` (`/favicon.svg`, azul `#304cfd`) | PASADA 3-D: 200 `image/svg+xml`, cero petición al .ico, consola limpia |
 | Pendientes E de pasada 1/2 | — | PASADA 3-E1–E3 (overflow 1024/768; sticky OFF 1440×800 + último contacto; disclosure teclado 1024) y PASADA 4 (bullet 2 Enter→aria-current+scrollLeft 445; hover NavTabs = spec RF-5; axe 0 violaciones en×claro×about y es×oscuro×resume; contraste del chevron claro 5.87 / oscuro 12.06 ✓ contrast.md filas 15/19/39) |
 
-Suite tras todo: **445/40**, build ✅ validate:content ✅. **Spot-check #105c (tras aplicar los tokens)**: avatar 102px exactos a 375 en ambos temas, gap chevron↔nombre 23px sin solape, md–lg (144px) y 1024 intactos, overflow 0 en 375/Resume/768/1024 → APROBADO. ⚠️ Nota: el gap de 23px queda justo con el nombre de ejemplo ("Alex Rivera"); **reconfirmar en 375 cuando `src/content/cv.*.json` tenga el nombre definitivo** (el contenido es editable por diseño; no es defecto de layout).
+Suite tras todo: **445/40**, build ✅ validate:content ✅. **Spot-check #105c (tras aplicar los tokens)**: avatar 102px exactos a 375 en ambos temas, gap chevron↔nombre 23px sin solape, md–lg (144px) y 1024 intactos, overflow 0 en 375/Resume/768/1024 → APROBADO. ⚠️ Nota: el gap de 23px queda justo con el nombre de ejemplo ("Alex Rivera"); **reconfirmar en 375 cuando `src/content/cv.*.json` tenga el nombre definitivo** (el contenido es editable por diseño; no es defecto de layout). → **Reconfirmado y cerrado el 2026-11-11** con "Juan Manuel Ibáñez": 72.84px sin solape (sección "Pasada enfocada post-contenido real").
 
 ### Quedan en manos del usuario (no verificables por agentes)
 

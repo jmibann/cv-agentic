@@ -647,9 +647,12 @@ por el CV real, en ambos idiomas, sin tocar el esquema.
 > PDF y avatar en `public/`, tests adaptados (`3855eb0` `befb0db` `63f6665`) y CTA
 > con `assetUrl` (`5f6c0a6`); suite **447/40**, `validate:content` y `build` ✅.
 > Hecho además el **paso 5**: la spec/plan/tasks de Foundation se alinearon con el
-> contenido real, aprovadas por el usuario como **decisión #109** (`docs/README.md`).
-> Falta: **paso 8** (QA visual con la app servida por el usuario, #91) y **paso 9**
-> (los Cambios de motion, tras aprobar specs/planes/tareas).
+> contenido real, aprobadas por el usuario como **decisión #109** (`docs/README.md`).
+> Hecho también el **paso 8**: QA visual **APROBADA** con la app servida por el
+> usuario (§XVI en `docs/diagnostics.md`, informe en `docs/qa-report.md`) — grilla
+> 375–1440 × temas × idiomas sin overflow ni solapes y gap chevron↔nombre a 375px con
+> el nombre real = **72.84px**.
+> Falta: **paso 9** (los Cambios de motion, tras aprobar specs/planes/tareas).
 
 ### 5.1 Datos y assets
 
@@ -732,7 +735,7 @@ it("validates both example files against the schema", () => {
 
 ### 5.4 Impacto en la spec de Foundation
 
-**Aprovado por el usuario y aplicado (decisión #109).** Queda el texto de la
+**Aprobado por el usuario y aplicado (decisión #109).** Queda el texto de la
 propuesta como registro; lo ejecutado es exactamente esto, con dos correcciones que
 pidió el usuario: los `testimonials/*.svg` **se conservan** (los usa el fixture
 `data/cv.example.{en,es}.json`) y el Cambio se registró como **#109**, referenciado
@@ -768,10 +771,10 @@ en §XV y en la nota de T9.
 6. ✅ Copiar assets a `public/…`; rutas con `assetUrl`/base, incluido el CTA
    (`63f6665` + `5f6c0a6`).
 7. ✅ `npm run validate:content`, `npm test` (447/40), `npm run build`.
-8. ⏳ QA visual: Sidebar (avatar/contactos/CTA), About (servicios; sin sección de
-   testimonios), Resume (education/experience/skills), ambos idiomas y temas —
-   requiere que el usuario sirva la app (#91). Re-observar el gap
-   chevron↔nombre a 375px con el nombre real.
+8. ✅ QA visual: Sidebar (avatar/contactos/CTA), About (servicios; sin sección de
+   testimonios), Resume (education/experience/skills), ambos idiomas y temas, con la
+   app servida por el usuario (#91). Gap chevron↔nombre a 375px con "Juan Manuel
+   Ibáñez" = **72.84px**, sin solapes → APROBADO (§XVI, `docs/qa-report.md`).
 9. ⏳ Recién después, arrancar los Cambios de motion.
 
 **Tareas (Tn):** los pasos 1–4 y 6–7 se ejecutaron como **mantenimiento
