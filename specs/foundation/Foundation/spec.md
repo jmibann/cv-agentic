@@ -60,7 +60,9 @@ Estructura que crea F1 en la raíz (no es un componente visual):
 package.json · package-lock.json · .nvmrc (26, #110) · .gitignore
 index.html                  ← `<html lang="en">` + meta theme-color #eceef4
                               + script anti-flash inline en <head> (foundations/theming.md, tal cual)
+                              + `<title>Juan Manuel Ibáñez · Frontend Engineer</title>` (nombre y cargo, no el del repo; #115)
                               + `<link rel="icon" type="image/svg+xml" href="/favicon.svg">` (Cambio F5 2026-10-08, hallazgo D4: el navegador pedía /favicon.ico → 404)
+                              + `<link rel="apple-touch-icon" href="/apple-touch-icon.png">` (#115)
 vite.config.ts              ← plugin react + resolve.alias @data/*
 tsconfig.json               ← único; strict, noUnusedLocals, noUnusedParameters,
                               noUncheckedIndexedAccess, moduleResolution "bundler",
@@ -69,17 +71,23 @@ tsconfig.json               ← único; strict, noUnusedLocals, noUnusedParamete
 eslint.config.js            ← flat: typescript-eslint (strict), react-hooks,
                               react-refresh; --max-warnings 0; no-restricted-syntax
                               que prohíbe #[0-9a-fA-F]{3,8}\b|rgb(|hsl( en .tsx
-public/images/              ← avatar.png (foto real del sitio) y
+public/images/              ← avatar.png (foto real del sitio), testimonials/{magrael,
+                              jptigani,dharari}.jpg (fotos reales de los testimonios, #112) y
                               testimonials/{maria,john,lena}.svg (silueta neutra, sin texto
-                              ni marcas, viewBox cuadrado). Los de testimonios el sitio ya
-                              no los muestra (`testimonials: []`), pero **se conservan**:
+                              ni marcas, viewBox cuadrado). El sitio ya no muestra las
+                              siluetas, pero **se conservan**:
                               los referencia el fixture `data/cv.example.{en,es}.json`.
                               No borrarlos. (El `avatar.svg` original quedó obsoleto en
                               `861fb9a` y se retiró en `63f6665` — #109)
-public/favicon.svg          ← hexágono simple de marca (form factor de HexAvatar, pointy-top;
-                              fill del azul de acento del kit — literal `#304cfd`, el valor de
-                              `--color-accent` (tokens.css:97); un asset público no es CSS de app;
-                              sobre transparente, viewBox cuadrado 64×64; Cambio F5 — D4)
+public/favicon.svg          ← ícono tipo app (#115, reemplaza el hexágono liso de D4): cuadrado
+                              redondeado (`rx` 14) relleno del azul de acento del kit — literal
+                              `#304cfd`, el valor de `--color-accent` (tokens.css:97); un asset
+                              público no es CSS de app —, con un hexágono pointy-top en trazo
+                              blanco (form factor de HexAvatar) y el monograma "JM" adentro,
+                              dibujado con paths (sin `<text>`: no depende de fuentes);
+                              viewBox cuadrado 64×64
+public/apple-touch-icon.png ← el mismo diseño a 180×180, cuadrado a sangre (iOS redondea las
+                              esquinas), para "Agregar a pantalla de inicio" (#115)
 src/main.tsx                ← importa ../tokens/tokens.css (única importación, ruta
                               relativa), @fontsource/poppins/{300,400,500,600}.css,
                               src/styles/global.css; monta ThemeProvider > LocaleProvider > App
