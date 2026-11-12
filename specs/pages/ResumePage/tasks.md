@@ -13,3 +13,6 @@
   - Hecho cuando:
     (a) **módulo CSS**: `.page` flujo de bloque normal con `* + * { margin-top: var(--stack-gap) }` (cero flex/grid/`overflow` — RF-6, inspección); `.columns { display: grid; row-gap: var(--stack-gap); column-gap: var(--layout-gap) }` + **único `@media (min-width: 768px)`** (solo layout) con `grid-template-columns: repeat(2, minmax(0, 1fr))` y cláusula `grid-column: 1 / -1` para el hijo único (RF-3, inspección; skills siempre ancho completo debajo);
     (b) **tests**: test 9 de la spec (unión `className` en `.page`, G-B) + test 8 (`expectNoA11yViolations` en escenario completo); cero colores literales; verde tras `feat(ResumePage): T4`.
+
+- [ ] **T5. Una sola columna con Experience primero.** RF-3, RF-6 (cambio de spec aprobado por el usuario, #114)
+  - Hecho cuando: (a) **test 2**: dentro de `.columns` la región de experience es el primer hijo y la de education el último (única aserción cambiada, autorizada por #114); (b) `ResumePage.tsx` monta experience antes que education (orden del DOM, no `order` de CSS); (c) `ResumePage.module.css`: `.columns { display: grid; row-gap: var(--stack-gap) }` sin `@media` ni `:only-child`; verde tras `feat(ResumePage): T5`.

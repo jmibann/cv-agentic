@@ -143,8 +143,10 @@ h2 Testimonials → TestimonialCarousel (1 por vista; 2 ≥ md)
 
 ```
 h1 Resume (SectionTitle decorated)
-┌ ResumeSection Education ┐ ┌ ResumeSection Experience ┐   lado a lado ≥ md (gap --layout-gap)
-└─────────────────────────┘ └──────────────────────────┘   apiladas < md
+┌ ResumeSection Experience ────────────────────────────┐   una sola columna en
+└──────────────────────────────────────────────────────┘   todos los anchos (#114)
+┌ ResumeSection Education ─────────────────────────────┐   gap --stack-gap
+└──────────────────────────────────────────────────────┘
 h2 Skills → SkillList (chips) a ancho completo
 ```
 
