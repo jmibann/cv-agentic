@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-12** (CI §XVII; testimonios §XVIII–§XIX).
+Última actualización: **2026-11-12** (CI §XVII; testimonios §XVIII–§XIX; Resume en una columna §XX).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#113 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#114 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -49,6 +49,13 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### §XX · 2026-11-12 — ResumePage en una sola columna, Experience primero
+- Qué: a pedido del usuario (las dos columnas con timeline desde 768px eran difíciles de leer), Resume pasa a una sola columna en todos los anchos: Experience arriba, Education debajo, Skills al final. Preview previa en navegador con CSS inyectado; Cambio de spec aprobado (RF-3 reescrito, RF-2/RF-6, Anatomía, Estilos, Responsive y test 2). T5: orden invertido en el DOM (no `order` de CSS: lectura y foco = visual) y `.columns` sin `@media` ni `:only-child`. Única aserción cambiada: el orden de las regiones en el test 2, autorizada por el cambio de spec.
+- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · navegador 375/768/1334: una columna, Experience primero, sin overflow, consola limpia.
+- Decisiones: **#114** → `docs/README.md`.
+- Commits: `28e6ecf` (spec/T5) · `1c16bf5` (test rojo) · `174bc4e` (feat).
+- Abre: nada. Cierra: nada (§XVI compactada a una línea por el tope de 150).
+
 ### §XIX · 2026-11-12 — TestimonialCard: avatar anclado arriba
 - Qué: auditoría en navegador de la alineación de los hexágonos: con `align-items: end` el avatar bajaba con cada línea de nombre/rol, no sobresalía en ningún ancho y quedaba desalineado entre cards (50px a 768, 25px a 1440). Cambio aprobado (T6): `.header` → `align-items: start` y reserva exacta de la comilla con el token nuevo `--testimonial-quote-reserve` (2.2rem → 2rem ≥580). Sin clamp del rol (decisión del usuario).
 - Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · navegador 375/580/768/1024/1440 × claro/oscuro × en/es: avatar −24/−30px idéntico en las 3 cards, 0 invasión de la comilla, sin overflow, dialog OK, consola limpia.
@@ -70,14 +77,7 @@ de la entrada); el detalle queda en git.
 - Commits: `cf28268` (Node 26) · `35dbf2d` (lint/test en el deploy).
 - Abre: nada. Cierra: hallazgos 1–3 de "Auditoría pendiente" (queda el 4: categoría `motion`).
 
-### §XVI · 2026-11-11 — QA visual post-contenido (pasada enfocada)
-
-- Qué: el reviewer verificó en vivo (app servida por el usuario en `http://localhost:5173/`, #91) el resultado del contenido real: Sidebar con avatar real y `alt` derivado, contactos solo email/ubicación, CTA del PDF con `href="/cv/Juan-Manuel-Ibanez-CV.pdf"` → 200 `application/pdf`, About/Resume **sin** sección de testimonios, Resume con los counts reales (4/10/23) y periodos en/es, cero placeholders de ejemplo, grilla 375/768/1024/1440 × claro/oscuro × en/es sin overflow ni solapes y consola limpia. **Medición crítica**: gap chevron↔nombre a 375px con "Juan Manuel Ibáñez" = **72.84px** en los 4 cruces (3× los 23px de la referencia con "Alex Rivera") → cierra la nota pendiente de #105c. Fueron dos pasadas: la 1ª agotó el límite de pasos sin renderizar la Resume EN; la 2ª, enfocada, la cerró.
-- Veredicto: **APROBADO**, sin hallazgos que corregir. No se tocó código (el usuario pidió solo reporte).
-- Checks de la pasada: grilla 16/16 con `scrollWidth === clientWidth`; HEAD del PDF 200; counts 4/10/23 en es y en; barrido de placeholders `[]`; consola sin errores ni warnings.
-- Decisiones: ninguna nueva. Se reafirman #108 (testimonios vacíos, sin teléfono/WhatsApp) y **#109** (headline/cargos en inglés; los `testimonials/*.svg` **se conservan** como fixture de `data/cv.example.{en,es}.json` → la sugerencia de limpiarlos **no se aplica**).
-- Registra: informe completo con evidencia en `docs/qa-report.md` ("Pasada enfocada post-contenido real").
-- Abre: nada nuevo. Cierra: fila "Verificación post-contenido" de **Abiertos**.
+### 2026-11-11 · §XVI — QA visual post-contenido (pasada enfocada) · — · `git show bbb70b9:docs/diagnostics.md`
 
 ### 2026-11-11 · §XV — Contenido real, tests y CTA de descarga · #107–#109 · `git show 0c5c54b:docs/diagnostics.md`
 
