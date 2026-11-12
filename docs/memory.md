@@ -6,7 +6,7 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XXI) y `docs/README
 
 ## Estado actual (2026-11-12)
 
-- **ENTREGADO — F1–F5 cerradas**: 28/28 `implementada` (27 de componentes + Foundation); QA F5 + Ctrl+P real ✅; suite **448/40**. Resume en una sola columna, Experience primero (#114, §XX); favicon tipo app JM + título real (#115, §XXI).
+- **ENTREGADO — F1–F5 cerradas**: 28/28 `implementada` (27 de componentes + Foundation); QA F5 + Ctrl+P real ✅; suite **449/40**. Resume en una sola columna, Experience primero (#114, §XX); favicon tipo app JM + título real (#115, §XXI).
 - **Mantenimiento 2026-11-11 cerrado (§XIV–§XVI)**: base Vite + `assetUrl()`
   (`c2d4232`/`5f6c0a6`); **CV real** + assets (`63f6665`) sin teléfono/WhatsApp; **3 testimonios reales**
   (#112, textos literales; TestimonialCard T5/T6: comilla reservada y avatar anclado arriba, #113); tests adaptados sin debilitar (`3855eb0`/`befb0db`); spec de

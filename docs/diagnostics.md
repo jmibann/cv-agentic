@@ -59,7 +59,8 @@ de la entrada); el detalle queda en git.
 - Qué: a pedido del usuario (el hexágono liso se veía como un "cubito" genérico y la pestaña decía `cv-agentic`), propuesta de 3 favicons; elegida la **C**: cuadrado redondeado `#304cfd` con hexágono en trazo blanco y monograma JM en paths (sin depender de fuentes). Se agrega `apple-touch-icon.png` 180×180 (mismo diseño a sangre, generado desde el SVG) y el título pasa a `Juan Manuel Ibáñez · Frontend Engineer`. Cambio de spec de Foundation (T14; reabre #105a con motivo concreto). T14b corrige el test rojo (Vite reescribía `new URL("….png", import.meta.url)`), sin tocar aserciones.
 - Checks: lint ✓ · typecheck ✓ · test **448/40** ✓ · build ✓ (con base `/cv-agentic/` ambos links salen prefijados) · navegador: título OK, `/favicon.svg` y `/apple-touch-icon.png` 200, consola limpia.
 - Decisiones: **#115** → `docs/README.md`.
-- Commits: `a0d7b5f` (spec/T14) · `3b4db39` + `516621a` (tests) · `9ebcca4` (feat).
+- Post-deploy: el usuario vio el ícono viejo; el SVG publicado no parseaba (un `--` en el comentario XML; la verificación previa solo miró el 200). T14c: test de XML bien formado (rojo real) + `fix` del comentario; suite **449/40**.
+- Commits: `a0d7b5f` (spec/T14) · `3b4db39` + `516621a` + `afbc660` (tests) · `9ebcca4` (feat) · `05e2cb6` (fix).
 - Abre: nada. Cierra: nada (§XVII compactada a una línea por el tope de 150).
 
 ### §XX · 2026-11-12 — ResumePage en una sola columna, Experience primero
