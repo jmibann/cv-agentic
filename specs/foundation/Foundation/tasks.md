@@ -197,7 +197,7 @@ T3b (deuda L1 detectada en su review).
     `prefers-reduced-motion: reduce` de `tokens.css` colapsa a `0.01ms` las
     **cinco** duraciones (fast, base, slow, exit, stagger); `lint`/`typecheck`/
     `test` en verde tras el commit del usuario.
-- [ ] **T16. `data-theme-switching` en `ThemeProvider` + regla global.** RF-9 — delegable a `foundation` sin esperar T15
+- [x] **T16. `data-theme-switching` en `ThemeProvider` + regla global.** RF-9 — delegable a `foundation` sin esperar T15 — 6dda460 (test) + c0bc995 (feat); reviewer APROBADO (454/40; menor registrada: comentario "nada que huérfano" roto en `ThemeProvider.test.tsx:399` + typo "huelfano" cuerpo `6dda460`, deuda de forma para el próximo toque del archivo)
   - Hecho cuando: `test(Foundation): T16` (rojo) agrega a `ThemeProvider.test.tsx`
     los casos con rAF/timers falsos: (a) al cambiar el tema por `toggleTheme`
     el atributo está en `<html>` **antes** de aplicar el nuevo `data-theme` y
