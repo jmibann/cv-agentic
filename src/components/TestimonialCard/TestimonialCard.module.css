@@ -66,11 +66,14 @@
   margin-bottom: 0.75rem;
 }
 
-/* Tabla → bloque identity (<div> con h3 + p de rol): la tabla NO le asigna
-   ninguna propiedad (el apilamiento vertical lo da el flujo de bloques); la
-   clase existe para cumplir el markup de spec → Anatomía y que la unión
-   `styles.identity` resuelva una clase real en el módulo. */
+/* Tabla → Identidad (<div> con h3 + p de rol; T5, Cambio 2026-11-12, #112):
+   el apilamiento vertical lo da el flujo de bloques. `padding-inline-end`
+   reserva el ancho de la comilla (2rem, el `--icon-size` literal de `.quote`)
+   más su distancia al borde (`--testimonial-quote-inset-inline`), así nombre
+   y rol nunca quedan debajo de la comilla absoluta. Solo tokens + literal de
+   la tabla; escala con el token, sin `@media` propios (RF-6). */
 .identity {
+  padding-inline-end: calc(2rem + var(--testimonial-quote-inset-inline));
 }
 
 /* Tabla → Avatar (RF-4, HexAvatar; clase unida al `wrap` — el elemento raíz
