@@ -1,5 +1,5 @@
 # Foundation
-Estado: implementada
+Estado: aprobada
 
 Pieza de F1 (decisión #84): deja la app lista para que F2–F4 construyan
 componentes con TDD. El alcance está derivado **solo** de
@@ -44,6 +44,20 @@ un componente ni cómo testearlo.
   `"2015 — Present"`, `"2015 — Actualidad"` (`end: null`) y
   `"Mar 2019 — Nov 2021"` / `"mar 2019 — nov 2021"` (`Intl` mes abreviado +
   año), con separador `" — "`.
+- **RF-9:** CUANDO cambia el tema (`toggleTheme` o cambio del sistema sin
+  preferencia guardada), ENTONCES EL SISTEMA aplica `data-theme` **sin
+  transiciones de color**: agrega `data-theme-switching` a `<html>` antes de
+  aplicarlo y lo quita después de dos frames; SI el componente se desmonta o el
+  tema cambia de nuevo antes de la remoción, ENTONCES el atributo se limpia o la
+  supresión se reinicia sin dejar estado huérfano.
+- **RF-10:** EL SISTEMA expone en `tokens/tokens.css` la escala de motion
+  aprobada (decisión #106): `--duration-fast: 0.15s`, `--duration-base: 0.2s`
+  (antes 0.3s), `--duration-slow: 0.3s` (antes 0.6s, sin usos actuales),
+  `--duration-exit: 0.22s`, `--duration-stagger: 0.03s`, `--ease-standard` y
+  `--ease-emphasized` sin cambio, `--ease-enter: cubic-bezier(0.22, 1, 0.36, 1)`
+  y `--ease-exit: cubic-bezier(0.4, 0, 1, 1)` nuevos; SI
+  `prefers-reduced-motion: reduce`, ENTONCES las cinco duraciones valen
+  `0.01ms`.
 
 *Notas de trazabilidad (Clarificación F1): el orden de resolución de tema e
 idioma (`cv:theme` → sistema → `light`; `cv:locale` → navegador `es*` → `en`) y
@@ -197,6 +211,11 @@ crean a mano.
   iniciales de `theme-color` (`#eceef4` / `#151517`), excepción de la regla
   dura 1 de `docs/DESIGN.md`, verificada por test contra `--palette-light-bg` /
   `--palette-dark-bg` (decisión #60).
+- Supresión de transiciones al cambiar de tema (RF-9, Cambio motion #106):
+  `html[data-theme-switching] * { transition: none }` en `src/styles/global.css`
+  (+ `::before`/`::after`), sin `!important`; especificidad (0,1,1) gana a las
+  clases hasheadas de los módulos. El anti-flash de `index.html` no se toca: la
+  supresión rige solo los cambios interactivos.
 - Imágenes en `public/images/`: son contenido, no estilos. `avatar.png` es la foto
   real del sitio; los `testimonials/*.svg` se conservan como fixture del ejemplo
   `data/cv.example.{en,es}.json` aunque el sitio no los muestre (`testimonials: []`).
@@ -259,6 +278,12 @@ Fuente: `foundations/theming.md`, `foundations/i18n.md`,
   (mock de `matchMedia`); con preferencia guardada, lo ignora.
 - `<meta name="theme-color">` se actualiza tanto con `toggleTheme` como con un
   cambio de `prefers-color-scheme` sin preferencia guardada.
+- Al cambiar el tema agrega `data-theme-switching` a `<html>` **antes** de
+  aplicar el nuevo `data-theme` y lo remueve tras dos frames (mock
+  `requestAnimationFrame`/timers); vale para `toggleTheme` y para el cambio del
+  sistema (RF-9).
+- Cleanup: al desmontar el provider no queda `data-theme-switching` en `<html>`;
+  un cambio rápido vuelve a suprimir sin dejar estado huérfano (RF-9).
 - `useTheme` fuera del provider lanza un error descriptivo.
 
 **LocaleProvider / contenido / i18n:**
@@ -288,6 +313,15 @@ Fuente: `foundations/theming.md`, `foundations/i18n.md`,
 - **Esquema al día** (`schema.test.ts`): las listas de `@data/constants` son
   iguales a los `enum` del esquema y `data/cv.types.generated.ts` está al día
   (regenerarlo en memoria y comparar).
+
+**Motion tokens (`tokens/tokens.css`, inspección, RF-10):**
+- Valores exactos de la escala aprobada: `--duration-fast: 0.15s`,
+  `--duration-base: 0.2s`, `--duration-slow: 0.3s`, `--duration-exit: 0.22s`,
+  `--duration-stagger: 0.03s`, `--ease-enter: cubic-bezier(0.22, 1, 0.36, 1)`,
+  `--ease-exit: cubic-bezier(0.4, 0, 1, 1)`; `--ease-standard` y
+  `--ease-emphasized` sin cambio.
+- Con `prefers-reduced-motion: reduce`, las **cinco** duraciones (fast, base,
+  slow, exit, stagger) valen `0.01ms`.
 
 **Tooling (smoke, tareas primeras):**
 - Test smoke del proyecto (por ejemplo el render del `App` provisorio con el
@@ -324,3 +358,8 @@ decisión #91):** texto provisorio con Poppins sobre `--color-bg`; con
 - No correr `npm run dev` (decisión #91) ni `build` por tarea.
 - No usar `baseUrl` (deprecado), `any`, `@ts-ignore`, `eslint-disable` ni
   `React.FC`; no copiar tokens a `src/`; no subir el peso del cuerpo de 300.
+- No usar `!important` en la supresión de transiciones del cambio de tema
+  (`data-theme-switching`), ni tocar el anti-flash de `index.html` para ella
+  (la supresión es solo para cambios interactivos).
+- No agregar `@keyframes`, librerías de animación ni transiciones que usen
+  duraciones fuera de los tokens (RF-10; la escala vive en `tokens.css`).
