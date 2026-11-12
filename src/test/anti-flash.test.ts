@@ -192,9 +192,12 @@ describe("index.html anti-flash (RF-1)", () => {
     expect(faviconSvg).toMatch(/<rect\b[^>]*\brx="14"[^>]*fill="#304cfd"/);
     expect(faviconSvg).toMatch(/stroke="#fff"/);
 
-    // PNG real de 180×180: firma PNG + ancho/alto del chunk IHDR.
+    // PNG real de 180×180: firma PNG + ancho/alto del chunk IHDR. La ruta va
+    // en una variable: con un literal, Vite reescribe `new URL("….png",
+    // import.meta.url)` como URL de asset y deja de ser `file:` (T14b).
+    const touchIconPath = "../../public/apple-touch-icon.png";
     const png = readFileSync(
-      fileURLToPath(new URL("../../public/apple-touch-icon.png", import.meta.url)),
+      fileURLToPath(new URL(touchIconPath, import.meta.url)),
     );
     expect(png.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
     expect(png.readUInt32BE(16)).toBe(180);
