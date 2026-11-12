@@ -281,6 +281,7 @@
   --testimonial-avatar-offset: 2.5rem;             /* cuánto sube el avatar → 3.75rem (≥580) */
   --testimonial-quote-inset-block: 0.7rem;         /* → 1.5rem (≥580) */
   --testimonial-quote-inset-inline: 1.2rem;        /* → 1.875rem (≥580) */
+  --testimonial-quote-reserve: 2.2rem;             /* → 2rem (≥580); comilla (2rem) + inset-inline − padding derecho de la card (#113) */
   /* Protrusión real del avatar sobre el borde de la card, + 0.5rem para la drop-shadow */
   --testimonial-headroom: calc(var(--testimonial-avatar-offset) - var(--testimonial-padding-top) + 0.5rem);
 }
@@ -325,6 +326,7 @@
     --testimonial-avatar-offset: 3.75rem;
     --testimonial-quote-inset-block: 1.5rem;
     --testimonial-quote-inset-inline: 1.875rem;
+    --testimonial-quote-reserve: 2rem;
   }
 }
 

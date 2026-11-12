@@ -54,26 +54,27 @@
 
 /* Tabla → Encabezado: grilla `auto 1fr` — avatar en la columna 1, identity en
    la 2, SIN márgenes negativos de layout (la subida del avatar es solo la de
-   `.avatar`). `align-items: end` alinea el pie del hexágono con la última
-   línea del bloque. `column-gap: 0.9375rem` (15px) y `margin-bottom: 0.75rem`
+   `.avatar`). `align-items: start` (T6, #113; antes `end`) ancla el avatar
+   arriba: sobresale siempre lo mismo con cualquier cantidad de líneas de
+   nombre y rol, y queda alineado entre cards. `column-gap: 0.9375rem` (15px) y `margin-bottom: 0.75rem`
    (12px) son fijos citados de la tabla (medidas internas del componente,
    regla dura 2 de docs/DESIGN.md; no escalan por breakpoint). */
 .header {
   display: grid;
   grid-template-columns: auto 1fr;
   column-gap: 0.9375rem;
-  align-items: end;
+  align-items: start;
   margin-bottom: 0.75rem;
 }
 
-/* Tabla → Identidad (<div> con h3 + p de rol; T5, Cambio 2026-11-12, #112):
+/* Tabla → Identidad (<div> con h3 + p de rol; T5 #112, ajustada en T6 #113):
    el apilamiento vertical lo da el flujo de bloques. `padding-inline-end`
-   reserva el ancho de la comilla (2rem, el `--icon-size` literal de `.quote`)
-   más su distancia al borde (`--testimonial-quote-inset-inline`), así nombre
-   y rol nunca quedan debajo de la comilla absoluta. Solo tokens + literal de
-   la tabla; escala con el token, sin `@media` propios (RF-6). */
+   reserva exactamente lo que la comilla absoluta invade del área de
+   contenido (comilla 2rem + inset-inline − padding derecho de la card), así
+   nombre y rol nunca quedan debajo de ella. Escala con el token, sin
+   `@media` propios (RF-6). */
 .identity {
-  padding-inline-end: calc(2rem + var(--testimonial-quote-inset-inline));
+  padding-inline-end: var(--testimonial-quote-reserve);
 }
 
 /* Tabla → Avatar (RF-4, HexAvatar; clase unida al `wrap` — el elemento raíz
