@@ -212,10 +212,15 @@ crean a mano.
   dura 1 de `docs/DESIGN.md`, verificada por test contra `--palette-light-bg` /
   `--palette-dark-bg` (decisión #60).
 - Supresión de transiciones al cambiar de tema (RF-9, Cambio motion #106):
-  `html[data-theme-switching] * { transition: none }` en `src/styles/global.css`
-  (+ `::before`/`::after`), sin `!important`; especificidad (0,1,1) gana a las
-  clases hasheadas de los módulos. El anti-flash de `index.html` no se toca: la
-  supresión rige solo los cambios interactivos.
+  `:root[data-theme-switching] *` (+ `*::before`/`*::after`) con
+  `transition: none` en `src/styles/global.css`, sin `!important`; especificidad
+  **(0,2,0)**: gana a los selectores de módulo como `.social a` / `.contacts a`
+  (0,1,1), que empatarían con `html[data-theme-switching] *` (0,1,1) y ganarían
+  por orden de carga (global.css se importa antes que los componentes).
+  Regla para los Cambios motion siguientes: ninguna `transition` en un selector
+  de especificidad (0,2,0) o mayor (lo verifica el reviewer en cada Cambio).
+  El anti-flash de `index.html` no se toca: la supresión rige solo los cambios
+  interactivos.
 - Imágenes en `public/images/`: son contenido, no estilos. `avatar.png` es la foto
   real del sitio; los `testimonials/*.svg` se conservan como fixture del ejemplo
   `data/cv.example.{en,es}.json` aunque el sitio no los muestre (`testimonials: []`).

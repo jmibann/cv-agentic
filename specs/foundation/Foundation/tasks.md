@@ -185,3 +185,49 @@ T3b (deuda L1 detectada en su review).
 
 - [x] **T14. Favicon tipo app, apple-touch-icon y título con nombre (#115).** spec → Anatomía (`index.html`, `public/favicon.svg`, `public/apple-touch-icon.png`) — 9ebcca4 (tests `3b4db39` + corrección `516621a` T14b: Vite reescribía el `new URL` literal del PNG; aserciones intactas. Gates 448/40 + build verdes; navegador: título OK, ambos íconos 200, consola limpia). Post-deploy: SVG mal formado (`--` en el comentario XML) → T14c `afbc660` (test XML bien formado) + `fix` `05e2cb6`; 449/40 verdes
   - Hecho cuando: `index.html` lleva `<title>Juan Manuel Ibáñez · Frontend Engineer</title>` y `<link rel="apple-touch-icon" href="/apple-touch-icon.png" />` (después del anti-flash, contrato T4); `public/favicon.svg` es un cuadrado redondeado (`<rect … rx="14"`) con fill `#304cfd`, hexágono en trazo blanco y monograma "JM" en paths (sin `<text>`); `public/apple-touch-icon.png` existe y es PNG 180×180; `src/test/anti-flash.test.ts` agrega un `it` con esas aserciones (rojo en `test(Foundation): T14`); lint/typecheck/test/build verdes.
+
+## Cambio motion (#106) — RF-9/RF-10 (puerta de Plan+Tareas aprobada 2026-11-12 con ajustes)
+
+- [ ] **T15. Escala de motion en `tokens/tokens.css`.** RF-10 — **kit: lo ejecuta y commitea el usuario** (precedente `--z-skip` `b2563f0`); solo-inspección (#101, rojo no exigible)
+  - Hecho cuando: `--duration-fast: 0.15s` (sin cambio), `--duration-base: 0.2s`
+    (antes 0.3s), `--duration-slow: 0.3s` (antes 0.6s), `--duration-exit: 0.22s`
+    y `--duration-stagger: 0.03s` nuevos; `--ease-enter: cubic-bezier(0.22, 1,
+    0.36, 1)` y `--ease-exit: cubic-bezier(0.4, 0, 1, 1)` nuevos;
+    `--ease-standard`/`--ease-emphasized` intactos; el bloque
+    `prefers-reduced-motion: reduce` de `tokens.css` colapsa a `0.01ms` las
+    **cinco** duraciones (fast, base, slow, exit, stagger); `lint`/`typecheck`/
+    `test` en verde tras el commit del usuario.
+- [ ] **T16. `data-theme-switching` en `ThemeProvider` + regla global.** RF-9 — delegable a `foundation` sin esperar T15
+  - Hecho cuando: `test(Foundation): T16` (rojo) agrega a `ThemeProvider.test.tsx`
+    los casos con rAF/timers falsos: (a) al cambiar el tema por `toggleTheme`
+    el atributo está en `<html>` **antes** de aplicar el nuevo `data-theme` y
+    se quita tras dos frames; (b) igual por cambio del sistema sin preferencia
+    guardada; (c) desmontar el provider lo limpia; (d) un segundo cambio rápido
+    reinicia la supresión sin dejar atributo huérfano; (e) el montaje inicial
+    **no** lo aplica (ref de primer montaje). `feat(Foundation): T16`:
+    `data-theme-switching` + `data-theme` + meta `theme-color` aplicados en el
+    **mismo** `useLayoutEffect` (decisión 1 del plan); remoción tras doble
+    `requestAnimationFrame`; cleanup incondicional con `cancelAnimationFrame`;
+    en `src/styles/global.css` la regla `:root[data-theme-switching] *` +
+    `*::before`/`*::after` con `transition: none`, sin `!important`
+    (especificidad (0,2,0), ajuste 1 de la puerta); los tests F1 preexistentes
+    de `ThemeProvider` siguen verdes; lint/typecheck/test verdes; `feat` no
+    toca tests; no se toca `index.html` ni `tokens/tokens.css`.
+- [ ] **T17. Test de contrato de los tokens de motion (lectura `fs`).** RF-10 — requiere T15 aplicado; delegable a `foundation`; commit único `test(Foundation): T17` (#101: aserta el documento aprobado, verde al escribirse)
+  - Hecho cuando: un test en `src/` (extensión de `src/test/anti-flash.test.ts`
+    o nuevo archivo en la carpeta de tests) lee `tokens/tokens.css` con `fs` y
+    aserta los valores exactos de T15: las cinco duraciones (`0.15/0.2/0.3/
+    0.22/0.03s`), `--ease-enter` y `--ease-exit` con sus `cubic-bezier`, y que
+    el bloque `prefers-reduced-motion: reduce` fija `0.01ms` en las cinco;
+    el test **no** escribe `tokens.css` (fuera del permiso `edit`); el commit
+    toca solo archivos de test; lint/typecheck/test verdes.
+- [ ] **T18. Cierre del Cambio: docs de kit + QA + build.** — `foundations/motion.md` lo ejecuta y commitea el usuario; la QA la hace el `reviewer` con la app servida por el usuario (#91)
+  - Hecho cuando: `foundations/motion.md` documenta la escala nueva, el cambio
+    de tema sin transiciones (`data-theme-switching`), reduced motion con
+    delays anulados, y la regla para los Cambios motion 2–4: **ninguna
+    `transition` en un selector de especificidad (0,2,0) o mayor** (la verifica
+    el reviewer en cada Cambio); QA visual en navegador de las transiciones
+    existentes con `--duration-base` a 0.2s (tabs, chevron, Button hover/press,
+    bullet del carrusel, dialog; §2.3 de la propuesta) sin jank; `npm run build`
+    verde; con la aprobación del usuario, `spec.md` vuelve a
+    `Estado: implementada` y se actualizan los documentos de estado (#86).

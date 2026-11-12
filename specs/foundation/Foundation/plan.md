@@ -123,3 +123,61 @@ La API completa (firmas de providers, hooks, `format`, `formatPeriod`,
   storage); RF-7→T8 (generados al día) + T9 (`load`/rechazos); RF-8→T7.
 - Al cerrar la pieza: `npm run build` en verde + verificación visual del
   reviewer con la app servida por el usuario (#91).
+
+---
+
+# Plan del Cambio motion (#106) — RF-9/RF-10
+
+Aprobado por el usuario el 2026-11-12 con ajustes (especificidad (0,2,0),
+`useLayoutEffect` con ref de montaje, orden de ejecución, RF-10 con test fs,
+cierre con QA + build). Base: `specs/motion/proposal.md` §4.1. Unidad de
+delegación: una tarea = `test(Foundation): Tn` (rojo) + `feat(Foundation): Tn`
+(#73); T15 y T18 son de kit y los ejecuta el usuario.
+
+## Archivos del Cambio (agrupados por tarea)
+
+| Tarea | Archivos | Responsabilidad | Dueño |
+|---|---|---|---|
+| T15 | `tokens/tokens.css` | escala RF-10: `base 0.2s`, `slow 0.3s`, `exit 0.22s`, `stagger 0.03s`, `ease-enter`/`ease-exit`; reduced motion → las **5** duraciones a `0.01ms` | usuario (kit, precedente `--z-skip` `b2563f0`) |
+| T16 | `src/providers/ThemeProvider.tsx` · `ThemeProvider.test.tsx` · `src/styles/global.css` | RF-9: switching + `data-theme` + meta en el **mismo** `useLayoutEffect`; regla `:root[data-theme-switching] *,::before,::after { transition: none }` | `foundation` |
+| T17 | `src/test/anti-flash.test.ts` (o nuevo test fs en `src/`) | RF-10: contrato de los valores de `tokens.css` (5 duraciones, `ease-enter`/`ease-exit`, override reduced motion) leído con `fs` | `foundation` (escribe solo `src/**`; lee kit) |
+| T18 | `foundations/motion.md` + QA navegador + `build` | docs: tokens, tema sin transiciones, reduced motion con delays, regla "sin `transition` en selectores ≥ (0,2,0)" (rige Cambios 2–4; la verifica el reviewer); QA §2.3 de la propuesta con `base` 0.2s | usuario + reviewer |
+
+## Decisiones del Cambio (con alternativa descartada)
+
+1. **Un solo `useLayoutEffect`**: agrega `data-theme-switching`, aplica
+   `data-theme` y el meta `theme-color`; **ref de primer montaje** saltea la
+   supresión inicial (coherente con spec: solo cambios interactivos).
+   *Descartado:* `useEffect` pasivo + layout aparte (el `data-theme` puede
+   pintar antes del switching y filtra la transición de color; hallazgo del
+   usuario en la puerta).
+2. **Doble `requestAnimationFrame`** para quitar el atributo; cleanup
+   incondicional con `cancelAnimationFrame` al desmontar o al volver a cambiar.
+   *Descartado:* `setTimeout` fijo (no garantiza el frame ni el orden).
+3. **Regla global `:root[data-theme-switching] *` (0,2,0)**, sin
+   `!important` (+ pseudos). *Descartado:* `html[data-theme-switching] *`
+   (0,1,1): empata con `.social a`/`.contacts a` y pierde por orden de carga.
+   *Descartado también:* clase `no-transition` por componente (invasivo).
+4. **RF-10 con test `fs` (T17), no solo inspección**: `anti-flash.test.ts` ya
+   lee `tokens.css` con `fs`; se le agregan las aserciones. Régimen #101:
+   commit único `test(Foundation): T17`, verde al escribirse (espeja el
+   documento aprobado de T15); requiere T15 aplicado.
+5. **`--duration-slow` se repurposea** (0.6→0.3s; cero usos actuales).
+   *Descartado:* token paralelo `--duration-content` (proliferación).
+6. **No se toca el anti-flash** de `index.html`. *Descartado:* extender la
+   supresión al primer paint.
+
+## Ejecución y cobertura
+
+- Orden: **T16 se delega ya** (no depende de T15: jsdom con rAF mockeado y la
+  regla global no lee duraciones). **T15 la hace el usuario cuando pueda**;
+  recién con T15 aplicado se delega **T17** (aserta los valores del documento).
+  **T18** cierra el Cambio.
+- Cobertura: RF-9 → T16 (tests: aplica antes del theme + quita a los 2 frames,
+  cleanup al desmontar, cambio rápido sin huérfanos, vía sistema igual, montaje
+  inicial sin atributo). RF-10 → T15 + T17.
+- Cierre del Cambio: T18 — QA visual de las transiciones existentes a 0.2s
+  (tabs, chevron, Button hover/press, bullet, dialog; §2.3 de la propuesta) +
+  `npm run build` verde + aprobación del usuario → `Estado: implementada`.
+- Commits de código: `test/feat/fix(Foundation): Tn` (T16), `test(Foundation):
+  T17`; T15/T18 los commitea el usuario.
