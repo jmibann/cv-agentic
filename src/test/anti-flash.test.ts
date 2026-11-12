@@ -171,4 +171,33 @@ describe("index.html anti-flash (RF-1)", () => {
     expect(faviconSvg).toContain('fill="#304cfd"');
     expect(faviconSvg).not.toMatch(/<text\b/); // sin texto ni marcas
   });
+
+  it("ships the app-style favicon, a touch icon and a real page title", () => {
+    // T14 (#115): el título deja de ser el nombre del repo; el favicon pasa a
+    // ícono tipo app (cuadrado redondeado + hexágono + monograma JM en
+    // paths) y se agrega el apple-touch-icon para la pantalla de inicio.
+    const head = capture(
+      indexHtml,
+      /<head>([\s\S]*?)<\/head>/,
+      "<head>…</head>",
+    );
+    expect(head).toMatch(
+      /<title>Juan Manuel Ibáñez · Frontend Engineer<\/title>/,
+    );
+    expect(head).toMatch(
+      /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png" \/>/,
+    );
+
+    const faviconSvg = readRepoFile("../../public/favicon.svg");
+    expect(faviconSvg).toMatch(/<rect\b[^>]*\brx="14"[^>]*fill="#304cfd"/);
+    expect(faviconSvg).toMatch(/stroke="#fff"/);
+
+    // PNG real de 180×180: firma PNG + ancho/alto del chunk IHDR.
+    const png = readFileSync(
+      fileURLToPath(new URL("../../public/apple-touch-icon.png", import.meta.url)),
+    );
+    expect(png.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+    expect(png.readUInt32BE(16)).toBe(180);
+    expect(png.readUInt32BE(20)).toBe(180);
+  });
 });
