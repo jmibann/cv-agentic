@@ -203,4 +203,15 @@ describe("index.html anti-flash (RF-1)", () => {
     expect(png.readUInt32BE(16)).toBe(180);
     expect(png.readUInt32BE(20)).toBe(180);
   });
+
+  it("ships a well-formed favicon SVG that browsers can parse", () => {
+    // T14c (#115): un `--` dentro de un comentario XML deja el SVG mal
+    // formado; el servidor lo entrega con 200 pero el navegador no lo puede
+    // dibujar y la pestaña cae al ícono cacheado. Se parsea como lo haría el
+    // navegador (image/svg+xml) y no debe haber <parsererror>.
+    const faviconSvg = readRepoFile("../../public/favicon.svg");
+    const doc = new DOMParser().parseFromString(faviconSvg, "image/svg+xml");
+    expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
+    expect(doc.documentElement.tagName).toBe("svg");
+  });
 });
