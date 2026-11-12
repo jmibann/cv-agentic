@@ -37,6 +37,11 @@ no puede cambiar la API ni debilitar tests sin pasar por el usuario.
 | F4 | ResumePage | [pages/ResumePage/spec.md](pages/ResumePage/spec.md) | SectionTitle, ResumeSection, SkillList, LocaleProvider (`useCv`, `useLocale`) |
 | F4 | AppLayout | [layout/AppLayout/spec.md](layout/AppLayout/spec.md) | todo lo anterior, incluidos useHashTab, AboutPage y ResumePage |
 
+Fuera de la tabla: `specs/motion/proposal.md` es una **propuesta transversal**
+de movimiento aprobada (decisión #106), no una pieza: no tiene
+`spec.md`/`plan.md`/`tasks.md` todavía. Cuando se aprueben, sus piezas entrarán
+en esta tabla con la categoría `motion`.
+
 **Quién construye cada fase:** F1 → `foundation`. F2 y F3 → `component-builder`. F4 →
 `integrator`, en el orden de la tabla: `useHashTab` → páginas → AppLayout.
 **Unidad de trabajo: una tarea (Tn) del `tasks.md` de la pieza por encargo**
@@ -114,8 +119,9 @@ specs/<categoria>/<Name>/
 └─ tasks.md     Tn con "Hecho cuando"                       (ídem)
 ```
 
-No hay archivos `.md` sueltos dentro de `specs/<categoria>/`: la única excepción
-es `specs/README.md` (este índice).
+No hay archivos `.md` sueltos dentro de `specs/<categoria>/`: las únicas excepciones
+son `specs/README.md` (este índice) y `specs/motion/proposal.md` (propuesta
+transversal, no spec de pieza).
 
 ## Plantilla de spec
 

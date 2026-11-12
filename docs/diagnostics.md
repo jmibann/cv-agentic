@@ -2,7 +2,7 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-12** (CI §XVII; testimonios §XVIII–§XIX; Resume en una columna §XX; favicon §XXI).
+Última actualización: **2026-11-12** (saneado de documentación §XXII; favicon §XXI; Resume en una columna §XX).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
@@ -42,12 +42,18 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Auditoría pendiente: registro de specs | Queda **1 de 4** hallazgos del usuario (2026-11-11): la categoría `motion` de `specs/` no está registrada en `AGENTS.md:16` ni en `specs/README.md` (que en `:117-118` solo excepciona `specs/README.md` como `.md` suelto; `specs/motion/proposal.md` existe desde `2886109`). Los hallazgos 1–3 (`deploy.yml`) se cerraron en §XVII. **Dueño: el usuario**, sin ampliar permisos de los agentes. Descartado sin acción: `public/**/.DS_Store` (gitignored; el CI construye desde un checkout limpio) | Usuario; cierre con el hash del commit |
 | Motion (post-entrega) | Propuesta aprobada (#106) en `specs/motion/proposal.md`; falta aprobar specs/planes/tareas y luego implementar tokens, tabs B, Sidebar grid, `data-theme-switching`, reduced motion, dialog y Separator. No se toca código antes de esa puerta | Puerta de Plan+Tareas / Cambio |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XXII · 2026-11-12 — Saneado de documentación (hallazgo de auditoría cerrado)
+- Qué: saneado 1–4 aprobado por el usuario: (1) conteos obsoletos 27→**28 specs** (27 de componentes + Foundation) en README y memoria; (2) suite actual **448** en el modo mantenimiento del README; (3) la categoría `motion` queda registrada en `specs/README.md` (nota bajo el índice + excepción a la regla de `.md` sueltos; **falta el equivalente en `AGENTS.md`**, bloqueado por los permisos de edición del orchestrator → queda pendiente su cierre parcial con tu edición o permiso) — sale la fila "Auditoría pendiente: registro de specs" de **Abiertos**; (4) §XI y §XII compactadas a una línea (tope #98; hashes de creación `133b1e8`/`31d8f27`). Sin cambios de código ni specs de pieza.
+- Checks: lint ✓ · typecheck ✓ · test **448/40** ✓.
+- Decisiones: ninguna nueva (cierra el hallazgo 4 de la auditoría del usuario 2026-11-11).
+- Commits: docs(state) de este saneado (ver `git log`).
+- Abre: mini-hallazgo nuevo: edición de `AGENTS.md` sin permiso de `edit` para el orchestrator (¿ampliar permisos o sigue siendo trabajo del usuario?). Cierra: fila "Auditoría pendiente: registro de specs" (parcial, ver arriba).
 
 ### §XXI · 2026-11-12 — Favicon tipo app y título real
 - Qué: a pedido del usuario (el hexágono liso se veía como un "cubito" genérico y la pestaña decía `cv-agentic`), propuesta de 3 favicons; elegida la **C**: cuadrado redondeado `#304cfd` con hexágono en trazo blanco y monograma JM en paths (sin depender de fuentes). Se agrega `apple-touch-icon.png` 180×180 (mismo diseño a sangre, generado desde el SVG) y el título pasa a `Juan Manuel Ibáñez · Frontend Engineer`. Cambio de spec de Foundation (T14; reabre #105a con motivo concreto). T14b corrige el test rojo (Vite reescribía `new URL("….png", import.meta.url)`), sin tocar aserciones.
@@ -87,21 +93,9 @@ de la entrada); el detalle queda en git.
 
 ### 2026-11-06 · §XIII — Bug-fix ControlsBar T4 (alineación) · — · `git show 47cd6da:docs/diagnostics.md`
 
-### §XII · 2026-10-08 — Cierre de F5 (QA) — fin del proceso F1–F5
+### 2026-10-08 · §XII — Cierre de F5 (fin del proceso F1–F5) · #104–#105 · `git show 31d8f27:docs/diagnostics.md`
 
-- Qué: **F5 CERRADA**. Cuatro pasadas del reviewer con chrome-devtools MCP sobre la app servida por el usuario (#91) + verificación de **papel real por Ctrl+P del usuario: APROBADA** (6/6 criterios). La 1ª/2ª pasada detectaron el paquete #104 (B-2/B-3/M-1 print, D1 solape 375, D2/D3 anillos, D4 favicon), corregido íntegramente en 8 tareas nuevas repartidas en sus piezas (ControlsBar T3, CornerTab T5, TestimonialCard T4, Sidebar T7, AppLayout T7/T8, Foundation T13/T13b) y re-verificado en vivo en pasadas 3/4 + spot-check #105c. Decisiones del usuario: **#104** (mecánicas) y **#105** (visuales: favicon cerrado como está, **F8 CERRADO** — `9rem` definitivo sin captura; base `< md` `6.375rem` aplicada, commit del usuario `190c678`; chevron con acento semántico por tema). Cierre del proceso: **F1–F5 completas**, 27/27 specs `implementada`, proyecto entregado.
-- Checks: lint ✓ · typecheck ✓ · test **445/40** ✓ · build ✓ · validate:content ✓ · axe en navegador: **0 violaciones** (2×about/res × 2 idiomas) ✓ · contrastes del chevron: 5.87:1 claro / 12.06:1 oscuro ✓ (filas contrast.md 15/19/39) · zero overflow 375–1440 ✓ · sticky/float/dialog/teclado ✓ (informe completo con evidencia en `docs/qa-report.md`).
-- Decisiones: **#104** y **#105** → registro. Sin reglas nuevas de proceso.
-- Commits del paquete: `eaa4d01` `25e2ee4` `02a2756` `fac2fbe` `87edfd1` `74bafe2` `b93c510` (+ tests `c0492ac` `dc026d0` `7d602eb` `06bf088`); docs #104 `3b86937`, kit #104b `6109561`, qa-report `f2cb537` `5b9fce3`, #105 `5a9c240`, token `190c678` (usuario). Cierre de F4 en §XI. Menores de forma registradas en `tasks.md`/`qa-report.md`.
-- Abre: fila "Pendientes post-F5 (residuos)" (re-observar gap 23px con nombre definitivo; deudas de forma opcionales). Cierra: filas F5/F3 y el resto de F4 de **Abiertos**. Proceso completo: queda del usuario el push (57+ commits); el reemplazo del contenido se completó en §XV.
-
-### §XI · 2026-10-08 — Cierre de F4
-
-- Qué: **F4 Integración cerrada (4/4)**: `hooks/useHashTab` (3 tareas), `pages/AboutPage` (4), `pages/ResumePage` (4) y `layout/AppLayout` (6) con spec `Estado: implementada`; `App.tsx` definitivamente montado sobre AppLayout; impresión transversal fijada por contrato `data-*` + `global.css` (decisión **#103**) y token nuevo `--z-skip`. Kickoff: Clarificación con hallazgos en las 4 specs (U1–U5, A1–A11, P1–P11) resueltas por el usuario; Plan+Tareas de fase aprobados en una puerta (17 tareas, asignación 1:1 de Tests verificada antes del cierre, regla F3). Hitos de proceso: **guard `isTabId`** en el sitio de uso (NavTabs intacta; alternativa genérico descartada); el stack `data-print-page` con **una sola copia de cada página** (resuelve h1 doble, ids duplicados y orden dependiente del tab); ajuste T2b/T3b en AboutPage (re-acotes de asserts globales `<p>`/`article` ante contenido nuevo, **con aprobación explícita del usuario**, patrón F3 vigente); 3 tareas de **verificación pura** sin `feat` en AppLayout (T2/T3/T4, on-arrival declarado por test, extensión práctica de #101); reemplazo autorizado del smoke de `App.test.tsx` (doble documentación Foundation+plan T6); **reparo comment-only `fix(SectionTitle)`** (glob con `*/` que cerraba el comentario: bug latente de F2 que solo el primer build con grafo completo destapó — el build #80 por pieza en F2/F3 nunca importó esos módulos en `vite build`); mock `vi.hoisted`+`importOriginal` consolidado para variantes de contenido (vacíos/`end: null`).
-- Checks: lint ✓ · typecheck ✓ · test **441/40** ✓ · build ✓ (1988 módulos, post-reparo `7e07fcc`) · validate:content ✓ (todo sobre `7e07fcc`/HEAD de la puerta).
-- Decisiones: **#103** → `docs/README.md`. Nuevas reglas de proceso: ninguna fuera de aplicaciones de #99/#101/#102 y del patrón de ajuste entre tareas ya vigente.
-- Commits: specs `implementada` `ac65f1f` `6d8d0d5` `2984844` `730d9ce`; Clarificación aplicada `b42c4ab`; plan/tasks fase `dc05e3b`; tokens `--z-skip` `b2563f0` (usuario); feats clave `7e0f45c` `ab13f31` `ceb9c12` (hook) `8f47cb4` (AboutPage T4) `977a320` (ResumePage T4) `0fe9c9c`/`127cff7` (AppLayout T5/T6); reparo `7e07fcc`. Notas de forma: `730d9ce` marcó T6 **y** spec en un solo commit bajo subject "T6 approved"; `bc040d2` subject con sufijo español (#102, no enmendable); `127cff7` sin cuerpo.
-- Abre: fila "Seguimientos F4" en **Abiertos**; cierra: items F4-verification de la fila "Seguimientos F3" (no-BFC, skip-link→ControlsBar, banner único, defs ×1, unicidad tabpanel, superficies RF-4 de primitivas en consumidores). **Siguiente: F5** — QA completa con app servida por el usuario (#91; pedir `npm run dev` y URL), informe en `docs/qa-report.md` (#85).
+### 2026-10-08 · §XI — Cierre de F4 · #103 · `git show 133b1e8:docs/diagnostics.md`
 
 ### 2026-10-07 · Cierre de F3 · #99–#102 · `git show 7f52303:docs/diagnostics.md`
 
