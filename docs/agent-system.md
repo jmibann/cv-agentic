@@ -118,7 +118,7 @@ quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
 con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`. Trabajo abierto al
 2026-11-12: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109),
 **QA visual aprobada** (§XVI) y **CI** (§XVII: Node 26 LTS desde `.nvmrc`, #110;
-`lint` → `test` → `build` antes de publicar, #111) cerrados; queda el push/deploy, el
+`lint` → `test` → `build` antes de publicar, #111) y **testimonios reales** (§XVIII, #112) cerrados; queda el push/deploy, el
 registro de la categoría `motion` (último hallazgo de auditoría — **lo resuelve el
 usuario, sin ampliar permisos de los agentes**) y el **motion**, aprobado pero sin
 implementar (`specs/motion/proposal.md`; tabla **Abiertos** de diagnostics).

@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-12** (CI: Node 26 LTS + quality gates, §XVII).
+Última actualización: **2026-11-12** (CI §XVII; testimonios reales §XVIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#111 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#112 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -49,6 +49,13 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### §XVIII · 2026-11-12 — Testimonios reales + Cambio de TestimonialCard
+- Qué: 3 testimonios reales en `cv.{en,es}.json` (revierte el `testimonials: []` de #108; textos literales en su idioma original, errores incluidos por decisión del usuario; siluetas neutras como avatar). La QA en navegador detectó que la comilla pisaba nombres largos (20px a 375, 10px a 768) → Cambio aprobado: `.identity` reserva `calc(2rem + --testimonial-quote-inset-inline)` (T5). Re-QA: 0 invasión en 375/580/768/1024/1440 × claro/oscuro × en/es, sin overflow, dialog OK, consola limpia (el único error fue de HMR al editar el JSON; desaparece al recargar).
+- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · validate:content ✓ · build ✓.
+- Decisiones: **#112** → `docs/README.md`.
+- Commits: `b0f19bc` (spec/T5) · `11d5edc` (fix T5) · `7f7cbe3` (contenido).
+- Abre: nada. Cierra: nada (§XIII–§XIV compactadas a una línea para respetar el tope de 150).
+
 ### §XVII · 2026-11-12 — CI: Node 26 LTS y quality gates en el deploy
 - Qué: el usuario resolvió los hallazgos 1–3 de la auditoría. **Node 26 LTS** ("Lithium", LTS desde 26.13.0): `.nvmrc` `24`→`26`, `@types/node` `^26`, y `deploy.yml` lee `node-version-file: .nvmrc` en vez de `lts/*` (S5, `AGENTS.md`, tabla de entorno y `spec.md:60` de Foundation alineados; #45 y T1 quedan como historia). **Quality gates**: el deploy corre `lint` → `test` → `build` y no publica si algo falla; se quitó la línea comentada `VITE_API_URL` (D2).
 - Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · validate:content ✓ · YAML del workflow parseado ✓.
@@ -73,20 +80,9 @@ de la entrada); el detalle queda en git.
 - Commits: `3855eb0` (test Foundation) · `befb0db` (tests de contenido) · `63f6665` (contenido/assets) · `5f6c0a6` (CTA) · `aa9d310` (proposal de motion) · `6826436` (parche #109).
 - Abre: fila "Auditoría pendiente: CI y registro de specs" (4 hallazgos del usuario); la de "Verificación post-contenido" se cerró en §XVI. Cierra: "Contenido real (post-entrega)".
 
-### §XIV · 2026-11-11 — Mantenimiento: deploy GitHub Pages + propuesta de motion
+### 2026-11-11 · §XIV — Deploy GitHub Pages + propuesta de motion · #106–#108 · `git show 3496bb7:docs/diagnostics.md`
 
-- Qué: se verificó y documentó la **base de despliegue**: `vite.config.ts` usa `/cv-agentic/` solo con `DEPLOY_TARGET=gh-pages`, y `src/utils/assetUrl.ts` centraliza el prefijo de `BASE_URL` para assets de `/public` (lo usan HexAvatar y Sidebar). Se registró la **propuesta de motion aprobada** (`specs/motion/proposal.md`): tokens, tabs B, grid del Sidebar, `data-theme-switching`, reduced motion, dialog y Separator; implementación **no iniciada**. Se registró el **Cambio de contenido** previo (#108): CV real en/es, `testimonials: []`, contact sin teléfono/WhatsApp y ajuste de tests.
-- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ (1989 módulos) · validate:content ✓.
-- Decisiones: **#106** (motion), **#107** (base/assets) y **#108** (contenido) → `docs/README.md`.
-- Commits: `c2d4232` (base/assets) · `5f6c0a6` (CTA) · docs `3496bb7`; ejecución del contenido en §XV.
-- Abre: fila "Motion (post-entrega)"; cierra: nada (contenido se cerró en §XV).
-
-### §XIII · 2026-11-06 — Mantenimiento: bug-fix ControlsBar T4 (alineación)
-- Qué: el `div[role="group"]` interno de ControlsBar pasó a ser el contenedor flex (`.group`: `display:flex; align-items:center; gap:var(--controls-gap)`); se eliminó el `gap` inerte del `<header>` (único hijo flex: el group). Corrige la alineación por baseline que bajaba ThemeToggle respecto de LanguageSwitcher; sin cambio de API, ARIA ni spec (el usuario lo clasificó como bug-fix).
-- Checks: lint ✓ · typecheck ✓ · test **446/40** ✓ · build ✓ · QA visual 375/768/1024/1440 × claro/oscuro × en/es: mismo top/bottom y gap 8/12px, sin overflow ✓.
-- Decisiones: ninguna nueva (mantenimiento).
-- Commits: `d65ac7a` (test) · `9f9de59` (fix) · `f97562d` (T4 en tasks) · `a12dfb7` (T4 aprobada).
-- Abre: nada; cierra: nada.
+### 2026-11-06 · §XIII — Bug-fix ControlsBar T4 (alineación) · — · `git show 47cd6da:docs/diagnostics.md`
 
 ### §XII · 2026-10-08 — Cierre de F5 (QA) — fin del proceso F1–F5
 
