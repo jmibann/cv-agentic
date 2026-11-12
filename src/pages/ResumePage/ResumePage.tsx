@@ -1,9 +1,9 @@
 // ResumePage — panel Resume (specs/pages/ResumePage/spec.md). T1 (RF-1,
 // RF-2 columns, RF-5): raíz `div.page` con el `h1` de `t.resume.title` como
 // PRIMER hijo (`SectionTitle as="h1" decorated`, spec → Anatomía) y `.columns`
-// con dos `ResumeSection` (education/experience), cada una montada SOLO si su
+// con dos `ResumeSection` (experience/education desde T5), cada una montada SOLO si su
 // colección no está vacía (RF-2: "SI un conjunto está vacío, ENTONCES no
-// aparece su columna"; la rama vacía se testa en T2 con mock). La página FIXA
+// aparece su sección"; la rama vacía se testa en T2 con mock). La página FIXA
 // los `timelineIdPrefix` ("edu"/"exp", decisión 14 de ResumeSection: sin
 // derivación interna) y reenvía `locale` —el **idioma activo** de
 // `useLocale()`, NO `cv.locale` (Clarificación F4 P7)— y
@@ -14,11 +14,8 @@
 // T4 hecha: `ResumePage.module.css` declara la tabla "Estilos y tokens" AL
 // PIE (RF-3/RF-6, por inspección: `.page` flujo de bloque con
 // `* + * { margin-top: var(--stack-gap) }` sin flex/grid/overflow; `.columns`
-// grid con row-gap --stack-gap / column-gap --layout-gap y el ÚNICO @media
-// (min-width: 768px, md) con 2 columnas + la cláusula RF-3
-// `.columns > *:only-child { grid-column: 1 / -1 }` para el hijo único —
-// selector estructural, sin depender de la clase hasheada de ResumeSection;
-// documentado en el módulo). Las clases se conectan vía `styles.x` (los tests
+// grid de una sola columna con row-gap --stack-gap, sin @media desde T5
+// (#114: Experience primero, Education debajo, en todos los anchos). Las clases se conectan vía `styles.x` (los tests
 // las afirman con el canon #99 `styles.x ?? "x"`); la unión de `className`
 // del consumidor al raíz usa el mecanismo canónico (filtro tipado de
 // undefined + join, base primero — precedente AboutPage T4). `index.ts`
@@ -86,17 +83,9 @@ export function ResumePage({ className }: ResumePageProps): ReactNode {
           inspección del markup (raíz sin <div> hijo directo). */}
       {cv.education.length > 0 || cv.experience.length > 0 ? (
         <div className={styles.columns}>
-          {cv.education.length > 0 ? (
-            <ResumeSection
-              id="education"
-              title={t.resume.education}
-              icon="book-open"
-              entries={cv.education}
-              locale={locale}
-              timelineIdPrefix="edu"
-              presentLabel={t.timeline.present}
-            />
-          ) : null}
+          {/* T5 (#114): Experience primero, Education debajo, en una sola
+              columna. El orden es el del DOM (no `order` de CSS), así la
+              lectura y el foco siguen el orden visual. */}
           {cv.experience.length > 0 ? (
             <ResumeSection
               id="experience"
@@ -105,6 +94,17 @@ export function ResumePage({ className }: ResumePageProps): ReactNode {
               entries={cv.experience}
               locale={locale}
               timelineIdPrefix="exp"
+              presentLabel={t.timeline.present}
+            />
+          ) : null}
+          {cv.education.length > 0 ? (
+            <ResumeSection
+              id="education"
+              title={t.resume.education}
+              icon="book-open"
+              entries={cv.education}
+              locale={locale}
+              timelineIdPrefix="edu"
               presentLabel={t.timeline.present}
             />
           ) : null}
