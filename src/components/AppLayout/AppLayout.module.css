@@ -4,12 +4,17 @@
    layout y el skip link con foco (única pieza con color propio acá, y SOLO
    por tokens semánticos — la spec fija "fondo --color-surface, texto
    --color-accent-text, radio --radius-8, --shadow-control, z-index --z-skip"):
-   cero medidas literales fuera de tokens/`calc()`/keywords; cero `@media
-   print` (el contrato transversal vive en src/styles/global.css, regla dura 3
-   de docs/DESIGN.md). Cada `@media` usa el literal de breakpoint aprobado en
-   docs/tokens/breakpoints.md (992 = lg, 1200 = xl; los @media no aceptan
-   custom properties) y cambia solo layout. Las fórmulas de contenedor, grilla
-   y sticky se copian EXACTAS de foundations/layout.md (no hay números propios).
+   cero medidas literales fuera de tokens/`calc()`/keywords (la única excepción
+   la fija la propia spec de RF-9: el `10px` de `--panel-enter-x`, ver bloque
+   de entrada al final); cero `@media print` transversal (el contrato común
+   vive en src/styles/global.css, regla dura 3 de docs/DESIGN.md; la ÚNICA
+   excepción es la anulación de la animación de entrada de RF-9 — su portador
+   es la clase hasheada `.motionPanel` de este módulo, spec → "Impresión" —,
+   y vive al final del archivo). Cada `@media` de breakpoint usa el literal
+   aprobado en docs/tokens/breakpoints.md (992 = lg, 1200 = xl; los @media no
+   aceptan custom properties) y cambia solo layout. Las fórmulas de contenedor,
+   grilla y sticky se copian EXACTAS de foundations/layout.md (no hay números
+   propios).
 
    Cadena no-BFC del tramo del `h1` (spec → Estilos, "para que el flujo
    funcione"): float (CornerTab ≥ lg) y `h1` (dentro de .panel) comparten el
@@ -21,9 +26,11 @@
    bloque).
 
    Orden de cascada: .panel base antes de su @media 992 (especificidad igual,
-   el media gana por orden); los media queries son tres y de CONCURRENCIA
-   disjunta por propiedad: 992 toca padding-top, 1200 redefine .grid (display
-   completo), 1200+900 toca SOLO .aside. */
+   el media gana por orden); los media queries de breakpoint son tres y de
+   CONCURRENCIA disjunta por propiedad: 992 toca padding-top, 1200 redefine
+   .grid (display completo), 1200+900 toca SOLO .aside. El cuarto `@media`
+   (print, RF-9) no compite con ellos: anula la animación y gana por orden a
+   su propia regla base (ver bloque de entrada al final). */
 
 /* foundations → "Contenedor": max-width centrado, gutter lateral, el fondo
    inferior por token y ARRIBA el espacio --gutter-top que aloja la
@@ -197,5 +204,90 @@
     position: sticky;
     top: calc(var(--size-avatar-sidebar) * 0.71 + var(--space-7));
     z-index: var(--z-sticky);
+  }
+}
+
+/* ===========================================================================
+   ENTRADA DE PANEL (RF-9 · T12 · Cambio motion 2 #106/#116). spec → "Estilos
+   y tokens" → "Entrada de panel (RF-9), todo en AppLayout.module.css" + plan
+   → P2/P3/P5/P6. El nodo animado es el wrapper `data-motion-panel` que T11
+   monta con `key={active}` dentro del tabpanel; su nombre de clase es la
+   `.motionPanel` de este módulo (la referencia `styles.motionPanel` existía
+   desde T11 como no-op declarado: acá nacen sus reglas).
+
+   CERO `transition`: #116 (ninguna transición en especificidad (0,2,0)+) se
+   cumple porque las tres reglas con atributo usan `animation` o definen una
+   custom property — una variable no es una transición (plan → P3).
+
+   CERO color literal: el bloque no pinta fondo/texto, solo opacidad +
+   desplazamiento de entrada.
+
+   El UNICO literal del bloque es `10px` (y su signo `-10px`): fijado por la
+   spec ("10px es un literal fijado por la spec ... no cambia por breakpoint"),
+   análogo a los literales de docs/tokens/breakpoints.md; la duración y la curva
+   salen de los tokens semánticos (--duration-slow, --ease-enter: foundations/
+   motion.md y tokens.css).
+
+   Especificidad (0,2,0) en las tres reglas de `.motionPanel[data-motion-...]`
+   (clase + atributo): los selectores van SIEMPRE ACOTADOS por la clase — un
+   selector de atributo suelto en un CSS Module es global (precedente
+   `.contacts p`; plan → P3). La clase basta + sobra para identificar el nodo
+   (solo AppLayout renderiza el wrapper).
+
+   El atributo `data-motion-direction` SOLO se renderiza con cambio de tab
+   (T11: ausencia en el primer render → ninguna de estas reglas aplica → sin
+   animación al montar, RF-9 / "No hacer" → "No animar en el render inicial":
+   la `animation` vive atada al atributo, P5, jamás a `.motionPanel` sola).
+   =========================================================================== */
+
+/* Dirección de entrada (plan → P3): cada atributo fija SOLO la variable
+   `--panel-enter-x` (el desplazamiento inicial del `translateX`); ninguna
+   declara `animation`. About→Resume entra desde la derecha (+10px),
+   Resume→About desde la izquierda (-10px) (spec → RF-9). */
+.motionPanel[data-motion-direction="from-left"] {
+  --panel-enter-x: -10px;
+}
+
+.motionPanel[data-motion-direction="from-right"] {
+  --panel-enter-x: 10px;
+}
+
+/* Un ÚNICO @keyframes (plan → P3; descartado: dos keyframes elegidos por
+   atributo, duplicarían frames sin beneficio): el desplazamiento de origen
+   lo aporta la variable según el atributo del nodo animado. `to` fija el
+   estado final (opacidad 1, translateX 0). */
+@keyframes panel-enter {
+  from {
+    opacity: 0;
+    transform: translateX(var(--panel-enter-x));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* La corrida de animación (plan → P2/P5): `animation` declarada SOLO en
+   `.motionPanel[data-motion-direction]` (presente el atributo = hubo cambio
+   de tab), con relleno `backwards` — NO `both` (P2: both dejaría un
+   `transform` permanente y crearía contexto de apilamiento; backwards aplica
+   el `from` solo durante el retraso, inexistente acá, y libera al terminar).
+   Duración/curva por tokens. Es una animación disparada por el remount
+   (`key`): cada cambio de tab reinicia el nodo y la corre desde cero. */
+.motionPanel[data-motion-direction] {
+  animation: panel-enter var(--duration-slow) var(--ease-enter) backwards;
+}
+
+/* Impresión (plan → P6; spec → "Impresión" / "Estilos y tokens"): anular la
+   animación en print. Va DENTRO del módulo, NO en global.css (allí se importa
+   antes y el empate (0,2,0) lo ganaría esta regla; mismo patrón que `.social
+   a` en la etapa 1), y DESPUÉS de la regla de `animation` de arriba: mismo
+   selector (0,2,0), gana por orden de aparición. Sin `!important` (no hace
+   falta: el orden resuelve el empate). Cero impacto en layout: `animation:
+   none` solo quita el fundido/`translateX` en papel (QA F5, #91). */
+@media print {
+  .motionPanel[data-motion-direction] {
+    animation: none;
   }
 }
