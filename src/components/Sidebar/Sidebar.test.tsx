@@ -284,9 +284,12 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
 // (criterio ICON_MAP de Icon) + inspección del reviewer: en jsdom distinguir
 // paths específicos sería acoplarse a internals de lucide. El `Separator` (un
 // `<div aria-hidden>` sin nombre) se verifica por selección estructural
-// acotada: `#sidebar-contacts > div[aria-hidden="true"]` — es el ÚNICO div
-// aria-hidden directo del bloque (la lista es `ul` y los IconBox son `span`
-// anidados en los `li`); criterio declarado, sin testid.
+// acotada con la constante `SEPARATOR_IN_ADDITIONAL`:
+// `#sidebar-contacts div[aria-hidden="true"]` descendiente (reescritura C9/
+// #106 vigente: misma aserción, blindada contra el wrapper `additionalBody`
+// del Cambio motion 3) — es el ÚNICO div aria-hidden del subárbol del bloque
+// (la lista es `ul`, los IconBox son `span` anidados en los `li` y el wrapper
+// no declara `aria-hidden`); criterio declarado, sin testid.
 //
 // Armazón: helper `renderSidebarWithDefs` propio de T3 (no se toca
 // `renderSidebar` de T2, P4/T2) que monta `AccentGradientDefs` junto a la
@@ -746,60 +749,6 @@ describe("Sidebar Download CV call-to-action (T5: RF-2)", () => {
 });
 
 // ============================================================================
-// Tests de T6 (specs/layout/Sidebar/tasks.md) — cierre a11y de la pieza
-// (Tests esperados #9: `expectNoA11yViolations` sin violaciones, colapsado Y
-// expandido; constitución T4: el archivo termina con este caso) y covering
-// check de RF-7/RF-10 por INSPECCIÓN.
-//
-// #101 VERDE ON-ARRIVAL DECLARADO (encargo de T6; criterio NavTabs T4 /
-// CornerTab T4): T6 agrega el módulo CSS completo, las clases de la Anatomía
-// y `index.ts` — nada de eso es discriminate-testable en jsdom: "jsdom no
-// aplica `@media`: los tests verifican el comportamiento del disclosure, no la
-// visibilidad por breakpoint" (spec → Tests esperados, nota final) y las
-// hojas de estilo no se cargan (#101). Fabricar un rojo leyendo el CSS como
-// texto está explícitamente descartado. El markup ya era accesible desde
-// T2–T5 (roles, nombres, `aria-*`, links y disclosure asertados allí con sus
-// casos); el valor de este cierre es la regresión futura sobre el markup
-// completo en AMBOS estados del disclosure. Se inspeccionan (reviewer + QA
-// F5): grilla `auto 1fr` < md y `md–lg`, 2/1 columnas de contactos, columna
-// xl con avatar sobresaliente (fórmula −0.71 de foundations/layout.md),
-// `--sidebar-*` tokens, hover/foco de redes y contactos, el `@media` 1200
-// (desde T7 oculta `.disclosure` y pisa `.additionalCollapsed`), el tramo del Separator
-// sin acumular `gap` y cero `@media print` propio (RF-10).
-//
-// Armazón: `renderSidebarWithDefs` (T3) — fixture completo (4 contactos con
-// `IconBox` tone gradient + redes) junto a `AccentGradientDefs`; la expansión
-// se logra con `user.click` sobre el botón (patrón T4), no manipulando clases.
-// Sin `HexAvatarDefs`: la pieza no usa HexAvatar.
-// ============================================================================
-
-describe("Sidebar accessibility audit collapsed and expanded (T6: Tests 9)", () => {
-  it("has no accessibility violations with the contacts collapsed", async () => {
-    // Estado inicial del disclosure en todo < xl (decisión 11): colapsado por
-    // clase; el id del `aria-controls` existe (RF-10) y todo el contenido
-    // accesible del landmark pasa axe.
-    const { container } = renderSidebarWithDefs();
-
-    await expectNoA11yViolations(container);
-  });
-
-  it("has no accessibility violations with the contacts expanded", async () => {
-    const user = userEvent.setup();
-    const { container } = renderSidebarWithDefs();
-
-    // Tests 9: la auditoría también en expandido — click real del botón
-    // (misma interacción que T4; el estado observable es `aria-expanded`).
-    await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
-    expect(screen.getByRole("button", { name: LABELS.hideContacts })).toHaveAttribute(
-      "aria-expanded",
-      "true",
-    );
-
-    await expectNoA11yViolations(container);
-  });
-});
-
-// ============================================================================
 // Tests del Cambio motion 3 (T9: RF-11 — specs/layout/Sidebar/spec.md →
 // "Entrada de contactos"; Tests esperados 11–13; tasks.md → "Cambio motion 3",
 // puerta Spec+Plan+Tareas aprobada en 3 rondas, decisiones #106/#116).
@@ -951,5 +900,59 @@ describe("contacts entrance (Cambio motion 3)", () => {
       "aria-expanded",
       "false",
     );
+  });
+});
+
+// ============================================================================
+// Tests de T6 (specs/layout/Sidebar/tasks.md) — cierre a11y de la pieza
+// (Tests esperados #9: `expectNoA11yViolations` sin violaciones, colapsado Y
+// expandido; constitución T4: el archivo termina con este caso) y covering
+// check de RF-7/RF-10 por INSPECCIÓN.
+//
+// #101 VERDE ON-ARRIVAL DECLARADO (encargo de T6; criterio NavTabs T4 /
+// CornerTab T4): T6 agrega el módulo CSS completo, las clases de la Anatomía
+// y `index.ts` — nada de eso es discriminate-testable en jsdom: "jsdom no
+// aplica `@media`: los tests verifican el comportamiento del disclosure, no la
+// visibilidad por breakpoint" (spec → Tests esperados, nota final) y las
+// hojas de estilo no se cargan (#101). Fabricar un rojo leyendo el CSS como
+// texto está explícitamente descartado. El markup ya era accesible desde
+// T2–T5 (roles, nombres, `aria-*`, links y disclosure asertados allí con sus
+// casos); el valor de este cierre es la regresión futura sobre el markup
+// completo en AMBOS estados del disclosure. Se inspeccionan (reviewer + QA
+// F5): grilla `auto 1fr` < md y `md–lg`, 2/1 columnas de contactos, columna
+// xl con avatar sobresaliente (fórmula −0.71 de foundations/layout.md),
+// `--sidebar-*` tokens, hover/foco de redes y contactos, el `@media` 1200
+// (desde T7 oculta `.disclosure` y pisa `.additionalCollapsed`), el tramo del Separator
+// sin acumular `gap` y cero `@media print` propio (RF-10).
+//
+// Armazón: `renderSidebarWithDefs` (T3) — fixture completo (4 contactos con
+// `IconBox` tone gradient + redes) junto a `AccentGradientDefs`; la expansión
+// se logra con `user.click` sobre el botón (patrón T4), no manipulando clases.
+// Sin `HexAvatarDefs`: la pieza no usa HexAvatar.
+// ============================================================================
+
+describe("Sidebar accessibility audit collapsed and expanded (T6: Tests 9)", () => {
+  it("has no accessibility violations with the contacts collapsed", async () => {
+    // Estado inicial del disclosure en todo < xl (decisión 11): colapsado por
+    // clase; el id del `aria-controls` existe (RF-10) y todo el contenido
+    // accesible del landmark pasa axe.
+    const { container } = renderSidebarWithDefs();
+
+    await expectNoA11yViolations(container);
+  });
+
+  it("has no accessibility violations with the contacts expanded", async () => {
+    const user = userEvent.setup();
+    const { container } = renderSidebarWithDefs();
+
+    // Tests 9: la auditoría también en expandido — click real del botón
+    // (misma interacción que T4; el estado observable es `aria-expanded`).
+    await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
+    expect(screen.getByRole("button", { name: LABELS.hideContacts })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+
+    await expectNoA11yViolations(container);
   });
 });
