@@ -81,7 +81,7 @@ solo en clases (0,1,0) (#116 aclarada: `transition: none` excluido).
     (los ítems jamás `opacity: 0` en papel con el bloque colapsado). Sin tests
     nuevos (print = inspección + Ctrl+P del usuario, criterio #101 explícito);
     resto de `global.css` intacto; suite verde.
-- [ ] **T13. Cierre del Cambio: suite + build + QA + docs.** #80, #91, #86
+- [x] **T13. Cierre del Cambio: suite + build + QA + docs.** #80, #91, #86 — lint/typecheck ✓ · suite **466/41** ✓ · build ✓. QA del reviewer APROBADA en vivo + revisión completa de pieza: expansión 310 ms + stagger total ~290 ms con `backwards` verificado mid-flight, repliegue 224 ms con `visibility` diferido y cero animación de ítems en la salida, carga sin animación a 900 y 1400 (P5'), cruce de media 900→1400 sin animar, reinicio al reexpandir, clics rápidos coherentes, colapsado fuera de foco y del árbol (medido — el punto diferido de T9), #116 en los 3 archivos, consola limpia. **Ctrl+P real con el bloque colapsado: aprobado por el usuario** (contactos completos y visibles). Quedan para el usuario: **commitear el C3 de `foundations/motion.md`** (redactado y entregado; anotado en Abiertos) y la confirmación de `prefers-reduced-motion` con flag real (por inspección P6' cerrada). Con la aprobación del usuario (2026-11-13): spec → `Estado: implementada` y documentos de estado (#86, §XXVI).
   - Hecho cuando: `npm run lint && npm run typecheck && npm test` y
     `npm run build` verdes; QA del reviewer con app servida por el usuario
     (#91, checklist del plan → anexo); el **C3 de `foundations/motion.md`**
