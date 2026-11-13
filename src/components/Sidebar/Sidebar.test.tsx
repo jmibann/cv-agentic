@@ -314,7 +314,7 @@ const PROFILE_WITH_CV: Profile = {
 };
 
 // Selector estructural del Separator dentro del bloque (criterio arriba).
-const SEPARATOR_IN_ADDITIONAL = '#sidebar-contacts > div[aria-hidden="true"]';
+const SEPARATOR_IN_ADDITIONAL = '#sidebar-contacts div[aria-hidden="true"]';
 
 // Render de T3 con las defs del gradiente (armazón, patrón IconBox T1).
 function renderSidebarWithDefs(overrides: Partial<SidebarProps> = {}) {
@@ -796,5 +796,160 @@ describe("Sidebar accessibility audit collapsed and expanded (T6: Tests 9)", () 
     );
 
     await expectNoA11yViolations(container);
+  });
+});
+
+// ============================================================================
+// Tests del Cambio motion 3 (T9: RF-11 — specs/layout/Sidebar/spec.md →
+// "Entrada de contactos"; Tests esperados 11–13; tasks.md → "Cambio motion 3",
+// puerta Spec+Plan+Tareas aprobada en 3 rondas, decisiones #106/#116).
+//
+// Alcance: SOLO tests de la estructura del wrapper y del atributo de entrada.
+// La implementación (wrapper `.additionalBody` + `data-contacts-animate` en
+// `Sidebar.tsx`, CSS de entrada en el módulo) es T10/T11: este commit se
+// deja en rojo a propósito en los tests 11 y 12.
+//
+// Rojo on-arrival esperado (solo tests 11 y 12):
+// - Test 11: hoy `#sidebar-contacts` renderiza Separator + `ul.contacts` +
+//   CTA como hijos DIRECTOS (Anatomía pre-Cambio); ningún hijo lleva la clase
+//   del wrapper (`additionalBody` no existe ni en el TSX ni en el módulo —
+//   verificado). El filtro por clase da 0 y `toHaveLength(1)` falla.
+// - Test 12: `data-contacts-animate` no aparece en el markup actual (RF-11/
+//   P1': refleja `expanded`; lo monta T10). El rojo cae exactamente donde
+//   debe: la ausencia inicial pasa porque el atributo efectivamente no está,
+//   y `toHaveAttribute` tras el primer click de expandir es el rojo (y sus
+//   dos hermanos de re-expansión).
+//
+// Verdes de llegada declarados (#101, los fija el body del commit):
+// - Test 13 (green on-arrival): la clase de colapso existe desde T4 (misma
+//   `collapsedClass` del bloque T4/T7, canon #99) y `aria-expanded="false"`
+//   es el estado inicial vigente. SIN `toBeVisible()`: jsdom no aplica los
+//   estilos de los CSS Modules ni los `@media` (#101); "fuera del foco y del
+//   árbol de accesibilidad" se verifica en QA en navegador (spec → Tests 13).
+// - Reescritura C9 (#106) de la constante `SEPARATOR_IN_ADDITIONAL` (bloque
+//   T3, una línea): de `> div[aria-hidden="true"]` a ` div[aria-hidden="
+//   true"]` descendiente — MISMA aserción de fondo, blindada contra el
+//   wrapper que llega en T10; sigue siendo el Separator el único
+//   `div[aria-hidden]` del subárbol (`IconBox` es `<span>`, `Icon` es `<svg>`
+//   — verificado en T3). Los 4 usos (:379/:475/:489/:744) quedan intactos
+//   con sus `toHaveLength(n)`.
+//
+// Justificación de las queries (constitución T3): el wrapper se selecciona
+// por su CLASE del módulo (canon #99 `styles.name ?? "name"`, patrones
+// `collapsedClass` de T4 y `ctaFullWidthClass` de T5): "único div de
+// contenido" no tiene rol ni nombre accesibles (es contenedor de layout).
+// Dentro del wrapper: la lista de contactos por rol `list` con `within`
+// (ÚNICA `ul` del wrapper: la de redes vive en `baseInfo`, fuera de
+// `#sidebar-contacts`) y el CTA por rol `link` + nombre `downloadCv`
+// (prueba de contención, no duplica el test 6 de T5). El Separator (`<div
+// aria-hidden>` sin rol por contrato, su RF-1) por selección estructural
+// acotada al wrapper — criterio declarado en T3, ahora `body.querySelector`
+// (único `div[aria-hidden]` de su subárbol). El orden Separator→lista es
+// INCONDICIONAL (la fixture trae lista) vía
+// `compareDocumentPosition(...) & Node.DOCUMENT_POSITION_FOLLOWING` (truthy):
+// no depende del CSS, observable en jsdom. Test 12: atributo por
+// presencia/ausencia (literal de spec → Anatomía/Estados; criterio
+// `data-print-hide` de T7). Sin `data-testid`.
+//
+// Armazón: `renderSidebarWithDefs` (T3). Test 11: con `PROFILE_WITH_CV`
+// (la prueba pide Separator + lista + CTA: fixture con `downloadCvUrl` para
+// tener los tres). Tests 12 y 13: fixture base completo (4 contactos) — el
+// disclosure opera sobre el bloque con contenido; el CTA no interviene.
+// ============================================================================
+
+// Clase del wrapper de contenido del bloque (canon #99; spec → Anatomía del
+// Cambio motion 3: `additionalBody`, único hijo de contenido, dueña de la
+// pila vertical).
+const bodyClass = styles.additionalBody ?? "additionalBody";
+
+// Literal del atributo de entrada (spec → Anatomía/Estados, RF-11/P1':
+// presente SOLO cuando `expanded`; mismo criterio de literalidad del id
+// `CONTACTS_ID` de T4: es contrato público de la pieza, no se importa del
+// TSX).
+const CONTACTS_ANIMATE_ATTR = "data-contacts-animate";
+
+describe("contacts entrance (Cambio motion 3)", () => {
+  it("wraps Separator, contacts list and CTA in a single additionalBody child, Separator before the list (test 11: RF-11)", () => {
+    const { container } = renderSidebarWithDefs({ profile: PROFILE_WITH_CV });
+
+    const contacts = container.querySelector(`#${CONTACTS_ID}`);
+    if (contacts === null) {
+      throw new Error(
+        `expected #${CONTACTS_ID} to exist (RF-10: id alcanzable del disclosure)`,
+      );
+    }
+
+    // Test 11: UN único div hijo de contenido con la clase del wrapper.
+    const wrappers = Array.from(contacts.children).filter(
+      (child): child is HTMLElement =>
+        child instanceof HTMLElement && child.classList.contains(bodyClass),
+    );
+    expect(wrappers).toHaveLength(1);
+    const body = wrappers[0];
+    if (body === undefined) {
+      throw new Error(
+        `expected #${CONTACTS_ID} to have exactly one direct child with the wrapper class "${bodyClass}"`,
+      );
+    }
+    expect(body.tagName).toBe("DIV");
+
+    // Ese hijo contiene Separator + ul.contacts + el CTA (Anatomía del
+    // Cambio motion 3: la pila migra de `.additional` al wrapper).
+    const separator = body.querySelector('div[aria-hidden="true"]');
+    if (separator === null) {
+      throw new Error("expected the wrapper to contain the Separator (div[aria-hidden])");
+    }
+    const contactsList = within(body).getByRole("list");
+    within(body).getByRole("link", { name: LABELS.downloadCv });
+
+    // Orden INCONDICIONAL (la fixture trae lista): el Separator precede a
+    // `ul.contacts` — compareDocumentPosition con DOCUMENT_POSITION_FOLLOWING.
+    expect(
+      separator.compareDocumentPosition(contactsList) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("reflects expanded on data-contacts-animate: absent initially, on expand, off on collapse, on again on re-expand (test 12: RF-11)", async () => {
+    const user = userEvent.setup();
+    const { container } = renderSidebarWithDefs();
+
+    const contacts = container.querySelector(`#${CONTACTS_ID}`);
+    if (contacts === null) {
+      throw new Error(`expected #${CONTACTS_ID} to exist (RF-10)`);
+    }
+
+    // RF-11/P1': nada anima en el render inicial — el atributo NO debe
+    // existir (también cubre "nada anima en la carga" observable en jsdom).
+    expect(contacts).not.toHaveAttribute(CONTACTS_ANIMATE_ATTR);
+
+    // Expandir: presente.
+    await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
+    expect(contacts).toHaveAttribute(CONTACTS_ANIMATE_ATTR);
+
+    // Colapsar: ausente otra vez (el cierre no anima los ítems; RF-11).
+    await user.click(screen.getByRole("button", { name: LABELS.hideContacts }));
+    expect(contacts).not.toHaveAttribute(CONTACTS_ANIMATE_ATTR);
+
+    // Reexpandir: presente de nuevo (el atributo refleja `expanded`; el
+    // reinicio observable de la animación lo verifica el reviewer en
+    // navegador — T13).
+    await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
+    expect(contacts).toHaveAttribute(CONTACTS_ANIMATE_ATTR);
+  });
+
+  it("marks the collapsed state with the module collapsed class and aria-expanded=false, without visibility assertions (test 13: RF-3/RF-11)", () => {
+    // VERDE DE LLEGADA (#101): la clase de colapso existe desde T4 (canon
+    // #99, misma const del bloque T4/T7) y `aria-expanded="false"` es el
+    // estado inicial vigente. SIN `toBeVisible()`: jsdom no aplica los
+    // estilos de los CSS Modules (spec → Tests 13).
+    const { container } = renderSidebarWithDefs();
+
+    const contacts = container.querySelector(`#${CONTACTS_ID}`);
+    expect(contacts).not.toBeNull();
+    expect(contacts).toHaveClass(collapsedClass);
+    expect(screen.getByRole("button", { name: LABELS.showContacts })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
   });
 });
