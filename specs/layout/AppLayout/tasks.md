@@ -75,7 +75,7 @@ puerta). Dueño: `integrator`; no toca `global.css`, NavTabs, `src/test/**` ni
     `transition` nuevas (regla (0,2,0)+ de #116 — la verifica el reviewer);
     `global.css` y el resto del módulo intactos; suite completa verde tras el
     `feat`.
-- [ ] **T13. Cierre del Cambio: build + QA del reviewer + docs.** #80, #91, #86
+- [x] **T13. Cierre del Cambio: build + QA del reviewer + docs.** #80, #91, #86 — build ✓ (prebuild+validate:content+tsc+vite, sin warnings); QA del reviewer con app servida APROBADA + revisión completa de pieza APROBADA (463/41): animación bidireccional medida (`matrix ±10px`+opacity 0 inicial, 0.3s `--ease-enter` `backwards`), carga inicial sin animación, sin residuos (transform `none`, sin contexto de apilamiento), flujo del `h1` junto a la solapa ✓ 1000/1440 × 2 tabs, consola limpia, #116: 0 `transition` en el módulo. Por inspección (limitación del MCP, igual que F5): reduced motion real y Ctrl+P, a confirmar el usuario. Con aprobación del usuario (2026-11-13), spec → `Estado: implementada` y docs de estado (#86, §XXV).
   - Hecho cuando: `npm run build` verde; QA del reviewer con la app servida por
     el usuario (#91): animación en ambos sentidos, **sin animación en la carga
     inicial**, reduced motion instantáneo, impresión sin animación y flujo del

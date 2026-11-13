@@ -1,6 +1,5 @@
 # AppLayout
-Estado: aprobada
-Reabierta 2026-11-13 por el Cambio motion 2; vuelve a `implementada` al cerrar.
+Estado: implementada
 
 ## Propósito
 
