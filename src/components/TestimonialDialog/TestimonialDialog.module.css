@@ -63,26 +63,27 @@
   max-height: calc(100dvh - 2rem);
   box-shadow: var(--shadow-dialog);
 
-  /* Fila "Entrada" (decisión 19) — estado FINAL en la base: opacity: 1 y
-     transform: scale(1) (los →1 de la fila; sin @media propio de salida).
-     La transición se declara ACÁ, sobre el estado final, con PROPIEDADES
-     CONCRETAS (opacity/transform, nunca `all`: docs/DESIGN.md → Do/Don't):
-     es el MECANISMO ESTÁNDAR de @starting-style como único activador —
-     el dialog nace SIN open (display: none por la UA), showModal() lo abre,
-     el navegador lo renderiza por primera vez y interpola desde
-     @starting-style (bloque abajo) hacia este estado final. SALIDA SIN
-     ANIMACIÓN: al cerrar no hay bloque @starting-style que cubra la
-     transición de vuelta ni `transition-behavior: allow-discrete` en el
+  /* Fila "Entrada" (decisión 19; Cambio motion 4 → propuesta §4.4, C7) —
+     entrada `opacity`/`transform` 0.2s (`--duration-base`) con curva de
+     entrada `--ease-enter` y `@starting-style` como ÚNICO mecanismo: el
+     dialog nace SIN open (display: none por la UA), showModal() lo abre, el
+     navegador lo renderiza por primera vez y interpola desde
+     @starting-style (bloque abajo) hacia este estado FINAL (opacity: 1 y
+     transform: scale(1), los →1 de la fila). La transición se declara ACÁ,
+     sobre el estado final, con PROPIEDADES CONCRETAS (opacity/transform,
+     nunca `all`: docs/DESIGN.md → Do/Don't). CIERRE INSTANTÁNEO (sin
+     animación de salida): al cerrar no hay bloque @starting-style que cubra
+     la transición de vuelta ni `transition-behavior: allow-discrete` en el
      módulo, así que el display: none de la UA se aplica de inmediato y
-     opacity/transform no alcanzan a animar — cierre instantáneo, literal
-     del "Hecho cuando" de T3. Reducción de movimiento: --duration-base/
-     --ease-standard (0.3s ease-in-out; 0.01ms con prefers-reduced-motion en
-     tokens.css). Verificación: inspección + QA F5. */
+     opacity/transform no alcanzan a animar — literal del "Hecho cuando" de
+     T3. Reducción de movimiento: SIN @media propio, el token
+     --duration-base colapsa a 0.01ms en tokens/tokens.css. Verificación:
+     inspección + QA en navegador (T5/F5; #101: jsdom no computa curvas). */
   opacity: 1;
   transform: scale(1);
   transition:
-    opacity var(--duration-base) var(--ease-standard),
-    transform var(--duration-base) var(--ease-standard);
+    opacity var(--duration-base) var(--ease-enter),
+    transform var(--duration-base) var(--ease-enter);
 }
 
 /* Fila "Backdrop" (RF-5): --color-overlay (rgb con alpha del token semántico;
