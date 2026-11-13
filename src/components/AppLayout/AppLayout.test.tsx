@@ -775,3 +775,130 @@ describe("AppLayout accessibility audit (T5: cierre, Tests 10)", () => {
     await expectNoA11yViolations(container);
   });
 });
+
+// ===========================================================================
+// Tests de T11 (specs/layout/AppLayout/tasks.md, Cambio motion 2 #106/#116) —
+// RF-9: tests 13 y 16 de la spec. El wrapper de entrada de la página activa
+// dentro del tabpanel (`data-motion-panel`, `key={active}`, con
+// `data-motion-direction` SOLO cuando la dirección no es `null`) AÚN NO EXISTE:
+// estos dos `it` nacen en ROJO REAL y se cierran con el `feat(AppLayout): T11`
+// (no hay código que los satisfaga; a diferencia de T2/T3/T4, acá no hay nada
+// verde on-arrival). El CSS de la animación es T12: acá solo estructura y
+// atributos, observables en jsdom.
+// Justificación de la query (constitución T3): el wrapper NO tiene rol,
+// `tabIndex` ni texto propio (spec → No hacer: "No dar al wrapper `role`,
+// `tabIndex` ni texto propio") y su clase va hasheada por el módulo CSS hasta
+// T12, así que no existe query por rol/nombre posible: se consulta por el
+// atributo-contrato `[data-motion-panel]`, mismo mecanismo ya usado en este
+// archivo para el stack de impresión (test 12: `querySelector
+// ("[data-print-only]")`/`[data-print-stack]`) y precedentemente justificado.
+// La unicidad del wrapper (`toHaveLength(1)`) refuerza que el bloque inactivo
+// `data-print-only` NO recibe wrapper (Anatomía: solo la página del tabpanel).
+// El "nodo wrapper anterior ya no está en el documento" (segunda parte del
+// test 13, prueba del `key`) se mide capturando la REFERENCIA del nodo antes
+// del par de clicks rápidos y verificando `container.contains(prev) === false`
+// + no-identidad del nodo final: React remonta con `key={active}`, reusar el
+// mismo objeto DOM probaría que el `key` no opera.
+// Test 16: render inicial SIN `data-motion-direction` (sin animación al montar;
+// la `animation` solo se declara con el atributo presente — P5, CSS en T12) y
+// conservación del valor tras un cambio de idioma por el LanguageSwitcher REAL
+// (click "Español", camino literal del test 5 de este archivo). El assert de
+// identidad de nodo (tras el idioma NO se remonta el wrapper) respalda el "no
+// corta la animación en curso" del test 16: la dirección se recalcula SOLO
+// cuando cambia `active` (patrón de ajuste de estado, plan → P1).
+// ===========================================================================
+
+describe("AppLayout entry wrapper marks the direction on tab change (T11: RF-9, Tests 13)", () => {
+  it("sets from-right on About→Resume and from-left on Resume→About, and a fast double click remounts the wrapper leaving the old node out of the document", async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithProviders(<AppLayout />);
+
+    // Un único wrapper en el árbol: vive dentro del tabpanel; el bloque
+    // inactivo `data-print-only` no lleva wrapper (Anatomía).
+    expect(container.querySelectorAll("[data-motion-panel]")).toHaveLength(1);
+
+    // Click About→Resume: dirección "from-right" (llega desde la derecha).
+    await user.click(screen.getByRole("tab", { name: uiEn.nav.resume }));
+    const fromRight =
+      container.querySelector<HTMLElement>("[data-motion-panel]");
+    if (fromRight === null) {
+      throw new Error(
+        "debe existir el wrapper data-motion-panel dentro del tabpanel (RF-9)",
+      );
+    }
+    expect(fromRight).toHaveAttribute("data-motion-direction", "from-right");
+    // El wrapper cuelga del tabpanel (spec → Anatomía: dentro de .panel), no
+    // del bloque de impresión (RF-8 intacto).
+    expect(screen.getByRole("tabpanel")).toContainElement(fromRight);
+
+    // Click Resume→About: dirección "from-left".
+    await user.click(screen.getByRole("tab", { name: uiEn.nav.about }));
+    const fromLeft = container.querySelector("[data-motion-panel]");
+    if (fromLeft === null) {
+      throw new Error("el wrapper data-motion-panel debe persistir al cambiar de tab (RF-9)");
+    }
+    expect(fromLeft).toHaveAttribute("data-motion-direction", "from-left");
+
+    // Dos clicks rápidos (About→Resume→About): el atributo FINAL es coherente
+    // con el tab alcanzado (About → "from-left")…
+    await user.click(screen.getByRole("tab", { name: uiEn.nav.resume }));
+    await user.click(screen.getByRole("tab", { name: uiEn.nav.about }));
+    const finalWrapper = container.querySelector("[data-motion-panel]");
+    if (finalWrapper === null) {
+      throw new Error(
+        "el wrapper data-motion-panel debe existir tras los clicks rápidos (RF-9)",
+      );
+    }
+    expect(finalWrapper).toHaveAttribute("data-motion-direction", "from-left");
+    // …y el nodo wrapper ANTERIOR ya no está en el documento (prueba del
+    // `key={active}`): la referencia capturada antes del par quedó desmontada
+    // y el nodo final es un objeto distinto.
+    expect(container.contains(fromLeft)).toBe(false);
+    expect(finalWrapper).not.toBe(fromLeft);
+  });
+});
+
+describe("AppLayout entry wrapper has no direction on first render and keeps it across a language change (T11: RF-9, Tests 16)", () => {
+  it("renders the wrapper without data-motion-direction initially and preserves from-right after switching to Spanish through the real switcher", async () => {
+    const user = userEvent.setup();
+    const { container } = renderWithProviders(<AppLayout />);
+
+    // Render inicial: el wrapper EXISTE y NO lleva `data-motion-direction`
+    // (sin animación al montar; RF-9 + No hacer "No animar en el render
+    // inicial").
+    const initial = container.querySelector("[data-motion-panel]");
+    if (initial === null) {
+      throw new Error(
+        "el wrapper data-motion-panel debe existir ya en el render inicial (RF-9)",
+      );
+    }
+    expect(initial).not.toHaveAttribute("data-motion-direction");
+
+    // Cambio de tab: aparece la dirección.
+    await user.click(screen.getByRole("tab", { name: uiEn.nav.resume }));
+    const wrapper = container.querySelector("[data-motion-panel]");
+    if (wrapper === null) {
+      throw new Error(
+        "debe existir el wrapper data-motion-panel tras el cambio de tab (RF-9)",
+      );
+    }
+    expect(wrapper).toHaveAttribute("data-motion-direction", "from-right");
+
+    // Re-render por cambio de idioma (camino integrado del test 5: click al
+    // LanguageSwitcher real, opción "Español" — nombre fijo NO traducido): el
+    // valor de `data-motion-direction` SE CONSERVA (plan → P1: la dirección
+    // solo se recalcula cuando cambia `active`; un re-render ajeno no la
+    // recalcula ni corta la animación en curso).
+    await user.click(screen.getByRole("button", { name: "Español" }));
+    const afterLanguage = container.querySelector("[data-motion-panel]");
+    if (afterLanguage === null) {
+      throw new Error(
+        "el wrapper debe sobrevivir el re-render por idioma (RF-9, test 16)",
+      );
+    }
+    expect(afterLanguage).toHaveAttribute("data-motion-direction", "from-right");
+    // Y no se remontó: un cambio de idioma NO es un cambio de tab (el `key`
+    // es `active`); remontar sería justamente "cortar la animación".
+    expect(afterLanguage).toBe(wrapper);
+  });
+});
