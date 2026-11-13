@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-12** (saneado de documentación §XXII; favicon §XXI; Resume en una columna §XX).
+Última actualización: **2026-11-13** (puerta motion etapa 1 + saneado §XXIII; documentación §XXII; favicon §XXI).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#115 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#116 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -42,11 +42,18 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Motion (post-entrega) | Propuesta aprobada (#106) en `specs/motion/proposal.md`; falta aprobar specs/planes/tareas y luego implementar tokens, tabs B, Sidebar grid, `data-theme-switching`, reduced motion, dialog y Separator. No se toca código antes de esa puerta | Puerta de Plan+Tareas / Cambio |
+| Motion (post-entrega) | Etapa 1 (Foundation) **#116**: T15–T17 aplicadas y aprobadas; falta **T18** (`foundations/motion.md` en manos del usuario + QA del reviewer con app servida + `build` + `spec.md` → `implementada`). Cambios 2–4 (tabs B AppLayout, grid del Sidebar, TestimonialDialog) necesitan cada uno su puerta spec→plan→tareas. Regla #116: ninguna `transition` en selector de especificidad (0,2,0) o mayor; la verifica el reviewer en cada Cambio | Puerta T18 / Plan+Tareas de cada Cambio |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XXIII · 2026-11-13 — Puerta motion etapa 1 + saneado de documentación
+- Qué: se registra acá la aprobación de la puerta Plan+Tareas del Cambio motion etapa 1 Foundation (spec `37d9e80`, plan+tareas `ee9e8a2`; ajustes → **#116**) y su ejecución: T15 tokens (usuario, `c2befd1`; checkbox pendiente → `463f4da`), T16 `data-theme-switching` (`6dda460`+`c0bc995`, APROBADA) y T17 test de contrato (`122a996`, APROBADA). Junto con eso, saneado de 6 hallazgos de la auditoría de documentación del usuario (2026-11-13): estado rancio de motion/suite/conteos en `docs/memory.md`, `README.md` (filas Motion, Post-entrega y "F2 → seguimientos", eliminada esta última por cerrada en F3–F5), `docs/diagnostics.md` (fila Motion de Abiertos y falta de entrada de la puerta), `docs/README.md` (fila #106) y `specs/motion/proposal.md` (l.3 y l.447; edición aprobada por el usuario). Poda #98: §XVIII–§XX a una línea.
+- Checks: lint ✓ · typecheck ✓ · test **456/40** ✓ (build no aplica: no cierra pieza ni puerta de código; corre en T18).
+- Decisiones: **#116** → `docs/README.md` (regla permanente: ninguna `transition` en selector de especificidad (0,2,0) o mayor, para los Cambios motion 2–4).
+- Commits: `463f4da` (T15 en `tasks.md`) · `3bde85b` (#116) · el de esta entrada y los del resto del pase (memoria, README, proposal).
+- Abre: nada nuevo. Cierra: fila "Motion" rancia de **Abiertos** (reescrita a T18 + Cambios 2–4) y los 6 hallazgos del saneado.
 
 ### §XXII · 2026-11-12 — Saneado de documentación (hallazgo de auditoría cerrado)
 - Qué: saneado 1–4 aprobado por el usuario: (1) conteos obsoletos 27→**28 specs** (27 de componentes + Foundation) en README y memoria; (2) suite actual **448** en el modo mantenimiento del README; (3) la categoría `motion` registrada en `specs/README.md` (nota bajo el índice + excepción a la regla de `.md` sueltos) y en `AGENTS.md:16` (edición manual del usuario: `AGENTS.md` no está en los permisos de `edit`/`git add` del orchestrator) — sale la fila "Auditoría pendiente: registro de specs" de **Abiertos**; (4) §XI y §XII compactadas a una línea (tope #98; hashes de creación `133b1e8`/`31d8f27`). Sin cambios de código ni specs de pieza.
@@ -63,26 +70,11 @@ de la entrada); el detalle queda en git.
 - Commits: `a0d7b5f` (spec/T14) · `3b4db39` + `516621a` + `afbc660` (tests) · `9ebcca4` (feat) · `05e2cb6` (fix).
 - Abre: nada. Cierra: nada (§XVII compactada a una línea por el tope de 150).
 
-### §XX · 2026-11-12 — ResumePage en una sola columna, Experience primero
-- Qué: a pedido del usuario (las dos columnas con timeline desde 768px eran difíciles de leer), Resume pasa a una sola columna en todos los anchos: Experience arriba, Education debajo, Skills al final. Preview previa en navegador con CSS inyectado; Cambio de spec aprobado (RF-3 reescrito, RF-2/RF-6, Anatomía, Estilos, Responsive y test 2). T5: orden invertido en el DOM (no `order` de CSS: lectura y foco = visual) y `.columns` sin `@media` ni `:only-child`. Única aserción cambiada: el orden de las regiones en el test 2, autorizada por el cambio de spec.
-- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · navegador 375/768/1334: una columna, Experience primero, sin overflow, consola limpia.
-- Decisiones: **#114** → `docs/README.md`.
-- Commits: `28e6ecf` (spec/T5) · `1c16bf5` (test rojo) · `174bc4e` (feat).
-- Abre: nada. Cierra: nada (§XVI compactada a una línea por el tope de 150).
+### 2026-11-12 · §XX — ResumePage en una sola columna, Experience primero · #114 · `git show 31d7ee9:docs/diagnostics.md`
 
-### §XIX · 2026-11-12 — TestimonialCard: avatar anclado arriba
-- Qué: auditoría en navegador de la alineación de los hexágonos: con `align-items: end` el avatar bajaba con cada línea de nombre/rol, no sobresalía en ningún ancho y quedaba desalineado entre cards (50px a 768, 25px a 1440). Cambio aprobado (T6): `.header` → `align-items: start` y reserva exacta de la comilla con el token nuevo `--testimonial-quote-reserve` (2.2rem → 2rem ≥580). Sin clamp del rol (decisión del usuario).
-- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · build ✓ · navegador 375/580/768/1024/1440 × claro/oscuro × en/es: avatar −24/−30px idéntico en las 3 cards, 0 invasión de la comilla, sin overflow, dialog OK, consola limpia.
-- Decisiones: **#113** → `docs/README.md`.
-- Commits: `390bb06` (spec/T6) · `24faf70` (fix + token).
-- Abre: nada. Cierra: nada (§XV compactada a una línea por el tope de 150).
+### 2026-11-12 · §XIX — TestimonialCard: avatar anclado arriba · #113 · `git show c240dd8:docs/diagnostics.md`
 
-### §XVIII · 2026-11-12 — Testimonios reales + Cambio de TestimonialCard
-- Qué: 3 testimonios reales en `cv.{en,es}.json` (revierte el `testimonials: []` de #108; textos literales en su idioma original, errores incluidos por decisión del usuario; siluetas neutras como avatar). La QA en navegador detectó que la comilla pisaba nombres largos (20px a 375, 10px a 768) → Cambio aprobado: `.identity` reserva `calc(2rem + --testimonial-quote-inset-inline)` (T5). Re-QA: 0 invasión en 375/580/768/1024/1440 × claro/oscuro × en/es, sin overflow, dialog OK, consola limpia (el único error fue de HMR al editar el JSON; desaparece al recargar).
-- Checks: lint ✓ · typecheck ✓ · test **447/40** ✓ · validate:content ✓ · build ✓.
-- Decisiones: **#112** → `docs/README.md`.
-- Commits: `b0f19bc` (spec/T5) · `11d5edc` (fix T5) · `7f7cbe3` (contenido).
-- Abre: nada. Cierra: nada (§XIII–§XIV compactadas a una línea para respetar el tope de 150).
+### 2026-11-12 · §XVIII — Testimonios reales + Cambio de TestimonialCard · #112 · `git show 36be49c:docs/diagnostics.md`
 
 ### 2026-11-12 · §XVII — CI: Node 26 LTS y quality gates en el deploy · #110–#111 · `git show a9849b7:docs/diagnostics.md`
 
