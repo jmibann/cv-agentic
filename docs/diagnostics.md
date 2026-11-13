@@ -2,7 +2,7 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-13** (cierre motion cambio 3 §XXVI + sync de pendientes C3/reduced-motion/Actions sin entrada nueva: no es puerta F ni decisión de reglas).
+Última actualización: **2026-11-13** (sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
@@ -42,11 +42,17 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Motion, Cambio 4 (post-entrega) | Solo queda **TestimonialDialog**: `--ease-standard`→`--ease-enter` manteniendo `@starting-style` y sin salida; limpiar el comentario rancio `TestimonialDialog.module.css:79` ("0.3s"); con su puerta spec→plan→tareas (regla #116 **aclarada**: `transition: none` excluido). CERRADOS 2026-11-13: C3 de `foundations/motion.md` commiteado por el usuario (`5edfcb0`); `prefers-reduced-motion` **probado en Chrome** (contactos del Sidebar y cambio de tabs, correcto); Ctrl+P con contactos colapsados ✓; push y Actions verdes. Único cabo suelto: la aclaración de #116 aún NO está redactada en la viñeta de `foundations/motion.md` (líneas 41–43 conservan el texto viejo) — manos del usuario (kit) | Puerta del Cambio 4 |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XXVII · 2026-11-13 — Cierre del Cambio motion 4 y del sistema motion (4/4)
+- Qué: último Cambio, TestimonialDialog: fila "Entrada" de la spec `--ease-standard`→`--ease-enter` (la historia quedó solo en el anexo del plan, ajuste de redacción del usuario) y plan/tareas aprobados (`febce50`/`e72b964`). T4 (`1d2aba8`, feat único, verde-only #101 bien declarado: sin discriminator jsdom sobre la curva; hunk único; close hover conserva standard — ítem 10 de la matriz) APROBADA. T5: QA en vivo — entrada 200 ms con `cubic-bezier(0.22,1,0.36,1)` y frame inicial `scale(0.96)` vía `@starting-style` (sin overshoot), **cierre instantáneo en los 3 caminos** (Close/Esc/backdrop real; 0 `transitionrun`, `getAnimations()=[]`; 6 runs = 2×3 aperturas, 0 cancels), backdrop/scroll/bloqueo de fondo sin regresión, print `display:none` presente, reapertura reinicia; pieza 15/15 con cierre axe. Usuario: **Ctrl+P con el dialog abierto OK** y aplicó los **dos textos permanentes de #116** (`11b475b`: viñeta en `foundations/motion.md` + regla corta en `AGENTS.md` → Convenciones). TestimonialDialog → `implementada` (**28/28**); **propuesta reescrita a 4/4** (cabecera con las cuatro puertas §XXIV–§XXVII + #116 permanente; nota de las citas +1 línea). Sistema motion **COMPLETO**.
+- Checks: lint ✓ · typecheck ✓ · test **466/41** ✓ · build ✓ (prebuild + validate:content incluidos).
+- Decisiones: ninguna nueva; #116 elevada a **regla permanente** (decisión del usuario, registro en su fila de `docs/README.md`).
+- Commits: `febce50` `e72b964` `1d2aba8` `80a5301` `11b475b` (usuario) + `a8e1ff9` (specs) y el docs de este cierre.
+- Abre: nada. Cierra: la **fila Motion de Abiertos** (el sistema queda completo; los opcionales de forma viven en sus filas).
 
 ### §XXVI · 2026-11-13 — Cierre del Cambio motion 3 (Sidebar, expansión de contactos)
 - Qué: Cambio completo sobre Sidebar: spec reabierta y aprobada en 3 rondas (`4313f3d`, con la **enmienda de #116** escrita en su fila de `docs/README.md`: la regla refiere a `transition` que puedan *producir animación*; `transition: none` excluido) + plan/tareas (`8a89a5f`; ajustes del usuario: T12 feat-only, `data-contacts-animate` refleja `expanded` sin estado extra, reescritura C9 del Selector a descendiente —una línea, 4 usos intactos—, test 13 por clase y no `toBeVisible()`). Ejecución: T9+T9b (`c5617e0`/`2db9975`, reubicación del cierre axe ordenada por el reviewer), T10 (`5162e2e` wrapper + atributo), T11 (`4e80fb3` grid 0fr/1fr + stagger gated `backwards` + P5' con clase simple ≥1200), T12 (`efbe0e1` print en `global.css`: se quema el `display: block` heredado de #103 — el grid base del módulo lo hace inerte — y resets (1,0,0)); todas APROBADAS por tarea + revisión completa. QA en vivo: expansión 310 ms + stagger ~290 ms (mid-flight verificó `backwards`), repliegue 224 ms con `visibility` diferido, cargas 900/1400 sin animación, cruce de media sin animar, reinicio al reexpandir, clics rápidos, colapsado fuera de foco/árbol medido. **Ctrl+P con el bloque colapsado aprobado por el usuario.** Sidebar → `implementada` (28/28). Pendientes del usuario: commitear el C3 de `foundations/motion.md` (redactado y entregado) y confirmar reduced-motion con flag real (por inspección P6' cerrada).
@@ -55,12 +61,7 @@ de la entrada); el detalle queda en git.
 - Commits: `4313f3d` `8a89a5f` `c5617e0` `2db9975` `5162e2e` `4e80fb3` `efbe0e1` + las marcas de tareas.
 - Abre: los 2 pendientes del usuario (fila Motion de **Abiertos**). Cierra: el Cambio motion 3; queda solo el 4 (TestimonialDialog).
 
-### §XXV · 2026-11-13 — Cierre del Cambio motion 2 (AppLayout, entrada de panel)
-- Qué: Cambio motion 2 completo sobre AppLayout: spec RF-9 reabierta y aprobada en 2 rondas (`6c71f12`; ajustes del usuario: print en el módulo por orden de importación, dirección `null` en el primer render, reset preexistente no atribuido al `key`, `backwards`, setState-condicional en lugar de refs en render por `react-hooks/refs`, selectores acotados por clase); plan+tasks aprobados con ajuste de T12 en dos commits (`aa75256`). Ejecución T10–T13 (`84bb91b`/`28ec533` · `67b912b`/`88bb4a9` · `600c93f`/`fd8b4c5`), todas APROBADAS por tarea + revisión completa APROBADA: QA en vivo midió animación bidireccional (frame inicial `matrix(±10,0)` + opacity 0, 0.3s `--ease-enter` `backwards`), sin animación en carga inicial, sin residuos ni contexto de apilamiento, flujo del `h1` junto a la solapa 1000/1440 × 2 tabs, consola limpia, 0 `transition` en el módulo (#116). Reduced motion real y Ctrl+P quedaron por inspección (limitación del MCP). AppLayout → `Estado: implementada`.
-- Checks: lint ✓ · typecheck ✓ · test **463/41** ✓ · build ✓ (prebuild + validate:content incluidos).
-- Decisiones: ninguna nueva (#116 vigente; P1–P8 del anexo de `plan.md`).
-- Commits: `84bb91b` `28ec533` `67b912b` `88bb4a9` `600c93f` `fd8b4c5` + los docs de este pase. Menores registrados: tilde "patrón" en cuerpo `fd8b4c5`; assert extra de identidad de nodo en test 16 (informativo).
-- Abre: cambios 3–4 (fila Motion de **Abiertos**, con las 2 confirmaciones manuales del usuario). Cierra: el Cambio motion 2.
+### 2026-11-13 · §XXV — Cierre del Cambio motion 2 (AppLayout, entrada de panel) · — · `git show de5f32a:docs/diagnostics.md`
 
 ### 2026-11-13 · §XXIV — Cierre del Cambio motion etapa 1 (Foundation T18) · #116 · `git show fd3d1d1:docs/diagnostics.md`
 
