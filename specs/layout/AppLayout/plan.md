@@ -72,3 +72,64 @@ precondición de `useHashTab` RF-5; el 11 asserts del tablist (2 tabs, orden,
 Cobertura: T1→RF-1,RF-6 · T2→RF-2,RF-3,RF-5 (+guard A1) · T3→RF-4 ·
 T4→RF-7,RF-8 (capa DOM) · T5→RF-8 (print, inspección) + estilos/`--z-skip` +
 cierre a11y · T6→integración (`App.tsx`) · T9→alt del avatar derivado (en/es).
+
+## Anexo — Cambio motion 2 (2026-11-13, #106/#116; puerta Plan+Tareas aprobada con ajuste en T12)
+
+**Archivos nuevos/tocados:** `src/lib/tabDirection.ts` (nuevo),
+`src/lib/tabDirection.test.ts` (nuevo), `src/components/AppLayout/AppLayout.tsx`,
+`AppLayout.module.css`, `AppLayout.test.tsx`. **No se tocan:** `global.css`
+(P6), NavTabs, providers, `src/test/**`. Dueño de todo: `integrator`.
+
+**Decisiones:**
+
+- **P1 — Dirección estable con el patrón oficial de React "ajuste de estado al
+  cambiar"** (`useState` + `setState` condicional en render del propio
+  componente; spec → Anatomía). *Descartado:* leer/escribir refs durante el
+  render (lo prohíbe `react-hooks/refs` con recommended-latest, bloqueante de
+  lint) y mudar `{active, direction}` al estado de `useHashTab` (más invasiva:
+  sería Cambio de spec del hook). **Checklist de T11:** `npm run lint` debe
+  aceptar el `setState` condicionado bajo `react-hooks/set-state-in-render`;
+  si lo rechaza, **escalar al usuario antes de commitear el `feat`** (sin
+  `eslint-disable`).
+- **P2 — `animation-fill-mode: backwards`.** *Descartado:* `both` (deja
+  `transform` aplicado permanentemente → contexto de apilamiento y referencia
+  de `position: fixed` alterada).
+- **P3 — Un único `@keyframes panel-enter` con `var(--panel-enter-x)`; las
+  variables en `.motionPanel[data-motion-direction="from-left|from-right"]`
+  (0,2,0, acotadas por la clase).** *Descartado:* dos `@keyframes` elegidos por
+  atributo (duplica frames sin beneficio) y selector de atributo suelto (en un
+  CSS Module es global; precedente `.contacts p`). Una variable no es una
+  `transition`: #116 se cumple.
+- **P4 — `key={active}` solo en el wrapper.** *Descartado:* key en el tabpanel
+  o en las páginas (rompería foco/ARIA del panel).
+- **P5 — `animation` declarada solo en `.motionPanel[data-motion-direction]`.**
+  *Descartado:* animación incondicional en `.motionPanel` (animaría el render
+  inicial contra RF-9).
+- **P6 — Regla de impresión dentro del módulo, ubicada tras la de `animation`**
+  (empate (0,2,0) se resuelve por orden). *Descartado:* `global.css` (se
+  importa antes que los módulos en `main.tsx`: el empate lo ganaría el módulo y
+  la anulación de print no haría efecto — mismo patrón que `.social a` en la
+  etapa 1).
+- **P7 — `getTabDirection` + `MotionDirection` en `src/lib/tabDirection.ts`.**
+  *Descartado:* exportar desde `AppLayout.tsx` (obligaría a ampliar
+  `allowExportNames` de react-refresh, #96/#100: nombres nuevos = aprobación
+  del usuario; con `.ts` no se toca la lista).
+- **P8 — El test 14 es de NO REGRESIÓN, verde on-arrival declarado (#101):**
+  el reset entre tabs ocurre desde F4 por el intercambio de tipos
+  `AboutPage`↔`ResumePage`; *descartado:* presentarlo como prueba del `key`
+  (esa es la segunda parte del test 13).
+
+**Commits de T12 (ajuste de la puerta):** `test(AppLayout): T12` = solo el test
+14 (verde de llegada declarado, #101); `feat(AppLayout): T12` = solo el CSS.
+No se mezclan (regla de `git log -p` del reviewer).
+
+**Estrategia de tests del anexo:** RF-9 → tests 13–16 jsdom + test 15 puro en su
+archivo; CSS/animación por inspección y QA del reviewer con app servida (#91):
+animación en ambos sentidos, sin animación en la carga inicial, reduced motion
+instantáneo, impresión sin animación y **flujo del `h1` junto a la solapa
+flotante ≥ 992px** (el wrapper es div de bloque, sin flex/grid/overflow — RF-6
+de las páginas). `build` en T13 (cierre de pieza/Cambio, #80).
+
+Cobertura del anexo: T10→RF-9 (función pura) · T11→RF-9 (wrapper/atributos,
+tests 13/16) · T12→RF-9 (CSS entrada + print, inspección; test 14 no
+regresión) · T13→cierre (build + QA + docs).

@@ -30,3 +30,56 @@
 
 - [x] **T9. Alt del avatar derivado de `profile.name` (Cambio 2026-11-10).** RF-1 (Sidebar), integración — 861fb9a
   - Hecho cuando: `ui.en.ts`/`ui.es.ts` agregan `sidebar.avatarAlt` (`"Portrait of {name}"` / `"Retrato de {name}"`); `AppLayout` importa `format` y arma `avatarAlt: format(t.sidebar.avatarAlt, { name: cv.profile.name })` en `sidebarLabels`; `AppLayout.test.tsx` aserta el nombre accesible del avatar en inglés (`Portrait of Alex Rivera`) y, tras cambiar a Español, en español (`Retrato de Alex Rivera`); el resto de los labels no cambia; verde tras `feat(AppLayout): T9`.
+
+## Cambio motion 2 (2026-11-13, #106/#116) — puerta de Plan+Tareas aprobada con ajuste en T12
+
+Orden de dependencia: T10 → T11 → T12 → T13. Commits `test(AppLayout): Tn` →
+`feat(AppLayout): Tn` (T12 en dos commits, uno por tipo — decisión de la
+puerta). Dueño: `integrator`; no toca `global.css`, NavTabs, `src/test/**` ni
+`allowExportNames`.
+
+- [ ] **T10. `src/lib/tabDirection.ts`: función pura + tipo.** RF-9 (test 15 de la spec)
+  - Hecho cuando: `test(AppLayout): T10` (rojo: el módulo no existe) agrega
+    `src/lib/tabDirection.test.ts` con el test 15 literal: `(0, 1)` →
+    `"from-right"`; `(1, 0)` → `"from-left"`; `(null, 0)` → `null`; `(0, 0)` →
+    `null`. `feat(AppLayout): T10`: `getTabDirection(prev: number | null,
+    next: number): MotionDirection | null` y `export type MotionDirection =
+    "from-left" | "from-right"` en `src/lib/tabDirection.ts` (pura, sin
+    React/DOM, sin `any`); lint/typecheck/test verdes.
+- [ ] **T11. Wrapper de entrada en `AppLayout.tsx` (P1, P4).** RF-9 (tests 13 y 16)
+  - Hecho cuando: `test(AppLayout): T11` (rojo) agrega a `AppLayout.test.tsx`
+    los tests 13 y 16 literales (atributos `data-motion-panel` /
+    `data-motion-direction` según dirección, clicks rápidos con remount —el
+    nodo wrapper anterior ya no está—, ausencia del atributo en el render
+    inicial y conservación tras cambio de idioma). `feat(AppLayout): T11`: el
+    div wrapper dentro del tabpanel con `key={active}` y el atributo de
+    dirección SOLO cuando no es `null`; dirección con el patrón de ajuste de
+    estado en render (spec → Anatomía; sin refs leídas/escritas en render, sin
+    `flushSync`); foco/ARIA intactos (tests 4/8/11/12 verdes); **`npm run lint`
+    verde con `react-hooks/set-state-in-render` y `react-hooks/refs` sin
+    `eslint-disable` — si lint rechaza el patrón, ESCALAR al usuario antes del
+    `feat` (alternativa P1 descartada: estado en `useHashTab` = Cambio de spec
+    del hook)**; el `feat` no toca archivos de test.
+- [ ] **T12. CSS de entrada en `AppLayout.module.css` + test de no regresión (P2/P3/P5/P6/P8).** RF-9 (inspección) — dos commits, uno por tipo
+  - Hecho cuando: `test(AppLayout): T12` agrega a `AppLayout.test.tsx` el test
+    14 (avanzar carrusel en About → ir a Resume → volver → índice 0),
+    **verde de llegada declarado en el mensaje del commit (#101: verifica
+    comportamiento preexistente; no prueba el `key`)**, y no toca nada más.
+    `feat(AppLayout): T12` agrega SOLO al módulo: `--panel-enter-x: -10px/10px`
+    en `.motionPanel[data-motion-direction="from-left"|"from-right"]` (0,2,0,
+    acotadas por clase), un único `@keyframes panel-enter` con
+    `translateX(var(--panel-enter-x))`, `animation: panel-enter
+    var(--duration-slow) var(--ease-enter) backwards` solo en
+    `.motionPanel[data-motion-direction]`, y `@media print { … animation: none
+    }` ubicada DESPUÉS de la regla de `animation` (gana por orden); cero
+    `transition` nuevas (regla (0,2,0)+ de #116 — la verifica el reviewer);
+    `global.css` y el resto del módulo intactos; suite completa verde tras el
+    `feat`.
+- [ ] **T13. Cierre del Cambio: build + QA del reviewer + docs.** #80, #91, #86
+  - Hecho cuando: `npm run build` verde; QA del reviewer con la app servida por
+    el usuario (#91): animación en ambos sentidos, **sin animación en la carga
+    inicial**, reduced motion instantáneo, impresión sin animación y flujo del
+    `h1` junto a la solapa flotante ≥ 992px (wrapper div de bloque, sin
+    flex/grid/overflow); con la aprobación del usuario, `spec.md` →
+    `Estado: implementada`, T13 marcada y documentos de estado actualizados
+    (#86).
