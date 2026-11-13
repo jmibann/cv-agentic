@@ -77,6 +77,18 @@
 // EL USUARIO en `tokens.css`: este archivo no lo toca ni lo hardcodea (el
 // layout no depende del valor). `index.ts` sin cambios.
 //
+// T10 hecha (Cambio motion 3 2026-11-13, decisiones #106/#116; spec → RF-11 y
+// Anatomía; plan → Anexo P1'/P4'): dentro de `#sidebar-contacts` hay UN ÚNICO
+// div hijo de contenido, `additionalBody`, que envuelve Separator +
+// `ul.contacts` + CTA (el contenedor pasa a grid de una fila con un solo
+// hijo; la pila vertical y el CSS de entrada migran al wrapper en T11 — este
+// archivo no declara estilos). El atributo `data-contacts-animate` se
+// renderiza SOLO cuando `expanded` (P1': refleja el estado, sin `hasToggled`
+// ni estado extra; nada anima en el render inicial ni en la carga ≥ xl). Cero
+// `style` inline (RF-10 vigente: la expansión forzada de impresión debe poder
+// pisar por clase) y `aria-expanded`/`aria-controls`/`data-print-hide`/
+// labels/chevron intactos. Tests 11 y 12 de T9 verdes con esto.
+//
 // RF-8 (C2): la pieza no importa `useCv()` ni `useLocale()` — todos los datos
 // y textos entran por props.
 //
@@ -298,101 +310,118 @@ export function Sidebar({ profile, contact, social, labels, className }: Sidebar
           el `margin-block` del separador y el del CTA su `margin-top` (
           `.cta`) — y el @media 1200 pisa la de colapso por especificidad
           (selector compuesto; decisión 8=a/RF-10). El id sigue alcanzable
-          para el `aria-controls` y para print (RF-10). */}
-      <div id={CONTACTS_CONTAINER_ID} className={additionalClassName}>
-        {/* RF-9: sin contactos **y** sin `downloadCvUrl` no se renderiza el
-            Separator (un `.additional` sin contenido no deja huérfano el
-            separador). La condición evalúa `profile.downloadCvUrl` según la
-            spec; desde T5 el CTA de descarga real acompaña esta regla (test
-            T3 "keeps the Separator…" sigue vigente con el botón montado). */}
-        {(contact.length > 0 || profile.downloadCvUrl !== undefined) && <Separator />}
+          para el `aria-controls` y para print (RF-10).
+          T10 (Cambio motion 3; RF-11, plan → Anexo P1'/P4'): el contenido
+          pasa a un ÚNICO hijo `additionalBody` — el contenedor queda con un
+          solo hijo (grid de una fila desde T11; la pila migra al wrapper con
+          el CSS de T11, no acá) — y `data-contacts-animate` se renderiza
+          SOLO cuando `expanded` (P1': refleja el estado sin `hasToggled`;
+          `undefined` omite el atributo — nada anima en el render inicial ni
+          en la carga ≥ xl). */}
+      <div
+        id={CONTACTS_CONTAINER_ID}
+        className={additionalClassName}
+        data-contacts-animate={expanded ? "" : undefined}
+      >
+        {/* additionalBody (spec → Anatomía del Cambio motion 3; P4'): wrapper
+            único de contenido de `#sidebar-contacts` — Separator + lista +
+            CTA —, dueño de la pila vertical cuando el CSS la reubique (T11).
+            Sin estilos propios acá. */}
+        <div className={styles.additionalBody}>
+          {/* RF-9: sin contactos **y** sin `downloadCvUrl` no se renderiza el
+              Separator (un `.additional` sin contenido no deja huérfano el
+              separador). La condición evalúa `profile.downloadCvUrl` según la
+              spec; desde T5 el CTA de descarga real acompaña esta regla (test
+              T3 "keeps the Separator…" sigue vigente con el botón montado). */}
+          {(contact.length > 0 || profile.downloadCvUrl !== undefined) && <Separator />}
 
-        {/* RF-9 (mitad `contact`; Tests 8): `contact=[]` → no se monta la
-            lista. Orden de render = orden recibido (CvData). */}
-        {contact.length > 0 && (
-          <ul className={styles.contacts}>
-            {contact.map((item) => {
-              // RF-5: href explícito con prioridad, o derivado por tipo
-              // (`getContactHref`, función pura testeada en T1). `undefined`
-              // (location, phone/whatsapp sin dígitos) → texto plano.
-              const href = getContactHref(item);
+          {/* RF-9 (mitad `contact`; Tests 8): `contact=[]` → no se monta la
+              lista. Orden de render = orden recibido (CvData). */}
+          {contact.length > 0 && (
+            <ul className={styles.contacts}>
+              {contact.map((item) => {
+                // RF-5: href explícito con prioridad, o derivado por tipo
+                // (`getContactHref`, función pura testeada en T1). `undefined`
+                // (location, phone/whatsapp sin dígitos) → texto plano.
+                const href = getContactHref(item);
 
-              // Criterio de externidad (RF-6, decisión 10; plan →
-              // Decisiones: "por tipo/campo explícito, no heurística de
-              // dominio"): es externo un contacto con `href` explícito que
-              // sea URL http(s) (p. ej. sitio web) y, entre los derivados,
-              // SOLO whatsapp — `getContactHref` produce para él siempre
-              // `https://wa.me/…`; los derivados email/phone son
-              // `mailto:`/`tel:`, que se abren sin `target` ni `rel` (RF-6).
-              // Links externos siempre con `rel="noopener noreferrer"` (D6).
-              const external =
-                item.href !== undefined ? /^https?:/i.test(item.href) : item.type === "whatsapp";
+                // Criterio de externidad (RF-6, decisión 10; plan →
+                // Decisiones: "por tipo/campo explícito, no heurística de
+                // dominio"): es externo un contacto con `href` explícito que
+                // sea URL http(s) (p. ej. sitio web) y, entre los derivados,
+                // SOLO whatsapp — `getContactHref` produce para él siempre
+                // `https://wa.me/…`; los derivados email/phone son
+                // `mailto:`/`tel:`, que se abren sin `target` ni `rel` (RF-6).
+                // Links externos siempre con `rel="noopener noreferrer"` (D6).
+                const external =
+                  item.href !== undefined ? /^https?:/i.test(item.href) : item.type === "whatsapp";
 
-              return (
-                // Key: `item.id` (identificador estable del esquema, únicos
-                // por entrada — mismo criterio que redes).
-                <li key={item.id}>
-                  {/* Anatomía: IconBox (decorativo por su RF-2: el
-                      significado lo da el texto acompañante) y bloque de
-                      texto Overhead + valor. */}
-                  <IconBox icon={CONTACT_ICONS[item.type]} />
-                  <div>
-                    {/* Label traducido por tipo, recibido por props (RF-8;
-                        spec → Accesibilidad: label y valor en el mismo `li`). */}
-                    <Overhead>{labels.contact[item.type]}</Overhead>
+                return (
+                  // Key: `item.id` (identificador estable del esquema, únicos
+                  // por entrada — mismo criterio que redes).
+                  <li key={item.id}>
+                    {/* Anatomía: IconBox (decorativo por su RF-2: el
+                        significado lo da el texto acompañante) y bloque de
+                        texto Overhead + valor. */}
+                    <IconBox icon={CONTACT_ICONS[item.type]} />
+                    <div>
+                      {/* Label traducido por tipo, recibido por props (RF-8;
+                          spec → Accesibilidad: label y valor en el mismo `li`). */}
+                      <Overhead>{labels.contact[item.type]}</Overhead>
 
-                    {/* Valor completo en `title` (tabla Contactos; el
-                        ellipsis lo aplica el módulo en T6). Con href → `<a>`;
-                        `target`/`rel` solo si es externo (undefined omite el
-                        atributo en el DOM). Sin href → `<p>` (RF-5: "el
-                        valor se muestra como texto"). */}
-                    {href !== undefined ? (
-                      <a
-                        href={href}
-                        title={item.value}
-                        target={external ? "_blank" : undefined}
-                        rel={external ? "noopener noreferrer" : undefined}
-                      >
-                        {item.value}
-                      </a>
-                    ) : (
-                      <p title={item.value}>{item.value}</p>
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                      {/* Valor completo en `title` (tabla Contactos; el
+                          ellipsis lo aplica el módulo en T6). Con href → `<a>`;
+                          `target`/`rel` solo si es externo (undefined omite el
+                          atributo en el DOM). Sin href → `<p>` (RF-5: "el
+                          valor se muestra como texto"). */}
+                      {href !== undefined ? (
+                        <a
+                          href={href}
+                          title={item.value}
+                          target={external ? "_blank" : undefined}
+                          rel={external ? "noopener noreferrer" : undefined}
+                        >
+                          {item.value}
+                        </a>
+                      ) : (
+                        <p title={item.value}>{item.value}</p>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
 
-        {/* T5 (RF-2; Anatomía): CTA de descarga SOLO si existe
-            `profile.downloadCvUrl` (SI no existe, ENTONCES no se renderiza el
-            botón). Primitiva F2 exacta de la Anatomía: `Button
-            href={assetUrl(profile.downloadCvUrl)} download icon="download"
-            fullWidth` — `assetUrl` antepone el base de Vite a la ruta pública
-            del PDF (GitHub Pages); `download={true}` transmite
-            el atributo `download` (Button RF-8), `icon` es `Icon` sin `label`
-            → decorativo con su tone default `current` (Button.tsx T4/Icon
-            RF-4: sin gradiente, no requieren defs), y `fullWidth` da el ancho
-            (regla 13 del marco: el link mide el ancho del contenedor). El
-            texto viene de `labels.downloadCv` por props (RF-8/C3). Link de
-            descarga mismo-origen: NO es externo de RF-6 — sin `target`/`rel`
-            (Button los omite cuando no se pasan). T6: `className={styles.cta}`
-            — la clase se UNE al raíz del Button (su API) y aporta el
-            `margin-top: var(--sidebar-cta-gap)` de la tabla "Download CV";
-            en la pila de `.additional` (sin `gap` propio) ese margen es todo
-            lo que separa contactos↔CTA. */}
-        {profile.downloadCvUrl !== undefined && (
-          <Button
-            href={assetUrl(profile.downloadCvUrl)}
-            download
-            icon="download"
-            fullWidth
-            className={styles.cta}
-          >
-            {labels.downloadCv}
-          </Button>
-        )}
+          {/* T5 (RF-2; Anatomía): CTA de descarga SOLO si existe
+              `profile.downloadCvUrl` (SI no existe, ENTONCES no se renderiza el
+              botón). Primitiva F2 exacta de la Anatomía: `Button
+              href={assetUrl(profile.downloadCvUrl)} download icon="download"
+              fullWidth` — `assetUrl` antepone el base de Vite a la ruta pública
+              del PDF (GitHub Pages); `download={true}` transmite
+              el atributo `download` (Button RF-8), `icon` es `Icon` sin `label`
+              → decorativo con su tone default `current` (Button.tsx T4/Icon
+              RF-4: sin gradiente, no requieren defs), y `fullWidth` da el ancho
+              (regla 13 del marco: el link mide el ancho del contenedor). El
+              texto viene de `labels.downloadCv` por props (RF-8/C3). Link de
+              descarga mismo-origen: NO es externo de RF-6 — sin `target`/`rel`
+              (Button los omite cuando no se pasan). T6: `className={styles.cta}`
+              — la clase se UNE al raíz del Button (su API) y aporta el
+              `margin-top: var(--sidebar-cta-gap)` de la tabla "Download CV";
+              en la pila del wrapper (sin `gap` propio hasta T11) ese margen es
+              todo lo que separa contactos↔CTA. */}
+          {profile.downloadCvUrl !== undefined && (
+            <Button
+              href={assetUrl(profile.downloadCvUrl)}
+              download
+              icon="download"
+              fullWidth
+              className={styles.cta}
+            >
+              {labels.downloadCv}
+            </Button>
+          )}
+        </div>
       </div>
     </Box>
   );
