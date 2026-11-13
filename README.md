@@ -4,7 +4,7 @@ Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-11-12)
+## Estado actual (2026-11-13)
 
 | Qué | Estado |
 |---|---|
@@ -33,9 +33,8 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **Testimonios (2026-11-12)** | ✅ 3 testimonios reales (María Angélica Grael, Pablo Tigani, Diego Rafael Harari) con sus fotos reales; textos literales en su idioma original y traducidos al otro (**#112**). Cambios de `TestimonialCard`: T5, la comilla ya no pisa nombres largos; T6 (**#113**), el avatar queda anclado arriba y alineado entre cards con cualquier cantidad de líneas. QA en navegador 375–1440 × claro/oscuro × en/es ✅. Commits `b0f19bc` `11d5edc` `7f7cbe3` `390bb06` `24faf70` `8bac5b7`; detalle §XVIII–§XIX. |
 | **Resume en una columna (2026-11-12)** | ✅ Experience arriba y Education debajo, cada una con su timeline a ancho completo, en todos los anchos (**#114**, ResumePage T5; antes iban lado a lado desde 768px). Orden invertido en el DOM para que lectura y foco sigan el visual. Commits `28e6ecf` `1c16bf5` `174bc4e`; detalle §XX. |
 | **Favicon y título (2026-11-12)** | ✅ Favicon tipo app (cuadrado azul, hexágono blanco y monograma JM), `apple-touch-icon.png` 180×180 y título de pestaña `Juan Manuel Ibáñez · Frontend Engineer` (**#115**, Foundation T14). Commits `a0d7b5f` `3b4db39` `516621a` `9ebcca4`; detalle §XXI. |
-| **Motion (2026-11-11)** | 🟡 **Propuesta aprobada, implementación NO iniciada**: `specs/motion/proposal.md` fija tokens, tabs (alternativa B), grid del Sidebar, supresión de transiciones al cambiar tema, reduced motion y dialog. Falta aprobar specs/planes/tareas. |
-| Post-entrega / próximos trabajos (2026-11-12) | Push de los commits locales (lo hacés vos) y verificar el deploy: en Actions, "Setup Node" en 26.13.x y los pasos `lint`/`test` en verde; en el sitio, el `base` real de GitHub Pages (avatar, PDF, fuente, consola) → resultado a registrar con el hash · aprobar specs/planes/tareas de motion · opcionales: deudas de forma, StrictMode/F1-F2 |
-| F2 → seguimientos abiertos | Combo hover+focus del Button (el `outline` gana siempre; la spec no fija el combo) → **F5** · Badge RF-6 ("no dentro de `Box inner`") se verifica en los consumidores → **F3/F4** (SkillList/Sidebar) · Overhead RF-4 (nunca sobre `--color-bg` en claro) se verifica en los consumidores → **F3/F4** (Sidebar) · IconBox RF-5 (no dentro de `Box variant="inner"`) se verifica en los consumidores → **F3/F4** (Sidebar/ResumeSection) · `--button-small-padding-*` literales: promover a token si se repite en otro componente |
+| **Motion (2026-11-13)** | 🟡 **Etapa 1 (Foundation) en cierre (#106/#116)**: puerta de specs/planes/tareas aprobada 2026-11-12 con ajustes (regla permanente: ninguna `transition` en selector de especificidad (0,2,0) o mayor, rige Cambios 2–4). T15 tokens (`c2befd1`, usuario) · T16 `data-theme-switching` (`c0bc995`) · T17 test de contrato (`122a996`) aplicados y APROBADOS (suite 456/40). Falta **T18** (`foundations/motion.md`, QA del reviewer, build y `spec.md` → `implementada`) y los Cambios 2–4 (tabs B AppLayout, grid del Sidebar, TestimonialDialog), cada uno con su puerta. |
+| Post-entrega / próximos trabajos (2026-11-13) | Push de los commits locales (lo hacés vos; `main` adelantado) y verificar Actions post-push · cerrar motion T18 y abrir los Cambios 2–4 · deploy ya publicado e inspeccionado en vivo (§XXI, #115/T14c) · opcionales: deudas de forma, StrictMode/F1-F2 (tabla **Abiertos** de diagnostics) · ~~seguimientos de F2~~ **cerrados**: sus ítems se verificaron en F3–F5 (combo hover+focus del Button resuelto por cascada en `Button.module.css`; `--button-small-padding-*` son tokens desde #99) |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
 
@@ -57,7 +56,7 @@ cv-agentic/
 
 ## Mantenimiento (modo actual — desde 2026-10-08)
 
-El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (448 tests,
+El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (456 tests,
 build, validate:content, QA en navegador y en papel; últimos trabajos:
 bug-fix ControlsBar T4, base de deploy para GitHub Pages y CV real, 2026-11-11;
 Node 26 LTS y quality gates en el deploy, 2026-11-12).
@@ -70,7 +69,7 @@ Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 | Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
 | Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
 | Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
-| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#115: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
+| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#116: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
 Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
 (P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;
