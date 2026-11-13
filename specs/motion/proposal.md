@@ -1,13 +1,17 @@
 # Sistema de motion — auditoría, propuesta y Cambios en espera
 
-**Estado:** propuesta y borradores de Cambios; **implementación no iniciada**.
+**Estado:** propuesta aprobada (#106); **etapa 1 (Foundation) implementada y
+aprobada por el reviewer salvo T18** (puerta Plan+Tareas 2026-11-12 con ajustes
+→ #116); **Cambios 2–4 (AppLayout, Sidebar, TestimonialDialog) en espera**, cada
+uno con su propia puerta spec→plan→tareas. Actualizado 2026-11-13.
 **Fecha:** 2026-11-11.
 **Alcance:** Fases 0–2 (diagnóstico, inventario y diseño), borradores de
 specs/planes/tareas de los Cambios y el Cambio de contenido previo.
 
 > **Puertas de esta etapa:**
 > 1. No se modifica código ni tests hasta que el usuario apruebe los
->    specs/planes/tareas de cada Cambio.
+>    specs/planes/tareas de cada Cambio. *(Etapa 1: puerta pasada
+>    2026-11-12 — `37d9e80`/`ee9e8a2`, #116; T15–T17 aplicadas y aprobadas.)*
 > 2. No se arranca nada hasta que el usuario confirme que resolvió el árbol de
 >    trabajo sucio (`src/utils/assetUrl.ts`, `HexAvatar.tsx`, `Sidebar.tsx`,
 >    `vite.config.ts`).
@@ -444,7 +448,8 @@ ese orden porque el archivo es compartido.
 
 ### 4.1 Foundation — tokens, tema y docs
 
-**Spec:** `specs/foundation/Foundation/spec.md` (hoy `Estado: implementada`).
+**Spec:** `specs/foundation/Foundation/spec.md` (`Estado: aprobada`, reabierta
+por este Cambio; vuelve a `implementada` al cerrar T18).
 
 **RF nuevos (EARS):**
 
