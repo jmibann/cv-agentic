@@ -29,3 +29,62 @@
 
 - [x] **T8. Alt del avatar dinámico (Cambio 2026-11-10).** RF-1, RF-8 — 861fb9a
   - Hecho cuando: `SidebarLabels` expone `avatarAlt: string` y el `<img>` usa `alt={labels.avatarAlt}` (ya no lee `profile.avatar.alt`, campo eliminado de `Image`); el fixture de `Sidebar.test.tsx` no declara `alt` y consulta `getByRole("img", { name: LABELS.avatarAlt })`; se mantienen las ausencias de `width`/`height`/`decoding`; la pieza sigue sin importar `useCv`/`useLocale` (inspección); verde tras `feat(Sidebar): T8`.
+
+## Cambio motion 3 (2026-11-13, #106/#116) — puerta Spec+Plan+Tareas aprobada en 3 rondas
+
+Orden de dependencia: T9 → T10 → T11 → T12 → T13. Dueño: `integrator`. No tocar
+providers, AppLayout, `src/test/**`, configs, `allowExportNames`. Transiciones
+solo en clases (0,1,0) (#116 aclarada: `transition: none` excluido).
+
+- [ ] **T9. Tests de la entrada de contactos + reescritura C9 del Selector.** RF-11 (tests 11–13), C9
+  - Hecho cuando: commit único `test(Sidebar): T9` que solo toca
+    `Sidebar.test.tsx`: (a) **rojos**: test 11 (wrapper `.additionalBody` único
+    hijo de `#sidebar-contacts` conteniendo Separator/lista/CTA + aserción de
+    orden incondicional Separator→`ul.contacts` por
+    `compareDocumentPosition & DOCUMENT_POSITION_FOLLOWING`) y test 12
+    (`data-contacts-animate` **refleja `expanded`**: ausente al inicio, presente
+    al expandir, ausente al colapsar, presente al reexpandir); (b) **verdes de
+    llegada declarados en el body (#101)**: test 13 (colapsado: clase del módulo
+    canon #99 + `aria-expanded="false"`; la clase existe desde T4; sin
+    `toBeVisible()`) y la reescritura C9 de UNA línea de la constante
+    `SEPARATOR_IN_ADDITIONAL` a `'#sidebar-contacts div[aria-hidden="true"]'`
+    (los 4 usos `:379/:475/:489/:744` quedan intactos con sus `toHaveLength(n)`;
+    el body cita C9/#106). Ningún assert previo debilitado ni borrado; rojo
+    esperado: solo tests 11 y 12.
+- [ ] **T10. Wrapper + atributo en `Sidebar.tsx`.** RF-11 (P1', P4')
+  - Hecho cuando: `feat(Sidebar): T10` solo toca `Sidebar.tsx`: dentro de
+    `#sidebar-contacts` un único div `className={styles.additionalBody}` que
+    envuelve Separator + `ul.contacts` + CTA; `data-contacts-animate` presente
+    SOLO cuando `expanded` (P1'; sin estado extra); sin `style` inline;
+    `aria-expanded`/`aria-controls`/`data-print-hide`/labels intactos; tests 11
+    y 12 verdes; el resto de la suite sin tocar.
+- [ ] **T11. CSS de entrada en `Sidebar.module.css`.** RF-11 (P2', P3', P5'), #116
+  - Hecho cuando: `feat(Sidebar): T11` solo toca el módulo: `.additional` grid
+    (0fr/1fr + visibility + transiciones según la tabla de spec, (0,1,0),
+    colapso después de la base); la pila de decisión 11 migra a
+    `.additionalBody` (con `min-height: 0; overflow: hidden`); `@keyframes
+    item-enter` + regla de entrada gated por
+    `.additional[data-contacts-animate] .additionalBody > *` con `backwards` y
+    delays `calc(n × --duration-stagger)` (nth-child 1–4 + cap n+5); override
+    ≥1200 `.additionalCollapsed` a secas (0,1,0) al final con `transition:
+    none` (P5'); **eliminar la `transition: color` inerte de `.contacts a`**
+    (propuesta §3.4, menor de §XXIV); ningún `@media print` en el módulo
+    (RF-10); **auto-check #116 sobre el archivo completo: 0 transiciones que
+    animen en (0,2,0)+** (lo replica el reviewer); suite verde.
+- [ ] **T12. Print de contactos en `global.css`.** RF-10/RF-11 (P7')
+  - Hecho cuando: `feat(Sidebar): T12` solo toca `src/styles/global.css`: dentro
+    del `@media print` existente, el bloque §3.5: `#sidebar-contacts`
+    (1,0,0)` { visibility: visible; grid-template-rows: 1fr }` (+ el
+    `display: block` vigente se conserva o se quema contra el grid — decidir con
+    comentario), `#sidebar-contacts, #sidebar-contacts * { animation: none;
+    transition: none }`, `#sidebar-contacts li { opacity: 1; transform: none }`
+    (los ítems jamás `opacity: 0` en papel con el bloque colapsado). Sin tests
+    nuevos (print = inspección + Ctrl+P del usuario, criterio #101 explícito);
+    resto de `global.css` intacto; suite verde.
+- [ ] **T13. Cierre del Cambio: suite + build + QA + docs.** #80, #91, #86
+  - Hecho cuando: `npm run lint && npm run typecheck && npm test` y
+    `npm run build` verdes; QA del reviewer con app servida por el usuario
+    (#91, checklist del plan → anexo); el **C3 de `foundations/motion.md`**
+    (excepción `grid-template-rows: 0fr↔1fr`) lo redacta el orchestrator y lo
+    aplica y commitea el usuario (kit); con la aprobación del usuario: spec →
+    `Estado: implementada`, T13 marcada y documentos de estado (#86).
