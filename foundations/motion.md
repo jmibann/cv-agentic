@@ -42,7 +42,10 @@ Foundation T17).
   (#116; rige los Cambios motion 2–4 y la verifica el reviewer en cada uno):
   así la supresión del cambio de tema gana **sin `!important`**.
 - No animar `height`, `width` de layout ni `top/left` (salvo el bullet, que es chico
-  y aislado). Preferir `transform` y `opacity`.
+  y aislado). Preferir `transform` y `opacity`. **Única excepción a la altura
+  (#106/C3, vigente desde el Cambio 3 del Sidebar):** `grid-template-rows:
+  0fr ↔ 1fr` con wrapper `min-height: 0; overflow: hidden` — sin `height: auto`
+  ni medición JS.
 - **Cambio de tema sin transiciones (RF-9, T16):** `ThemeProvider` aplica
   `data-theme-switching` + `data-theme` + meta `theme-color` en un único
   `useLayoutEffect`; el atributo va a `<html>` **antes** del nuevo tema y se
