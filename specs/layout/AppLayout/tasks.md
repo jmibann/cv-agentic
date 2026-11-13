@@ -38,7 +38,7 @@ Orden de dependencia: T10 → T11 → T12 → T13. Commits `test(AppLayout): Tn`
 puerta). Dueño: `integrator`; no toca `global.css`, NavTabs, `src/test/**` ni
 `allowExportNames`.
 
-- [ ] **T10. `src/lib/tabDirection.ts`: función pura + tipo.** RF-9 (test 15 de la spec)
+- [x] **T10. `src/lib/tabDirection.ts`: función pura + tipo.** RF-9 (test 15 de la spec) — 84bb91b (test, rojo real) + 28ec533 (feat); reviewer APROBADO (460/41; nota para T11: la comparación es numérica, la frontera de índices la asegura el llamador)
   - Hecho cuando: `test(AppLayout): T10` (rojo: el módulo no existe) agrega
     `src/lib/tabDirection.test.ts` con el test 15 literal: `(0, 1)` →
     `"from-right"`; `(1, 0)` → `"from-left"`; `(null, 0)` → `null`; `(0, 0)` →
