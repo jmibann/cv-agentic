@@ -44,14 +44,31 @@
 // re-exporta la superficie pública (AppLayout + AppLayoutProps).
 // Diferido: T6 (reemplazo de `App.tsx`) NO se toca: aprobación pendiente del
 // usuario.
+// T11 hecha (Cambio motion 2, RF-9, tests 13/16): dentro del tabpanel, la
+// página activa viaja envuelta en el `div[data-motion-panel]` de la Anatomía —
+// `key={active}` SOLO en el wrapper (P4: ni en el panel ni en las páginas, que
+// romperían foco/ARIA) y `data-motion-direction` renderizado ÚNICAMENTE cuando
+// la dirección no es `null` (P5 en capa markup: el render inicial no lleva
+// atributo → sin animación; la `animation` se declara en T12 sobre el
+// atributo). La dirección se fija con el patrón oficial de React "ajuste de
+// estado al cambiar una prop/estado" (P1): `useState` + `setState` condicional
+// EN RENDER del propio componente — no es un efecto, no lee ni escribe refs en
+// render (`react-hooks/refs`), no usa `flushSync` ni View Transitions (spec →
+// No hacer) — recalculando con la función pura `getTabDirection` (T10) sobre
+// los índices en `TAB_IDS`; un re-render ajeno (idioma, tema) NO la recalcula
+// y conserva el valor (test 16: la animación en curso no se corta). El bloque
+// inactivo `data-print-only` no se toca (RF-8: el wrapper vive solo en el
+// tabpanel).
 
 import type { MouseEvent, ReactNode } from "react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { useCv, useLocale } from "../../providers/LocaleProvider";
 import { AboutPage } from "../../pages/AboutPage";
 import { ResumePage } from "../../pages/ResumePage";
 import { useHashTab } from "../../lib/useHashTab";
+import { getTabDirection } from "../../lib/tabDirection";
+import type { MotionDirection } from "../../lib/tabDirection";
 import { format } from "../../i18n/format";
 
 import { AccentGradientDefs } from "../Icon";
@@ -88,6 +105,23 @@ export function AppLayout({ className }: AppLayoutProps): ReactNode {
   const { t } = useLocale();
   const cv = useCv();
   const [active, setActive] = useHashTab(TAB_IDS, "about");
+
+  // RF-9 (T11, plan → P1): dirección de entrada con el patrón oficial de
+  // React "ajuste de estado al cambiar una prop/estado" — `setState`
+  // condicional durante el render del PROPIO componente (no es un efecto;
+  // spec → Anatomía). Prohibido leer/escribir refs acá (`react-hooks/refs`).
+  // La dirección SOLO se recalcula cuando cambia `active`: un re-render ajeno
+  // (idioma, tema) conserva el valor y no corta la animación en curso (test
+  // 16). En el render inicial `prevActive === active` → `direction` sigue
+  // `null` y el atributo no se renderiza (sin animación al montar, RF-9).
+  const [prevActive, setPrevActive] = useState(active);
+  const [direction, setDirection] = useState<MotionDirection | null>(null);
+  if (active !== prevActive) {
+    setPrevActive(active);
+    setDirection(
+      getTabDirection(TAB_IDS.indexOf(prevActive), TAB_IDS.indexOf(active)),
+    );
+  }
 
   // RF-4: foco al tabpanel desde el skip link. La ref existe ya en T1 (el
   // tabpanel la conecta); el handler hace `preventDefault()` (el hash NO debe
@@ -197,7 +231,27 @@ export function AppLayout({ className }: AppLayoutProps): ReactNode {
                   data-print-page={active}
                   className={styles.panel}
                 >
-                  {active === "about" ? <AboutPage /> : <ResumePage />}
+                  {/* RF-9 (T11, plan → P4): wrapper de entrada SOLO alrededor
+                      de la página activa del tabpanel — `key={active}` remonta
+                      el nodo al cambiar de tab (prueba: test 13, el nodo
+                      anterior sale del documento) y `data-motion-direction`
+                      se renderiza ÚNICAMENTE cuando la dirección no es `null`
+                      (render inicial sin atributo → sin animación; la
+                      `animation` se declara en T12 sobre el atributo). Sin
+                      `role`, `tabIndex` ni texto propio (spec → No hacer). El
+                      nombre de clase lo resuelve el módulo (T12 declara
+                      `.motionPanel`; en jsdom la query va por el atributo, no
+                      por la clase). */}
+                  <div
+                    data-motion-panel
+                    key={active}
+                    {...(direction
+                      ? { "data-motion-direction": direction }
+                      : {})}
+                    className={styles.motionPanel}
+                  >
+                    {active === "about" ? <AboutPage /> : <ResumePage />}
+                  </div>
                 </div>
                 {/* Panel inactivo montado UNA vez, fuera del tabpanel, con
                     `hidden` (excluido del árbol de accesibilidad en pantalla;
