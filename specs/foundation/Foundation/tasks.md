@@ -188,7 +188,7 @@ T3b (deuda L1 detectada en su review).
 
 ## Cambio motion (#106) — RF-9/RF-10 (puerta de Plan+Tareas aprobada 2026-11-12 con ajustes)
 
-- [ ] **T15. Escala de motion en `tokens/tokens.css`.** RF-10 — **kit: lo ejecuta y commitea el usuario** (precedente `--z-skip` `b2563f0`); solo-inspección (#101, rojo no exigible)
+- [x] **T15. Escala de motion en `tokens/tokens.css`.** RF-10 — **kit: lo ejecuta y commitea el usuario** (precedente `--z-skip` `b2563f0`); solo-inspección (#101, rojo no exigible) — c2befd1 (usuario); el contrato queda cubierto por el test de T17 `122a996` (APROBADO), que fija los valores de esta tarea
   - Hecho cuando: `--duration-fast: 0.15s` (sin cambio), `--duration-base: 0.2s`
     (antes 0.3s), `--duration-slow: 0.3s` (antes 0.6s), `--duration-exit: 0.22s`
     y `--duration-stagger: 0.03s` nuevos; `--ease-enter: cubic-bezier(0.22, 1,
