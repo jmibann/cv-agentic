@@ -29,7 +29,35 @@
 - `closeLabel` como `aria-label` del botón (nombre del botón); el `<h2 id>` fija el nombre del dialog (`aria-labelledby`).
 - No toca `src/test/setup.ts`: los tests **usan** el mock existente (`showModal`→`open`; `close`→ quita `open` + dispara evento `close`) y verifican que alcanza (19).
 
-## Estrategia de tests
+## Anexo — Cambio motion 4 (2026-11-13, #106/#116; puerta Spec+Plan+Tareas aprobada con ajuste de redacción del usuario)
+
+- **Historia del cambio (no va en la spec → fila "Entrada", por decisión del
+  usuario):** propuesta §4.4 e ítem 9 de la matriz §2.4 (#106): cambiar **solo
+  el easing** de la entrada (`--ease-standard`→`--ease-enter`); se mantienen
+  `--duration-base` 0.2 s y `@starting-style` como único mecanismo; sin salida.
+  El hover del botón close conserva `--ease-standard` (ítem 10: "se conserva").
+  C7 de la matriz de hallazgos. Menor heredado de §XXIV: el comentario
+  "0.3s ease-in-out" (módulo, bloque Entrada) está rancio doblemente (la
+  duración es 0.2 s desde T15 y el easing pasa a `enter`) — se reescribe acá.
+- **Alcance:** `TestimonialDialog.module.css` únicamente (2 valores +
+  comentario). Cero tsx, cero tests (régimen #101: jsdom no computa
+  transiciones; verificación = inspección + QA en navegador), cero cambios en
+  `@starting-style`, backdrop, print, close o layout.
+- **T4:** `feat(TestimonialDialog): T4` — commit único, **verde-only declarado
+  #101** (no hay rojo posible sin inventar alcance; el rojo artificial leyendo
+  CSS como texto queda descartado — precedente T3/T5 de esta pieza y decisión
+  #101). Hecho: `.dialog` sigue (0,1,0); entrada `--ease-enter`; close intacto;
+  suite sin regresiones.
+- **T5:** cierre — suite + `build` + QA del reviewer con app servida (#91):
+  apertura ~200 ms con deceleración marcada (`cubic-bezier(0.22,1,0.36,1)`, sin
+  rebote), **cierre sigue instantáneo (regresión clave)**, hover close sin
+  cambios, backdrop/print sin regresión; spec → `implementada`; docs #86
+  (§XXVII) y **propuesta `specs/motion/proposal.md` marcada 4/4 implementada**
+  (cabecera + cualquier "en espera" restante); regla #116 elevada a permanente
+  (viñeta en `foundations/motion.md` + regla corta en sitio a decidir:
+  `docs/DESIGN.md` o `AGENTS.md` → Convenciones — ambos en manos del usuario).
+
+Cobertura del anexo: T4→RF-5/RF-6 (fila Entrada; inspección) · T5→cierre + QA.
 
 Harness con `HexAvatarDefs` + `AccentGradientDefs` (armazón). `renderWithDialog`: montar con `testimonial` o `null`; rerender para transiciones. Tests 1–8 de la spec; el 5 se desdobla en tres asserts: backdrop real (click en target=dialog con coords fuera del rect — `Object.defineProperty(el,"getBoundingClientRect")` o mock de rect), padding (coords dentro del rect → no cierra), contenido (no cierra). Evento `close` sintético (simula Esc) → `onClose` una vez; `null` desde el padre con abierto → cleanup cierra y **no** llama `onClose` (18=b). Cierre `expectNoA11yViolations` con dialog abierto. P1 (backdrop color, overflow, print, animación): inspección.
 
