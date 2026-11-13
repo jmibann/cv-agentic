@@ -60,7 +60,7 @@ puerta). Dueño: `integrator`; no toca `global.css`, NavTabs, `src/test/**` ni
     `eslint-disable` — si lint rechaza el patrón, ESCALAR al usuario antes del
     `feat` (alternativa P1 descartada: estado en `useHashTab` = Cambio de spec
     del hook)**; el `feat` no toca archivos de test.
-- [ ] **T12. CSS de entrada en `AppLayout.module.css` + test de no regresión (P2/P3/P5/P6/P8).** RF-9 (inspección) — dos commits, uno por tipo
+- [x] **T12. CSS de entrada en `AppLayout.module.css` + test de no regresión (P2/P3/P5/P6/P8).** RF-9 (inspección) — dos commits, uno por tipo — 600c93f (test 14, verde-on-arrival declarado #101) + fd8b4c5 (solo CSS, 5 reglas en el orden de la spec); reviewer APROBADO (463/41; #116 sobre TODO el módulo: 0 `transition`; las −9 del feat son comentario puro; menor no enmendable: tilde "patrón" en el cuerpo de `fd8b4c5`)
   - Hecho cuando: `test(AppLayout): T12` agrega a `AppLayout.test.tsx` el test
     14 (avanzar carrusel en About → ir a Resume → volver → índice 0),
     **verde de llegada declarado en el mensaje del commit (#101: verifica
