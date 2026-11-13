@@ -43,9 +43,9 @@
 // `document.getElementById(...) === null`: es el contrato de ausencia del
 // spec → No hacer.
 
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ReactNode } from "react";
 
 import { LocaleProvider } from "../../providers/LocaleProvider";
@@ -900,5 +900,139 @@ describe("AppLayout entry wrapper has no direction on first render and keeps it 
     // Y no se remontó: un cambio de idioma NO es un cambio de tab (el `key`
     // es `active`); remontar sería justamente "cortar la animación".
     expect(afterLanguage).toBe(wrapper);
+  });
+});
+
+// ===========================================================================
+// Test de T12 (specs/layout/AppLayout/tasks.md, Cambio motion 2 #106/#116) —
+// RF-9: test 14 de la spec, NO REGRESIÓN, VERDE ON-ARRIVAL declarado (#101;
+// plan → P8). Al volver a About el carrusel de testimonios está en índice 0.
+// Ese reset NO es prueba del `key={active}` (esa es la segunda parte del test
+// 13 de T11): ocurre desde F4 por el intercambio de TIPOS de página en el
+// tabpanel — AboutPage desmonta y monta fresca, con estado nuevo (spec →
+// Anatomía, "El reset de estado entre tabs NO lo produce el `key`"). Por eso
+// este `it` no puede nacer rojo: no hay comportamiento nuevo que implementar
+// acá (el `feat` de T12 es CSS puro, no observable en jsdom — #101); si diera
+// rojo habría una regresión REAL en el intercambio de páginas y se frena.
+// Discrimen (regresión futura): si el tabpanel dejara de intercambiar los
+// tipos y AboutPage sobreviviera montada entre tabs (p. ej. ocultándola con
+// CSS en vez de desmontarla), el índice 2 viajado persistiría a la vuelta y
+// el assert final falla.
+// Mecánica del "avance" (criterio exacto del scroll de T3 en
+// TestimonialCarousel.test.tsx): clickear el bullet NO alcanza en jsdom — su
+// onClick solo llama `track.scrollTo` (no-op del setup F1), no despacha
+// `scroll` y `aria-current` no se mueve; el índice avanza por el handler de
+// scroll de RF-5. Se mockean los accessores de medición en el PROTOTIPO antes
+// del render (offsetLeft/scrollWidth/clientWidth: los únicos lectores del
+// árbol son el `measure` del carrusel — verificado con búsqueda global) y el
+// `scrollLeft` se fija POR INSTANCIA en el track (padre del group del primer
+// slide, criterio del carrusel: sin clases ni tags propios), con rAF stub
+// síncrono para que el recálculo caiga dentro del `fireEvent.scroll` (act).
+// Limpieza: `afterEach` ACOTADO al describe (restoreAllMocks +
+// unstubAllGlobals, precedente exacto TestimonialCarousel.test.tsx): el
+// mock de matchMedia del setup es defineProperty, no stubGlobal, y no se ve
+// afectado; sin este afterEach los spies de prototipo filtrarían a los tests
+// siguientes del archivo.
+// Justificación de queries (constitución T3): el estado del carrusel se lee
+// por el ESTADO ACCESIBLE del bullet activo — `aria-current="true"` (único
+// valor que fija la spec del carrusel, RF-5; los inactivos quedan SIN
+// atributo) — sobre los bullets por ROL button + NOMBRE accesible derivado
+// con `format` de la FUENTE `uiEn.testimonials.goToSlide` (C3: sin literales
+// propios; la interpolación stop→n ya está testeada en la pieza) y el track
+// se localiza vía el group nombrado con `uiEn.testimonials.slideLabel` y el
+// total de `cvByLocale.en.testimonials`. NO se asertan clases: jsdom no
+// computa el CSS del módulo (#101) y el encargo lo prohíbe explícitamente.
+// ===========================================================================
+
+describe("AppLayout resets the testimonials carousel to index zero across tab changes (T12: RF-9, Tests 14)", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  it("advances the carousel in About, visits Resume and comes back with the first bullet active", async () => {
+    // Escenario de medición fijado (criterio TestimonialCarousel T3/T9):
+    // offsets [0,300,600] y maxScroll = 900 − 600 = 300 → stops [0,300] →
+    // paginación dibujada con 2 bullets ("Go to slide 1"/"Go to slide 2",
+    // regla stop→n) para los 3 testimonios del contenido de ejemplo.
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(
+      function (this: HTMLElement): number {
+        const parent = this.parentElement;
+        if (parent === null) {
+          return 0;
+        }
+        const index = Array.from(parent.children).indexOf(this);
+        return [0, 300, 600][index] ?? 0;
+      },
+    );
+    vi.spyOn(Element.prototype, "scrollWidth", "get").mockReturnValue(900);
+    vi.spyOn(Element.prototype, "clientWidth", "get").mockReturnValue(600);
+    // rAF síncrono: el recálculo de RF-5 cae dentro del fireEvent.scroll
+    // (envuelto en act) y el assert es determinista (criterio del carrusel).
+    vi.stubGlobal(
+      "requestAnimationFrame",
+      (callback: FrameRequestCallback): number => {
+        callback(0);
+        return 1;
+      },
+    );
+
+    const user = userEvent.setup();
+    renderWithProviders(<AppLayout />);
+
+    const bulletName = (n: number): string =>
+      format(uiEn.testimonials.goToSlide, { n });
+    const bullet1 = screen.getByRole("button", { name: bulletName(1) });
+    const bullet2 = screen.getByRole("button", { name: bulletName(2) });
+
+    // Precondition: carrusel recién medido en índice 0 (bullet 1 con
+    // aria-current="true" — decisión 21 del carrusel — y bullet 2 sin el
+    // atributo). Con ≤1 stop no habría bullets y estos queries fallarían:
+    // la medición mockeada es parte del escenario, no decorativa.
+    expect(bullet1).toHaveAttribute("aria-current", "true");
+    expect(bullet2).not.toHaveAttribute("aria-current");
+
+    // Avance real del carrusel: `scrollLeft` al segundo stop FIJADO POR
+    // INSTANCIA en el track (padre del group del slide 1, nombrado con la
+    // fuente y el total del contenido — sin literales) + evento scroll.
+    const track = screen
+      .getByRole("group", {
+        name: format(uiEn.testimonials.slideLabel, {
+          current: 1,
+          total: cvByLocale.en.testimonials.length,
+        }),
+      })
+      .parentElement;
+    if (track === null) {
+      throw new Error("el slide 1 debe tener un track padre en el DOM");
+    }
+    Object.defineProperty(track, "scrollLeft", {
+      value: 300,
+      configurable: true,
+    });
+    fireEvent.scroll(track);
+
+    // El escenario quedó efectivamente avanzando: el activo es el bullet 2
+    // (sin esto, el assert final sería trivialmente cierto: el carrusel
+    // nunca salió del 0).
+    expect(bullet2).toHaveAttribute("aria-current", "true");
+    expect(bullet1).not.toHaveAttribute("aria-current");
+
+    // Ida y vuelta: tab Resume y de vuelta a About (clicks reales a los
+    // tabs por rol+nombre, criterio test 4 de este archivo).
+    await user.click(screen.getByRole("tab", { name: uiEn.nav.resume }));
+    await user.click(screen.getByRole("tab", { name: uiEn.nav.about }));
+
+    // Test 14, NO REGRESIÓN: el carrusel volvió al ÍNDICE 0. Los queries
+    // alcanzan los bullets de la AboutPage NUEVA del tabpanel (la viajera
+    // desmontó; la del bloque `hidden` de print no es accesible): bullet 1
+    // con aria-current="true" y bullet 2 sin el atributo — índice 0 por el
+    // estado accesible, no por clases (#101: jsdom no computa el módulo).
+    expect(
+      screen.getByRole("button", { name: bulletName(1) }),
+    ).toHaveAttribute("aria-current", "true");
+    expect(
+      screen.getByRole("button", { name: bulletName(2) }),
+    ).not.toHaveAttribute("aria-current");
   });
 });
