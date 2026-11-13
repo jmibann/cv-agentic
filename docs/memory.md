@@ -2,13 +2,13 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XXV) y `docs/README.md` (#1–#116).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XXVI) y `docs/README.md` (#1–#116, con la enmienda de #116: `transition: none` excluido).
 
 ## Estado actual (2026-11-13)
 
-- **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **463/41**. Recientes: saneado de documentación (§XXII–§XXIII); **motion cambios 1 y 2 cerrados** — Foundation T15–T18 (§XXIV) y AppLayout entrada de panel T10–T13 (§XXV).
+- **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **466/41**. Recientes: saneado de documentación (§XXII–§XXIII); **motion cambios 1–3 cerrados** — Foundation (§XXIV), AppLayout entrada de panel (§XXV) y Sidebar expansión de contactos con grid `0fr↔1fr` (§XXVI; Ctrl+P colapsado aprobado por el usuario).
 - **Mantenimiento 2026-11-11/12 (§XIV–§XIX)**: CV real + 3 testimonios reales (#112/#113) con `assetUrl()`/base (#107); tests adaptados sin debilitar; QA visual aprobada (gap chevron↔nombre 72.84px a 375; `qa-report.md`). `headline`/cargos en inglés en `cv.es.json`: decisión editorial #109, **no re-reportarla**.
-- **Motion: cambios 1 (Foundation) y 2 (AppLayout) CERRADOS** (#106/#116, §XXIV–§XXV). Faltan **grid del Sidebar (3)** y **TestimonialDialog (4)**, cada uno con su puerta spec→plan→tareas; arrancan con los menores anotados en la fila Motion de **Abiertos** (stagger `calc(n × --duration-stagger)`, `Sidebar.module.css:386`, `TestimonialDialog.module.css:79`, confirmaciones manuales reduced-motion/Ctrl+P).
+- **Motion: cambios 1–3 CERRADOS** (#106/#116, §XXIV–§XXVI). Queda solo **TestimonialDialog (4)** (su puerta spec→plan→tareas; `--ease-enter` + comentario rancio `:79`) y los pendientes del usuario de la fila Motion de **Abiertos**: commitear el C3 de `foundations/motion.md` (redactado, entregado) y confirmar reduced-motion con flag real.
 - **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre `lint` → `test` → `build` y no publica si algo falla (#111). Pages publicado e inspeccionado en vivo (§XXI).
 - **Pendientes del usuario**: **push** (`main` adelantado) y verificar Actions post-push · abrir los Cambios motion 2–4 · deudas de forma (fila "Pendientes post-F5" de diagnostics).
 
@@ -17,9 +17,9 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XXV) y `docs/README
 - Fuente de verdad: `docs/constitution.md` > skill `sdd` > spec. **Nadie edita `spec.md`
   sin aprobación explícita del usuario** (`ask`, P2/#75/#94); un cambio de lo que espera un
   test **es** Cambio de spec. `src/test/**`, configs y `src/test/a11y.ts`: intocables.
-- Motion (#116, rige Cambios 2–4): **ninguna `transition` en un selector de especificidad
-  (0,2,0) o mayor** (la supresión global `:root[data-theme-switching] *` gana sin
-  `!important`); el reviewer la verifica en cada Cambio.
+- Motion (#116 con su enmienda, rige el Cambio 4): **ninguna `transition` que produzca
+  animación en un selector de especificidad (0,2,0) o mayor**; `transition: none` está
+  excluido (es la supresión); el reviewer la verifica en cada Cambio.
 - Flujo futuro: contenido → `integrator` (dueño de `src/content/**`, con
   `validate:content`); cambio en pieza existente → **Cambio** (spec→plan→tasks→código);
   pieza nueva → `/sdd-spec` + `/sdd-plan <cat>/<Name>` (puertas de pieza suelta);

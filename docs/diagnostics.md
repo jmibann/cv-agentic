@@ -2,7 +2,7 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-13** (cierre motion cambio 2 §XXV; cierre etapa 1 §XXIV; saneado §XXIII).
+Última actualización: **2026-11-13** (cierre motion cambio 3 §XXVI; cambio 2 §XXV; etapa 1 §XXIV).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
@@ -42,11 +42,18 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Motion, Cambios 3–4 (post-entrega) | Etapas 1 (Foundation, §XXIV) y 2 (tabs B AppLayout, §XXV) **CERRADAS**. Faltan grid del Sidebar (3) y TestimonialDialog (4), cada uno con su puerta spec→plan→tareas. Regla #116: ninguna `transition` en selector (0,2,0) o mayor + delays de stagger derivados de `calc(n × --duration-stagger)` (los verifica el reviewer en cada Cambio). Anotados en código: `transition` inerte `Sidebar.module.css:386` (→ 3), comentario rancio `TestimonialDialog.module.css:79` (→ 4). Confirmaciones manuales del usuario pendientes (por inspección en §XXIV/§XXV): reduced motion con flag real y Ctrl+P | Puerta de Plan+Tareas de cada Cambio |
+| Motion, Cambio 4 (post-entrega) | Cambios 1–3 cerrados (Foundation §XXIV, AppLayout §XXV, Sidebar §XXVI; Ctrl+P con contactos colapsados **aprobado por el usuario**). Falta **TestimonialDialog (4)**: `--ease-standard`→`--ease-enter` manteniendo `@starting-style` y sin salida; limpiar el comentario rancio `TestimonialDialog.module.css:79` ("0.3s"); con su puerta spec→plan→tareas (regla #116 **aclarada**: `transition: none` excluido). Pendientes del usuario: **commitear el C3 de `foundations/motion.md`** (redactado y entregado en §XXVI) y confirmar `prefers-reduced-motion` con flag real (por inspección P6' cerrada) | Puerta del Cambio 4 + manos del usuario |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XXVI · 2026-11-13 — Cierre del Cambio motion 3 (Sidebar, expansión de contactos)
+- Qué: Cambio completo sobre Sidebar: spec reabierta y aprobada en 3 rondas (`4313f3d`, con la **enmienda de #116** escrita en su fila de `docs/README.md`: la regla refiere a `transition` que puedan *producir animación*; `transition: none` excluido) + plan/tareas (`8a89a5f`; ajustes del usuario: T12 feat-only, `data-contacts-animate` refleja `expanded` sin estado extra, reescritura C9 del Selector a descendiente —una línea, 4 usos intactos—, test 13 por clase y no `toBeVisible()`). Ejecución: T9+T9b (`c5617e0`/`2db9975`, reubicación del cierre axe ordenada por el reviewer), T10 (`5162e2e` wrapper + atributo), T11 (`4e80fb3` grid 0fr/1fr + stagger gated `backwards` + P5' con clase simple ≥1200), T12 (`efbe0e1` print en `global.css`: se quema el `display: block` heredado de #103 — el grid base del módulo lo hace inerte — y resets (1,0,0)); todas APROBADAS por tarea + revisión completa. QA en vivo: expansión 310 ms + stagger ~290 ms (mid-flight verificó `backwards`), repliegue 224 ms con `visibility` diferido, cargas 900/1400 sin animación, cruce de media sin animar, reinicio al reexpandir, clics rápidos, colapsado fuera de foco/árbol medido. **Ctrl+P con el bloque colapsado aprobado por el usuario.** Sidebar → `implementada` (28/28). Pendientes del usuario: commitear el C3 de `foundations/motion.md` (redactado y entregado) y confirmar reduced-motion con flag real (por inspección P6' cerrada).
+- Checks: lint ✓ · typecheck ✓ · test **466/41** ✓ · build ✓ (prebuild + validate:content incluidos).
+- Decisiones: ninguna nueva (enmienda registrada en la fila #116).
+- Commits: `4313f3d` `8a89a5f` `c5617e0` `2db9975` `5162e2e` `4e80fb3` `efbe0e1` + las marcas de tareas.
+- Abre: los 2 pendientes del usuario (fila Motion de **Abiertos**). Cierra: el Cambio motion 3; queda solo el 4 (TestimonialDialog).
 
 ### §XXV · 2026-11-13 — Cierre del Cambio motion 2 (AppLayout, entrada de panel)
 - Qué: Cambio motion 2 completo sobre AppLayout: spec RF-9 reabierta y aprobada en 2 rondas (`6c71f12`; ajustes del usuario: print en el módulo por orden de importación, dirección `null` en el primer render, reset preexistente no atribuido al `key`, `backwards`, setState-condicional en lugar de refs en render por `react-hooks/refs`, selectores acotados por clase); plan+tasks aprobados con ajuste de T12 en dos commits (`aa75256`). Ejecución T10–T13 (`84bb91b`/`28ec533` · `67b912b`/`88bb4a9` · `600c93f`/`fd8b4c5`), todas APROBADAS por tarea + revisión completa APROBADA: QA en vivo midió animación bidireccional (frame inicial `matrix(±10,0)` + opacity 0, 0.3s `--ease-enter` `backwards`), sin animación en carga inicial, sin residuos ni contexto de apilamiento, flujo del `h1` junto a la solapa 1000/1440 × 2 tabs, consola limpia, 0 `transition` en el módulo (#116). Reduced motion real y Ctrl+P quedaron por inspección (limitación del MCP). AppLayout → `Estado: implementada`.
@@ -55,12 +62,7 @@ de la entrada); el detalle queda en git.
 - Commits: `84bb91b` `28ec533` `67b912b` `88bb4a9` `600c93f` `fd8b4c5` + los docs de este pase. Menores registrados: tilde "patrón" en cuerpo `fd8b4c5`; assert extra de identidad de nodo en test 16 (informativo).
 - Abre: cambios 3–4 (fila Motion de **Abiertos**, con las 2 confirmaciones manuales del usuario). Cierra: el Cambio motion 2.
 
-### §XXIV · 2026-11-13 — Cierre del Cambio motion etapa 1 (Foundation T18)
-- Qué: aprobada la puerta T18 por el usuario: `foundations/motion.md` documenta la escala nueva (9 tokens), el cambio de tema sin transiciones (`data-theme-switching`), reduced motion con las cinco duraciones y la regla (0,2,0) de #116 para los Cambios 2–4 (el archivo lo escribió y commiteó el usuario, kit). QA visual del reviewer en la app servida: tabs/hover/chevron/bullet/dialog ~192–202 ms sin jank; cambio de tema con 0 eventos de color, doble click rápido sin atributo huérfano; inspección de especificidad: 0 violaciones en los 12 selectores con `transition`. `spec.md` de Foundation vuelve a `Estado: implementada` (28/28); T18 marcada en `tasks.md`.
-- Checks: lint ✓ · typecheck ✓ · test **456/40** ✓ · build ✓ (prebuild + validate:content incluidos).
-- Decisiones: ninguna nueva (#116 vigente).
-- Commits: `e3c511d` (motion.md, usuario) · el de `tasks.md`/`spec.md` y el de los documentos de estado de este pase.
-- Abre: los 3 menores de la revisión de T18 (stagger `calc`, `Sidebar.module.css:386`, `TestimonialDialog.module.css:79`) → ya anotados en la fila Motion de **Abiertos** para los Cambios 3/4. Cierra: la etapa 1 del motion.
+### 2026-11-13 · §XXIV — Cierre del Cambio motion etapa 1 (Foundation T18) · #116 · `git show fd3d1d1:docs/diagnostics.md`
 
 ### 2026-11-13 · §XXIII — Puerta motion etapa 1 + saneado de documentación · #116 · `git show aca2b59:docs/diagnostics.md`
 
