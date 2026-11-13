@@ -6,11 +6,11 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XXIII) y `docs/READ
 
 ## Estado actual (2026-11-13)
 
-- **Entregado — F1–F5 cerradas**; Foundation **reabierta** por el Cambio motion (`Estado: aprobada`, vuelve a `implementada` al cerrar T18): 27/28 `implementada`; suite **456/40**. Recientes: Resume una columna, Experience primero (#114, §XX); favicon app JM + título real (#115, §XXI); saneado de documentación (§XXII–§XXIII).
+- **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **456/40**. Recientes: Resume una columna (#114, §XX); favicon app JM + título real (#115, §XXI); saneado de documentación (§XXII–§XXIII); **motion etapa 1 cerrada** — Foundation T15–T18 (§XXIV).
 - **Mantenimiento 2026-11-11/12 (§XIV–§XIX)**: CV real + 3 testimonios reales (#112/#113) con `assetUrl()`/base (#107); tests adaptados sin debilitar; QA visual aprobada (gap chevron↔nombre 72.84px a 375; `qa-report.md`). `headline`/cargos en inglés en `cv.es.json`: decisión editorial #109, **no re-reportarla**.
-- **Motion etapa 1 (Foundation) en cierre (#106/#116)**: T15 tokens (`c2befd1`, usuario) + T16 `data-theme-switching` (`c0bc995`) + T17 test de contrato (`122a996`) ✅ reviewer. Faltan **T18** (`foundations/motion.md` en manos del usuario + QA reviewer con app servida + build + spec → `implementada`) y los Cambios 2–4 (AppLayout, Sidebar, TestimonialDialog), cada uno con su puerta spec→plan→tareas.
+- **Motion: etapa 1 (Foundation) CERRADA** (#106/#116, §XXIV): tokens, `data-theme-switching`, contrato y `foundations/motion.md` aprobados con QA en vivo. Faltan los **Cambios 2–4** (tabs B AppLayout, grid del Sidebar, TestimonialDialog), cada uno con su puerta spec→plan→tareas; arrancan con los menores anotados en la fila Motion de **Abiertos** (diagnostics).
 - **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre `lint` → `test` → `build` y no publica si algo falla (#111). Pages publicado e inspeccionado en vivo (§XXI).
-- **Pendientes del usuario**: **push** (`main` adelantado) y verificar Actions post-push · motion T18 y Cambios 2–4 · deudas de forma (fila "Pendientes post-F5" de diagnostics).
+- **Pendientes del usuario**: **push** (`main` adelantado) y verificar Actions post-push · abrir los Cambios motion 2–4 · deudas de forma (fila "Pendientes post-F5" de diagnostics).
 
 ## Reglas no negociables para cualquier tarea futura
 
