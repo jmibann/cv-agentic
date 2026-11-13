@@ -58,7 +58,7 @@ solo en clases (0,1,0) (#116 aclarada: `transition: none` excluido).
     SOLO cuando `expanded` (P1'; sin estado extra); sin `style` inline;
     `aria-expanded`/`aria-controls`/`data-print-hide`/labels intactos; tests 11
     y 12 verdes; el resto de la suite sin tocar.
-- [ ] **T11. CSS de entrada en `Sidebar.module.css`.** RF-11 (P2', P3', P5'), #116
+- [x] **T11. CSS de entrada en `Sidebar.module.css`.** RF-11 (P2', P3', P5'), #116 — 4e80fb3 (feat, único archivo, 177+/61−); reviewer APROBADO con auto-check #116 independiente: 5 `transition` en el archivo, todas (0,1,0)/(0,1,1) o `none`; compuesto (0,2,0) viejo desaparecido; pila migrada sin reinventar; `backwards` ✓; delays/cap con derivación `calc(n × --duration-stagger)` ✓; `4px` único literal nuevo; cero reduced-motion/print/`!important` propios; preexistente byte a byte intacto fuera de lo ordenado (466/41). Ventana T11→T12: el print todavía recorta con el bloque colapsado — T12 es bloqueante para cerrar el Cambio.
   - Hecho cuando: `feat(Sidebar): T11` solo toca el módulo: `.additional` grid
     (0fr/1fr + visibility + transiciones según la tabla de spec, (0,1,0),
     colapso después de la base); la pila de decisión 11 migra a
