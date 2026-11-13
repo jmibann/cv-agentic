@@ -46,7 +46,7 @@ puerta). Dueño: `integrator`; no toca `global.css`, NavTabs, `src/test/**` ni
     next: number): MotionDirection | null` y `export type MotionDirection =
     "from-left" | "from-right"` en `src/lib/tabDirection.ts` (pura, sin
     React/DOM, sin `any`); lint/typecheck/test verdes.
-- [ ] **T11. Wrapper de entrada en `AppLayout.tsx` (P1, P4).** RF-9 (tests 13 y 16)
+- [x] **T11. Wrapper de entrada en `AppLayout.tsx` (P1, P4).** RF-9 (tests 13 y 16) — 67b912b (test, rojo real 2/20) + 88bb4a9 (feat); reviewer APROBADO (462/41; P1 resuelto: lint acepta el setState condicionado sin disables; `styles.motionPanel` referida antes de T12 = no-op tolerado; menores informativos: assert de identidad extra en test 16, línea larga `:838` cosmético)
   - Hecho cuando: `test(AppLayout): T11` (rojo) agrega a `AppLayout.test.tsx`
     los tests 13 y 16 literales (atributos `data-motion-panel` /
     `data-motion-direction` según dirección, clicks rápidos con remount —el
