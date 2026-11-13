@@ -213,7 +213,7 @@ T3b (deuda L1 detectada en su review).
     (especificidad (0,2,0), ajuste 1 de la puerta); los tests F1 preexistentes
     de `ThemeProvider` siguen verdes; lint/typecheck/test verdes; `feat` no
     toca tests; no se toca `index.html` ni `tokens/tokens.css`.
-- [ ] **T17. Test de contrato de los tokens de motion (lectura `fs`).** RF-10 — requiere T15 aplicado; delegable a `foundation`; commit único `test(Foundation): T17` (#101: aserta el documento aprobado, verde al escribirse)
+- [x] **T17. Test de contrato de los tokens de motion (lectura `fs`).** RF-10 — requiere T15 aplicado; delegable a `foundation`; commit único `test(Foundation): T17` (#101: aserta el documento aprobado, verde al escribirse) — 122a996 (T15 del usuario `c2befd1`); reviewer APROBADO (456/40; mutaciones en memoria: cambia/borra/zona → rompe; menores de forma: `declaredValue` toma la primera declaración vs última de cascada y sensible a comentario inline antes del `;` — deuda si el test se vuelve a tocar)
   - Hecho cuando: un test en `src/` (extensión de `src/test/anti-flash.test.ts`
     o nuevo archivo en la carpeta de tests) lee `tokens/tokens.css` con `fs` y
     aserta los valores exactos de T15: las cinco duraciones (`0.15/0.2/0.3/
