@@ -16,17 +16,22 @@
     centrada en xl con el avatar sobresaliente, redes/links con hover/foco, y
     el `@media (min-width: 1200px)` — el ÚNICO media de comportamiento xl del
     módulo (decisión 8=a: oculta el botón de disclosure `.disclosure` — desde
-    T7, antes la CornerTab — y fuerza visible
-    `.additional`) más el `@media (min-width: 768px)` de la grilla de
+    T7, antes la CornerTab — y fuerza visible el bloque de contactos; desde el
+    Cambio motion 3/P5' lo hace sobre `.additionalCollapsed` a secas (0,1,0)
+    al final del media, con `transition: none`) más el `@media (min-width:
+    768px)` de la grilla de
    contactos (2 columnas expandidas en md–lg; 1 columna < md y xl), que es
    cambio puro de layout. Dentro de ambos `@media` solo hay keywords de
    layout, tokens, `calc()` de tokens y `0` (docs/tokens/breakpoints.md →
    Reglas; los tracks `1fr`/`minmax(0, 1fr)` son el ejemplo canónico de ese
-   documento). Cero `@media print` propio (RF-10): la expansión forzada y la
-   ocultación del botón en impresión son de los estilos compartidos (G-D,
-   foundations/layout.md → Impresión), que alcanzan este bloque por su id
-   `#sidebar-contacts` y por la clase de colapso — por eso el colapso es por
-   CLASE y nunca `style` inline. Cero colores literales (regla 1 de
+    documento). Cero `@media print` propio (RF-10; Cambio motion 3: el print
+    de RF-10/RF-11 para el grid `0fr↔1fr` — expansión forzada, resets de
+    animación y `visibility` — vive en `global.css` sobre el id
+    `#sidebar-contacts`, tarea T12; no va acá): la expansión forzada y la
+    ocultación del botón en impresión son de los estilos compartidos (G-D,
+    foundations/layout.md → Impresión), que alcanzan este bloque por su id
+    `#sidebar-contacts` y por la clase de colapso — por eso el colapso es por
+    CLASE y nunca `style` inline. Cero colores literales (regla 1 de
    docs/DESIGN.md): el módulo no declara ningún color fuera de tokens
    semánticos; los pares usados están registrados en docs/tokens/contrast.md
    (redes `text-muted` sobre surface 5.02/6.01 y su hover/foco
@@ -36,47 +41,149 @@
     — el MISMO par ya registrado para hover/foco de redes, contrast.md →
     "Íconos informativos"; el botón no tiene fondo propio, así que ya no
     aplica el par sobre `surface-raised` de la CornerTab 5.47/10.60). Transiciones de PROPIEDADES
-   concretas con `--duration-base`/`--ease-standard` (Do/Don't de DESIGN:
-   nunca `transition: all`); `--duration-base` colapsa a 0.01ms bajo
-   prefers-reduced-motion en tokens.css. Literales del módulo: SOLO los que
+   concretas con su par duration+ease (Do/Don't de DESIGN: nunca
+   `transition: all`): `--duration-base`/`--ease-standard` en chevron y redes,
+   y desde el Cambio motion 3 (RF-11) el par de entrada
+   `--duration-slow`/`--ease-enter` y el de salida
+   `--duration-exit`/`--ease-exit` SOLO en las clases `.additional` y
+   `.additionalCollapsed` (0,1,0) — regla #116 aclarada: prohibida toda
+   `transition` que anime en selectores (0,2,0)+; el `transition: none` del
+   override ≥1200 está excluido (desactiva, no anima) y la entrada de ítems
+   es `animation` (0,3,0), no `transition`. Bajo prefers-reduced-motion no
+   hay regla propia (P6'): `--duration-base`/`--duration-slow`/
+   `--duration-exit`/`--duration-stagger` colapsan a 0.01ms en tokens.css y
+   todo —duraciones y delays derivados de `calc()`— se vuelve imperceptible.
+   Literales del módulo: SOLO los que
    la spec fija textualmente y se citan en cada regla (180° del chevron —
    RF-4—, la fórmula `-0.71` del avatar, compartida con
-   foundations/layout.md, y los `0` de resets/posicionamiento permitidos por
+   foundations/layout.md, el `4px` del `@keyframes item-enter` — RF-11:
+   "translateY(4px)→0"—, y los `0` de resets/posicionamiento permitidos por
    breakpoints.md); toda medida que cambia por breakpoint es token (la del
    avatar del xl escala vía --size-avatar-sidebar, no hay literal de
    tamaño). Sin margen externo en el raíz (Do/Don't): ni `.baseInfo` ni
-   `.additional` declaran margen; ver "pila sin acumulación" abajo. */
+   `.additional` ni `.additionalBody` declaran margen; ver "pila sin
+   acumulación" abajo. */
 
-/* Pila de `.additional` SIN acumulación en el tramo del Separator
-   (decisión 11 + Separator RF-4; plan → Decisiones: "el mecanismo exacto lo
-   elige el builder y lo documenta"). Mecanismo elegido: el contenedor NO usa
-   `gap` ni márgenes propios — es un div de flujo normal (block, sin regla
-   base con `display`) y el espacio entre sus hijos lo aporta SOLO el margen
-   propio de cada hijo: el `Separator` trae su `margin-block:
+/* Contenedor del disclosure (Anatomía `.additional`, id `sidebar-contacts`
+   desde T3 — `aria-controls`/RF-10). CAMBIO MOTION 3 (RF-11; spec → tabla
+   "Entrada de contactos"; plan → Anexo P3'/P4'): grid de UNA fila cuya altura
+   anima con el track `0fr↔1fr` — la ÚNICA excepción a "no animar altura" del
+   kit (spec → No hacer; C3 de foundations/motion.md, excepción que redacta el
+   orchestrator en T13). Esta base es el estado EXPANDIDO: `1fr` + visible,
+   entrada con `--duration-slow`/`--ease-enter`; el `visibility 0s` SIN delay
+   mantiene el bloque accesible durante toda la entrada, y el
+   `visibility 0s var(--duration-exit)` del colapso (abajo) difiere el hidden
+   hasta el final del cierre (RF-11: colapsado = fuera del árbol de
+   accesibilidad y del foco — se verifica en QA en navegador, no en jsdom).
+   Transiciones SOLO acá y en `.additionalCollapsed`, ambas (0,1,0) — #116
+   aclarada: cero `transition` que anime en selectores (0,2,0)+. La pila
+   vertical (decisión 11) ya no vive en este contenedor: MIGRÓ a
+   `.additionalBody` (abajo) con el wrapper de T10. */
+.additional {
+  display: grid;
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows var(--duration-slow) var(--ease-enter),
+    visibility 0s;
+}
+
+/* Colapso del bloque de contactos (nace en T4 por `display: none`; CAMBIO
+   MOTION 3, RF-11: pasa a `grid-template-rows: 0fr` + `visibility: hidden`,
+   nunca `style` inline — RF-10: el print de T12 y el media ≥1200 abajo deben
+   poder forzar la apertura pisando esta CLASE). La clase se aplica SOLO
+   cuando `expanded === false` (ternaria en el TSX, T4). Salida
+   `--duration-exit`/`--ease-exit` y `visibility` recién a los
+   `--duration-exit` (0fr durante todo el cierre, fuera del árbol al
+   terminar). P3': MISMA especificidad (0,1,0) que la base y declarada
+   DESPUÉS en el archivo → gana por orden determinista dentro del módulo
+   (descartado depender del orden compuesto/simple y descartado `!important`;
+   el viejo mecanismo compuesto del media 1200 se reemplaza en T11/T12 por el
+   override a secas de P5', al final del archivo). */
+.additionalCollapsed {
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows var(--duration-exit) var(--ease-exit),
+    visibility 0s var(--duration-exit);
+}
+
+/* Pila del bloque SIN acumulación en el tramo del Separator — dueña del
+   mecanismo desde el Cambio motion 3: `.additionalBody` (decisión 11 +
+   Separator RF-4; plan → Anexo P4': "recibe la pila de `.additional`"; el
+   mecanismo elegido en T6 se MIGRA intacto, solo cambia el contenedor).
+   El contenedor NO usa `gap` ni márgenes propios — flujo normal de bloque y
+   el espacio entre sus hijos (Separator, lista, CTA) lo aporta SOLO el
+   margen propio de cada hijo: el `Separator` trae su `margin-block:
    var(--separator-gap)` de su propio módulo (así el tramo línea↔contactos lo
    da solo el separador, sin suma del contenedor) y el CTA trae su
    `margin-top: var(--sidebar-cta-gap)` (fila "Download CV" de la tabla, vía
    la clase `.cta` unida al raíz del Button). El contenedor no suma nada en
    ningún tramo. Verificación `#sidebar-contacts` VACÍO (nota de T3): sin
-   hijos no hay márgenes ni gap que pinten — cero spacing fantasma (block con
-   `gap: 0` implícito; un `display: none` en los < xl ni lo muestra). Edge
+   hijos no hay márgenes ni gap que pinten — cero spacing fantasma. Edge
    documentado para F5: sin contactos y con CTA, Separator y CTA quedan
    adyacentes en flujo block y sus márgenes verticales COLAPSAN (máximo, no
-   suma); en flex serían suma — elegido el flujo block también porque RF-3
-   fija textualmente "fuerza `display: block` en `.additional`" y así el
-   media 1200 no cambia de modelo de layout. */
+   suma); en flex serían suma — se mantiene el flujo block heredado de T3/T6;
+   lo que cambia con el Cambio motion 3 es el contenedor EXTERNO
+   (`.additional`, grid de una fila), no el modelo interno del wrapper. */
+.additionalBody {
+  /* `min-height: 0`: necesidad MECÁNICA del grid padre — el track solo
+     encoge bajo el contenido si el ítem puede encogerse (0 permitido).
+     `overflow: hidden`: recorta el contenido durante el cierre 0fr (RF-11;
+     tabla "Entrada de contactos", fila wrapper). */
+  min-height: 0;
+  overflow: hidden;
+}
 
-/* Colapso del bloque de contactos (T4; spec → Responsive, Colapsable < xl:
-   "`.additional` oculto con una clase del módulo (`display: none`, nunca
-   `style` inline)"). La clase se aplica SOLO cuando `expanded === false`
-   (ternaria en el TSX); en ≥ xl el @media 1200 de T6 (abajo) fuerza
-   `display: block` sobre el bloque cualquiera sea esta clase: el override
-   usa el selector COMPUESTO `.additional.additionalCollapsed` (0,2,0) y gana
-   a esta regla (0,1,0) POR ESPECIFICIDAD, sin depender del orden del
-   stylesheet y sin `!important` (decisión 8=a; es el punto marcado en el
-   review de T4: "el media debe pisar la clase de colapso"). */
-.additionalCollapsed {
-  display: none;
+/* Entrada de ítems del wrapper (RF-11; tabla "Entrada de contactos"; plan →
+   Anexo P2'). Gated por `data-contacts-animate` (P1': el atributo SOLO
+   existe cuando `expanded` — nada anima en el render inicial ni en la carga
+   ≥ xl; los clics rápidos quedan guiados por clases, sin timers JS). Es
+   `animation`, no `transition`: el selector compuesto (0,3,0) NO viola #116,
+   que solo restringe transiciones. `backwards` (P2'): los ítems no se ven
+   antes de su paso. Un `li` de la lista NO es hijo directo del wrapper: los
+   ítems animados son Separator, lista y CTA. */
+.additional[data-contacts-animate] .additionalBody > * {
+  animation: item-enter var(--duration-base) var(--ease-enter) backwards;
+}
+
+/* Delays escalonados 0/30/60/90 ms: `calc(n × --duration-stagger)` con n =
+   0–3 por posición (tabla, fila delays) y CAP al 4.º paso para un eventual
+   5.º hijo+ (fila cap; con los hijos típicos del wrapper nunca interviene).
+   P6' reduced motion: `--duration-stagger` colapsa a 0.01ms en tokens.css →
+   los delays derivados se achican solos, sin regla propia acá. */
+.additional[data-contacts-animate] .additionalBody > :nth-child(1) {
+  animation-delay: calc(0 * var(--duration-stagger));
+}
+
+.additional[data-contacts-animate] .additionalBody > :nth-child(2) {
+  animation-delay: calc(1 * var(--duration-stagger));
+}
+
+.additional[data-contacts-animate] .additionalBody > :nth-child(3) {
+  animation-delay: calc(2 * var(--duration-stagger));
+}
+
+.additional[data-contacts-animate] .additionalBody > :nth-child(4) {
+  animation-delay: calc(3 * var(--duration-stagger));
+}
+
+.additional[data-contacts-animate] .additionalBody > :nth-child(n+5) {
+  animation-delay: calc(4 * var(--duration-stagger));
+}
+
+/* Keyframes de la entrada (tabla, fila `@keyframes item-enter`, textual de
+   RF-11): opacity 0→1 + translateY(4px)→0. El `4px` es el LITERAL fijado por
+   la spec ("`translateY(4px)→0`"); el `none` del to es keyword de
+   transformación, no medida. */
+@keyframes item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Chevron del disclosure (T4, RF-4; spec → Responsive, Colapsable: "el
@@ -373,17 +480,15 @@
 
 /* Link de contacto (Estados, fila "Link de contacto": "sin subrayado;
    subrayado en hover/foco; foco con anillo estándar" + fila "Contactos":
-   "Links sin subrayado; subrayado en hover/foco" + transición de `color`
-   por tokens — la tabla Estados de contactos no fija cambio de color: el
-   color queda --color-heading en reposo/hover/foco y la transición de
-   `color` se declara por textual de la regla "Contactos" del encargo/Estados
-   de redes, inofensiva con color estable y fiel si los compartidos de print
-   lo reasignan; nunca `transition: all`). Los <a> de contacto NO son
-   decorativos como los de redes: son texto, por eso el subrayado (no
-   cambian de color al hover — tabla Estados). */
+   "Links sin subrayado; subrayado en hover/foco"). CAMBIO MOTION 3
+   (propuesta §3.4; el menor quedó registrado en tasks.md → T6): se ELIMINA
+   la `transition: color` que T6 declaró — era inerte: la tabla Estados de
+   contactos no fija cambio de color (el color queda --color-heading en
+   reposo/hover/foco) y el contrato de entrada de RF-11 no la incluye. Los
+   <a> de contacto NO son decorativos como los de redes: son texto, por eso
+   el subrayado (no cambian de color al hover — tabla Estados). */
 .contacts a {
   text-decoration: none;
-  transition: color var(--duration-base) var(--ease-standard);
 }
 
 .contacts a:hover,
@@ -471,30 +576,41 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* RF-3 (decisión 8=a, textual de la tabla Responsive/Colapsable en ≥ xl:
-     "un @media (min-width: 1200px) del propio módulo fuerza `display: block`
-     y oculta el botón de disclosure" — T7/Cambio F5):
-     - `.disclosure { display: none }`: en T7 el media y la clase base del
-       botón viven en el MISMO módulo (desaparece el problema cross-módulo
-       que obligaba al compuesto `.disclosureTab.disclosureTab` de T6 para
-       pisar el `display: flex` de CornerTab), así que la ocultación se
-       resuelve como el `margin-top` del avatar arriba: misma especificidad
+  /* RF-3 (decisión 8=a; tabla Responsive/Colapsable en ≥ xl tras el Cambio
+     motion 3: "un @media (min-width: 1200px) del propio módulo fuerza
+     `grid-template-rows: 1fr` + `visibility: visible` sobre
+     `.additionalCollapsed` (0,1,0, al final) y oculta el botón"), más el
+     control #116/P5' del cierre:
+     - `.disclosure { display: none }`: INTACTO desde T7 — el media y la
+       clase base del botón viven en el MISMO módulo, misma especificidad
        (0,1,0) que la base `.disclosure` y ORDEN determinista dentro del
        archivo (el media va después). Sin `!important`. El botón queda "no
        visible ni operable" (RF-3: sigue montado, sin render condicional por
        ancho); su `data-print-hide` es además el hook del contrato de
        impresión (RF-10, decisión #104a).
-     - `.additional.additionalCollapsed` (0,2,0) pisa el `display: none` de
-       la clase de colapso (0,1,0) también por especificidad, sin depender
-        del orden (el selector compuesto es el mecanismo limpio
-       declarado en tasks.md → T4/T6). Expandido, la clase de colapso no
-       está y el div es block por default: visible en ambos estados, que es
-       exactamente "contactos siempre visibles". */
+     - `.additionalCollapsed` A SECAS (0,1,0; P5', al final del media y del
+       archivo): fuerza `grid-template-rows: 1fr` + `visibility: visible`
+       sobre la clase de colapso — misma especificidad que la base y que el
+       colapso, gana por ORDEN (este media es el último bloque del módulo y
+       la regla va la última dentro de él; dentro de un mismo archivo el
+       orden es determinista, criterio del `margin-top` del avatar arriba).
+       No hace falta el `display` del viejo bloque: `.additional` ya es grid
+       por su base (0,1,0) y el colapso nuevo no declara `display` — nada
+       que pisar acá. El `transition: none` (P5') evita que AGRANDAR la
+       ventana con el bloque colapsado dispare la animación de altura
+       (RF-11: en ≥1200 nada anima al cambiar el tamaño); es legal bajo #116
+       aclarada (desactiva, no anima) y es el único `transition: none` del
+       módulo. El viejo compuesto `.additional.additionalCollapsed` (0,2,0)
+       con `display: block` se elimina: el colapso ya no es por `display`
+       (RF-11) y el abierto forzado de impresión lo resuelve el bloque de
+       T12 en `global.css` sobre el id, no el media. */
   .disclosure {
     display: none;
   }
 
-  .additional.additionalCollapsed {
-    display: block;
+  .additionalCollapsed {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: none;
   }
 }
