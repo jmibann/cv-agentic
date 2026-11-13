@@ -221,7 +221,7 @@ T3b (deuda L1 detectada en su review).
     el bloque `prefers-reduced-motion: reduce` fija `0.01ms` en las cinco;
     el test **no** escribe `tokens.css` (fuera del permiso `edit`); el commit
     toca solo archivos de test; lint/typecheck/test verdes.
-- [ ] **T18. Cierre del Cambio: docs de kit + QA + build.** — `foundations/motion.md` lo ejecuta y commitea el usuario; la QA la hace el `reviewer` con la app servida por el usuario (#91)
+- [x] **T18. Cierre del Cambio: docs de kit + QA + build.** — `foundations/motion.md` lo ejecuta y commitea el usuario; la QA la hace el `reviewer` con la app servida por el usuario (#91) — doc del kit `e3c511d` (usuario); reviewer **APROBADO** 2026-11-13 (QA visual en vivo ~200 ms por transición, sin jank; cambio de tema con 0 eventos de color y sin atributo huérfano; regla (0,2,0): 0 violaciones en 12 selectores; lint/typecheck/test 456/40 + build verdes). Menores registrados para los Cambios 2–4: delays de stagger deben derivar de `calc(n × --duration-stagger)` (revisa el reviewer del Cambio 3); `transition: color` inerte en `Sidebar.module.css:386` → Cambio 3; comentario rancio "0.3s" en `TestimonialDialog.module.css:79` → Cambio 4. Con la aprobación del usuario, `spec.md` → `Estado: implementada` y documentos de estado actualizados (#86, §XXIV).
   - Hecho cuando: `foundations/motion.md` documenta la escala nueva, el cambio
     de tema sin transiciones (`data-theme-switching`), reduced motion con
     delays anulados, y la regla para los Cambios motion 2–4: **ninguna
