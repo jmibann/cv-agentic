@@ -215,3 +215,76 @@ describe("index.html anti-flash (RF-1)", () => {
     expect(doc.documentElement.tagName).toBe("svg");
   });
 });
+
+/**
+ * Valor declarado de `--token` dentro de `source` (hasta el `;`, recortado);
+ * lanza si la declaración no existe (rojo por ausencia, nunca `undefined`).
+ * Con `noUncheckedIndexedAccess`, `capture` es el único acceso a grupos.
+ */
+function declaredValue(source: string, token: string): string {
+  const value = capture(
+    source,
+    new RegExp(`${token}:\\s*([^;]+);`),
+    `${token} declaration`,
+  );
+  return value.trim();
+}
+
+/**
+ * T17 (RF-10, Cambio motion #106): test de contrato de la escala de motion de
+ * `tokens/tokens.css` leída con `fs` (plan.md, decisión 4: se extiende este
+ * archivo, que ya lee los tokens). Régimen #101: commit único de test, verde
+ * al escribirse porque aserta el documento aprobado que T15 (`c2befd1`) ya
+ * aplicó; cualquier edición de esos valores sin Cambio de spec rompe acá.
+ * El test NO escribe `tokens.css` (kit, fuera del permiso de foundation).
+ */
+describe("motion tokens scale in tokens/tokens.css (RF-10, #106)", () => {
+  const tokensCss = readRepoFile("../../tokens/tokens.css");
+
+  // Las cinco duraciones se declaran dos veces en el archivo (alcance base y
+  // override de reduced motion). Se separan las dos zonas para que cada
+  // aserción lea la declaración que le corresponde, sin depender del orden
+  // de `capture` sobre todo el archivo.
+  const reducedBlock = capture(
+    tokensCss,
+    /@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*?)\n\}/,
+    "@media (prefers-reduced-motion: reduce) block",
+  );
+  const baseScope = tokensCss.slice(0, tokensCss.indexOf(reducedBlock));
+
+  // Valores textuales exactos de la escala aprobada (spec.md → RF-10 y
+  // "Tests esperados" → "Motion tokens"): `--ease-standard` y
+  // `--ease-emphasized` se asertan intactos junto con los tokens nuevos.
+  const MOTION_SCALE: ReadonlyArray<readonly [token: string, value: string]> =
+    [
+      ["--duration-fast", "0.15s"],
+      ["--duration-base", "0.2s"],
+      ["--duration-slow", "0.3s"],
+      ["--duration-exit", "0.22s"],
+      ["--duration-stagger", "0.03s"],
+      ["--ease-standard", "ease-in-out"],
+      ["--ease-emphasized", "cubic-bezier(0.455, 0.03, 0.515, 0.955)"],
+      ["--ease-enter", "cubic-bezier(0.22, 1, 0.36, 1)"],
+      ["--ease-exit", "cubic-bezier(0.4, 0, 1, 1)"],
+    ];
+
+  const DURATION_TOKENS: ReadonlyArray<string> = [
+    "--duration-fast",
+    "--duration-base",
+    "--duration-slow",
+    "--duration-exit",
+    "--duration-stagger",
+  ];
+
+  it("declares the approved motion scale (five durations, four easings) in the base scope", () => {
+    for (const [token, value] of MOTION_SCALE) {
+      expect(declaredValue(baseScope, token), token).toBe(value);
+    }
+  });
+
+  it("collapses the five durations to 0.01ms under prefers-reduced-motion: reduce", () => {
+    for (const token of DURATION_TOKENS) {
+      expect(declaredValue(reducedBlock, token), token).toBe("0.01ms");
+    }
+  });
+});
