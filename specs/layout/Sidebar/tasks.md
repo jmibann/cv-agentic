@@ -51,7 +51,7 @@ solo en clases (0,1,0) (#116 aclarada: `transition: none` excluido).
     (los 4 usos `:379/:475/:489/:744` quedan intactos con sus `toHaveLength(n)`;
     el body cita C9/#106). Ningún assert previo debilitado ni borrado; rojo
     esperado: solo tests 11 y 12.
-- [ ] **T10. Wrapper + atributo en `Sidebar.tsx`.** RF-11 (P1', P4')
+- [x] **T10. Wrapper + atributo en `Sidebar.tsx`.** RF-11 (P1', P4') — 5162e2e (feat, único archivo; 119+/90− mostly reindentación); reviewer APROBADO (25/25 Sidebar, suite 466/41, lint/typecheck ✓; condicionales RF-9 y ARIA línea a línea intactos; `data-contacts-animate={expanded ? "" : undefined}` sin casts/estado extra; ventana transitoria `additionalBody` sin clase = esperada hasta T11)
   - Hecho cuando: `feat(Sidebar): T10` solo toca `Sidebar.tsx`: dentro de
     `#sidebar-contacts` un único div `className={styles.additionalBody}` que
     envuelve Separator + `ul.contacts` + CTA; `data-contacts-animate` presente
