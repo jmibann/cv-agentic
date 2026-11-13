@@ -163,18 +163,58 @@ html:has(dialog[open]) {
     display: none;
   }
 
-  /* Contactos SIEMPRE expandidos (foundations → "Impresión"). Hook estable
+  /* Contactos SIEMPRE expandidos (foundations → "Impresión"; RF-10/RF-11,
+   * plan → Anexo P7' y propuesta §3.5 — Cambio motion 3, T12). Hook estable
    * INSPECCIONADO (Sidebar.tsx): el contenedor lleva el id NATIVO estable
-   * `sidebar-contacts` — línea 139 `CONTACTS_CONTAINER_ID =
-   * "sidebar-contacts"`, montado en el div de la línea 277; su propia spec lo
-   * declara "contrato público… para el aria-controls y para print (RF-10)"
-   * (comentario línea ~276). El colapso de pantalla es por CLASE hasheada no
-   * alcanzable (.additionalCollapsed display:none, Sidebar.module.css línea
-   * 68; y la pila xl .additional.additionalCollapsed (0,2,0) línea ~444) — el
-   * selector por ID (1,0,0) gana a ambas por especificidad, sin importar el
-   * orden de las hojas. */
+   * `sidebar-contacts` (contrato público de la pieza: `aria-controls` +
+   * print, RF-10). El colapso de pantalla YA NO es `display: none` desde
+   * T11: es `grid-template-rows: 0fr` + `visibility: hidden` en las clases
+   * `.additional`/`.additionalCollapsed` (0,1,0) del módulo. El selector por
+   * ID (1,0,0) gana a ambas por ESPECIFICIDAD, sin importar el orden de las
+   * hojas (mismo criterio del contrato #104a con las clases hasheadas).
+   * Cascada verificada contra Sidebar.module.css (T11) — forma mínima
+   * correcta, el `display: block` del contrato viejo SALE de acá:
+   * - `visibility: visible` (1,0,0) pisa el `hidden` de
+   *   `.additionalCollapsed` (0,1,0).
+   * - `grid-template-rows: 1fr` (1,0,0) pisa el `0fr` (0,1,0) y abre la
+   *   fila al alto del contenido.
+   * - `display` NO hay que pisarlo: el contenedor conserva el
+   *   `display: grid` de la base `.additional` (0,1,0) del módulo porque el
+   *   colapso nuevo no declara `display` en ninguna parte — y así la
+   *   impresión reproduce el MISMO estado computado que el xl forzado (P5':
+   *   grid + 1fr + visible). Mantener `display: block` cambiaría el modelo
+   *   de layout en papel sin necesidad y volvería INERTE el
+   *   `grid-template-rows: 1fr` (propiedad solo de grid). El wrapper
+   *   `.additionalBody` (`min-height: 0; overflow: hidden`) no recorta nada
+   *   en una fila `1fr`: toma el alto completo del contenido.
+   * - Reset de animación: `#sidebar-contacts` y `#sidebar-contacts *`
+   *   ((1,0,0) con el universal) ganan a la entrada de ítems gated
+   *   `.additional[data-contacts-animate] .additionalBody > *` (0,3,0) —
+   *   con `backwards` los ítems se pintarían en su estado `from`
+   *   (`opacity: 0`) si imprimiera a mitad de la entrada — y a las
+   *   transiciones de altura/`visibility` del módulo. `animation: none`/
+   *   `transition: none` aquí son SUPRESIÓN: #116 aclarada los excluye del
+   *   límite de especificidad (desactivan, no animan).
+   * - `#sidebar-contacts li` (1,0,1): colchón literal de P7'/propuesta §3.5
+   *   para "el estado colapsado no puede dejar ítems `opacity: 0` en
+   *   papel"; desde T11 el `li` no recibe animación propia (los animados
+   *   son los hijos directos del wrapper), así que la regla es defensiva.
+   * Verificación: inspección + Ctrl+P del usuario con la app servida
+   * (#101/#91; sin test jsdom, como el resto del contrato de impresión). */
   #sidebar-contacts {
-    display: block;
+    visibility: visible;
+    grid-template-rows: 1fr;
+  }
+
+  #sidebar-contacts,
+  #sidebar-contacts * {
+    animation: none;
+    transition: none;
+  }
+
+  #sidebar-contacts li {
+    opacity: 1;
+    transform: none;
   }
 
   /* sin saltos de página dentro de ítems (foundations → "Impresión":
