@@ -8,9 +8,9 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XXVI) y `docs/READM
 
 - **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **466/41**. Recientes: saneado de documentación (§XXII–§XXIII); **motion cambios 1–3 cerrados** — Foundation (§XXIV), AppLayout entrada de panel (§XXV) y Sidebar expansión de contactos con grid `0fr↔1fr` (§XXVI; Ctrl+P colapsado aprobado por el usuario).
 - **Mantenimiento 2026-11-11/12 (§XIV–§XIX)**: CV real + 3 testimonios reales (#112/#113) con `assetUrl()`/base (#107); tests adaptados sin debilitar; QA visual aprobada (gap chevron↔nombre 72.84px a 375; `qa-report.md`). `headline`/cargos en inglés en `cv.es.json`: decisión editorial #109, **no re-reportarla**.
-- **Motion: cambios 1–3 CERRADOS** (#106/#116, §XXIV–§XXVI). Queda solo **TestimonialDialog (4)** (su puerta spec→plan→tareas; `--ease-enter` + comentario rancio `:79`) y los pendientes del usuario de la fila Motion de **Abiertos**: commitear el C3 de `foundations/motion.md` (redactado, entregado) y confirmar reduced-motion con flag real.
+- **Motion: cambios 1–3 CERRADOS** (#106/#116, §XXIV–§XXVI) y sus confirmaciones manuales hechas: C3 de `foundations/motion.md` commiteado (`5edfcb0`), reduced-motion probado en Chrome (Sidebar + tabs ✓), Ctrl+P colapsado ✓, push y Actions verdes. Queda solo **TestimonialDialog (4)** (puerta spec→plan→tareas; `--ease-enter` + comentario rancio `:79`) y un cabo suelto de forma: redactar la aclaración de #116 (`transition: none` excluido) en la viñeta de `foundations/motion.md` — manos del usuario.
 - **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre `lint` → `test` → `build` y no publica si algo falla (#111). Pages publicado e inspeccionado en vivo (§XXI).
-- **Pendientes del usuario**: **push** (`main` adelantado) y verificar Actions post-push · abrir los Cambios motion 2–4 · deudas de forma (fila "Pendientes post-F5" de diagnostics).
+- **Pendientes**: push de `5edfcb0` + el sync de docs que lo acompañe (Actions ya vistos verdes post-push anterior) · abrir el **Cambio motion 4** · aclaración #116 en `motion.md` (usuario) · deudas de forma (fila "Pendientes post-F5" de diagnostics).
 
 ## Reglas no negociables para cualquier tarea futura
 

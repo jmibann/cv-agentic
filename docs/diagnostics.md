@@ -2,7 +2,7 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-13** (cierre motion cambio 3 §XXVI; cambio 2 §XXV; etapa 1 §XXIV).
+Última actualización: **2026-11-13** (cierre motion cambio 3 §XXVI + sync de pendientes C3/reduced-motion/Actions sin entrada nueva: no es puerta F ni decisión de reglas).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
@@ -42,7 +42,7 @@ de la entrada); el detalle queda en git.
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
 | Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Motion, Cambio 4 (post-entrega) | Cambios 1–3 cerrados (Foundation §XXIV, AppLayout §XXV, Sidebar §XXVI; Ctrl+P con contactos colapsados **aprobado por el usuario**). Falta **TestimonialDialog (4)**: `--ease-standard`→`--ease-enter` manteniendo `@starting-style` y sin salida; limpiar el comentario rancio `TestimonialDialog.module.css:79` ("0.3s"); con su puerta spec→plan→tareas (regla #116 **aclarada**: `transition: none` excluido). Pendientes del usuario: **commitear el C3 de `foundations/motion.md`** (redactado y entregado en §XXVI) y confirmar `prefers-reduced-motion` con flag real (por inspección P6' cerrada) | Puerta del Cambio 4 + manos del usuario |
+| Motion, Cambio 4 (post-entrega) | Solo queda **TestimonialDialog**: `--ease-standard`→`--ease-enter` manteniendo `@starting-style` y sin salida; limpiar el comentario rancio `TestimonialDialog.module.css:79` ("0.3s"); con su puerta spec→plan→tareas (regla #116 **aclarada**: `transition: none` excluido). CERRADOS 2026-11-13: C3 de `foundations/motion.md` commiteado por el usuario (`5edfcb0`); `prefers-reduced-motion` **probado en Chrome** (contactos del Sidebar y cambio de tabs, correcto); Ctrl+P con contactos colapsados ✓; push y Actions verdes. Único cabo suelto: la aclaración de #116 aún NO está redactada en la viñeta de `foundations/motion.md` (líneas 41–43 conservan el texto viejo) — manos del usuario (kit) | Puerta del Cambio 4 |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
