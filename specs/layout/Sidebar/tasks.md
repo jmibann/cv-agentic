@@ -36,7 +36,7 @@ Orden de dependencia: T9 → T10 → T11 → T12 → T13. Dueño: `integrator`. 
 providers, AppLayout, `src/test/**`, configs, `allowExportNames`. Transiciones
 solo en clases (0,1,0) (#116 aclarada: `transition: none` excluido).
 
-- [ ] **T9. Tests de la entrada de contactos + reescritura C9 del Selector.** RF-11 (tests 11–13), C9
+- [x] **T9. Tests de la entrada de contactos + reescritura C9 del Selector.** RF-11 (tests 11–13), C9 — c5617e0 (rojo diseñado: SOLO tests 11/12; verdes-on-arrival #101: test 13 + C9 con los 4 usos intactos) + 2db9975 (T9b: reubicación ordenada por el reviewer — el cierre `expectNoA11yViolations` vuelve al final; bonus: comentario T3 alineado a C9); reviewer APROBADO (lint/typecheck ✓; menores documentados: cita histórica de líneas sin corregir, comentario partido cosmético)
   - Hecho cuando: commit único `test(Sidebar): T9` que solo toca
     `Sidebar.test.tsx`: (a) **rojos**: test 11 (wrapper `.additionalBody` único
     hijo de `#sidebar-contacts` conteniendo Separator/lista/CTA + aserción de
