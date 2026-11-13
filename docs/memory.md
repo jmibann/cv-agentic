@@ -2,28 +2,24 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XXI) y `docs/README.md` (#1–#115).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XXIII) y `docs/README.md` (#1–#116).
 
-## Estado actual (2026-11-12)
+## Estado actual (2026-11-13)
 
-- **ENTREGADO — F1–F5 cerradas**: 28/28 `implementada` (27 de componentes + Foundation); QA F5 + Ctrl+P real ✅; suite **449/40**. Resume en una sola columna, Experience primero (#114, §XX); favicon tipo app JM + título real (#115, §XXI).
-- **Mantenimiento 2026-11-11 cerrado (§XIV–§XVI)**: base Vite + `assetUrl()`
-  (`c2d4232`/`5f6c0a6`); **CV real** + assets (`63f6665`) sin teléfono/WhatsApp; **3 testimonios reales**
-  (#112, textos literales; TestimonialCard T5/T6: comilla reservada y avatar anclado arriba, #113); tests adaptados sin debilitar (`3855eb0`/`befb0db`); spec de
-  Foundation alineada (**#109**; `headline`/cargos en inglés por decisión editorial
-  — no re-reportarla). **QA visual APROBADA (§XVI)**: gap chevron↔nombre a 375px con el
-  nombre real = **72.84px**, sin solapes ni overflow (informe: `qa-report.md`).
-- **Motion aprobado, NO implementado**: contrato en `specs/motion/proposal.md` (#106); falta aprobar specs/planes/tareas.
-- **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre
-  `lint` → `test` → `build` y no publica si algo falla (#111). Commits `cf28268`/`35dbf2d`.
-- **Pendientes del usuario**: push + verificar Actions y GitHub Pages (base `/cv-agentic/`);
-  aprobar specs motion. (Hallazgo "registrar `motion`" cerrado 2026-11-12: `specs/README.md` `a783d69` + `AGENTS.md` `c04f13d`.)
+- **Entregado — F1–F5 cerradas**; Foundation **reabierta** por el Cambio motion (`Estado: aprobada`, vuelve a `implementada` al cerrar T18): 27/28 `implementada`; suite **456/40**. Recientes: Resume una columna, Experience primero (#114, §XX); favicon app JM + título real (#115, §XXI); saneado de documentación (§XXII–§XXIII).
+- **Mantenimiento 2026-11-11/12 (§XIV–§XIX)**: CV real + 3 testimonios reales (#112/#113) con `assetUrl()`/base (#107); tests adaptados sin debilitar; QA visual aprobada (gap chevron↔nombre 72.84px a 375; `qa-report.md`). `headline`/cargos en inglés en `cv.es.json`: decisión editorial #109, **no re-reportarla**.
+- **Motion etapa 1 (Foundation) en cierre (#106/#116)**: T15 tokens (`c2befd1`, usuario) + T16 `data-theme-switching` (`c0bc995`) + T17 test de contrato (`122a996`) ✅ reviewer. Faltan **T18** (`foundations/motion.md` en manos del usuario + QA reviewer con app servida + build + spec → `implementada`) y los Cambios 2–4 (AppLayout, Sidebar, TestimonialDialog), cada uno con su puerta spec→plan→tareas.
+- **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre `lint` → `test` → `build` y no publica si algo falla (#111). Pages publicado e inspeccionado en vivo (§XXI).
+- **Pendientes del usuario**: **push** (`main` adelantado) y verificar Actions post-push · motion T18 y Cambios 2–4 · deudas de forma (fila "Pendientes post-F5" de diagnostics).
 
 ## Reglas no negociables para cualquier tarea futura
 
 - Fuente de verdad: `docs/constitution.md` > skill `sdd` > spec. **Nadie edita `spec.md`
   sin aprobación explícita del usuario** (`ask`, P2/#75/#94); un cambio de lo que espera un
   test **es** Cambio de spec. `src/test/**`, configs y `src/test/a11y.ts`: intocables.
+- Motion (#116, rige Cambios 2–4): **ninguna `transition` en un selector de especificidad
+  (0,2,0) o mayor** (la supresión global `:root[data-theme-switching] *` gana sin
+  `!important`); el reviewer la verifica en cada Cambio.
 - Flujo futuro: contenido → `integrator` (dueño de `src/content/**`, con
   `validate:content`); cambio en pieza existente → **Cambio** (spec→plan→tasks→código);
   pieza nueva → `/sdd-spec` + `/sdd-plan <cat>/<Name>` (puertas de pieza suelta);
