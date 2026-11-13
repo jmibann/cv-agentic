@@ -38,9 +38,12 @@ Foundation T17).
 ## Reglas
 
 - Transicionar **propiedades concretas**, nunca `transition: all`.
-- **Ninguna `transition` en un selector de especificidad (0,2,0) o mayor**
-  (#116; rige los Cambios motion 2–4 y la verifica el reviewer en cada uno):
-  así la supresión del cambio de tema gana **sin `!important`**.
+- **Regla permanente (#116):** ninguna `transition` que **produzca animación**
+  en un selector de especificidad (0,2,0) o mayor; `transition: none` está
+  **excluido** — es la supresión misma, no una animación. Con esto la
+  supresión del cambio de tema (`:root[data-theme-switching] *`, (0,2,0))
+  gana **sin `!important`** hoy y siempre. La verifica el reviewer en cada
+  entrega/Cambio.
 - No animar `height`, `width` de layout ni `top/left` (salvo el bullet, que es chico
   y aislado). Preferir `transform` y `opacity`. **Única excepción a la altura
   (#106/C3, vigente desde el Cambio 3 del Sidebar):** `grid-template-rows:

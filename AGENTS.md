@@ -106,6 +106,8 @@ reviewer **al cerrar la pieza** y en cada puerta (decisión #80).
   hay cambios de layout (y, si hace falta, tokens, `calc()` de tokens o `0`).
 - Foco: siempre el anillo estándar (`--focus-ring-width` / `--focus-ring-offset`).
 - `z-index` siempre con un token `--z-*`.
+- Motion (#116): ninguna `transition` que anime en selectores (0,2,0)+;
+  `transition: none` excluido (es supresión). Contrato en `foundations/motion.md`.
 - Textos: contenido desde `useCv()` (solo en páginas/AppLayout), interfaz
   desde `useLocale().t`. Nada hardcodeado en componentes.
 - **Unidad de trabajo: una tarea (Tn) de `specs/<cat>/<Name>/tasks.md`** (skill `sdd`).
