@@ -71,7 +71,7 @@ solo en clases (0,1,0) (#116 aclarada: `transition: none` excluido).
     (propuesta §3.4, menor de §XXIV); ningún `@media print` en el módulo
     (RF-10); **auto-check #116 sobre el archivo completo: 0 transiciones que
     animen en (0,2,0)+** (lo replica el reviewer); suite verde.
-- [ ] **T12. Print de contactos en `global.css`.** RF-10/RF-11 (P7')
+- [x] **T12. Print de contactos en `global.css`.** RF-10/RF-11 (P7') — efbe0e1 (feat, único archivo, 50+/10−, hunk único dentro de `@media print`); reviewer APROBADO con tabla de cascada independiente: colapsado en papel → grid base conserva `1fr` efectivo (se quita el `display: block` heredado de #103, justificado), `visibility` heredada, `(1,0,0)` gana al gated (0,3,0)/(0,4,0) → `animation: none` en todo el subárbol (cero ítems `opacity: 0`), `li` defensivo; resto del print byte a byte intacto; #116 aclarada aplicada a los `transition: none`. Menores: body con "separa" (typo no enmendable), selector duplicado deliberado con comentario. Sin tests nuevos = prescripto (#101; Ctrl+P real en T13).
   - Hecho cuando: `feat(Sidebar): T12` solo toca `src/styles/global.css`: dentro
     del `@media print` existente, el bloque §3.5: `#sidebar-contacts`
     (1,0,0)` { visibility: visible; grid-template-rows: 1fr }` (+ el
