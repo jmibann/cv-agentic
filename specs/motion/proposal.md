@@ -1,21 +1,36 @@
-# Sistema de motion — auditoría, propuesta y Cambios en espera
+# Sistema de motion — IMPLEMENTADO (4/4)
 
-**Estado:** propuesta aprobada (#106); **etapa 1 (Foundation) implementada y
-aprobada por el reviewer salvo T18** (puerta Plan+Tareas 2026-11-12 con ajustes
-→ #116); **Cambios 2–4 (AppLayout, Sidebar, TestimonialDialog) en espera**, cada
-uno con su propia puerta spec→plan→tareas. Actualizado 2026-11-13.
-**Fecha:** 2026-11-11.
+**Estado:** sistema de motion **completo e implementado 4/4** (2026-11-13), tras
+su aprobación original (#106, 2026-11-11) y cuatro puertas de Cambio: **1
+Foundation** — escala de tokens, supresión `data-theme-switching`, contrato por
+test y docs de kit (puerta con ajustes → **#116**; cierre §XXIV); **2 AppLayout**
+— entrada de panel con dirección (`src/lib/tabDirection.ts`), `backwards`, print
+en el módulo (§XXV); **3 Sidebar** — expansión de contactos con grid
+`0fr↔1fr`, `data-contacts-animate`, stagger `calc(n × --duration-stagger)`,
+P5' ≥1200 (§XXVI); **4 TestimonialDialog** — entrada con `--ease-enter`
+manteniendo `@starting-style` y cierre instantáneo (§XXVII). **#116 rige como
+regla permanente** (con su aclaración: `transition: none` está excluido — es la
+supresión; textos del kit aplicados en `11b475b`: `foundations/motion.md` +
+`AGENTS.md` → Convenciones).
+**Fecha:** 2026-11-11 (proposición original; el diseño de Fases 0–2 sigue
+ abajo como registro — la implementación pudo afinar detalles de forma, nunca
+ el contrato).
 **Alcance:** Fases 0–2 (diagnóstico, inventario y diseño), borradores de
-specs/planes/tareas de los Cambios y el Cambio de contenido previo.
+specs/planes/tareas de los Cambios y el Cambio de contenido previo — todo
+consumido por las cuatro etapas.
 
-> **Puertas de esta etapa:**
+> **Puertas de esta etapa (histórico, todas pasadas):**
 > 1. No se modifica código ni tests hasta que el usuario apruebe los
->    specs/planes/tareas de cada Cambio. *(Etapa 1: puerta pasada
->    2026-11-12 — `37d9e80`/`ee9e8a2`, #116; T15–T17 aplicadas y aprobadas.)*
+>    specs/planes/tareas de cada Cambio. *(Cuatro puertas: 2026-11-12 y 2026-11-13.)*
 > 2. No se arranca nada hasta que el usuario confirme que resolvió el árbol de
 >    trabajo sucio (`src/utils/assetUrl.ts`, `HexAvatar.tsx`, `Sidebar.tsx`,
->    `vite.config.ts`).
-> 3. El **Cambio de contenido** va antes que los Cambios de motion.
+>    `vite.config.ts`). *(Resuelto en `c2d4232`/`5f6c0a6`.)*
+> 3. El **Cambio de contenido** va antes que los Cambios de motion. *(Hecho:
+>    #108/#109, `63f6665`/`befb0db`; §XIV–§XVI.)*
+
+*Nota de mantenimiento (T5): las citas de líneas de la matriz §2.4 reflejan el
+archivo al redactarse la propuesta; tras `1d2aba8` de TestimonialDialog,
+`:83-85`/`:194` son `:84-86`/`:195`. Citación histórica, no defecto.*
 
 Base: inspección estática del reviewer con contexto limpio sobre `654f26e`,
 verificada por el orchestrator en los archivos citados.
