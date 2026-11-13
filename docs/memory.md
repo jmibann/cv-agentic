@@ -2,13 +2,13 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XXIII) y `docs/README.md` (#1–#116).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XXV) y `docs/README.md` (#1–#116).
 
 ## Estado actual (2026-11-13)
 
-- **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **456/40**. Recientes: Resume una columna (#114, §XX); favicon app JM + título real (#115, §XXI); saneado de documentación (§XXII–§XXIII); **motion etapa 1 cerrada** — Foundation T15–T18 (§XXIV).
+- **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **463/41**. Recientes: saneado de documentación (§XXII–§XXIII); **motion cambios 1 y 2 cerrados** — Foundation T15–T18 (§XXIV) y AppLayout entrada de panel T10–T13 (§XXV).
 - **Mantenimiento 2026-11-11/12 (§XIV–§XIX)**: CV real + 3 testimonios reales (#112/#113) con `assetUrl()`/base (#107); tests adaptados sin debilitar; QA visual aprobada (gap chevron↔nombre 72.84px a 375; `qa-report.md`). `headline`/cargos en inglés en `cv.es.json`: decisión editorial #109, **no re-reportarla**.
-- **Motion: etapa 1 (Foundation) CERRADA** (#106/#116, §XXIV): tokens, `data-theme-switching`, contrato y `foundations/motion.md` aprobados con QA en vivo. Faltan los **Cambios 2–4** (tabs B AppLayout, grid del Sidebar, TestimonialDialog), cada uno con su puerta spec→plan→tareas; arrancan con los menores anotados en la fila Motion de **Abiertos** (diagnostics).
+- **Motion: cambios 1 (Foundation) y 2 (AppLayout) CERRADOS** (#106/#116, §XXIV–§XXV). Faltan **grid del Sidebar (3)** y **TestimonialDialog (4)**, cada uno con su puerta spec→plan→tareas; arrancan con los menores anotados en la fila Motion de **Abiertos** (stagger `calc(n × --duration-stagger)`, `Sidebar.module.css:386`, `TestimonialDialog.module.css:79`, confirmaciones manuales reduced-motion/Ctrl+P).
 - **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre `lint` → `test` → `build` y no publica si algo falla (#111). Pages publicado e inspeccionado en vivo (§XXI).
 - **Pendientes del usuario**: **push** (`main` adelantado) y verificar Actions post-push · abrir los Cambios motion 2–4 · deudas de forma (fila "Pendientes post-F5" de diagnostics).
 
