@@ -77,7 +77,7 @@ import type { CvData, Locale } from "@data/cv.types.generated";
 ## Alcance
 
 - **Paneles**: About (presentación, servicios, testimonios) y Resume
-  (Education, Experience, Skills en chips).
+  (Experience, Projects, Education, Skills en chips).
 - **Estructura**: Sidebar (identidad, redes, contactos, Download CV), NavTabs
   (tablist en solapa, siempre visible), ControlsBar (tema + idioma).
 - **Fuera**: ver `docs/DESIGN.md` → "Fuera de alcance".

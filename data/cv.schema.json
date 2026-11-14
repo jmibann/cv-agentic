@@ -320,12 +320,12 @@
         "title": {
           "type": "string",
           "minLength": 1,
-          "description": "Carrera (Education) o puesto (Experience)."
+          "description": "Carrera (Education), puesto (Experience) o nombre del proyecto (Projects)."
         },
         "organization": {
           "type": "string",
           "minLength": 1,
-          "description": "Institución o empresa."
+          "description": "Institución, empresa o, en Projects, el contexto del proyecto."
         },
         "start": {
           "$ref": "#/definitions/YearMonth"

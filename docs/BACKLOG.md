@@ -6,27 +6,12 @@ postergados** para el loop de mantenimiento. Ninguno bloquea el sitio. Cada íte
 necesita decisión del usuario antes de implementarse (flujo por tipo de tarea:
 "Modo mantenimiento" en `docs/agent-system.md`).
 
-## Primer mantenimiento (recomendado al tomar el control)
-
-- **Push** de las ~57+ commits locales (`git push`).
-- **Contenido real**: reemplazar `cv.example.*` por el CV real (textos, avatar,
-  testimonios con permiso de sus autores) → `npm run validate:content` + suite.
-  Con el nombre definitivo: **re-observar 375px es/en** el gap chevron↔nombre
-  (23px medidos con "Alex Rivera"; fila "Pendientes post-F5" de diagnostics).
-- **Opcional**: `profile.downloadCvUrl` (activa el CTA y ejercita la regla print
-  `aside [download]`, hoy latente); un pase de deudas de forma registrado en
-  Abiertos (comentario inglés `useHashTab.test.ts:143`, jerga "asiértan", F1/F2).
-
 ## Pendientes de contenido
 
-- **Download CV / PDF.** El PDF existe pero su integración se resuelve en una
-  etapa futura. Hoy la spec condiciona el botón a `profile.downloadCvUrl`
-  (si falta, no se muestra). Decidir:
-  - ¿Un PDF por idioma? (probable: `downloadCvUrl` en cada `cv.<locale>.json`,
-    que pasa a ser campo traducible).
-  - Ubicación (`public/cv/…`), nombre de archivo, tamaño, y si abre en pestaña
-    nueva o descarga.
-- **Contenido real** → ver "Primer mantenimiento" (arriba).
+- **Download CV / PDF.** ✅ Integrado: `profile.downloadCvUrl` apunta a
+  `public/cv/Juan-Manuel-Ibanez-CV.pdf` y el botón del Sidebar lo descarga.
+  Queda abierto: ¿un PDF por idioma? (`downloadCvUrl` distinto en cada
+  `cv.<locale>.json`, que pasaría a ser campo traducible).
 - **Imágenes.** Formato (`.webp`/`.avif`), tamaños para `srcset` del avatar y
   de los testimonios.
 
@@ -53,7 +38,8 @@ necesita decisión del usuario antes de implementarse (flujo por tipo de tarea:
   `docs/README.md` y §XXVIII de `docs/diagnostics.md`). El favicon ya quedó
   resuelto en F5: `public/favicon.svg` + `<link rel="icon">` (`b93c510`,
   decisión #105a).
-- **Deploy.** Plataforma (Netlify, Vercel, GitHub Pages…), dominio, CI.
+- **Deploy.** ✅ Resuelto: GitHub Pages con CI (`lint` → `test` → `build`,
+  Node 26; #107, #110, #111). Queda abierto solo un dominio propio.
 - **Test de contraste automatizado.** axe en jsdom no mide
   contraste; evaluar Playwright + axe en navegador real para QA automático
   en ambos temas.

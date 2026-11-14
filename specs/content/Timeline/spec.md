@@ -3,7 +3,7 @@ Estado: implementada
 
 ## Propósito
 
-Lista cronológica vertical para Education y Experience: línea fina a la
+Lista cronológica vertical para Experience, Projects y Education: línea fina a la
 izquierda, un punto de acento por ítem, título, período y descripción.
 
 ## Requisitos (EARS)

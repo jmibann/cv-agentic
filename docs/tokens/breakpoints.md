@@ -8,7 +8,7 @@ Mobile-first. Los estilos base son para el viewport más chico y cada `@media`
 |---|---|---|---|
 | base | — | < 580px (teléfonos) | Una columna, tipografía mobile, `--box-padding` 0.9375rem |
 | `sm` | `(min-width: 580px)` | teléfonos grandes | Tipografía desktop, `--box-padding` 1.5rem |
-| `md` | `(min-width: 768px)` | tablet vertical | `--box-padding` 1.875rem, Education/Experience lado a lado, 2 testimonios por vista, contactos del sidebar en 2 columnas |
+| `md` | `(min-width: 768px)` | tablet vertical | `--box-padding` 1.875rem, 2 testimonios por vista, contactos del sidebar en 2 columnas |
 | `lg` | `(min-width: 992px)` | tablet horizontal / laptop chica | NavTabs tamaño completo con el `h1` en la misma franja, ServiceCards en 2 columnas |
 | `xl` | `(min-width: 1200px)` | desktop | Sidebar vertical fijo a la izquierda (3/12), contenido 9/12, avatar sobresale, contactos siempre visibles, `--gutter-top` 10rem |
 

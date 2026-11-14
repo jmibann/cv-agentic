@@ -136,11 +136,11 @@ export interface Service {
 export interface TimelineEntry {
   id: Id;
   /**
-   * Carrera (Education) o puesto (Experience).
+   * Carrera (Education), puesto (Experience) o nombre del proyecto (Projects).
    */
   title: string;
   /**
-   * Institución o empresa.
+   * Institución, empresa o, en Projects, el contexto del proyecto.
    */
   organization: string;
   start: YearMonth;

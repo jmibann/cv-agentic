@@ -68,7 +68,7 @@ documento es:
 
 ```
 h1  título de página (uno por tabpanel)
-└─ h2  sección (Services, Testimonials, Education, Experience, Skills)
+└─ h2  sección (Services, Testimonials, Experience, Projects, Education, Skills)
    └─ h3  ítem (ServiceCard, TimelineItem, TestimonialCard)
 ```
 

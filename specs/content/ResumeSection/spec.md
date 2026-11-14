@@ -3,7 +3,7 @@ Estado: implementada
 
 ## Propósito
 
-Bloque "Education" o "Experience" del panel Resume: título h2 con IconBox +
+Bloque "Experience", "Projects" o "Education" del panel Resume: título h2 con IconBox +
 Timeline.
 
 ## Requisitos (EARS)
@@ -48,7 +48,7 @@ export interface ResumeSectionProps {
 
 - `display: flex; flex-direction: column;`
 - El h2 usa `margin-bottom` del SectionTitle; entre título y timeline no se agrega más.
-- La disposición en columnas (lado a lado ≥ md) la hace **ResumePage**, no este componente.
+- La disposición de las secciones (una sola columna, apiladas; #114) la hace **ResumePage**, no este componente.
 
 ## Estados
 

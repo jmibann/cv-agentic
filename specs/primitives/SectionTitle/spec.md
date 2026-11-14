@@ -12,7 +12,7 @@ título → contenido es siempre el mismo y no depende de quién lo use. Valores
 h1 decorado `var(--title-decorated-gap)`; h2 `1.25rem`; h3 `0.5rem` (ver
 `foundations/typography.md` → "Márgenes de títulos"). Ningún otro margen.
 
-**with icon**: h2 de sección con `IconBox` a la izquierda ("Education", "Experience").
+**with icon**: h2 de sección con `IconBox` a la izquierda ("Experience", "Projects", "Education").
 
 ## Requisitos (EARS)
 
