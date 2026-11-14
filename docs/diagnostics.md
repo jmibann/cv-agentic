@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-14** (Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
+Última actualización: **2026-11-14** (Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#117 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#118 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -47,6 +47,13 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### §XXIX · 2026-11-14 — Cambio #118: colección `projects` y sección Projects en Resume
+- Qué: el proyecto `cv-agentic` sale de `experience` y pasa a `projects` (obligatorio en el esquema, `TimelineEntry`); Resume muestra Experience → Projects → Education → Skills, con ícono `code`. Foundation T20 + ResumePage T6, hechas por Claude Code a pedido del usuario.
+- Checks: lint · typecheck · test (479/41) · build · validate:content; navegador (sección visible, sin errores de consola).
+- Decisiones: #118 → `docs/README.md` (tres aserciones existentes del test de ResumePage cambiadas, autorizadas ahí).
+- Commits: `b005014` (spec) · `4c63dc3`+`9b0f0f8` → `4ae17a1` (T20) · `a48ddef` → `fc50777` (T6).
+- Abre: —; cierra: —.
+
 ### §XXVIII · 2026-11-14 — Cierre del Cambio #117 (Foundation: metadatos SEO y para compartir)
 - Qué: Cambio completo sobre la pieza Foundation, la primera vez que se reabrió una pieza tras F5 por un pedido nuevo (no por defecto): metadatos en `index.html` — `<meta>` (description, og×5, twitter) después del `<title>` y antes del anti-flash; `<link rel="canonical">` y JSON-LD `Person` después del bloque de íconos (contrato T4 respetado); literales fijados por el usuario en la puerta de spec; JSON-LD cruzado con `cv.en.json` (`name`/`jobTitle`/`sameAs`) y con identidad `url` ≡ canonical ≡ `og:url`; `public/og-image.png` 1200×630 aportada por el usuario, entró intacta al `feat` (no se regeneró). Flujo completo con las cuatro puertas: spec reaprobada con ajustes (estado en línea propia + conteo 5+1 como test + registro #117 adelantado al commit de spec) `472bc1d` · plan+tareas aprobados `a75e7fa` · T19: `test` rojo por (a)–(e) con el PNG nacido en verde (#101 declarado) `0025a21` → `feat` `f17cd78`; reviewer **APROBADO** por tarea y revisión completa del Cambio (QA sobre `dist/index.html`: literales y orden intactos, Vite no reescribió; `dist/og-image.png` presente — byte-a-byte verificado por tamaño + semántica de copia de Vite; 0 caracteres CJK en el repo, pedido explícito del usuario). Foundation → `Estado: implementada` otra vez. Menor registrada: `<script>` anti-flash en columna 0 (deuda preexistente de T4, si el archivo vuelve a tocarse). Nota de proceso: al reviewer le llegó una consigna del orchestrator con un carácter CJK propio ("no修改 nothing"), declarada y ajena a la entrega — cuidado futuro al redactar encargos.
 - Checks: lint ✓ · typecheck ✓ · test **472/41** (+6 contratos de #117) ✓ · build ✓ (prebuild + validate:content incluidos).
@@ -61,12 +68,7 @@ de la entrada); el detalle queda en git.
 - Commits: `febce50` `e72b964` `1d2aba8` `80a5301` `11b475b` (usuario) + `a8e1ff9` (specs) y el docs de este cierre.
 - Abre: nada. Cierra: la **fila Motion de Abiertos** (el sistema queda completo; los opcionales de forma viven en sus filas).
 
-### §XXVI · 2026-11-13 — Cierre del Cambio motion 3 (Sidebar, expansión de contactos)
-- Qué: Cambio completo sobre Sidebar: spec reabierta y aprobada en 3 rondas (`4313f3d`, con la **enmienda de #116** escrita en su fila de `docs/README.md`: la regla refiere a `transition` que puedan *producir animación*; `transition: none` excluido) + plan/tareas (`8a89a5f`; ajustes del usuario: T12 feat-only, `data-contacts-animate` refleja `expanded` sin estado extra, reescritura C9 del Selector a descendiente —una línea, 4 usos intactos—, test 13 por clase y no `toBeVisible()`). Ejecución: T9+T9b (`c5617e0`/`2db9975`, reubicación del cierre axe ordenada por el reviewer), T10 (`5162e2e` wrapper + atributo), T11 (`4e80fb3` grid 0fr/1fr + stagger gated `backwards` + P5' con clase simple ≥1200), T12 (`efbe0e1` print en `global.css`: se quema el `display: block` heredado de #103 — el grid base del módulo lo hace inerte — y resets (1,0,0)); todas APROBADAS por tarea + revisión completa. QA en vivo: expansión 310 ms + stagger ~290 ms (mid-flight verificó `backwards`), repliegue 224 ms con `visibility` diferido, cargas 900/1400 sin animación, cruce de media sin animar, reinicio al reexpandir, clics rápidos, colapsado fuera de foco/árbol medido. **Ctrl+P con el bloque colapsado aprobado por el usuario.** Sidebar → `implementada` (28/28). Pendientes del usuario: commitear el C3 de `foundations/motion.md` (redactado y entregado) y confirmar reduced-motion con flag real (por inspección P6' cerrada).
-- Checks: lint ✓ · typecheck ✓ · test **466/41** ✓ · build ✓ (prebuild + validate:content incluidos).
-- Decisiones: ninguna nueva (enmienda registrada en la fila #116).
-- Commits: `4313f3d` `8a89a5f` `c5617e0` `2db9975` `5162e2e` `4e80fb3` `efbe0e1` + las marcas de tareas.
-- Abre: los 2 pendientes del usuario (fila Motion de **Abiertos**). Cierra: el Cambio motion 3; queda solo el 4 (TestimonialDialog).
+### 2026-11-13 · §XXVI — Cierre del Cambio motion 3 (Sidebar, expansión de contactos) · — · `git show 5ac25ff:docs/diagnostics.md`
 
 ### 2026-11-13 · §XXV — Cierre del Cambio motion 2 (AppLayout, entrada de panel) · — · `git show de5f32a:docs/diagnostics.md`
 
