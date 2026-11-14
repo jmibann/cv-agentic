@@ -4,7 +4,7 @@ Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-11-13)
+## Estado actual (2026-11-14)
 
 | Qué | Estado |
 |---|---|
@@ -34,7 +34,8 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **Resume en una columna (2026-11-12)** | ✅ Experience arriba y Education debajo, cada una con su timeline a ancho completo, en todos los anchos (**#114**, ResumePage T5; antes iban lado a lado desde 768px). Orden invertido en el DOM para que lectura y foco sigan el visual. Commits `28e6ecf` `1c16bf5` `174bc4e`; detalle §XX. |
 | **Favicon y título (2026-11-12)** | ✅ Favicon tipo app (cuadrado azul, hexágono blanco y monograma JM), `apple-touch-icon.png` 180×180 y título de pestaña `Juan Manuel Ibáñez · Frontend Engineer` (**#115**, Foundation T14). Commits `a0d7b5f` `3b4db39` `516621a` `9ebcca4`; detalle §XXI. |
 | **Motion (2026-11-13)** | ✅ **SISTEMA COMPLETO 4/4** (#106/#116, §XXIV–§XXVII; propuesta marcada "IMPLEMENTADO"): 1 Foundation — escala de tokens, `data-theme-switching`, contrato y docs (`motion.md` C3 `5edfcb0`); 2 AppLayout — entrada de panel con dirección (`getTabDirection` pura, `key`, `backwards`, print en el módulo); 3 Sidebar — expansión grid `0fr↔1fr` (`data-contacts-animate`, stagger `calc`, P5' ≥1200, print id en `global.css`; Ctrl+P colapsado ✓ usuario); 4 TestimonialDialog — entrada `--ease-enter` con `@starting-style`, **cierre instantáneo medido en los 3 caminos**, hover close conserva standard (Ctrl+P dialog abierto ✓ usuario). Suite **466/41**, **28/28 `implementada`**, build ✓. **#116 es regla permanente** (`foundations/motion.md` + `AGENTS.md` → Convenciones, `11b475b`; aclaración `transition: none` excluido en `docs/README.md`). |
-| Post-entrega / próximos trabajos (2026-11-13) | Push de los commits locales (lo hacés vos; `main` adelantado con `11b475b` + el cierre) · ~~abrir el Cambio motion 4~~ **CERRADO — sistema motion completo 4/4** · ~~aclaración #116 en motion.md~~ **permanente** (`11b475b`) · ~~Ctrl+P / reduced-motion~~ **probados por el usuario ✓** · deploy publicado e inspeccionado en vivo (§XXI, #115/T14c) · quedan solo opcionales: deudas de forma, StrictMode/F1-F2 y el combo de 450 px de ControlsBar (filas propias de **Abiertos**) · ~~seguimientos de F2~~ **cerrados** (F3–F5: combo Button por cascada en `Button.module.css`; `--button-small-padding-*` tokens desde #99) |
+| **Metadatos SEO y Open Graph (2026-11-14)** | ✅ **Cambio #117 CERRADO** en Foundation (única tarea T19): `meta description`, canonical, Open Graph (5), `twitter:card`, JSON-LD `Person` cruzado con `cv.en.json` e identidad canonical≡`og:url`≡`url`, `public/og-image.png` 1200×630 intacta; colocación respetando el contrato T4 del anti-flash. Tests de contrato +6 en `anti-flash.test.ts`; QA del reviewer sobre `dist/` ✓. Commits `472bc1d` `a75e7fa` `0025a21` `f17cd78` `00a8268`; suite **472/41**, build ✓; detalle §XXVIII. Resuelve `docs/BACKLOG.md` → "Metadatos y Open Graph"; **"SEO por idioma" queda abierto** (metadatos solo en inglés, sin `hreflang` ni `og:locale`). |
+| Post-entrega / próximos trabajos (2026-11-13) | Push de los commits locales (lo hacés vos; `main` adelantado con `11b475b` + los docs de #117 y su cierre) · ~~abrir el Cambio motion 4~~ **CERRADO — sistema motion completo 4/4** · ~~aclaración #116 en motion.md~~ **permanente** (`11b475b`) · ~~Ctrl+P / reduced-motion~~ **probados por el usuario ✓** · ~~metadatos/Open Graph~~ **#117 CERRADO (2026-11-14)** · deploy publicado e inspeccionado en vivo (§XXI, #115/T14c) · quedan solo opcionales: deudas de forma (incl. columna 0 del `<script>` anti-flash, §XXVIII), StrictMode/F1-F2 y el combo de 450 px de ControlsBar (filas propias de **Abiertos**) · ~~seguimientos de F2~~ **cerrados** (F3–F5: combo Button por cascada en `Button.module.css`; `--button-small-padding-*` tokens desde #99) |
 
 Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
 
@@ -56,10 +57,10 @@ cv-agentic/
 
 ## Mantenimiento (modo actual — desde 2026-10-08)
 
-El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (466 tests,
+El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (472 tests,
 build, validate:content, QA en navegador y en papel; últimos trabajos:
-bug-fix ControlsBar T4, base de deploy para GitHub Pages y CV real, 2026-11-11;
-Node 26 LTS y quality gates en el deploy, 2026-11-12).
+Node 26 LTS y quality gates en el deploy, 2026-11-12; motion 4/4, 2026-11-13;
+metadatos SEO y Open Graph #117, 2026-11-14).
 Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 `.opencode/agents/`:
 
@@ -69,7 +70,7 @@ Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 | Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
 | Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
 | Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
-| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#116: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
+| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#117: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
 Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
 (P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;

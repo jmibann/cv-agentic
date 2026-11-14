@@ -1,9 +1,10 @@
 # Foundation
-Estado: aprobada
+Estado: implementada
 
 *Nota del Cambio #117 (2026-11-14): metadatos SEO y para compartir en
-`index.html` (RF-11…RF-14, tarea T19 en curso). El `Estado` vuelve a
-`implementada` al cerrar T19 con la aprobación del usuario.*
+`index.html` (RF-11…RF-14) — **cerrado**: T19 aprobada por el reviewer y por
+el usuario (tests `0025a21` + feat `f17cd78`; QA sobre `dist/` ✓). El
+`Estado` volvió a `implementada`.*
 
 Pieza de F1 (decisión #84): deja la app lista para que F2–F4 construyan
 componentes con TDD. El alcance está derivado **solo** de

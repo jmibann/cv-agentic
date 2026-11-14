@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-13** (sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
+Última actualización: **2026-11-14** (Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#116 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#117 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -41,11 +41,18 @@ de la entrada); el detalle queda en git.
 
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
-| Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
+| Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota), `<script>` anti-flash en columna 0 en `index.html` (preexistente de T4, menor de §XXVIII) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XXVIII · 2026-11-14 — Cierre del Cambio #117 (Foundation: metadatos SEO y para compartir)
+- Qué: Cambio completo sobre la pieza Foundation, la primera vez que se reabrió una pieza tras F5 por un pedido nuevo (no por defecto): metadatos en `index.html` — `<meta>` (description, og×5, twitter) después del `<title>` y antes del anti-flash; `<link rel="canonical">` y JSON-LD `Person` después del bloque de íconos (contrato T4 respetado); literales fijados por el usuario en la puerta de spec; JSON-LD cruzado con `cv.en.json` (`name`/`jobTitle`/`sameAs`) y con identidad `url` ≡ canonical ≡ `og:url`; `public/og-image.png` 1200×630 aportada por el usuario, entró intacta al `feat` (no se regeneró). Flujo completo con las cuatro puertas: spec reaprobada con ajustes (estado en línea propia + conteo 5+1 como test + registro #117 adelantado al commit de spec) `472bc1d` · plan+tareas aprobados `a75e7fa` · T19: `test` rojo por (a)–(e) con el PNG nacido en verde (#101 declarado) `0025a21` → `feat` `f17cd78`; reviewer **APROBADO** por tarea y revisión completa del Cambio (QA sobre `dist/index.html`: literales y orden intactos, Vite no reescribió; `dist/og-image.png` presente — byte-a-byte verificado por tamaño + semántica de copia de Vite; 0 caracteres CJK en el repo, pedido explícito del usuario). Foundation → `Estado: implementada` otra vez. Menor registrada: `<script>` anti-flash en columna 0 (deuda preexistente de T4, si el archivo vuelve a tocarse). Nota de proceso: al reviewer le llegó una consigna del orchestrator con un carácter CJK propio ("no修改 nothing"), declarada y ajena a la entrega — cuidado futuro al redactar encargos.
+- Checks: lint ✓ · typecheck ✓ · test **472/41** (+6 contratos de #117) ✓ · build ✓ (prebuild + validate:content incluidos).
+- Decisiones: #117 → `docs/README.md`.
+- Commits: `472bc1d` `a75e7fa` `0025a21` `f17cd78` `00a8268` + el docs de este cierre.
+- Abre: nada. Cierra: **BACKLOG → "Metadatos y Open Graph"** (resuelto; "SEO por idioma" queda abierto; ninguna fila de la tabla **Abiertos** se veía afectada).
 
 ### §XXVII · 2026-11-13 — Cierre del Cambio motion 4 y del sistema motion (4/4)
 - Qué: último Cambio, TestimonialDialog: fila "Entrada" de la spec `--ease-standard`→`--ease-enter` (la historia quedó solo en el anexo del plan, ajuste de redacción del usuario) y plan/tareas aprobados (`febce50`/`e72b964`). T4 (`1d2aba8`, feat único, verde-only #101 bien declarado: sin discriminator jsdom sobre la curva; hunk único; close hover conserva standard — ítem 10 de la matriz) APROBADA. T5: QA en vivo — entrada 200 ms con `cubic-bezier(0.22,1,0.36,1)` y frame inicial `scale(0.96)` vía `@starting-style` (sin overshoot), **cierre instantáneo en los 3 caminos** (Close/Esc/backdrop real; 0 `transitionrun`, `getAnimations()=[]`; 6 runs = 2×3 aperturas, 0 cancels), backdrop/scroll/bloqueo de fondo sin regresión, print `display:none` presente, reapertura reinicia; pieza 15/15 con cierre axe. Usuario: **Ctrl+P con el dialog abierto OK** y aplicó los **dos textos permanentes de #116** (`11b475b`: viñeta en `foundations/motion.md` + regla corta en `AGENTS.md` → Convenciones). TestimonialDialog → `implementada` (**28/28**); **propuesta reescrita a 4/4** (cabecera con las cuatro puertas §XXIV–§XXVII + #116 permanente; nota de las citas +1 línea). Sistema motion **COMPLETO**.

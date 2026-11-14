@@ -41,12 +41,18 @@ necesita decisión del usuario antes de implementarse (flujo por tipo de tarea:
   exacta contra el SVG actual del kit de prensa de LinkedIn
   (`https://brand.linkedin.com/downloads` — el entorno de los agentes no tiene
   red) y revisar sus guías de uso del logo para enlazar a un perfil propio.
-- **SEO por idioma.** Hoy el idioma no está en la URL (`/es/…`) y hay un solo
-  `<title>`/meta description. Si importa el SEO en español: rutas por idioma,
+- **SEO por idioma.** (**Abierto**, 2026-11-14.) Hoy el idioma no está en la
+  URL (`/es/…`) y los metadatos —un solo `<title>`/description, #117— existen
+  solo en inglés. Si importa el SEO en español: rutas por idioma,
   `hreflang`, metadatos por idioma y posiblemente prerender.
-- **Metadatos y Open Graph.** Título, descripción e imagen para compartir siguen
-  pendientes (un solo `<title>`/description). El favicon ya quedó resuelto en
-  F5: `public/favicon.svg` + `<link rel="icon">` (`b93c510`, decisión #105a).
+- **Metadatos y Open Graph.** ✅ **Resuelto (2026-11-14, decisión #117,
+  Foundation T19):** `meta description`, canonical, Open Graph (5 etiquetas),
+  `twitter:card`, JSON-LD `Person` (cruzado con `cv.en.json`) y
+  `public/og-image.png` 1200×630 en `index.html`, en inglés y con URLs
+  absolutas fijas al deploy de GitHub Pages (detalle: fila #117 de
+  `docs/README.md` y §XXVIII de `docs/diagnostics.md`). El favicon ya quedó
+  resuelto en F5: `public/favicon.svg` + `<link rel="icon">` (`b93c510`,
+  decisión #105a).
 - **Deploy.** Plataforma (Netlify, Vercel, GitHub Pages…), dominio, CI.
 - **Test de contraste automatizado.** axe en jsdom no mide
   contraste; evaluar Playwright + axe en navegador real para QA automático

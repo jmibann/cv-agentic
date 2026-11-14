@@ -2,15 +2,15 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XXVII) y `docs/README.md` (#1–#116, con la enmienda de #116: `transition: none` excluido).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XXVIII) y `docs/README.md` (#1–#117, con la enmienda de #116: `transition: none` excluido).
 
-## Estado actual (2026-11-13)
+## Estado actual (2026-11-14)
 
-- **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **466/41**. Recientes: **sistema motion COMPLETO 4/4** (#106/#116, §XXIV–§XXVII: Foundation, AppLayout, Sidebar, TestimonialDialog; Ctrl+P ✓ en ambos escenarios); C3 y textos permanentes de #116 en el kit (`5edfcb0`/`11b475b`).
+- **Entregado — F1–F5 cerradas**; **28/28 `implementada`**; suite **472/41**. Recientes: **Cambio #117 CERRADO** (§XXVIII: metadatos SEO/OG + JSON-LD + `og-image.png` en `index.html` — Foundation reabierta y vuelta a `implementada`; primera reapertura por pedido nuevo, el flujo de Cambio funcionó completo); **sistema motion COMPLETO 4/4** (#106/#116, §XXIV–§XXVII).
 - **Mantenimiento 2026-11-11/12 (§XIV–§XIX)**: CV real + 3 testimonios reales (#112/#113) con `assetUrl()`/base (#107); tests adaptados sin debilitar; QA visual aprobada (gap chevron↔nombre 72.84px a 375; `qa-report.md`). `headline`/cargos en inglés en `cv.es.json`: decisión editorial #109, **no re-reportarla**.
 - **Motion: CERRADO 4/4** (§XXIV–§XXVII; propuesta marcada "IMPLEMENTADO"). #116 rige como **regla permanente** (`foundations/motion.md` + `AGENTS.md` → Convenciones, `11b475b`; aclaración: `transition: none` excluido). Sin pendientes del sistema; QA live cerró dialog: 200 ms `ease-enter`, cierre 0 eventos ×3 caminos.
 - **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre `lint` → `test` → `build` y no publica si algo falla (#111). Pages publicado e inspeccionado en vivo (§XXI).
-- **Pendientes**: push de `11b475b` + el cierre (`a8e1ff9` + docs de este pase) · opcionales: deudas de forma, StrictMode/F1-F2 (filas propias de **Abiertos**). El motion y sus confirmaciones manuales (Ctrl+P, reduced-motion) quedaron **cerrados**.
+- **Pendientes**: push de los commits locales (desde `11b475b` hasta el docs de este cierre #117; lo hacés vos) · opcionales: deudas de forma —incluida la **nueva**: `<script>` anti-flash en columna 0 en `index.html`, preexistente de T4—, StrictMode/F1-F2 (filas propias de **Abiertos**). El motion y sus confirmaciones manuales (Ctrl+P, reduced-motion) quedaron **cerrados**.
 
 ## Reglas no negociables para cualquier tarea futura
 

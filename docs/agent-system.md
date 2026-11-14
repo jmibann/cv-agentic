@@ -116,12 +116,12 @@ El orden y las dependencias de los componentes están en
 F1–F5 cerradas (ver §XII en `docs/diagnostics.md` y `docs/qa-report.md`). No
 quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
 con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`. Trabajo abierto al
-2026-11-12: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109),
+2026-11-14: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109),
 **QA visual aprobada** (§XVI) y **CI** (§XVII: Node 26 LTS desde `.nvmrc`, #110;
-`lint` → `test` → `build` antes de publicar, #111) y **testimonios reales** (§XVIII–§XIX, #112–#113) , **Resume en una columna** (§XX, #114) y **favicon + título** (§XXI, #115) cerrados; queda el push/deploy, el
+`lint` → `test` → `build` antes de publicar, #111) y **testimonios reales** (§XVIII–§XIX, #112–#113) , **Resume en una columna** (§XX, #114) y **favicon + título** (§XXI, #115) cerrados; **motion COMPLETO 4/4** (§XXIV–§XXVII, #106/#116 — #116 es regla permanente en `foundations/motion.md` y `AGENTS.md`) y **metadatos SEO y Open Graph** (§XXVIII, #117: primera reapertura de una pieza cerrada por un pedido nuevo — spec→plan→T19→QA sobre `dist/`—) también cerrados; quedan el push, el
 registro de la categoría `motion` (último hallazgo de auditoría — **lo resuelve el
-usuario, sin ampliar permisos de los agentes**) y el **motion**, aprobado pero sin
-implementar (`specs/motion/proposal.md`; tabla **Abiertos** de diagnostics).
+usuario, sin ampliar permisos de los agentes**) y lo pendiente del BACKLOG
+("SEO por idioma", download/imagen, contraste automatizado…).
 El workflow `.github/workflows/deploy.yml` lo mantiene el usuario (ningún agente lo
 edita). Tareas futuras:
 
