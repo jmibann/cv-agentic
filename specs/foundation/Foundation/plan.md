@@ -181,3 +181,81 @@ delegación: una tarea = `test(Foundation): Tn` (rojo) + `feat(Foundation): Tn`
   `npm run build` verde + aprobación del usuario → `Estado: implementada`.
 - Commits de código: `test/feat/fix(Foundation): Tn` (T16), `test(Foundation):
   T17`; T15/T18 los commitea el usuario.
+
+---
+
+# Plan del Cambio #117 — Metadatos SEO y para compartir
+
+Aprobado por el usuario el 2026-11-14 en la puerta de Plan+Tareas (spec
+reaprobada en `472bc1d`). Base: decisión #117 (`docs/README.md`) y sus seis
+condiciones.
+Unidad de delegación: una tarea = `test(Foundation): T19` (rojo) +
+`feat(Foundation): T19` (#73/#101).
+
+## Archivos del Cambio (agrupados por tarea)
+
+| Tarea | Archivos | Responsabilidad | Dueño |
+|---|---|---|---|
+| T19 | `index.html` · `src/test/anti-flash.test.ts` · `public/og-image.png` | RF-11…RF-14: los nueve bloques de metadatos con los literales de la tabla de la spec y la colocación aprobada; los tests de contrato se agregan a `anti-flash.test.ts` (solo agrega); el PNG del usuario entra **intacto** en el `feat` (no se regenera) | `foundation` |
+
+## Decisiones del Cambio (con alternativa descartada)
+
+1. **Colocación (aprobada en la puerta de spec):** los `<meta>` (description,
+   og, twitter) después del `<title>` y **antes** del anti-flash — un `<meta>`
+   no es `<link>` ni `<script src>`, el contrato T4 no se viola y el orden
+   estándar es title→description→OG→twitter —; `<link rel="canonical">` y el
+   JSON-LD después del bloque de íconos, antes de `</head>`. *Descartado:*
+   todo al final del `<head>` (uniforme, pero separa `og:title` del `<title>`
+   con el script en el medio). *Descartado también:* canonical antes del
+   anti-flash (viola T4, `anti-flash.test.ts:123`).
+2. **URLs literales absolutas del deploy de GitHub Pages, fijadas en el HTML**
+   (condición 3 de #117; Vite no las reescribe en `index.html`). *Descartado:*
+   derivarlas de `import.meta.env.BASE_URL` o `assetUrl()` (son runtime; el
+   HTML de metadatos es estático y `og:*` exige URL absoluta).
+3. **El test cruza el JSON-LD con `src/content/cv.en.json` leído con `fs`**
+   (`name`/`jobTitle`/`sameAs`) **comparándolo parseado** (`JSON.parse` +
+   `toEqual` contra el objeto de seis claves exactas; el formato del bloque no
+   es contrato): si el contenido cambia y el JSON-LD no lo sigue, el desfase
+   se detecta acá. Además identidad `url` del JSON-LD ≡ `href` del canonical
+   ≡ `og:url` (si algún día cambia el dominio, no queda una etiqueta sin
+   actualizar). *Descartado:* solo literales duplicados sin cruce (el desfase
+   pasaría desapercibido). *Descartado también:* importar `cv.en.json` vía
+   módulo (aquí rigen los contratos entre documentos del plan base, decisión
+   7; `no-restricted-imports` de React/DOM no aplica: es un test `fs`).
+4. **Sede de los tests: `src/test/anti-flash.test.ts`** (extensión, solo
+   agrega). *Descartado:* archivo nuevo (dos sedes de contrato para el mismo
+   `index.html`; el de T4 ya lee el archivo y tiene los helpers `capture` /
+   `readRepoFile` y la lección T14b de la ruta en variable).
+5. **Conteo de etiquetas como aserción separada** (exactamente 5
+   `meta[property^="og:"]` y 1 `meta[name^="twitter:"]`): cubre el pasaje
+   "ninguna otra etiqueta fuera de la lista" de RF-11 (condición 1).
+   *Descartado:* dejar el límite solo en "No hacer" (sin test no es
+   verificable, P3).
+6. **Régimen #101 parcial y declarado:** la aserción del PNG (firma + IHDR
+   1200×630) **nace en verde** porque el archivo ya existe sin commitear; el
+   commit `test(Foundation): T19` es igualmente rojo por las etiquetas
+   ausentes en `index.html`. Queda declarado en el cuerpo de T19 (tasks).
+
+## Ejecución y cobertura
+
+- Orden: única tarea **T19** (sin dependencias internas; la spec ya fija
+  literales y colocación).
+- Cobertura: RF-11 → literales exactos + conteo 5+1 + `og:title` ≡ `<title>`;
+  RF-12 → JSON-LD parseado `toEqual` (seis claves) + cruce con `cv.en.json` +
+  identidad `url`/canonical/`og:url`; RF-13 → orden canonical y JSON-LD tras
+  el anti-flash (test T4 preexistente sigue vigente); RF-14 → PNG 1200×630
+  (firma + IHDR, ruta en variable, lección T14b).
+- El test "copies the inline script verbatim from foundations/theming.md" y
+  el contrato T4 preexistente **no se tocan**: los `<meta>` nuevos no los
+  afectan (`extractInlineScript` matchea solo `<script>` plano sin atributos;
+  el JSON-LD lleva `type` y no colisiona).
+- Cierre de pieza (la pieza vuelve a abrirse con este Cambio): al terminar
+  T19, revisión completa del reviewer contra la spec + `npm run build` verde
+  (#80) + QA del reviewer sobre `dist/index.html` (etiquetas intactas tras el
+  build: Vite no reescribió los literales) y presencia de `dist/og-image.png`
+  (sin servidor; inspección de `dist/`). Docs #86 + BACKLOG ("Metadatos y
+  Open Graph" resuelto; "SEO por idioma" sigue abierto) + hashes de #117:
+  los hace el orchestrator en la puerta de cierre, no el builder.
+- Commits de código: `test(Foundation): T19` (rojo; `git add` explícito del
+  archivo de test) → `feat(Foundation): T19` (`index.html` + `public/og-image.png`
+  con `git add public/og-image.png` explícito; el `feat` no toca tests).

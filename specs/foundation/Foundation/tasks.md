@@ -231,3 +231,39 @@ T3b (deuda L1 detectada en su review).
     bullet del carrusel, dialog; §2.3 de la propuesta) sin jank; `npm run build`
     verde; con la aprobación del usuario, `spec.md` vuelve a
     `Estado: implementada` y se actualizan los documentos de estado (#86).
+
+## Cambio #117 — Metadatos SEO y para compartir (spec reaprobada en `472bc1d`; puerta de Plan+Tareas aprobada 2026-11-14)
+
+- [ ] **T19. Metadatos en `index.html` + `public/og-image.png`.** RF-11, RF-12, RF-13, RF-14
+  - Hecho cuando: `test(Foundation): T19` (rojo) toca **solo**
+    `src/test/anti-flash.test.ts` y **solo agrega**, sin modificar los tests
+    de T4/T13/T14/T14b/T17: (a) las nueve etiquetas nuevas de la tabla
+    "Metadatos de compartir" de la spec con sus valores literales exactos;
+    (b) conteo: exactamente 5 `meta[property^="og:"]` y 1
+    `meta[name^="twitter:"]` en `index.html`; (c) `og:title` igual al texto
+    del `<title>`; (d) el `<link rel="canonical">` y el bloque
+    `<script type="application/ld+json">` aparecen después del índice del
+    script anti-flash; (e) JSON-LD **parseado** (`JSON.parse` + `toEqual`
+    contra el objeto esperado de seis claves exactas; el formato del bloque
+    no es contrato): `name`/`jobTitle`/`sameAs` (en orden) coinciden con
+    `profile.name`, `profile.headline` y `social[].url` de
+    `src/content/cv.en.json` leído con `fs`, y `url` del JSON-LD ≡ `href`
+    del canonical ≡ `og:url` (además del literal); (f) `public/og-image.png`
+    es PNG real 1200×630 (firma + IHDR, como el apple-touch de T14, **con la
+    ruta en una variable** — lección T14b). **Régimen #101 declarado (como
+    en T17):** la aserción (f) nace en verde porque el PNG ya existe sin
+    commitear; el commit sigue rojo por (a)–(e). `feat(Foundation): T19`:
+    `index.html` con los `<meta>` (description, og×5, twitter) después del
+    `<title>` y antes del anti-flash, y canonical + JSON-LD después del
+    apple-touch-icon, antes de `</head>`; **textos literales exactos de la
+    tabla de la spec, sin ninguna otra etiqueta** (condición 1 de #117); el
+    anti-flash y su test "verbatim" intactos; `public/og-image.png` entra
+    **intacto** al commit con `git add` explícito de la ruta (no se
+    regenera); el `feat` no toca tests; `npm run lint`, `npm run typecheck`
+    y `npm test` en verde tras el `feat`.
+  - Cierre de pieza (no es trabajo del builder): revisión completa del
+    reviewer + `npm run build` (#80) + QA sobre `dist/index.html` (etiquetas
+    intactas: Vite no reescribió los literales) y `dist/og-image.png`
+    presente; docs #86 + BACKLOG ("Metadatos y Open Graph" resuelto; "SEO
+    por idioma" queda abierto) + hashes de #117, a cargo del orchestrator;
+    con la aprobación del usuario, `spec.md` vuelve a `Estado: implementada`.
