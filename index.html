@@ -8,6 +8,19 @@
          docs/DESIGN.md, fijado por test (src/test/anti-flash.test.ts). -->
     <meta name="theme-color" content="#eceef4" />
     <title>Juan Manuel Ibáñez · Frontend Engineer</title>
+    <!-- #117 (T19, RF-11): metadatos de compartir. Los valores literales los
+         fija la tabla "Metadatos de compartir" de specs/foundation/Foundation/
+         spec.md y los verifica src/test/anti-flash.test.ts: no se editan. Van
+         después del <title> y antes del anti-flash (plan #117, decisión 1):
+         una etiqueta meta no es un link ni un script con src, el contrato T4
+         (anti-flash.test.ts) no se viola. -->
+    <meta name="description" content="Frontend Engineer with 7+ years in React and TypeScript: design systems, accessibility and AI-assisted development." />
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content="Juan Manuel Ibáñez · Frontend Engineer" />
+    <meta property="og:description" content="React · TypeScript · Design Systems · Accessibility" />
+    <meta property="og:url" content="https://jmibann.github.io/cv-agentic/" />
+    <meta property="og:image" content="https://jmibann.github.io/cv-agentic/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
 <script>
   (function () {
     var d = document.documentElement;
@@ -40,6 +53,26 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- #115 (T14): mismo ícono a 180×180 para "Agregar a pantalla de inicio". -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- #117 (T19, RF-13): canonical y JSON-LD van después del anti-flash y
+         del bloque de íconos, al final del head. El contrato del JSON-LD es
+         el objeto parseado (RF-12, seis claves exactas); el formato del
+         bloque en el HTML no lo es. La imagen la sirve /og-image.png (RF-14,
+         PNG 1200×630 en public/); las URLs son absolutas al deploy de GitHub
+         Pages: Vite no las reescribe en este archivo. -->
+    <link rel="canonical" href="https://jmibann.github.io/cv-agentic/" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Juan Manuel Ibáñez",
+        "jobTitle": "Frontend Engineer",
+        "url": "https://jmibann.github.io/cv-agentic/",
+        "sameAs": [
+          "https://github.com/jmibann",
+          "https://www.linkedin.com/in/juanmanuelibanez"
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
