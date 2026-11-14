@@ -234,7 +234,7 @@ T3b (deuda L1 detectada en su review).
 
 ## Cambio #117 — Metadatos SEO y para compartir (spec reaprobada en `472bc1d`; puerta de Plan+Tareas aprobada 2026-11-14)
 
-- [ ] **T19. Metadatos en `index.html` + `public/og-image.png`.** RF-11, RF-12, RF-13, RF-14
+- [x] **T19. Metadatos en `index.html` + `public/og-image.png`.** RF-11, RF-12, RF-13, RF-14 — f17cd78 (test `0025a21` rojo por (a)–(e) con (f) nacida en verde #101 declarado; feat `f17cd78`: `index.html` + PNG intacta; reviewer **APROBADO** 2026-11-14: gates 472/41 + build verdes, QA sobre `dist/index.html` (literales intactos, orden T4 mantenido) y `dist/og-image.png` presente; sin desviaciones spec↔plan↔tasks↔código. Menores: deuda de forma preexistente — `<script>` anti-flash en columna 0 en `index.html` (de T4, no la introdujo T19; deuda si el archivo vuelve a tocarse); byte-a-byte de `dist/og-image.png` verificado por tamaño + semántica de copia de Vite (hash directo no permitido al reviewer))
   - Hecho cuando: `test(Foundation): T19` (rojo) toca **solo**
     `src/test/anti-flash.test.ts` y **solo agrega**, sin modificar los tests
     de T4/T13/T14/T14b/T17: (a) las nueve etiquetas nuevas de la tabla
