@@ -35,6 +35,9 @@
 // región nombrada quedaría vacía). Es hija directa del raíz, DESPUÉS de
 // .columns (spec → Responsive), como `<section>` — no `<div>` —, por eso el
 // assert 5b de T2 (raíz sin `<div>` hijo) sigue siendo válido.
+// T6 hecha (#118): tercera `ResumeSection` — Projects (`cv.projects`,
+// `icon="code"`, prefijo "proj") — entre Experience y Education, con su propio
+// guard; `.columns` se monta si ALGUNA de las tres colecciones tiene entradas.
 
 import type { ReactNode } from "react";
 
@@ -81,7 +84,9 @@ export function ResumePage({ className }: ResumePageProps): ReactNode {
           vacíos (T2: "SI ambos están vacíos, no renderiza .columns"). El test
           5 verifica las ausencias por rol; la no-montada del contenedor, por
           inspección del markup (raíz sin <div> hijo directo). */}
-      {cv.education.length > 0 || cv.experience.length > 0 ? (
+      {cv.experience.length > 0 ||
+      cv.projects.length > 0 ||
+      cv.education.length > 0 ? (
         <div className={styles.columns}>
           {/* T5 (#114): Experience primero, Education debajo, en una sola
               columna. El orden es el del DOM (no `order` de CSS), así la
@@ -94,6 +99,19 @@ export function ResumePage({ className }: ResumePageProps): ReactNode {
               entries={cv.experience}
               locale={locale}
               timelineIdPrefix="exp"
+              presentLabel={t.timeline.present}
+            />
+          ) : null}
+          {/* T6 (#118): proyectos personales, fuera de la experiencia
+              laboral; mismo componente y mismo contrato que las otras dos. */}
+          {cv.projects.length > 0 ? (
+            <ResumeSection
+              id="projects"
+              title={t.resume.projects}
+              icon="code"
+              entries={cv.projects}
+              locale={locale}
+              timelineIdPrefix="proj"
               presentLabel={t.timeline.present}
             />
           ) : null}
