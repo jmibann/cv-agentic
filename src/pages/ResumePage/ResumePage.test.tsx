@@ -185,11 +185,18 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
     expect(columns.tagName).toBe("DIV");
     expect(columns).toHaveClass(COLUMNS_CLASS);
     expect(experienceRegion.parentElement).toBe(columns);
-    expect(columns.children).toHaveLength(2);
+    // T6 (#118, cambio de spec pedido por el usuario): `.columns` pasa de 2 a
+    // 3 hijos, con la región de Projects entre Experience y Education.
+    expect(columns.children).toHaveLength(3);
     // T5 (#114, cambio de spec aprobado): una sola columna con Experience
     // primero; el orden es del DOM (lectura y foco = orden visual).
     expect(columns.firstElementChild).toBe(experienceRegion);
     expect(columns.lastElementChild).toBe(educationRegion);
+    const projectsRegion = screen.getByRole("region", {
+      name: uiEn.resume.projects,
+    });
+    expect(experienceRegion.nextElementSibling).toBe(projectsRegion);
+    expect(projectsRegion.nextElementSibling).toBe(educationRegion);
 
     // El bloque .columns cuelga del raíz `div.page` y el `h1` sigue siendo su
     // PRIMER hijo (RF-1/RF-6: flujo de bloque para que el h1 fluya junto a la
@@ -306,6 +313,8 @@ interface ResumeCvHarness {
     | "presentNull"
     | "educationEmpty"
     | "columnsEmpty"
+    // T6 (test 11, #118): mismo mecanismo para vaciar `projects`.
+    | "projectsEmpty"
     // T3 (test 6): mismo mecanismo para vaciar `skills`.
     | "skillsEmpty";
 }
@@ -339,7 +348,12 @@ vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
         return { ...cv, education: [] };
       }
       if (cvHarness.scenario === "columnsEmpty") {
-        return { ...cv, education: [], experience: [] };
+        // T6 (#118): "todas las colecciones de timeline vacías" incluye
+        // `projects` desde que la página tiene tres secciones.
+        return { ...cv, education: [], experience: [], projects: [] };
+      }
+      if (cvHarness.scenario === "projectsEmpty") {
+        return { ...cv, projects: [] };
       }
       if (cvHarness.scenario === "skillsEmpty") {
         return { ...cv, skills: [] };
@@ -436,7 +450,8 @@ describe("ResumePage with education empty (T2: RF-2, Tests 5, mocked provider)",
       );
     }
     expect(columns.tagName).toBe("DIV");
-    expect(columns.children).toHaveLength(1);
+    // T6 (#118): con education vacía quedan Experience y Projects (antes 1).
+    expect(columns.children).toHaveLength(2);
 
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
@@ -653,6 +668,82 @@ describe("ResumePage className joining (T4: spec → API, G-B, Tests 9)", () => 
     expect(h1.parentElement).toBe(pageRoot);
     expect(pageRoot).toHaveClass(PAGE_CLASS);
     expect(pageRoot).toHaveClass(consumerClass);
+  });
+});
+
+// ===========================================================================
+// Tests de T6 (specs/pages/ResumePage/tasks.md, #118) — sección Projects:
+// test 10 (región nombrada por `t.resume.projects` con un `listitem` por
+// entrada de `cv.projects`, en el orden de los datos) y test 11 (con
+// `projects: []` por mock la región no existe y las otras dos siguen).
+// Aserciones existentes cambiadas por el mismo Cambio (autorizadas por #118,
+// declaradas en el commit): test 2 (`.columns` con 3 hijos y Projects en el
+// medio), test 5a (2 hijos con education vacía) y el escenario `columnsEmpty`
+// del mock (vacía también `projects`).
+// ===========================================================================
+
+const PROJECTS = cvByLocale.en.projects;
+
+describe("ResumePage projects region (T6: RF-2, RF-3, Tests 10)", () => {
+  it("renders a region named by t.resume.projects with one listitem per entry, in data order", () => {
+    // Freno anti-test-vacío (criterio T1/T2).
+    if (PROJECTS.length === 0) {
+      throw new Error(
+        "el contenido debe traer al menos una entrada en cv.projects (test 10 de la spec no puede correr vacío)",
+      );
+    }
+
+    renderResumePage();
+
+    const region = screen.getByRole("region", { name: uiEn.resume.projects });
+    expect(region.tagName).toBe("SECTION");
+    expect(region).toHaveAttribute("aria-labelledby", "resume-projects-title");
+
+    const heading = screen.getByRole("heading", {
+      level: 2,
+      name: uiEn.resume.projects,
+    });
+    expect(heading).toHaveAttribute("id", "resume-projects-title");
+    expect(region).toContainElement(heading);
+
+    expect(within(region).getAllByRole("listitem")).toHaveLength(PROJECTS.length);
+    expect(
+      within(region)
+        .getAllByRole("heading", { level: 3 })
+        .map((headingEl) => headingEl.textContent),
+    ).toEqual(PROJECTS.map((entry) => entry.title));
+  });
+});
+
+describe("ResumePage with empty projects (T6: RF-2, Tests 11, mocked provider)", () => {
+  beforeEach(() => {
+    cvHarness.scenario = "projectsEmpty";
+  });
+
+  it("renders no projects region while Experience and Education stay present", () => {
+    if (PROJECTS.length === 0) {
+      throw new Error(
+        "el contenido debe traer projects para que el escenario vacío (test 11) discrimine",
+      );
+    }
+
+    renderResumePage();
+
+    expect(
+      screen.queryByRole("region", { name: uiEn.resume.projects }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { level: 2, name: uiEn.resume.projects }),
+    ).not.toBeInTheDocument();
+
+    const experienceRegion = screen.getByRole("region", {
+      name: uiEn.resume.experience,
+    });
+    const educationRegion = screen.getByRole("region", {
+      name: uiEn.resume.education,
+    });
+    expect(experienceRegion.nextElementSibling).toBe(educationRegion);
+    expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 });
 
