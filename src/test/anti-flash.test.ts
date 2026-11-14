@@ -288,3 +288,149 @@ describe("motion tokens scale in tokens/tokens.css (RF-10, #106)", () => {
     }
   });
 });
+
+/**
+ * Forma mínima de `src/content/cv.en.json` para el cruce con el JSON-LD
+ * (T19, RF-12): solo las claves que usa el test. El JSON se lee con `node:fs`
+ * como contrato entre documentos (plan de Foundation, decisión 7), sin
+ * imports de React ni del módulo de contenido.
+ */
+interface CvEnDocument {
+  profile: { name: string; headline: string };
+  social: Array<{ url: string }>;
+}
+
+/**
+ * T19 (RF-11…RF-14, Cambio #117): metadatos de compartir en `index.html`.
+ * Los literales de la tabla "Metadatos de compartir" de spec.md (Anatomía)
+ * los fijó el usuario y se copian carácter por carácter: no se editan.
+ * Régimen #101 declarado en tasks.md: la aserción del PNG (grupo f) nace en
+ * verde porque `public/og-image.png` ya existe en el working tree; el commit
+ * `test(Foundation): T19` sigue rojo por (a)–(e), las etiquetas ausentes.
+ */
+describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
+  const indexHtml = readRepoFile("../../index.html");
+
+  // Grupo (a): ocho etiquetas de una línea con su literal exacto (el `·` y la
+  // ó de "Ibáñez" incluidos). La novena de la tabla es el bloque JSON-LD, cuyo
+  // contrato es el objeto parseado (grupo e, RF-12): acá se aserta solo su
+  // etiqueta de apertura.
+  const SHARING_TAGS: ReadonlyArray<string> = [
+    '<meta name="description" content="Frontend Engineer with 7+ years in React and TypeScript: design systems, accessibility and AI-assisted development." />',
+    '<meta property="og:type" content="profile" />',
+    '<meta property="og:title" content="Juan Manuel Ibáñez · Frontend Engineer" />',
+    '<meta property="og:description" content="React · TypeScript · Design Systems · Accessibility" />',
+    '<meta property="og:url" content="https://jmibann.github.io/cv-agentic/" />',
+    '<meta property="og:image" content="https://jmibann.github.io/cv-agentic/og-image.png" />',
+    '<meta name="twitter:card" content="summary_large_image" />',
+    '<link rel="canonical" href="https://jmibann.github.io/cv-agentic/" />',
+  ];
+
+  it("includes the nine sharing metadata tags with their exact literals (RF-11)", () => {
+    for (const tag of SHARING_TAGS) {
+      expect(indexHtml).toContain(tag);
+    }
+    expect(indexHtml).toContain('<script type="application/ld+json">');
+  });
+
+  it("ships exactly five og: metas and one twitter: meta (RF-11)", () => {
+    // Grupo (b): el conteo exacto cubre el "ninguna otra etiqueta fuera de la
+    // lista" de RF-11 (plan #117, decisión 5; condición 1 de #117).
+    const ogCount = [...indexHtml.matchAll(/<meta\s+property="og:/g)].length;
+    const twitterCount = [
+      ...indexHtml.matchAll(/<meta\s+name="twitter:/g),
+    ].length;
+    expect(ogCount).toBe(5);
+    expect(twitterCount).toBe(1);
+  });
+
+  it("keeps og:title identical to the <title> text (RF-11)", () => {
+    // Grupo (c).
+    const titleText = capture(
+      indexHtml,
+      /<title>([\s\S]*?)<\/title>/,
+      "<title> text",
+    );
+    const ogTitle = capture(
+      indexHtml,
+      /<meta property="og:title" content="([^"]*)"/,
+      "og:title content",
+    );
+    expect(ogTitle).toBe(titleText);
+  });
+
+  it("places the canonical link and the JSON-LD block after the anti-flash script (RF-13)", () => {
+    // Grupo (d): refuerzo explícito del contrato T4 ("runs before the bundle",
+    // arriba). Sin la etiqueta, `indexOf` da -1 y el `toBeGreaterThan` falla:
+    // rojo por ausencia, nunca `undefined`.
+    const scriptIndex = indexHtml.indexOf("<script>");
+    expect(scriptIndex).toBeGreaterThanOrEqual(0);
+    expect(indexHtml.indexOf('<link rel="canonical"')).toBeGreaterThan(
+      scriptIndex,
+    );
+    expect(
+      indexHtml.indexOf('<script type="application/ld+json">'),
+    ).toBeGreaterThan(scriptIndex);
+  });
+
+  it("embeds a parsed JSON-LD Person of six keys synced with cv.en.json (RF-12)", () => {
+    // Grupo (e): comparación sobre el objeto parseado (`toEqual` contra las
+    // seis claves exactas; el formato del bloque en el HTML no es contrato).
+    const rawBlock = capture(
+      indexHtml,
+      /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+      '<script type="application/ld+json">…</script>',
+    );
+    const jsonLd = JSON.parse(rawBlock) as Record<string, unknown>;
+    expect(jsonLd).toEqual({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Juan Manuel Ibáñez",
+      jobTitle: "Frontend Engineer",
+      url: "https://jmibann.github.io/cv-agentic/",
+      sameAs: [
+        "https://github.com/jmibann",
+        "https://www.linkedin.com/in/juanmanuelibanez",
+      ],
+    });
+
+    // Cruce con el contenido real leído con `fs` (decisión 3 del plan del
+    // #117): si el CV cambia y el JSON-LD no lo sigue, el desfase rompe acá.
+    const cvEn = JSON.parse(
+      readRepoFile("../../src/content/cv.en.json"),
+    ) as CvEnDocument;
+    expect(jsonLd["name"]).toBe(cvEn.profile.name);
+    expect(jsonLd["jobTitle"]).toBe(cvEn.profile.headline);
+    expect(jsonLd["sameAs"]).toEqual(cvEn.social.map((entry) => entry.url));
+
+    // Identidad url del JSON-LD ≡ href del canonical ≡ og:url, además del
+    // literal: si algún día cambia el dominio, no queda una etiqueta desfasada.
+    const canonicalHref = capture(
+      indexHtml,
+      /<link rel="canonical" href="([^"]*)"/,
+      "canonical href",
+    );
+    const ogUrl = capture(
+      indexHtml,
+      /<meta property="og:url" content="([^"]*)"/,
+      "og:url content",
+    );
+    expect(jsonLd["url"]).toBe("https://jmibann.github.io/cv-agentic/");
+    expect(jsonLd["url"]).toBe(canonicalHref);
+    expect(ogUrl).toBe(canonicalHref);
+  });
+
+  it("ships public/og-image.png as a real 1200×630 PNG (RF-14)", () => {
+    // Grupo (f): firma PNG + IHDR, como el apple-touch de T14. La ruta va en
+    // una variable: con un literal, Vite reescribe `new URL("….png",
+    // import.meta.url)` como URL de asset y deja de ser `file:` (T14b).
+    // Nace en verde: el PNG ya existe (régimen #101, declarado en tasks).
+    const ogImagePath = "../../public/og-image.png";
+    const png = readFileSync(
+      fileURLToPath(new URL(ogImagePath, import.meta.url)),
+    );
+    expect(png.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+    expect(png.readUInt32BE(16)).toBe(1200);
+    expect(png.readUInt32BE(20)).toBe(630);
+  });
+});
