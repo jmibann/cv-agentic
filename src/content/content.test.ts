@@ -13,6 +13,10 @@ import enContent from "./cv.en.json";
 import esContent from "./cv.es.json";
 import { cvByLocale } from "./index";
 
+// T20 (#118): textos de interfaz de la seccion Projects.
+import { uiEn } from "../i18n/ui.en";
+import { uiEs } from "../i18n/ui.es";
+
 /** Ruta relativa que declaran los JSON de `src/content` (Hecho cuando de T9). */
 const SCHEMA_REF = "../../data/cv.schema.json";
 
@@ -177,5 +181,61 @@ describe("validateCv rejects invalid content in memory (RF-7)", () => {
   it("rejects an extra field (additionalProperties: false)", () => {
     expect(validateCv(withExtraField(exampleBase))).toBe(false);
     expect(validateCv.errors?.[0]?.keyword).toBe("additionalProperties");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T20 (#118): coleccion `projects` (proyectos personales, fuera de
+// `experience`). Mismo contrato que `experience`: array obligatorio de
+// `TimelineEntry`, paridad en/es y orden de fechas. Solo se agregan tests; los
+// de T9 quedan intactos.
+// ---------------------------------------------------------------------------
+
+function withoutProjects(cv: CvData): unknown {
+  const { projects: _projects, ...rest } = cv;
+  return rest;
+}
+
+function withProjectEntry(cv: CvData): unknown {
+  // La entrada sale de una `TimelineEntry` valida del ejemplo (sin literales).
+  return { ...cv, projects: cv.experience.slice(0, 1) };
+}
+
+describe("projects collection (T20, #118)", () => {
+  it("requires the projects collection in the schema", () => {
+    expect(validateCv(withoutProjects(exampleBase))).toBe(false);
+    expect(validateCv.errors?.[0]?.keyword).toBe("required");
+  });
+
+  it("accepts projects entries shaped as TimelineEntry", () => {
+    if (exampleBase.experience.length === 0) {
+      throw new Error(
+        "el ejemplo del kit debe traer al menos una entrada de experience para armar la entrada de projects",
+      );
+    }
+    expect(validateCv(withProjectEntry(exampleBase))).toBe(true);
+  });
+
+  it("keeps the same project ids and periods in both locales", () => {
+    const en = cvByLocale.en.projects;
+    const es = cvByLocale.es.projects;
+    expect(idsOf(en)).toEqual(idsOf(es));
+    expect(en.map(({ start, end }) => ({ start, end }))).toEqual(
+      es.map(({ start, end }) => ({ start, end })),
+    );
+  });
+
+  it("orders every projects entry in both locales", () => {
+    const unordered = (["en", "es"] as const).flatMap((locale) =>
+      cvByLocale[locale].projects
+        .filter((entry) => !isOrdered(entry.start, entry.end))
+        .map((entry) => `${locale}:${entry.id}`),
+    );
+    expect(unordered).toEqual([]);
+  });
+
+  it("declares the Projects section title in both interface locales", () => {
+    expect(uiEn.resume.projects.length).toBeGreaterThan(0);
+    expect(uiEs.resume.projects.length).toBeGreaterThan(0);
   });
 });
