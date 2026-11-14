@@ -22,7 +22,7 @@ export const uiEn = {
   },
   contact: { email: "Email", phone: "Phone", whatsapp: "WhatsApp", location: "Location" },
   about: { title: "About Me", services: "What I'm Doing", testimonials: "Testimonials" },
-  resume: { title: "Resume", education: "Education", experience: "Experience", skills: "Skills" },
+  resume: { title: "Resume", education: "Education", experience: "Experience", projects: "Projects", skills: "Skills" },
   timeline: { present: "Present" },
   testimonials: {
     carouselLabel: "Testimonials",

@@ -100,14 +100,6 @@
   ],
   "experience": [
     {
-      "id": "cv-agentic",
-      "title": "AI-Built Bilingual Portfolio (this site)",
-      "organization": "Independent project",
-      "start": "2026-07",
-      "end": null,
-      "description": "Designed a 5-agent development system (Claude API, MCP, OpenCode) that delivered this React 19 / TypeScript / Vite site via spec- and test-driven development: 24 WCAG-compliant components, 445 tests with axe-core audits, human-in-the-loop gates and automated visual QA via Chrome DevTools MCP."
-    },
-    {
       "id": "making-sense",
       "title": "Frontend Developer",
       "organization": "Making Sense · Client: Vetsource",
@@ -178,6 +170,16 @@
       "start": "2013-07",
       "end": "2015-02",
       "description": "International product certifications (UL, TÜV Rheinland, IRAM, S-Mark, Intertek) across Argentina and Chile."
+    }
+  ],
+  "projects": [
+    {
+      "id": "cv-agentic",
+      "title": "AI-Built Bilingual Portfolio (this site)",
+      "organization": "Open source · github.com/jmibann/cv-agentic",
+      "start": "2026-07",
+      "end": null,
+      "description": "Designed a 5-agent development system (Claude API, MCP, OpenCode) that delivered this React 19 / TypeScript / Vite site through spec- and test-driven development: 24 WCAG-compliant components, 460+ automated tests with axe-core audits, CI quality gates and visual QA via Chrome DevTools MCP, with a human review gate on every task."
     }
   ],
   "skills": [

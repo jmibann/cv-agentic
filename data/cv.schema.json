@@ -13,6 +13,7 @@
     "services",
     "education",
     "experience",
+    "projects",
     "skills",
     "testimonials"
   ],
@@ -58,6 +59,13 @@
     "experience": {
       "type": "array",
       "description": "Timeline de Experience (orden de los datos = orden en pantalla).",
+      "items": {
+        "$ref": "#/definitions/TimelineEntry"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "description": "Timeline de Projects: proyectos personales, fuera de la experiencia laboral (orden de los datos = orden en pantalla).",
       "items": {
         "$ref": "#/definitions/TimelineEntry"
       }

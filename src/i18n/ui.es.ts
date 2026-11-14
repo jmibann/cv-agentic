@@ -33,6 +33,8 @@ export const uiEs = {
     title: "Currículum",
     education: "Educación",
     experience: "Experiencia",
+    // #118 (T20): seccion de proyectos personales en Resume.
+    projects: "Proyectos",
     skills: "Habilidades",
   },
   // "Actualidad" lo fija foundations/i18n.md → "Fechas y períodos" (RF-8).

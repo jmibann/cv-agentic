@@ -76,6 +76,10 @@ export interface CvData {
    */
   experience: TimelineEntry[];
   /**
+   * Timeline de Projects: proyectos personales, fuera de la experiencia laboral (orden de los datos = orden en pantalla).
+   */
+  projects: TimelineEntry[];
+  /**
    * Lista plana de chips, en el orden en que se muestran. Sin porcentajes ni categorías.
    */
   skills: string[];
