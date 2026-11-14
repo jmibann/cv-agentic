@@ -192,8 +192,9 @@ describe("validateCv rejects invalid content in memory (RF-7)", () => {
 // ---------------------------------------------------------------------------
 
 function withoutProjects(cv: CvData): unknown {
-  const { projects: _projects, ...rest } = cv;
-  return rest;
+  const copy: Record<string, unknown> = { ...cv };
+  delete copy.projects;
+  return copy;
 }
 
 function withProjectEntry(cv: CvData): unknown {
