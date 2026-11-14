@@ -3,14 +3,14 @@ Estado: implementada
 
 ## Propósito
 
-Contenido del panel **Resume**: Experience y Education (timelines) y Skills
-(chips). Se renderiza dentro del tabpanel de AppLayout.
+Contenido del panel **Resume**: Experience, Projects y Education (timelines) y
+Skills (chips). Se renderiza dentro del tabpanel de AppLayout.
 
 ## Requisitos (EARS)
 
 - RF-1: EL SISTEMA renderiza siempre un único `h1` con `t.resume.title`, con jerarquía h1 → h2 (sección) → h3 (ítem del Timeline).
-- RF-2: CUANDO `education` o `experience` tienen entradas, ENTONCES EL SISTEMA renderiza esa `<section>` nombrada por su `h2`; SI un conjunto está vacío, ENTONCES no aparece su sección, y SI ambos están vacíos, no renderiza `.columns`.
-- RF-3: EL SISTEMA apila las secciones en una sola columna en todos los anchos, con Experience antes que Education (orden del DOM, no `order` de CSS: el orden de lectura y de foco coincide con el visual). Verificación: test 2 (orden de las regiones) + inspección del CSS + QA (#114).
+- RF-2: CUANDO `experience`, `projects` o `education` tienen entradas, ENTONCES EL SISTEMA renderiza esa `<section>` nombrada por su `h2`; SI un conjunto está vacío, ENTONCES no aparece su sección, y SI los tres están vacíos, no renderiza `.columns` (#118: `projects` se suma a las dos colecciones originales).
+- RF-3: EL SISTEMA apila las secciones en una sola columna en todos los anchos, en el orden Experience → Projects → Education (orden del DOM, no `order` de CSS: el orden de lectura y de foco coincide con el visual). Verificación: test 2 (orden de las regiones) + inspección del CSS + QA (#114; Projects entre ambas: #118).
 - RF-4: CUANDO `skills` no está vacío, ENTONCES EL SISTEMA renderiza la `<section>` de skills con su lista; SI está vacío, ENTONCES no la renderiza.
 - RF-5: EL SISTEMA obtiene los datos con `useCv()` y los textos con `useLocale().t`, sin ordenar las entradas (el orden es el de los datos). Verificación de "sin ordenar": inspección del código (el reviewer).
 - RF-6: EL SISTEMA mantiene `.page` en flujo de bloque normal (para que el `h1` fluya junto a la solapa flotante), apila las secciones con un grid de una columna y aplica solo layout, sin estilos visuales. Verificación: inspección del CSS + QA F5.
@@ -26,6 +26,9 @@ Contenido del panel **Resume**: Experience y Education (timelines) y Skills
     <ResumeSection id="experience" title={t.resume.experience} icon="briefcase"
                    entries={cv.experience} locale={locale} timelineIdPrefix="exp"
                    presentLabel={t.timeline.present} />
+    <ResumeSection id="projects"   title={t.resume.projects}   icon="code"
+                   entries={cv.projects}   locale={locale} timelineIdPrefix="proj"
+                   presentLabel={t.timeline.present} />                <!-- #118 -->
     <ResumeSection id="education"  title={t.resume.education}  icon="book-open"
                    entries={cv.education}  locale={locale} timelineIdPrefix="edu"
                    presentLabel={t.timeline.present} />
@@ -38,10 +41,10 @@ Contenido del panel **Resume**: Experience y Education (timelines) y Skills
 </div>
 ```
 
-`ResumeSection` genera sus propios ids (`resume-education-title`,
-`resume-experience-title`) y no se renderiza si su colección está vacía. La
+`ResumeSection` genera sus propios ids (`resume-experience-title`,
+`resume-projects-title`, `resume-education-title`) y no se renderiza si su colección está vacía. La
 página **fija los prefijos de ids de Timeline** (decisión 14 de ResumeSection,
-prop obligatoria `timelineIdPrefix`): `"edu"` y `"exp"`; no hay derivación
+prop obligatoria `timelineIdPrefix`): `"exp"`, `"proj"` y `"edu"`; no hay derivación
 interna.
 
 ## API
@@ -55,7 +58,7 @@ export interface ResumePageProps {
 `className` se une a la clase `.page` del raíz (G-B); tiene su test de unión
 (test 9) aunque AppLayout no la pase hoy.
 
-Datos con `useCv()` (`education`, `experience`, `skills`) y textos e idioma con
+Datos con `useCv()` (`experience`, `projects`, `education`, `skills`) y textos e idioma con
 `useLocale()` (`const { t, locale } = useLocale()`: `t.resume.*`,
 `t.timeline.present`; `locale` es el **idioma activo** del provider, no
 `cv.locale`, que es el idioma del archivo). Componente de página: **sí** puede
@@ -79,21 +82,21 @@ sí pueden ser flex/grid: para cuando empiezan, la solapa ya terminó.
 
 ## Estados
 
-- Sin `education` o sin `experience` → esa sección no aparece; la otra sigue
-  a ancho completo (la grilla es de una columna).
-- Sin ninguna de las dos → no renderiza `.columns`.
+- Sin `experience`, sin `projects` o sin `education` → esa sección no aparece;
+  las demás siguen a ancho completo (la grilla es de una columna).
+- Sin ninguna de las tres → no renderiza `.columns`.
 - Sin `skills` → no renderiza la `<section>` de skills.
 - El `h1` se renderiza siempre.
 
 ## Responsive
 
-Experience y Education apiladas en una sola columna en todos los anchos
-(Experience primero, #114). Skills siempre a ancho completo, debajo.
+Experience, Projects y Education apiladas en una sola columna en todos los
+anchos, en ese orden (#114, #118). Skills siempre a ancho completo, debajo.
 
 ## Accesibilidad
 
 - Un único `h1`.
-- Education, Experience y Skills son regiones nombradas por su `h2`.
+- Experience, Projects, Education y Skills son regiones nombradas por su `h2`.
 - Jerarquía: h1 → h2 (sección) → h3 (ítem del Timeline).
 
 ## Tests esperados
@@ -106,14 +109,16 @@ módulo de contenido (`vi.mock` con delegación, precedente
 ThemeProvider.)
 
 1. Heading nivel 1 con `t.resume.title`, único: `getAllByRole("heading", { level: 1 })` de longitud 1.
-2. Regiones con nombre `t.resume.experience` y `t.resume.education`, en ese orden dentro de `.columns` (RF-3), cada una con un `listitem` por entrada.
+2. Regiones con nombre `t.resume.experience`, `t.resume.projects` y `t.resume.education`, en ese orden dentro de `.columns` (RF-3), cada una con un `listitem` por entrada.
 3. Región con nombre `t.resume.skills` con una lista que tiene un `listitem` por skill.
 4. Con el contenido mockeado con una entrada `"end": null` (sin depender del fixture del kit), el panel muestra `t.timeline.present` (RF-7).
-5. Con `education` vacío (mock) no existe esa región y Experience sigue presente; con `education` y `experience` ambas vacías (mock) no existe ninguna de las dos regiones y el `h1` sigue presente (RF-2; la ausencia de `.columns` se verifica por inspección del markup).
+5. Con `education` vacío (mock) no existe esa región y Experience sigue presente; con `experience`, `projects` y `education` vacías (mock) no existe ninguna de las tres regiones y el `h1` sigue presente (RF-2; la ausencia de `.columns` se verifica por inspección del markup).
 6. Con `skills` vacío (mock) no existe la región de skills.
 7. Con `locale = "es"` muestra textos de `ui.es` y contenido de `cv.es`.
 8. `expectNoA11yViolations` sin violaciones.
 9. Concatena `className` en el raíz `.page` (G-B).
+10. Región con nombre `t.resume.projects` (`resume-projects-title`) con un `listitem` por entrada de `cv.projects`, en el orden de los datos (#118).
+11. Con `projects` vacío (mock) no existe esa región y Experience y Education siguen presentes (RF-2, #118).
 
 ## No hacer
 

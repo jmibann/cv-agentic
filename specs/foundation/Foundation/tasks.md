@@ -267,3 +267,8 @@ T3b (deuda L1 detectada en su review).
     presente; docs #86 + BACKLOG ("Metadatos y Open Graph" resuelto; "SEO
     por idioma" queda abierto) + hashes de #117, a cargo del orchestrator;
     con la aprobación del usuario, `spec.md` vuelve a `Estado: implementada`.
+
+## Cambio #118 — Colección `projects` (pedido del usuario, 2026-11-14)
+
+- [ ] **T20. `projects` en el esquema, el contenido y los textos.** RF-7 (#118)
+  - Hecho cuando: `test(Foundation): T20` (rojo) **solo agrega** a `src/content/content.test.ts`: el validador rechaza un CV sin `projects` (`required`) y acepta `projects` con una entrada `TimelineEntry`; paridad en/es de ids y de `start`/`end` de `projects`; orden de fechas de cada entrada de `projects`; `uiEn.resume.projects` y `uiEs.resume.projects` existen y no estan vacios. `feat(Foundation): T20`: `data/cv.schema.json` agrega `projects` (array de `TimelineEntry`, **obligatorio**, entre `experience` y `skills`); `data/*.generated.*` regenerados con los scripts; `data/cv.example.{en,es}.json` reciben `"projects": []` (sin contenido inventado); `src/content/cv.{en,es}.json` mueven la entrada `cv-agentic` de `experience` a `projects` con la organizacion y la descripcion que paso el usuario (el resto del contenido no cambia); `src/i18n/ui.{en,es}.ts` agregan `resume.projects` ("Projects" / "Proyectos"); `foundations/i18n.md` documenta la clave nueva; lint, typecheck, test y `validate:content` verdes tras el `feat`.
