@@ -1,5 +1,9 @@
 # Foundation
-Estado: implementada
+Estado: aprobada
+
+*Nota del Cambio #117 (2026-11-14): metadatos SEO y para compartir en
+`index.html` (RF-11…RF-14, tarea T19 en curso). El `Estado` vuelve a
+`implementada` al cerrar T19 con la aprobación del usuario.*
 
 Pieza de F1 (decisión #84): deja la app lista para que F2–F4 construyan
 componentes con TDD. El alcance está derivado **solo** de
@@ -58,6 +62,28 @@ un componente ni cómo testearlo.
   y `--ease-exit: cubic-bezier(0.4, 0, 1, 1)` nuevos; SI
   `prefers-reduced-motion: reduce`, ENTONCES las cinco duraciones valen
   `0.01ms`.
+- **RF-11:** EL SISTEMA incluye en el `<head>` de `index.html` los siete
+  metadatos de descripción y para compartir con los valores literales de la
+  tabla "Metadatos de compartir" de la Anatomía (`description`, `og:type`,
+  `og:title`, `og:description`, `og:url`, `og:image`, `twitter:card`), sin
+  ninguna otra etiqueta de ese tipo fuera de esa lista — exactamente 5
+  `meta[property^="og:"]` y 1 `meta[name^="twitter:"]` —, y `og:title`
+  coincide con el texto del `<title>`.
+- **RF-12:** CUANDO se parsea el `<script type="application/ld+json">` de
+  `index.html` con `JSON.parse`, EL SISTEMA produce un `Person` de schema.org
+  con sus seis claves exactas (`@context`, `@type`, `name`, `jobTitle`, `url`,
+  `sameAs`), cuyo `name` y `jobTitle` coinciden con `profile.name` y
+  `profile.headline`, y su `sameAs` (en orden) con los `social[].url` de
+  `src/content/cv.en.json`; el `url` del JSON-LD, el `href` del canonical y
+  `og:url` son idénticos. La comparación es sobre el objeto parseado: el
+  formato del bloque en el HTML no es contrato.
+- **RF-13:** EL SISTEMA coloca el `<link rel="canonical">` y el bloque JSON-LD
+  **después** del script anti-flash y del bloque de íconos, sin violar el
+  contrato de T4 (ningún `<link>` ni `<script src>` antes del anti-flash).
+- **RF-14:** EL SISTEMA sirve como `og:image` el archivo
+  `public/og-image.png` — PNG real de 1200×630 — con su URL absoluta de
+  despliegue, fijada al sitio de GitHub Pages (Vite no la reescribe;
+  `assetUrl` es solo runtime).
 
 *Notas de trazabilidad (Clarificación F1): el orden de resolución de tema e
 idioma (`cv:theme` → sistema → `light`; `cv:locale` → navegador `es*` → `en`) y
@@ -77,6 +103,32 @@ index.html                  ← `<html lang="en">` + meta theme-color #eceef4
                               + `<title>Juan Manuel Ibáñez · Frontend Engineer</title>` (nombre y cargo, no el del repo; #115)
                               + `<link rel="icon" type="image/svg+xml" href="/favicon.svg">` (Cambio F5 2026-10-08, hallazgo D4: el navegador pedía /favicon.ico → 404)
                               + `<link rel="apple-touch-icon" href="/apple-touch-icon.png">` (#115)
+                              + Metadatos de compartir (#117, RF-11…RF-14). Colocación aprobada
+                                en el Cambio: los `<meta>` van **después del `<title>` y antes
+                                del anti-flash** — un `<meta>` no es `<link>` ni `<script src>`,
+                                el contrato T4 no se viola y el orden estándar es
+                                title→description→OG→twitter —; el `<link rel="canonical">` y
+                                el bloque JSON-LD van **después del anti-flash y del bloque de
+                                íconos**, antes de `</head>` (RF-13).
+                                Tabla "Metadatos de compartir" — literales exactos fijados por
+                                el usuario en #117; los verifica el test de T19; no se editan:
+                                  <meta name="description" content="Frontend Engineer with 7+ years in React and TypeScript: design systems, accessibility and AI-assisted development." />
+                                  <meta property="og:type" content="profile" />
+                                  <meta property="og:title" content="Juan Manuel Ibáñez · Frontend Engineer" />
+                                  <meta property="og:description" content="React · TypeScript · Design Systems · Accessibility" />
+                                  <meta property="og:url" content="https://jmibann.github.io/cv-agentic/" />
+                                  <meta property="og:image" content="https://jmibann.github.io/cv-agentic/og-image.png" />
+                                  <meta name="twitter:card" content="summary_large_image" />
+                                  <link rel="canonical" href="https://jmibann.github.io/cv-agentic/" />
+                                  <script type="application/ld+json">
+                                    { "@context": "https://schema.org", "@type": "Person",
+                                      "name": "Juan Manuel Ibáñez", "jobTitle": "Frontend Engineer",
+                                      "url": "https://jmibann.github.io/cv-agentic/",
+                                      "sameAs": ["https://github.com/jmibann",
+                                                 "https://www.linkedin.com/in/juanmanuelibanez"] }
+                                  </script>
+                                (el bloque JSON-LD del HTML puede estar formateado distinto:
+                                el contrato es el objeto parseado, RF-12)
 vite.config.ts              ← plugin react + resolve.alias @data/*
 tsconfig.json               ← único; strict, noUnusedLocals, noUnusedParameters,
                               noUncheckedIndexedAccess, moduleResolution "bundler",
@@ -102,6 +154,11 @@ public/favicon.svg          ← ícono tipo app (#115, reemplaza el hexágono li
                               viewBox cuadrado 64×64
 public/apple-touch-icon.png ← el mismo diseño a 180×180, cuadrado a sangre (iOS redondea las
                               esquinas), para "Agregar a pantalla de inicio" (#115)
+public/og-image.png         ← imagen para compartir, PNG real de 1200×630 (RF-14, #117). La
+                              aportó y aprobó el usuario y **no se regenera ni se modifica**:
+                              entra intacta en el commit `feat(Foundation): T19`. Referenciada
+                              solo por la URL absoluta de `og:image` (no por `assetUrl`: el
+                              HTML de metadatos es estático y Vite no reescribe esas URLs)
 src/main.tsx                ← importa ../tokens/tokens.css (única importación, ruta
                               relativa), @fontsource/poppins/{300,400,500,600}.css,
                               src/styles/global.css; monta ThemeProvider > LocaleProvider > App
@@ -270,6 +327,31 @@ Fuente: `foundations/theming.md`, `foundations/i18n.md`,
 - Los dos valores de `theme-color` del script coinciden con
   `--palette-light-bg` y `--palette-dark-bg` de `tokens/tokens.css` (el test
   lee ambos archivos).
+- **Metadatos de compartir (#117, RF-11…RF-14, T19)** — se agregan a
+  `src/test/anti-flash.test.ts` (solo agregan; es el archivo de tests de
+  contrato de `index.html`):
+  - cada una de las nueve etiquetas nuevas de la tabla "Metadatos de
+    compartir" de la Anatomía con su valor literal exacto;
+  - conteo exacto (RF-11 "ninguna otra etiqueta fuera de la lista"):
+    exactamente 5 `meta[property^="og:"]` y 1 `meta[name^="twitter:"]`;
+  - `og:title` igual al texto del `<title>`;
+  - el `<link rel="canonical">` y el bloque JSON-LD aparecen después del
+    índice del script anti-flash (refuerzo explícito del contrato T4 de
+    `anti-flash.test.ts:123`);
+  - el JSON-LD, **compar parseado** (`JSON.parse` + `toEqual` contra el
+    objeto esperado con sus seis claves exactas; el formato del bloque no es
+    contrato): `name`, `jobTitle` y `sameAs` (en orden) coinciden con
+    `profile.name`, `profile.headline` y la lista de `social[].url` de
+    `src/content/cv.en.json`, leído con `fs` (contrato entre documentos,
+    decisión 7 del plan; no se importa vía React); el `url` del JSON-LD se
+    aserta por literal y además es idéntico al `href` del canonical y a
+    `og:url`;
+  - `public/og-image.png` es PNG 1200×630 (firma PNG + IHDR, como el
+    apple-touch de T14) **con la ruta en una variable** (lección T14b: con
+    un literal, Vite reescribe el `new URL` y deja de ser `file:`). Como el
+    PNG ya existe, esta aserción **nace en verde** (régimen #101, declarado
+    en el cuerpo de T19); el commit `test(Foundation): T19` sigue rojo por
+    las etiquetas ausentes en `index.html`.
 
 **Helper de accesibilidad (`src/test/a11y.ts`):**
 - Un `<img>` sin `alt` produce una violación (el helper falla).
@@ -368,3 +450,13 @@ decisión #91):** texto provisorio con Poppins sobre `--color-bg`; con
   (la supresión es solo para cambios interactivos).
 - No agregar `@keyframes`, librerías de animación ni transiciones que usen
   duraciones fuera de los tokens (RF-10; la escala vive en `tokens.css`).
+- No agregar etiquetas de metadatos fuera de la tabla "Metadatos de
+  compartir" de la Anatomía (#117, condición 1), ni `hreflang`, `og:locale`
+  ni metadatos por idioma: "SEO por idioma" sigue abierto en
+  `docs/BACKLOG.md`.
+- No regenerar ni modificar `public/og-image.png` (lo aportó el usuario;
+  entra intacta en el `feat(Foundation): T19`).
+- No tocar el script anti-flash ni su test "verbatim from theming.md" (la
+  colocación de los nuevos `<meta>` no lo exige), ni `foundations/theming.md`.
+- No reescribir las URLs de metadatos como relativas ni con `assetUrl`: son
+  absolutas y fijas al deploy de GitHub Pages (Vite no las toca en HTML).
