@@ -56,7 +56,7 @@ Guardrails:
 - A written **constitution** sits above everything: stack limits, spec-before-code, separation of concerns, testing rules, data protection.
 - **Tests are never weakened:** no deleted or relaxed assertions, no `.skip`/`.only`, and implementation commits may not touch test files.
 - **Specs are immutable** without my explicit approval; agents cannot push.
-- Every rule change is logged in a numbered **decision register** (#1–#120).
+- Every rule change is logged in a numbered **decision register** (#1–#121).
 
 The build ran in five phases — Foundation, 11 primitives, 12 composites, integration, and a final QA pass in the browser and on paper — followed by maintenance changes (deploy, CI quality gates, motion, SEO, projects section).
 
@@ -87,7 +87,7 @@ What I'd take from it into a team: specs with testable requirements make AI outp
 | Build | Vite 8, ESLint 10 + typescript-eslint (0 warnings) |
 | Styling | CSS Modules + design tokens (`tokens/tokens.css`), Poppins (bundled), lucide-react, simple-icons |
 | Content | JSON Schema → generated TypeScript types + ajv validator, run in `prebuild` |
-| Testing | Vitest 5, React Testing Library, user-event, jsdom, axe-core — 482 tests in 41 files |
+| Testing | Vitest 5, React Testing Library, user-event, jsdom, axe-core — 485 tests in 42 files |
 | CI / CD | GitHub Actions: lint → test → build → GitHub Pages (nothing ships if a gate fails) |
 | Runtime | Node 26 LTS (`.nvmrc`) |
 
