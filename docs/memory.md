@@ -2,7 +2,7 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XXXII) y `docs/README.md` (#1–#120, con la enmienda de #116: `transition: none` excluido).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XXXIII) y `docs/README.md` (#1–#120, con la enmienda de #116: `transition: none` excluido).
 
 ## Estado actual (2026-11-15)
 
@@ -10,7 +10,7 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XXXII) y `docs/READ
 - **Mantenimiento 2026-11-11/12 (§XIV–§XIX)**: CV real + 3 testimonios reales (#112/#113) con `assetUrl()`/base (#107); tests adaptados sin debilitar; QA visual aprobada (gap chevron↔nombre 72.84px a 375; `qa-report.md`). `headline`/cargos en inglés en `cv.es.json`: decisión editorial #109, **no re-reportarla**.
 - **Motion: CERRADO 4/4** (§XXIV–§XXVII; propuesta marcada "IMPLEMENTADO"). #116 rige como **regla permanente** (`foundations/motion.md` + `AGENTS.md` → Convenciones, `11b475b`; aclaración: `transition: none` excluido). Sin pendientes del sistema; QA live cerró dialog: 200 ms `ease-enter`, cierre 0 eventos ×3 caminos.
 - **CI (§XVII)**: Node **26 LTS** (`.nvmrc`, que lee el deploy, #110); el deploy corre `lint` → `test` → `build` y no publica si algo falla (#111). Pages publicado e inspeccionado en vivo (§XXI).
-- **Pendientes**: ninguno bloqueante (todo pusheado y publicado al 2026-11-15, #119 incluido; saneado de docs §XXX) · opcionales: deudas de forma —incluida la **nueva**: `<script>` anti-flash en columna 0 en `index.html`, preexistente de T4—, StrictMode/F1-F2 (filas propias de **Abiertos**). El motion y sus confirmaciones manuales (Ctrl+P, reduced-motion) quedaron **cerrados**.
+- **Pendientes**: ninguno bloqueante (auditoría general §XXXIII, 2026-11-15: deps al día en rango; quedan 7 avisos moderados de dev por `minimatch`) · del usuario: PDF descargable ("445 tests", trae teléfono), "About" de GitHub, PageSpeed · opcionales: deudas de forma —incluida la **nueva**: `<script>` anti-flash en columna 0 en `index.html`, preexistente de T4—, StrictMode/F1-F2 (filas propias de **Abiertos**). El motion y sus confirmaciones manuales (Ctrl+P, reduced-motion) quedaron **cerrados**.
 
 ## Reglas no negociables para cualquier tarea futura
 

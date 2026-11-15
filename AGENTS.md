@@ -10,7 +10,7 @@ workspaces): el kit de diseño y la app conviven en la raíz. **Node 26 LTS**
 cv-agentic/
 ├─ AGENTS.md                  (este archivo)
 ├─ README.md                  presentación del repo, en inglés (#120; solo cambia a pedido del usuario)
-├─ docs/                      constitution, STATUS (estado), README completo, DESIGN, BACKLOG, diagnostics, memory, agent-system.md, qa-report (F5), tokens/ (breakpoints, contraste)
+├─ docs/                      constitution, STATUS (estado), README completo, DESIGN, BACKLOG, diagnostics, memory, agent-system.md, qa-report (F5), tokens/ (breakpoints, contraste), images/ (captura del README)
 ├─ tokens/                    tokens.css (lo importa la app)
 ├─ foundations/               tipografía, layout, movimiento, theming, i18n
 ├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (foundation, primitives, controls, layout, content, pages, hooks) + motion/proposal.md(propuesta transversal, no pieza)
@@ -19,9 +19,9 @@ cv-agentic/
 ├─ .opencode/skills/sdd/      skill del flujo SDD (SKILL.md)
 ├─ .opencode/commands/        comandos /sdd-* (atajos del flujo; ver docs/agent-system.md)
 ├─ opencode.json              config de OpenCode: MCP de Chrome DevTools (denegado salvo para el reviewer)
-├─ package.json               scripts: dev, lint, typecheck, test, build (los crea la Fase 1)
+├─ package.json               scripts: dev, lint, typecheck, test, build, gen:types, build:validator, validate:content
 ├─ index.html                 incluye el script anti-flash (tema, idioma y theme-color)
-├─ public/                    images/ (placeholders del contenido de ejemplo)
+├─ public/                    images/ (avatar.webp, fotos de testimonios y siluetas del ejemplo), cv/ (PDF descargable), og-image.png, favicon.svg, apple-touch-icon.png
 ├─ vite.config.ts · tsconfig.json (uno solo) · eslint.config.js · .nvmrc
 └─ src/
    ├─ main.tsx                importa ../tokens/tokens.css, fuente y estilos base; monta providers
@@ -30,6 +30,8 @@ cv-agentic/
    ├─ i18n/                   ui.en.ts, ui.es.ts, format.ts, formatPeriod.ts
    ├─ content/                cv.en.json, cv.es.json (editables), index.ts, content.test.ts, schema.test.ts
    ├─ lib/                    useHashTab y otras funciones puras compartidas
+   ├─ utils/                  assetUrl.ts (antepone el `base` de Vite a los assets de public/, #107)
+   ├─ scripts/                build-validator.ts, validate-content.ts (los corren los scripts de npm)
    ├─ components/<Name>/      <Name>.tsx, <Name>.module.css, <Name>.test.tsx, index.ts
    ├─ pages/                  AboutPage, ResumePage
    └─ test/                   setup.ts (jest-dom, mocks: matchMedia, dialog, ResizeObserver, scrollTo) · a11y.ts (expectNoA11yViolations, axe-core)

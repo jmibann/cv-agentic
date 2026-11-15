@@ -15,16 +15,16 @@ documentación se refiere a esos documentos de diseño, no a un paquete.
 cv-agentic/
 ├─ README.md          presentación del repo, en inglés (#120)
 ├─ AGENTS.md          convenciones para los agentes (OpenCode lo lee desde la raíz)
-├─ docs/              documentación: constitution, README completo, DESIGN, BACKLOG,
-│                     diagnostics, memory, agent-system.md (formato y permisos),
-│                     qa-report.md (F5) y tokens/ (breakpoints, contraste)
+├─ docs/              documentación: constitution, STATUS (estado), README completo, DESIGN,
+│                     BACKLOG, diagnostics, memory, agent-system.md (formato y permisos),
+│                     qa-report.md (F5), tokens/ (breakpoints, contraste) e images/
 ├─ tokens/            tokens.css (código: lo importa la app)
 ├─ foundations/       tipografía · layout · movimiento · theming · i18n
 ├─ specs/             una spec por pieza (foundation, primitives, controls, layout, content, pages, hooks) + motion/proposal.md
 ├─ data/              contrato de datos del CV (alias @data) + contenido de ejemplo
 ├─ .opencode/         agents/ (los 5 agentes), skills/sdd/, commands/ (/sdd-*)
 ├─ opencode.json      config de OpenCode (MCP de Chrome DevTools, solo para el reviewer)
-└─ src/ · public/ · index.html · package.json · vite.config.ts   ← los crea la Fase 1
+└─ src/ · public/ · index.html · package.json · vite.config.ts   ← la app
 ```
 
 ## Qué contiene
@@ -46,6 +46,7 @@ cv-agentic/
 | [docs/agent-system.md](agent-system.md) | Los 5 agentes de `.opencode/agents/` y los 8 comandos `/sdd-*`: formato, permisos y flujo |
 | [docs/BACKLOG.md](BACKLOG.md) | Temas postergados deliberadamente |
 | [docs/diagnostics.md](diagnostics.md) | Log mínimo de puertas F y decisiones de reglas (una entrada por evento con formato fijo, hashes y tabla **Abiertos**; sin secciones de estado: el estado vive en `docs/STATUS.md` y la memoria en `docs/memory.md`) |
+| [docs/STATUS.md](STATUS.md) | Tablero de estado del proyecto ("Estado actual", estructura, modo mantenimiento); lo actualiza el orchestrator al cerrar cada puerta F (#120) |
 | [docs/memory.md](memory.md) | Memoria entre sesiones (estado, decisiones recientes, aprendizajes; ~50 líneas, solo el orchestrator) |
 | `docs/qa-report.md` | Informe de QA de F5 (lo crea el orchestrator en F5, decisión #85) |
 

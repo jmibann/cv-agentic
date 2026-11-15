@@ -2,7 +2,7 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-15** (README en inglés y `docs/STATUS.md` §XXXII, #120; Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
+Última actualización: **2026-11-15** (auditoría general y saneado §XXXIII; README en inglés y `docs/STATUS.md` §XXXII, #120; Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
@@ -41,11 +41,19 @@ de la entrada); el detalle queda en git.
 
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
-| Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota), `<script>` anti-flash en columna 0 en `index.html` (preexistente de T4, menor de §XXVIII), comentarios viejos en `ResumePage.tsx`/`ResumePage.test.tsx` (§XXX) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
+| Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota), `<script>` anti-flash en columna 0 en `index.html` (preexistente de T4, menor de §XXVIII), comentarios viejos en `ResumePage.test.tsx` (§XXX; el de `ResumePage.tsx` se corrigió en §XXXIII) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
+| Del usuario (§XXXIII) | **PDF descargable** `public/cv/…pdf`: dice "445 tests" (hoy 482) e incluye el teléfono, que el sitio no muestra por decisión; **"About" del repo en GitHub**: descripción vieja y sin enlace al sitio; **PageSpeed**: volver a medir tras #119. **Dependencias**: 7 avisos moderados de desarrollo por `minimatch` vía `typescript-eslint` (esperar versión corregida; no forzar) | Usuario; `minimatch`: próxima actualización de dependencias |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
+
+### §XXXIII · 2026-11-15 — Auditoría general y saneado
+- Qué: dependencias actualizadas dentro de los rangos (`npm update` + `npm audit fix`, solo `package-lock.json`); comentarios viejos de `ResumePage.tsx` y `assetUrl.ts`; docs al día ("Modo mantenimiento" con #119/#120, árboles de AGENTS/`docs/README.md`/STATUS sin "los crea la Fase 1", `public/` y `src/utils`·`src/scripts`, fila de STATUS en "Qué contiene", ejemplo de `i18n.md`, BACKLOG). Hecho por Claude Code a pedido del usuario.
+- Checks: lint · typecheck · test (482/41) · build · validate:content. `npm audit`: 0 en producción; quedan 7 moderados de desarrollo (un solo `minimatch` transitivo de `typescript-eslint`, sin versión corregida en el rango).
+- Decisiones: ninguna nueva.
+- Commits: `b44cea9` (deps) · `d6b5a4b` (comentarios) + el docs de este saneado.
+- Abre: PDF descargable (dice "445 tests" y trae teléfono), "About" del repo en GitHub, re-medición en PageSpeed, `minimatch`; cierra: comentario viejo de `ResumePage.tsx`.
 
 ### §XXXII · 2026-11-15 — README público en inglés y tablero de estado a `docs/STATUS.md`
 - Qué: el tablero interno deja la raíz (`git mv README.md docs/STATUS.md`) y los agentes, la skill y AGENTS.md apuntan ahí; README nuevo en inglés con el texto del usuario, diagrama Mermaid del sistema de agentes y captura claro/oscuro (`docs/images/preview.png`). Hecho por Claude Code a pedido del usuario.
@@ -54,12 +62,7 @@ de la entrada); el detalle queda en git.
 - Commits: `b21b041` (mudanza) + el del README.
 - Abre: —; cierra: —.
 
-### §XXXI · 2026-11-15 — Cambio #119: avatar del sitio en WebP
-- Qué: `public/images/avatar.png` (269.794 bytes; PageSpeed estimaba 263 KiB de ahorro) se reemplaza por `avatar.webp` (512×512 con alfa, `cwebp -q 82`, 29.650 bytes, −89 %); `profile.avatar.src` actualizado en el contenido y en los ejemplos del kit. Foundation T21, hecha por Claude Code a pedido del usuario.
-- Checks: lint · typecheck · test (482/41) · build · validate:content; imagen decodificada comparada a la vista con el original. Sin verificación en navegador ni PageSpeed post-deploy.
-- Decisiones: #119 → `docs/README.md`.
-- Commits: `df85c61` (spec) · `23cd835` → `37f6659` (T21).
-- Abre: —; cierra: en parte BACKLOG → "Imágenes" (queda `srcset`/AVIF).
+### 2026-11-15 · §XXXI — Cambio #119: avatar del sitio en WebP · #119 · `git show 6f06934:docs/diagnostics.md`
 
 ### 2026-11-14 · §XXX — Saneado de documentación tras #117 y #118 (auditoría) · — · `git show e0b6104:docs/diagnostics.md`
 

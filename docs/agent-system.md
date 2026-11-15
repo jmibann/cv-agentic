@@ -116,9 +116,9 @@ El orden y las dependencias de los componentes están en
 F1–F5 cerradas (ver §XII en `docs/diagnostics.md` y `docs/qa-report.md`). No
 quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
 con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`. Trabajo abierto al
-2026-11-14: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109),
+2026-11-15: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109),
 **QA visual aprobada** (§XVI) y **CI** (§XVII: Node 26 LTS desde `.nvmrc`, #110;
-`lint` → `test` → `build` antes de publicar, #111) y **testimonios reales** (§XVIII–§XIX, #112–#113) , **Resume en una columna** (§XX, #114) y **favicon + título** (§XXI, #115) cerrados; **motion COMPLETO 4/4** (§XXIV–§XXVII, #106/#116 — #116 es regla permanente en `foundations/motion.md` y `AGENTS.md`) y **metadatos SEO y Open Graph** (§XXVIII, #117: primera reapertura de una pieza cerrada por un pedido nuevo — spec→plan→T19→QA sobre `dist/`—) y **sección Projects en Resume** (§XXIX, #118: colección `projects` en el esquema y el contenido) también cerrados; todo pusheado y publicado. Queda solo lo
+`lint` → `test` → `build` antes de publicar, #111) y **testimonios reales** (§XVIII–§XIX, #112–#113) , **Resume en una columna** (§XX, #114) y **favicon + título** (§XXI, #115) cerrados; **motion COMPLETO 4/4** (§XXIV–§XXVII, #106/#116 — #116 es regla permanente en `foundations/motion.md` y `AGENTS.md`) y **metadatos SEO y Open Graph** (§XXVIII, #117: primera reapertura de una pieza cerrada por un pedido nuevo — spec→plan→T19→QA sobre `dist/`—) y **sección Projects en Resume** (§XXIX, #118: colección `projects` en el esquema y el contenido) también cerrados; además **avatar en WebP** (§XXXI, #119) y **README público en inglés con el estado en `docs/STATUS.md`** (§XXXII, #120); todo pusheado y publicado. Queda solo lo
 postergado en el BACKLOG ("SEO por idioma", PDF por idioma, imágenes,
 contraste automatizado…).
 El workflow `.github/workflows/deploy.yml` lo mantiene el usuario (ningún agente lo

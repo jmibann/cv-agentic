@@ -41,7 +41,7 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **Proyectos en Resume (2026-11-14)** | ✅ **Cambio #118**: colección `projects` en el esquema y el contenido (el proyecto `cv-agentic` salió de `experience`) y sección Projects en Resume, entre Experience y Education, con ícono `code` (Foundation T20 + ResumePage T6; 479/41, build verde). |
 | **Avatar en WebP (2026-11-15)** | ✅ **Cambio #119**: `public/images/avatar.webp` (512×512 con alfa, 30 KB) reemplaza al PNG de 270 KB que PageSpeed marcaba con 263 KiB de ahorro; contenido y ejemplos apuntan a `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pusheado y publicado (WebP servido, PNG en 404); falta volver a medir en PageSpeed. |
 | **README en inglés (2026-11-15)** | ✅ **#120**: el `README.md` de la raíz presenta el repo en inglés (texto del usuario, diagrama del sistema de agentes, captura claro/oscuro); este tablero se mudó a `docs/STATUS.md` y los agentes apuntan acá. |
-| Post-entrega / próximos trabajos (2026-11-14) | Todo pusheado y publicado en GitHub Pages (metadatos #117 y sección Projects #118 verificados en el sitio servido). Sin pendientes bloqueantes; quedan solo los opcionales de la tabla **Abiertos** de `docs/diagnostics.md` (deudas de forma, StrictMode/F1-F2) y lo postergado en `docs/BACKLOG.md`. |
+| Post-entrega / próximos trabajos (2026-11-15) | Publicado en GitHub Pages (metadatos #117, sección Projects #118 y avatar WebP #119 verificados en el sitio servido; README #120 verificado en GitHub). Auditoría general §XXXIII: dependencias al día dentro de los rangos. Sin pendientes bloqueantes; quedan los opcionales de la tabla **Abiertos** de `docs/diagnostics.md` (deudas de forma, StrictMode/F1-F2, tres puntos del usuario: PDF, "About" de GitHub, PageSpeed) y lo postergado en `docs/BACKLOG.md`. |
 
 Detalle y decisiones: [docs/diagnostics.md](diagnostics.md).
 
@@ -58,7 +58,7 @@ cv-agentic/
 ├─ data/              esquema JSON del CV (fuente de verdad) + ejemplos
 ├─ .opencode/         agents/ (los 5 agentes), skills/sdd/, commands/ (/sdd-*)
 ├─ opencode.json      config de OpenCode (MCP de Chrome DevTools, solo para el reviewer)
-└─ src/ · public/ · index.html · package.json   ← los crea la Fase 1
+└─ src/ · public/ · index.html · package.json   ← la app
 ```
 
 ## Mantenimiento (modo actual — desde 2026-10-08)

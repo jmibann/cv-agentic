@@ -47,7 +47,7 @@ necesita decisión del usuario antes de implementarse (flujo por tipo de tarea:
   estático). Si se suman idiomas o el contenido crece: `import()` dinámico por
   idioma en `content/index.ts`.
 - **Aprendizajes entre tareas.** Hoy los aprendizajes viven en
-  `docs/memory.md` ("Aprendizajes y errores a evitar", máximo ~50 líneas, solo
+  `docs/memory.md` ("Reglas no negociables para cualquier tarea futura", máximo ~50 líneas, solo
   lo edita el orchestrator al cerrar cada puerta F). Si se ve que se repiten
   errores y no alcanza, diseñar un mecanismo propio (por ejemplo, un
   `LEARNINGS.md` que el orchestrator cure con los hallazgos del reviewer, que
