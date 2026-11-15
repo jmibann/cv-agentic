@@ -1,60 +1,4 @@
-/* CornerTab — specs/primitives/CornerTab/spec.md → Estilos y tokens (T1 base;
-   T2 variantes size; T3 placement float; T4 forma completa de la clase base:
-   fondo, bordes, radio y layout interno — RF-5). La clase base fija la fila
-   "Posición" de la tabla de la spec
-   (RF-1): absolute/top/right con `z-index: var(--z-raised)` (token; regla 2
-   de docs/DESIGN.md; comment de tokens.css: "CornerTab sobre el contenido del
-   Box") más las filas "Fondo"/"Borde"/"Radio"/"Layout interno" (T4, abajo).
-   Cero colores literales (regla 1 de docs/DESIGN.md): fondo
-   --color-surface-raised y bordes --color-border, ambos tokens semánticos que
-   existen en los dos temas; el único `@media` del módulo es el de
-   `.float` en T3 (RF-3; abajo) y ningún `@media print` propio (RF-4: la
-   oculta el estilo compartido de foundations/layout.md; resolución R-1 del
-   plan; "La tab siempre está visible en todos los breakpoints de pantalla" —
-   spec → Responsive: ninguna regla del módulo la oculta en pantalla; los
-   colores del fondo/borde los resuelve cada tema vía tokens). Ninguna medida
-   propia cambia por breakpoint — `top`/`right` son 0,
-   permitido por docs/tokens/breakpoints.md).
-   Cero pseudo-estados :hover/:focus y cero transiciones (spec → Estados:
-   ninguno propio; RF-6: hover/foco son del contenido). Sin margen externo
-   (docs/DESIGN.md → Do/Don't): el padre posiciona con gap; en T3 `.float`
-   usa márgenes negativos de calc() sobre --box-padding (compensación del
-   padding del Box, excepción igual a Separator/SectionTitle, no margen de
-   espaciado). Nombres de variante: `.md`/`.sm` = valor exacto del prop
-   `size` (criterio de la fase: Button `.small`/`.fullWidth`, Box
-   `.outer`/`.inner`; registrado aquí según el encargo de T2); `.float` =
-   valor exacto del prop `placement` (mismo criterio, encargo de T3).
-   Sombra: NINGUNA (spec → tabla "Sombra | ninguna" y "No hacer": "no agregarle
-   sombra 'para separarla'"; docs/DESIGN.md → Do/Don't: "CornerTab con borde
-   1px" vs "CornerTab sin borde o con sombra") — por eso el módulo no declara
-   `box-shadow` en ninguna regla. */
-
-/* Clase base del único elemento raíz (<div>, spec → Anatomía: un div
-   posicionado dentro del Box, que es position: relative). Valores exactos de
-   la tabla "Estilos y tokens" (spec; la fila "Posición" rige en overlay,
-   RF-1, y las filas "Fondo"/"Borde"/"Radio"/"Layout interno" llegan en T4,
-   RF-5, SIEMPRE visibles: en pantalla en todos los breakpoints — RF-4 — y en
-   ambos temas).
-   Borde OBLIGATORIO siempre (RF-5): en oscuro --color-surface-raised contra
-   --color-surface es 1.14:1 — fila "Oscuro: `surface-raised` sobre `surface`
-   | 1.14 | Solo con borde de 1px --color-border" y regla 4 de
-   docs/tokens/contrast.md: "--color-surface-raised siempre lleva borde de
-   1px (--color-border); sin él la CornerTab no se distingue de la card en
-   oscuro"; en claro rige el "SIEMPRE" del RF-5 (y el comment de
-    --color-border en tokens.css: "bordes 1px (CornerTab, controles)"). El
-    `1px` es una medida FIJA definida literalmente en
-   la tabla de la spec ("Borde | border-left: 1px solid var(--color-border);
-   border-bottom: 1px solid var(--color-border);"): no existe token genérico
-   de grosor de línea en tokens.css (--timeline-line-width es una medida
-   interna de Timeline, no reutilizable), y docs/tokens/breakpoints.md permite
-   literales de medidas fijas "si su spec las define" (misma justificación
-   aprobada en Separator T2, línea 1px de --color-track).
-   Radio: `0 var(--radius-20) 0 var(--radius-32)` literal de la fila "Radio"
-   (arriba-der = radio del Box; los 0 son permitidos por breakpoints.md). El
-   `display: flex; align-items: center;` es la fila "Layout interno" (centra
-   verticalmente el contenido: tab de NavTabs / botón Show Contacts; spec →
-   Estados: ninguno propio — los estados del contenido no viven acá).
-   Sin box-shadow (cabecera; spec → "No hacer"). */
+/* Positioned against the Box, which is position: relative. */
 .cornerTab {
   position: absolute;
   top: 0;
@@ -68,63 +12,27 @@
   align-items: center;
 }
 
-/* size="md" (default; RF-2, T2): fila `size="md"` de la tabla de la spec con
-   sus tokens — --size-nav-tab-height (3rem → 3.75rem ≥992) y
-   --corner-tab-padding-inline (20px → 2rem ≥992) escalan en tokens.css, así
-   que el módulo no agrega @media (regla de docs/tokens/breakpoints.md: toda
-   medida que cambia por breakpoint es token). Variante siempre presente
-   (md o sm): la base no declara alto/padding propios. */
 .md {
   min-height: var(--size-nav-tab-height);
   padding-inline: var(--corner-tab-padding-inline);
 }
 
-/* size="sm" (compacta, Show Contacts; RF-2, T2): fila `size="sm"` de la
-   tabla de la spec. Literales fijos 2.75rem/1.25rem PERMITIDOS: son medidas
-   que NO cambian por breakpoint y las define la spec
-   (docs/tokens/breakpoints.md → "Las medidas fijas (que no cambian por
-   breakpoint) pueden ser literales en el CSS del componente si su spec las
-   define"; plan.md → Decisiones: "size='sm' usa los literales fijos
-   2.75rem/1.25rem permitidos por breakpoints.md (no escalan)"). */
+/* Fixed literals: these sizes do not change by breakpoint. */
 .sm {
   min-height: 2.75rem;
   padding-inline: 1.25rem;
 }
 
-/* placement="float" (RF-3, T3): ÚNICO @media del módulo, el de `lg`
-   (min-width: 992px) fijado por spec → Responsive (el literal 992px dentro
-   del @media es la forma canónica: "Los @media no aceptan custom properties,
-   así que se escriben literales" — docs/tokens/breakpoints.md → Reglas; y es
-   uno de los cuatro valores de ancho permitidos).
-   FUERA del @media la clase .float NO pinta nada: RF-3 (spec) — "SI el
-   viewport es < 992px, ENTONCES permanece absoluta" —, así que en < 992 la
-   base `.cornerTab` de T1 (absolute/top/right/--z-raised) sigue rigiendo
-   también para float. Por eso `.float` se declara SOLO dentro del @media
-   (bloque textual de spec → Responsive): fuera de él la clase no pinta nada
-   (encargo de T3: "la clase `.float` NO pinta nada sin el media"); no hace
-   falta una regla vacía adicional.
-   Dentro del @media solo cambios de posicionamiento/float (layout) y medidas
-   que son tokens, calc() de tokens o 0 (docs/tokens/breakpoints.md → Reglas;
-   plan → Decisiones): position: relative saca a la tab del absoluto;
-   z-index: var(--z-raised) la apila por encima del h1 posicionado que fluye
-   al lado (resolución R-2 del plan, actualizada por el Cambio 2026-11-10:
-   el h1 de SectionTitle.decorated, position: relative, fluye al lado y con
-   z-index: auto su caja tapaba la mitad inferior del tab y se quedaba con
-   los clicks; apilar la tab lo evita y el h1 sigue siendo seleccionable, sin
-   pointer-events: none); los márgenes negativos de calc() sobre --box-padding
-   compensan el padding del Box para que la tab siga pegada a la esquina
-   (excepción de margen ya documentada en la cabecera del módulo) y --space-6
-   da el aire entre el h1 y la tab (spec → Responsive, bloque textual
-   `.float`, replicado aquí literalmente).
-   RF-4: ningún @media print propio — en impresión la oculta el estilo
-   compartido de foundations/layout.md (plan → Decisiones, resolución R-1). */
+/* Media queries cannot use custom properties, so the breakpoint is a literal. */
 @media (min-width: 992px) {
   .float {
-    position: relative; /* sale del absoluto; sigue anclada a la esquina */
-    z-index: var(--z-raised); /* por encima del h1 posicionado que fluye al lado (RF-3) */
+    /* Leaves absolute positioning but stays anchored to the corner. */
+    position: relative;
+    /* Above the positioned h1 that flows next to it. */
+    z-index: var(--z-raised);
     float: right;
     margin-top: calc(var(--box-padding) * -1);
     margin-right: calc(var(--box-padding) * -1);
-    margin-left: var(--space-6); /* aire entre el h1 y la tab */
+    margin-left: var(--space-6);
   }
 }
