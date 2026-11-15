@@ -133,7 +133,7 @@ describe("Button decorative icon and iconPosition (T4: RF-4, RF-7)", () => {
     );
     if (svg === null || label === undefined) {
       throw new Error(
-        `Falta ${svg === null ? "el <svg> decorativo" : "el nodo de texto del label"} en el raíz del Button`,
+        `Missing ${svg === null ? "the decorative <svg>" : "the label text node"} in the Button root`,
       );
     }
     return { svg, label };

@@ -33,13 +33,13 @@ interface SchemaEnumDefinition {
 function extractSchemaEnums(schemaSource: string): Record<string, readonly string[]> {
   const parsed: unknown = JSON.parse(schemaSource);
   if (typeof parsed !== "object" || parsed === null) {
-    throw new Error("data/cv.schema.json no es un objeto JSON");
+    throw new Error("data/cv.schema.json is not a JSON object");
   }
   const definitions = (
     parsed as { definitions?: Record<string, SchemaEnumDefinition | undefined> }
   ).definitions;
   if (definitions === undefined) {
-    throw new Error("data/cv.schema.json no tiene `definitions`");
+    throw new Error("data/cv.schema.json has no `definitions`");
   }
   const enums: Record<string, readonly string[]> = {};
   for (const [name, definition] of Object.entries(definitions)) {
@@ -55,7 +55,7 @@ function readGenTypesScript(): string {
   const script = (parsed as { scripts?: Record<string, string | undefined> })
     .scripts?.["gen:types"];
   if (script === undefined) {
-    throw new Error('package.json no define el script "gen:types"');
+    throw new Error('package.json does not define the "gen:types" script');
   }
   return script;
 }
@@ -81,7 +81,7 @@ describe("schema up to date (RF-7)", () => {
     const banner = /--bannerComment="([^"]*)"/.exec(readGenTypesScript())?.[1];
     if (banner === undefined) {
       throw new Error(
-        'El script "gen:types" debe fijar --bannerComment (plan.md, decisión 4)',
+        'The "gen:types" script must set --bannerComment',
       );
     }
 

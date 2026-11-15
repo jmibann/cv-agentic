@@ -51,13 +51,13 @@ describe("AboutPage intro paragraphs (T1: RF-2 intro, Tests 2)", () => {
 
     if (ABOUT_PARAGRAPHS.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer párrafos en profile.about (test 2 de la spec no puede correr vacío)",
+        "the content must have paragraphs in profile.about (this test cannot run on empty data)",
       );
     }
 
     const pageRoot = container.firstElementChild;
     if (pageRoot === null) {
-      throw new Error("AboutPage debe renderizar el raíz div.page (Anatomía)");
+      throw new Error("AboutPage must render the div.page root");
     }
     expect(pageRoot.tagName).toBe("DIV");
     expect(pageRoot).toHaveClass(PAGE_CLASS);
@@ -65,7 +65,7 @@ describe("AboutPage intro paragraphs (T1: RF-2 intro, Tests 2)", () => {
     expect(introBlocks).toHaveLength(1);
     const intro = introBlocks[0];
     if (intro === undefined) {
-      throw new Error("el raíz .page debe tener el bloque .intro como único div hijo directo (Anatomía)");
+      throw new Error("the .page root must have the .intro block as its only direct div child");
     }
     expect(intro).toHaveClass(INTRO_CLASS);
 
@@ -132,7 +132,7 @@ describe("AboutPage services region (T2: RF-2 services, RF-5, Tests 3)", () => {
   it("renders a region named by t.about.services with one li-wrapped article per service inside a ul", () => {
     if (SERVICES.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer servicios en cv.services (test 3 de la spec no puede correr vacío)",
+        "the content must have services (this test cannot run on empty data)",
       );
     }
 
@@ -164,7 +164,7 @@ describe("AboutPage services region (T2: RF-2 services, RF-5, Tests 3)", () => {
       const parent = article.parentElement;
       if (parent === null) {
         throw new Error(
-          `la ServiceCard de "${service.title}" debe vivir dentro de un <li> (Anatomía)`,
+          `the ServiceCard for "${service.title}" must live inside an <li>`,
         );
       }
       expect(parent.tagName).toBe("LI");
@@ -174,7 +174,7 @@ describe("AboutPage services region (T2: RF-2 services, RF-5, Tests 3)", () => {
     const pageRoot = region.parentElement;
     if (pageRoot === null) {
       throw new Error(
-        "la <section> de servicios debe ser hijo del raíz .page (Anatomía)",
+        "the services <section> must be a child of the .page root",
       );
     }
     expect(pageRoot.tagName).toBe("DIV");
@@ -191,7 +191,7 @@ describe("AboutPage with empty services (T2: RF-2, Tests 5a, mocked provider)", 
   it("renders no services region nor its h2 and keeps the unique h1 when services is empty", () => {
     if (SERVICES.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer servicios para que el escenario vacío (test 5a) discrimine",
+        "the content must have services for the empty scenario to be meaningful",
       );
     }
 
@@ -239,7 +239,7 @@ describe("AboutPage testimonials region is the carousel own section (T3: RF-2 te
     const pageRoot = region.parentElement;
     if (pageRoot === null) {
       throw new Error(
-        "la <section> del carrusel debe ser hijo del raíz .page (decisión 20: sin wrapper)",
+        "the carousel <section> must be a direct child of the .page root (no wrapper)",
       );
     }
     expect(pageRoot.tagName).toBe("DIV");
@@ -301,7 +301,7 @@ describe("AboutPage in Spanish locale (T3: Tests 6, real LocaleProvider seeded e
       cvByLocale.es.profile.about.length === 0
     ) {
       throw new Error(
-        "el contenido del kit debe traer about y services en cv.es para el test 6",
+        "the Spanish content must have about and services for this test",
       );
     }
 
@@ -362,7 +362,7 @@ describe("AboutPage className joining (T4: spec → API, G-B, Tests 8)", () => {
     const h1 = screen.getByRole("heading", { level: 1, name: ABOUT_TITLE });
     const pageRoot = h1.parentElement;
     if (pageRoot === null) {
-      throw new Error("el h1 debe ser hijo del raíz .page (Anatomía)");
+      throw new Error("the h1 must be a child of the .page root");
     }
     expect(pageRoot).toHaveClass(PAGE_CLASS);
     expect(pageRoot).toHaveClass(consumerClass);

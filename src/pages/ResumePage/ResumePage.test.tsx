@@ -56,7 +56,7 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
   it("renders a named region per timeline with one listitem per entry, in data order", () => {
     if (EDUCATION.length === 0 || EXPERIENCE.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer education y experience no vacías (test 2 de la spec no puede correr vacío)",
+        "the content must have non-empty education and experience (this test cannot run on empty data)",
       );
     }
 
@@ -98,7 +98,7 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
     });
     const columns = educationRegion.parentElement;
     if (columns === null) {
-      throw new Error("las <section> deben colgar del bloque .columns (Anatomía)");
+      throw new Error("the <section> elements must be children of the .columns block");
     }
     expect(columns.tagName).toBe("DIV");
     expect(columns).toHaveClass(COLUMNS_CLASS);
@@ -114,7 +114,7 @@ describe("ResumePage education and experience regions (T1: RF-2 columns, RF-5, T
 
     const pageRoot = columns.parentElement;
     if (pageRoot === null) {
-      throw new Error(".columns debe ser hijo del raíz .page (Anatomía)");
+      throw new Error(".columns must be a child of the .page root");
     }
     expect(pageRoot.tagName).toBe("DIV");
     expect(pageRoot).toHaveClass(PAGE_CLASS);
@@ -128,7 +128,7 @@ describe("ResumePage in Spanish locale (T1: Tests 7, real LocaleProvider seeded 
   it("shows the ui.es interface strings and the cv.es content when the active locale is es", () => {
     if (cvByLocale.es.education.length === 0 || cvByLocale.es.experience.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer education y experience en cv.es para el test 7",
+        "the Spanish content must have education and experience for this test",
       );
     }
     const esEntries = [...cvByLocale.es.education, ...cvByLocale.es.experience];
@@ -137,7 +137,7 @@ describe("ResumePage in Spanish locale (T1: Tests 7, real LocaleProvider seeded 
     );
     if (!esEntries.some((entry) => !enTitles.has(entry.title))) {
       throw new Error(
-        "los títulos de education/experience de cv.es deben diferir de los de cv.en al menos en uno para que el test 7 discrimine el contenido",
+        "at least one education/experience title must differ between cv.es and cv.en for this test to tell the content apart",
       );
     }
 
@@ -196,7 +196,7 @@ vi.mock("../../providers/LocaleProvider", async (importOriginal) => {
         const base = cv.education[0];
         if (base === undefined) {
           throw new Error(
-            "el cv del locale activo debe traer al menos una entrada de education para el escenario del test 4",
+            "the active locale's content must have at least one education entry for this scenario",
           );
         }
         return { ...cv, education: [{ ...base, end: null }], experience: [] };
@@ -230,7 +230,7 @@ describe("ResumePage presentLabel forwarded to an open-ended entry (T2: RF-7, Te
   it("shows t.timeline.present for the mocked end:null entry, proving the label travels through the page", () => {
     if (EDUCATION.length < 2) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer al menos DOS entradas de education para que el escenario mockeado (1 listitem) del test 4 discrimine",
+        "the content must have at least TWO education entries for the mocked scenario (1 listitem) to be meaningful",
       );
     }
 
@@ -260,7 +260,7 @@ describe("ResumePage with education empty (T2: RF-2, Tests 5, mocked provider)",
   it("renders no education region while Experience stays present and the h1 remains the only one", () => {
     if (EDUCATION.length === 0 || EXPERIENCE.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer education y experience no vacías para que el escenario 5a discrimine",
+        "the content must have non-empty education and experience for scenario 5a to be meaningful",
       );
     }
 
@@ -277,7 +277,7 @@ describe("ResumePage with education empty (T2: RF-2, Tests 5, mocked provider)",
     const columns = experienceRegion.parentElement;
     if (columns === null) {
       throw new Error(
-        "la <section> de experience debe colgar del bloque .columns (Anatomía)",
+        "the experience <section> must be a child of the .columns block",
       );
     }
     expect(columns.tagName).toBe("DIV");
@@ -297,7 +297,7 @@ describe("ResumePage with education and experience both empty (T2: RF-2, Tests 5
     // prove nothing.
     if (EDUCATION.length === 0 || EXPERIENCE.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer education y experience no vacías para que el escenario 5b discrimine",
+        "the content must have non-empty education and experience for scenario 5b to be meaningful",
       );
     }
 
@@ -313,7 +313,7 @@ describe("ResumePage with education and experience both empty (T2: RF-2, Tests 5
     const h1 = screen.getByRole("heading", { level: 1, name: RESUME_TITLE });
     const pageRoot = h1.parentElement;
     if (pageRoot === null) {
-      throw new Error("el h1 debe ser hijo del raíz .page (Anatomía)");
+      throw new Error("the h1 must be a child of the .page root");
     }
     expect(pageRoot.querySelectorAll(":scope > div")).toHaveLength(0);
 
@@ -328,7 +328,7 @@ describe("ResumePage skills region (T3: RF-4, Tests 3)", () => {
   it("renders a region named by t.resume.skills with one labelled list and one listitem per skill in data order", () => {
     if (SKILLS.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer skills en cv.skills (test 3 de la spec no puede correr vacío)",
+        "the content must have skills (this test cannot run on empty data)",
       );
     }
 
@@ -352,7 +352,7 @@ describe("ResumePage skills region (T3: RF-4, Tests 3)", () => {
     const pageRoot = region.parentElement;
     if (pageRoot === null) {
       throw new Error(
-        "la <section> de skills debe ser hijo del raíz .page (Anatomía)",
+        "the skills <section> must be a child of the .page root",
       );
     }
     expect(pageRoot.tagName).toBe("DIV");
@@ -360,7 +360,7 @@ describe("ResumePage skills region (T3: RF-4, Tests 3)", () => {
     expect(pageRoot.firstElementChild).toBe(h1);
     const columns = pageRoot.querySelector(":scope > div");
     if (columns === null) {
-      throw new Error(".columns debe seguir montado con el contenido real (Anatomía)");
+      throw new Error(".columns must stay mounted with the real content");
     }
     expect(region.previousElementSibling).toBe(columns);
   });
@@ -374,7 +374,7 @@ describe("ResumePage with empty skills (T3: RF-4, Tests 6, mocked provider)", ()
   it("renders no skills region nor its h2 when skills is empty", () => {
     if (SKILLS.length === 0) {
       throw new Error(
-        "el contenido de ejemplo del kit debe traer skills para que el escenario vacío (test 6) discrimine",
+        "the content must have skills for the empty scenario to be meaningful",
       );
     }
 
@@ -405,7 +405,7 @@ describe("ResumePage className joining (T4: spec → API, G-B, Tests 9)", () => 
 
     const pageRoot = container.firstElementChild;
     if (pageRoot === null) {
-      throw new Error("ResumePage debe renderizar el raíz .page (Anatomía)");
+      throw new Error("ResumePage must render the .page root");
     }
     const h1 = screen.getByRole("heading", { level: 1, name: RESUME_TITLE });
     expect(h1.parentElement).toBe(pageRoot);
@@ -420,7 +420,7 @@ describe("ResumePage projects region (T6: RF-2, RF-3, Tests 10)", () => {
   it("renders a region named by t.resume.projects with one listitem per entry, in data order", () => {
     if (PROJECTS.length === 0) {
       throw new Error(
-        "el contenido debe traer al menos una entrada en cv.projects (test 10 de la spec no puede correr vacío)",
+        "the content must have at least one projects entry (this test cannot run on empty data)",
       );
     }
 
@@ -454,7 +454,7 @@ describe("ResumePage with empty projects (T6: RF-2, Tests 11, mocked provider)",
   it("renders no projects region while Experience and Education stay present", () => {
     if (PROJECTS.length === 0) {
       throw new Error(
-        "el contenido debe traer projects para que el escenario vacío (test 11) discrimine",
+        "the content must have projects for the empty scenario to be meaningful",
       );
     }
 

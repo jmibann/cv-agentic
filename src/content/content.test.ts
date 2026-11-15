@@ -188,7 +188,7 @@ describe("projects collection (T20, #118)", () => {
   it("accepts projects entries shaped as TimelineEntry", () => {
     if (exampleBase.experience.length === 0) {
       throw new Error(
-        "el ejemplo del kit debe traer al menos una entrada de experience para armar la entrada de projects",
+        "the kit example must have at least one experience entry to build the projects entry from",
       );
     }
     expect(validateCv(withProjectEntry(exampleBase))).toBe(true);

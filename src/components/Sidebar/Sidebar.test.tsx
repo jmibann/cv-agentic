@@ -422,7 +422,7 @@ describe("contacts entrance (Cambio motion 3)", () => {
     const contacts = container.querySelector(`#${CONTACTS_ID}`);
     if (contacts === null) {
       throw new Error(
-        `expected #${CONTACTS_ID} to exist (RF-10: id alcanzable del disclosure)`,
+        `expected #${CONTACTS_ID} to exist (the id the disclosure button controls)`,
       );
     }
 

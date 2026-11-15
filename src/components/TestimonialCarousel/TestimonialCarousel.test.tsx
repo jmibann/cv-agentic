@@ -249,7 +249,7 @@ describe("TestimonialCarousel moves aria-current to the bullet of the active sto
       .getByRole("group", { name: "1 of 3" })
       .parentElement;
     if (track === null) {
-      throw new Error("T3: el slide no tiene track padre en el DOM");
+      throw new Error("the slide has no parent track in the DOM");
     }
 
     Object.defineProperty(track, "scrollLeft", {
@@ -301,7 +301,7 @@ describe("TestimonialCarousel bullet click scrolls the track to its stop with be
       .getByRole("group", { name: "1 of 3" })
       .parentElement;
     if (track === null) {
-      throw new Error("T4: el slide no tiene track padre en el DOM");
+      throw new Error("the slide has no parent track in the DOM");
     }
     const scrollTo = vi.fn();
     Object.defineProperty(track, "scrollTo", {

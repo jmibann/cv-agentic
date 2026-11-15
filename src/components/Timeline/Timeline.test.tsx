@@ -88,7 +88,7 @@ describe("Timeline article labelling (T1: RF-2, RF-5)", () => {
       const entry = ENTRIES[index];
       if (entry === undefined) {
         throw new Error(
-          "listitem sin entrada correspondiente en el fixture (invariante)",
+          "listitem without a matching entry in the fixture (invariant)",
         );
       }
 
@@ -247,7 +247,7 @@ const periodTimes = (article: HTMLElement): HTMLTimeElement[] =>
 const requireTime = (time: HTMLTimeElement | undefined): HTMLTimeElement => {
   if (time === undefined) {
     throw new Error(
-      "el período debe envolver cada fecha en <time dateTime> (RF-4)",
+      "the period must wrap each date in <time dateTime>",
     );
   }
   return time;
@@ -261,7 +261,7 @@ describe("Timeline period with time per endpoint (T2: RF-3, RF-4)", () => {
     const times = periodTimes(article);
     if (times.length !== 2) {
       throw new Error(
-        `un rango debe renderizar exactamente dos <time> (RF-4, Tests esperados 6); se encontraron ${times.length}`,
+        `a range must render exactly two <time> elements; found ${times.length}`,
       );
     }
     const start = requireTime(times[0]);
@@ -274,7 +274,7 @@ describe("Timeline period with time per endpoint (T2: RF-3, RF-4)", () => {
 
     const period = start.parentElement;
     if (period === null) {
-      throw new Error("cada <time> debe vivir en el <p class=period> (Anatomía)");
+      throw new Error("every <time> must live inside the <p class=period>");
     }
     expect(period.tagName).toBe("P");
     expect(period.textContent).toBe("Mar 2019 — Nov 2021");
@@ -289,7 +289,7 @@ describe("Timeline period with time per endpoint (T2: RF-3, RF-4)", () => {
     const times = periodTimes(article);
     if (times.length !== 2) {
       throw new Error(
-        `un rango debe renderizar exactamente dos <time> (RF-4, Tests esperados 6); se encontraron ${times.length}`,
+        `a range must render exactly two <time> elements; found ${times.length}`,
       );
     }
     const start = requireTime(times[0]);
@@ -323,7 +323,7 @@ describe("Timeline period with time per endpoint (T2: RF-3, RF-4)", () => {
     const times = periodTimes(article);
     if (times.length !== 2) {
       throw new Error(
-        `un rango debe renderizar exactamente dos <time> (RF-4, Tests esperados 6); se encontraron ${times.length}`,
+        `a range must render exactly two <time> elements; found ${times.length}`,
       );
     }
     const start = requireTime(times[0]);

@@ -150,7 +150,7 @@ describe("AppLayout tab change swaps panel, labelledby and hash (T2: RF-3, Tests
       const firstCall = replaceState.mock.calls[0];
       if (firstCall === undefined) {
         throw new Error(
-          "replaceState sin llamadas registradas (no debería: toHaveBeenCalledTimes(1) ya pasó)",
+          "replaceState has no recorded calls (unexpected: toHaveBeenCalledTimes(1) already passed)",
         );
       }
       expect(firstCall[2]).toMatch(/#resume$/);
@@ -177,7 +177,7 @@ describe("AppLayout tablist invariant (T2: RF-5, Tests 11)", () => {
     const firstTab = tabs[0];
     const secondTab = tabs[1];
     if (firstTab === undefined || secondTab === undefined) {
-      throw new Error("el tablist debe tener exactamente dos tabs (RF-5)");
+      throw new Error("the tablist must have exactly two tabs");
     }
     expect(tabs.map((tab) => tab.id)).toEqual(["tab-about", "tab-resume"]);
     expect(tabs.map((tab) => tab.textContent)).toEqual([
@@ -313,7 +313,7 @@ describe("AppLayout inactive page lives hidden outside the tabpanel (T4: RF-8, T
     const printOnly = document.querySelector("[data-print-only]");
     if (printOnly === null) {
       throw new Error(
-        "debe existir el bloque hermano data-print-only con la página inactiva (RF-8)",
+        "the sibling data-print-only block with the inactive page must exist",
       );
     }
     expect(printOnly.tagName).toBe("DIV");
@@ -351,7 +351,7 @@ describe("AppLayout inactive page lives hidden outside the tabpanel (T4: RF-8, T
     const printOnly = document.querySelector("[data-print-only]");
     if (printOnly === null) {
       throw new Error(
-        "debe existir el bloque hermano data-print-only con la página inactiva (RF-8, simétrico)",
+        "the sibling data-print-only block with the inactive page must exist (symmetric case)",
       );
     }
     expect(printOnly.hasAttribute("hidden")).toBe(true);
@@ -386,7 +386,7 @@ describe("AppLayout container className joining (T5: spec → API, G-B)", () => 
     const banner = screen.getByRole("banner");
     const containerDiv = banner.parentElement;
     if (containerDiv === null) {
-      throw new Error("el banner debe colgar del div.container (Anatomía)");
+      throw new Error("the banner must be a child of div.container");
     }
     expect(containerDiv.tagName).toBe("DIV");
     expect(containerDiv).toHaveClass(CONTAINER_CLASS);
@@ -453,7 +453,7 @@ describe("AppLayout entry wrapper marks the direction on tab change (T11: RF-9, 
       container.querySelector<HTMLElement>("[data-motion-panel]");
     if (fromRight === null) {
       throw new Error(
-        "debe existir el wrapper data-motion-panel dentro del tabpanel (RF-9)",
+        "the data-motion-panel wrapper must exist inside the tabpanel",
       );
     }
     expect(fromRight).toHaveAttribute("data-motion-direction", "from-right");
@@ -462,7 +462,7 @@ describe("AppLayout entry wrapper marks the direction on tab change (T11: RF-9, 
     await user.click(screen.getByRole("tab", { name: uiEn.nav.about }));
     const fromLeft = container.querySelector("[data-motion-panel]");
     if (fromLeft === null) {
-      throw new Error("el wrapper data-motion-panel debe persistir al cambiar de tab (RF-9)");
+      throw new Error("the data-motion-panel wrapper must persist across a tab change");
     }
     expect(fromLeft).toHaveAttribute("data-motion-direction", "from-left");
 
@@ -471,7 +471,7 @@ describe("AppLayout entry wrapper marks the direction on tab change (T11: RF-9, 
     const finalWrapper = container.querySelector("[data-motion-panel]");
     if (finalWrapper === null) {
       throw new Error(
-        "el wrapper data-motion-panel debe existir tras los clicks rápidos (RF-9)",
+        "the data-motion-panel wrapper must exist after the rapid clicks",
       );
     }
     expect(finalWrapper).toHaveAttribute("data-motion-direction", "from-left");
@@ -488,7 +488,7 @@ describe("AppLayout entry wrapper has no direction on first render and keeps it 
     const initial = container.querySelector("[data-motion-panel]");
     if (initial === null) {
       throw new Error(
-        "el wrapper data-motion-panel debe existir ya en el render inicial (RF-9)",
+        "the data-motion-panel wrapper must exist on the initial render",
       );
     }
     expect(initial).not.toHaveAttribute("data-motion-direction");
@@ -497,7 +497,7 @@ describe("AppLayout entry wrapper has no direction on first render and keeps it 
     const wrapper = container.querySelector("[data-motion-panel]");
     if (wrapper === null) {
       throw new Error(
-        "debe existir el wrapper data-motion-panel tras el cambio de tab (RF-9)",
+        "the data-motion-panel wrapper must exist after the tab change",
       );
     }
     expect(wrapper).toHaveAttribute("data-motion-direction", "from-right");
@@ -506,7 +506,7 @@ describe("AppLayout entry wrapper has no direction on first render and keeps it 
     const afterLanguage = container.querySelector("[data-motion-panel]");
     if (afterLanguage === null) {
       throw new Error(
-        "el wrapper debe sobrevivir el re-render por idioma (RF-9, test 16)",
+        "the wrapper must survive the re-render caused by a language change",
       );
     }
     expect(afterLanguage).toHaveAttribute("data-motion-direction", "from-right");
@@ -561,7 +561,7 @@ describe("AppLayout resets the testimonials carousel to index zero across tab ch
       })
       .parentElement;
     if (track === null) {
-      throw new Error("el slide 1 debe tener un track padre en el DOM");
+      throw new Error("slide 1 must have a parent track in the DOM");
     }
     Object.defineProperty(track, "scrollLeft", {
       value: 300,
