@@ -1,18 +1,4 @@
-/* IconBox — specs/primitives/IconBox/spec.md → Estilos y tokens (T3).
-   Cero colores literales, cero @media propios (RF-3: el tamaño es fijo, lo da
-   --size-icon-box; spec → Responsive) y cero pseudo-estados :hover/:focus ni
-   transiciones (RF-4: no es interactivo, sin estados). Sin margen propio: el
-   espaciado con el texto acompañante lo pone el consumidor, gap de
-   Sidebar/ResumeSection (spec → No hacer; docs/DESIGN.md → Do/Don't,
-   decisión #54). */
-
-/* Clase base del único elemento raíz (<span>, spec → Anatomía). Valores
-   exactos de la tabla "Estilos y tokens" de la spec: cuadrado con
-   --size-icon-box en ancho y alto (mismo token, 3rem); fondo
-   --color-surface-muted; radio --radius-12; inline-flex centrado
-   (align-items + justify-content) y flex-shrink: 0 para no comprimirse dentro
-   de padres flex. IconBox NO declara --icon-size: el ícono toma el fallback
-   default de Icon (--size-icon) (plan.md → Decisiones C-1). */
+/* flex-shrink: 0 keeps the square from being squeezed in flex rows. */
 .iconBox {
   display: inline-flex;
   align-items: center;
