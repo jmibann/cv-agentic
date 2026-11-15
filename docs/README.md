@@ -13,7 +13,7 @@ documentación se refiere a esos documentos de diseño, no a un paquete.
 
 ```
 cv-agentic/
-├─ README.md          índice corto del proyecto
+├─ README.md          presentación del repo, en inglés (#120)
 ├─ AGENTS.md          convenciones para los agentes (OpenCode lo lee desde la raíz)
 ├─ docs/              documentación: constitution, README completo, DESIGN, BACKLOG,
 │                     diagnostics, memory, agent-system.md (formato y permisos),
@@ -45,7 +45,7 @@ cv-agentic/
 | [.opencode/skills/sdd/SKILL.md](../.opencode/skills/sdd/SKILL.md) | Skill `sdd`: flujo Spec → Clarificación → Plan → Tareas → Implementación → Validación y quién ejecuta cada fase |
 | [docs/agent-system.md](agent-system.md) | Los 5 agentes de `.opencode/agents/` y los 8 comandos `/sdd-*`: formato, permisos y flujo |
 | [docs/BACKLOG.md](BACKLOG.md) | Temas postergados deliberadamente |
-| [docs/diagnostics.md](diagnostics.md) | Log mínimo de puertas F y decisiones de reglas (una entrada por evento con formato fijo, hashes y tabla **Abiertos**; sin secciones de estado: el estado vive en `README.md` y la memoria en `docs/memory.md`) |
+| [docs/diagnostics.md](diagnostics.md) | Log mínimo de puertas F y decisiones de reglas (una entrada por evento con formato fijo, hashes y tabla **Abiertos**; sin secciones de estado: el estado vive en `docs/STATUS.md` y la memoria en `docs/memory.md`) |
 | [docs/memory.md](memory.md) | Memoria entre sesiones (estado, decisiones recientes, aprendizajes; ~50 líneas, solo el orchestrator) |
 | `docs/qa-report.md` | Informe de QA de F5 (lo crea el orchestrator en F5, decisión #85) |
 

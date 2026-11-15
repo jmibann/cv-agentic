@@ -6,7 +6,7 @@ cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
-Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
+Lo vivo no vive aquí: estado → `docs/STATUS.md` ("Estado actual") · memoria →
 `docs/memory.md` · decisiones #1–#119 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
@@ -31,7 +31,7 @@ Entradas: **más reciente arriba**; el consolidado vive en la tabla **Abiertos**
 Cada **puerta F** o **decisión de reglas** agrega una entrada con el formato
 fijo de la "Plantilla de entrada" y actualiza la tabla **Abiertos** (lo cerrado
 **sale** de la tabla). Este archivo no lleva secciones de estado: el estado vive
-en `README.md` ("Estado actual") y en `docs/memory.md`. Si supera las **150
+en `docs/STATUS.md` ("Estado actual") y en `docs/memory.md`. Si supera las **150
 líneas**, el orchestrator reduce, **en esa misma puerta F**, a **una línea**
 cada entrada anterior a las de las dos últimas puertas F:
 `fecha · título · #n · git show <hash>:docs/diagnostics.md` (hash de creación

@@ -71,8 +71,8 @@ mínimo, en cada entrega:
   de archivos, nombres de tests y commits en inglés.
 - **Commits de documentos** (solo en revisión completa de pieza o de fase,
   decisión #88): con `git log --format="%h %s"` y `git show --stat <hash>`, los
-  commits `docs(...)` desde la puerta anterior solo tocan `README.md`,
-  `docs/**` o `specs/**`. Otra ruta es bloqueante.
+  commits `docs(...)` desde la puerta anterior solo tocan
+  `docs/**` o `specs/**` (el `README.md` de la raíz solo a pedido del usuario, #120). Otra ruta es bloqueante.
 
 
 **1. Comandos** (pegá la salida resumida)

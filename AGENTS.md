@@ -9,8 +9,8 @@ workspaces): el kit de diseño y la app conviven en la raíz. **Node 26 LTS**
 ```
 cv-agentic/
 ├─ AGENTS.md                  (este archivo)
-├─ README.md                  índice corto
-├─ docs/                      constitution, README completo, DESIGN, BACKLOG, diagnostics, memory, agent-system.md, qa-report (F5), tokens/ (breakpoints, contraste)
+├─ README.md                  presentación del repo, en inglés (#120; solo cambia a pedido del usuario)
+├─ docs/                      constitution, STATUS (estado), README completo, DESIGN, BACKLOG, diagnostics, memory, agent-system.md, qa-report (F5), tokens/ (breakpoints, contraste)
 ├─ tokens/                    tokens.css (lo importa la app)
 ├─ foundations/               tipografía, layout, movimiento, theming, i18n
 ├─ specs/                     una carpeta por pieza: <categoria>/<Name>/spec.md (foundation, primitives, controls, layout, content, pages, hooks) + motion/proposal.md(propuesta transversal, no pieza)
@@ -66,7 +66,7 @@ equivocada o incompleta, **se frena y se consulta al usuario**; no se
 - El log del proyecto vive en **`docs/diagnostics.md`** (decisiones #86 y #98):
   una entrada con formato fijo por puerta F o decisión de reglas, tabla
   **Abiertos** siempre actualizada (lo cerrado **sale** de la tabla) y sin
-  secciones de estado (el estado está en `README.md` y en `docs/memory.md`);
+  secciones de estado (el estado está en `docs/STATUS.md` y en `docs/memory.md`);
   si pasa de 150 líneas, el orchestrator reduce a **una línea** por entrada las
   anteriores a las de las dos últimas puertas F (`fecha · título · #n ·
   git show <hash>:docs/diagnostics.md`, hash de creación).
@@ -120,7 +120,7 @@ reviewer **al cerrar la pieza** y en cada puerta (decisión #80).
   de la config global). Es la forma que admiten los permisos bash de los
   agentes que commitean (decisión #83).
   Los de código los hacen foundation, component-builder e integrator; el
-  orchestrator commitea **solo documentos** (`README.md`, `docs/*`, `specs/*`),
+  orchestrator commitea **solo documentos** (`docs/*`, `specs/*`),
   con el repo en verde y con rutas explícitas (nunca `git add .`/`-A`);
   el reviewer no commitea (decisión #76).
 - **Una tarea por vez** (sin paralelismo): los tests en rojo rompen el
@@ -156,7 +156,7 @@ aprobadas". Cualquier otra: consultar al usuario.
 - No modificar el kit de diseño (`README.md`, `AGENTS.md`, `docs/`, `tokens/`,
   `foundations/`, `specs/`, `data/`, `.opencode/`) salvo pedido explícito del usuario.
   Excepciones: `data/*.generated.*` se regeneran con los scripts, nunca a mano;
-  el orchestrator actualiza `README.md` ("Estado actual"), `docs/memory.md` y
+  el orchestrator actualiza `docs/STATUS.md` ("Estado actual"), `docs/memory.md` y
   `docs/diagnostics.md` al cerrar cada puerta F (decisión #86; formato fijo,
   tabla Abiertos y poda a 150 líneas: #98), escribe
   `docs/qa-report.md` en F5 (decisión #85), mantiene el registro de

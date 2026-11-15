@@ -31,10 +31,10 @@ Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spe
 - **Documentos de estado (decisiones #86 y #98):** al cerrar cada **puerta F**
   (F1–F5) y cuando el usuario aprueba una decisión que cambia reglas (nueva
   entrada en el registro de `docs/README.md`), actualiza `docs/memory.md`, el
-  `README.md` de la raíz ("Estado actual") y agrega una entrada en
+  `docs/STATUS.md` ("Estado actual") y agrega una entrada en
   `docs/diagnostics.md` con el formato fijo de su "Plantilla de entrada",
   actualizando su tabla **Abiertos** (lo cerrado **sale** de la tabla). Ese
-  archivo no lleva secciones de estado: el estado vive en `README.md` y en
+  archivo no lleva secciones de estado: el estado vive en `docs/STATUS.md` y en
   `docs/memory.md`. Si pasa de **150 líneas**, el orchestrator reduce, en esa
   misma puerta F, a **una línea** cada entrada anterior a las de las dos
   últimas puertas F: `fecha · título · #n · git show <hash>:docs/diagnostics.md`
@@ -190,7 +190,7 @@ trabaja con el orquestador.
 - **Commits por tarea.** `test(<Name>): Tn` con los tests en rojo, después
   `feat(<Name>): Tn` con la implementación, y `fix(<Name>): Tn` si hubo
   correcciones. Los de código los hace quien implementa; el orchestrator
-  commitea **solo documentos** (`README.md`, `docs/*`, `specs/*`), en verde y
+  commitea **solo documentos** (`docs/*`, `specs/*`), en verde y
   con rutas explícitas, nunca `git add .`/`-A` (decisión #76). Si un hook de
   pre-commit bloquea el commit en rojo, no se usa
   `--no-verify`: se frena y se consulta al usuario.

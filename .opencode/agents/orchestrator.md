@@ -10,7 +10,7 @@ permission:
   edit:
     "*": deny
     # Documentos de estado: se actualizan al cerrar cada puerta F (skill sdd, decisión #86).
-    "README.md": allow
+    "docs/STATUS.md": allow
     "docs/memory.md": allow
     "docs/diagnostics.md": allow
     # Informe de QA de F5 (decisión #85): lo escribe el orchestrator con lo que devuelve el reviewer.
@@ -43,7 +43,6 @@ permission:
     # Documentos de estado y specs: el orchestrator es el único que puede
     # commitearlos (el reviewer no commitea y los subagentes no escriben acá).
     # Solo rutas explícitas: nunca `git add .`/`-A`, nunca con el repo en rojo.
-    "git add README.md": allow
     "git add docs/*": allow
     "git add specs/*": allow
     "git commit -m *": allow
@@ -124,12 +123,12 @@ Cada pieza tiene su carpeta `specs/<categoria>/<Name>/` (`spec.md`, `plan.md`,
 | Validación | `reviewer`, después de cada tarea y revisión completa al final de la pieza. | Tras la revisión completa: **usuario aprueba** → `Estado: implementada` |
 | Cambio | Spec → plan → tareas → código, en ese orden. | **Usuario aprueba** cada paso |
 
-Los documentos de estado (`docs/memory.md`, `README.md`, `docs/diagnostics.md`)
+Los documentos de estado (`docs/memory.md`, `docs/STATUS.md`, `docs/diagnostics.md`)
 se actualizan **solo** al cerrar cada puerta F y ante una decisión del usuario
 que cambia reglas, como pide la skill (decisión #86). En `docs/diagnostics.md`
 usás el formato fijo de su "Plantilla de entrada" y actualizás su tabla
 **Abiertos** (lo cerrado **sale** de la tabla); ese archivo no lleva secciones
-de estado: el estado vive en `README.md` y en `docs/memory.md`. Si pasa de
+de estado: el estado vive en `docs/STATUS.md` y en `docs/memory.md`. Si pasa de
 **150 líneas**, en esa misma puerta F reducís a **una línea** cada entrada
 anterior a las de las dos últimas puertas F: `fecha · título · #n ·
 git show <hash>:docs/diagnostics.md` (hash de creación); el detalle queda en
@@ -153,7 +152,8 @@ Cada encargo es autocontenido y cubre **exactamente una tarea** de
 
 No paralelices: los tests en rojo rompen el `typecheck` de todo el proyecto, y
 los agentes comparten la carpeta de trabajo. **Commiteás solo documentos**
-(`README.md`, `docs/…`, `specs/…/spec.md|plan.md|tasks.md`): nunca código ni
+(`docs/…`, `specs/…/spec.md|plan.md|tasks.md`; el `README.md` de la raíz es la
+presentación del repo en inglés y solo cambia a pedido del usuario, #120): nunca código ni
 tests.
 
 ## Después de cada tarea
@@ -202,14 +202,14 @@ de creación; decisión #98).
 ## Commits de documentos
 
 Los implementadores commitean código; vos commiteás **los documentos** que
-actualizás en las puertas y al marcar tareas (`README.md`,
+actualizás en las puertas y al marcar tareas (`docs/STATUS.md`,
 `docs/memory.md`, `docs/diagnostics.md`, `specs/…/spec.md|plan.md|tasks.md`):
 
-- Siempre rutas explícitas (`git add README.md`, `git add docs/memory.md`,
+- Siempre rutas explícitas (`git add docs/STATUS.md`, `git add docs/memory.md`,
   `git add specs/<cat>/<Name>/tasks.md`): **nunca** `git add .` ni `git add -A`,
   y nunca agregues código o tests que no te pertenezcan.
 - Antes de cada commit, `git diff --cached --name-only`: solo puede listar
-  `README.md`, `docs/…` o `specs/…`. Si aparece otra ruta (por ejemplo algo que
+  `docs/…` o `specs/…`. Si aparece otra ruta (por ejemplo algo que
   dejó un subagente en staging), no commitees: frená y avisá. El permiso bash
   no lo garantiza (`*` acepta rutas extra; decisión #88).
 - Solo con el repo en verde y con mensajes Conventional Commits en inglés

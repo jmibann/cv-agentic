@@ -1,10 +1,13 @@
-# cv-agentic
+# Estado del proyecto — cv-agentic
+
+Tablero de estado interno (antes era el `README.md` de la raíz; se mudó acá con
+la decisión #120). La presentación del repo está en [README.md](../README.md).
 
 Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
 claro/oscuro, en/es) construido por agentes de OpenCode con
 **spec-driven development**.
 
-## Estado actual (2026-11-14)
+## Estado actual (2026-11-15)
 
 | Qué | Estado |
 |---|---|
@@ -36,18 +39,18 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **Motion (2026-11-13)** | ✅ **SISTEMA COMPLETO 4/4** (#106/#116, §XXIV–§XXVII; propuesta marcada "IMPLEMENTADO"): 1 Foundation — escala de tokens, `data-theme-switching`, contrato y docs (`motion.md` C3 `5edfcb0`); 2 AppLayout — entrada de panel con dirección (`getTabDirection` pura, `key`, `backwards`, print en el módulo); 3 Sidebar — expansión grid `0fr↔1fr` (`data-contacts-animate`, stagger `calc`, P5' ≥1200, print id en `global.css`; Ctrl+P colapsado ✓ usuario); 4 TestimonialDialog — entrada `--ease-enter` con `@starting-style`, **cierre instantáneo medido en los 3 caminos**, hover close conserva standard (Ctrl+P dialog abierto ✓ usuario). Suite **466/41**, **28/28 `implementada`**, build ✓. **#116 es regla permanente** (`foundations/motion.md` + `AGENTS.md` → Convenciones, `11b475b`; aclaración `transition: none` excluido en `docs/README.md`). |
 | **Metadatos SEO y Open Graph (2026-11-14)** | ✅ **Cambio #117 CERRADO** en Foundation (única tarea T19): `meta description`, canonical, Open Graph (5), `twitter:card`, JSON-LD `Person` cruzado con `cv.en.json` e identidad canonical≡`og:url`≡`url`, `public/og-image.png` 1200×630 intacta; colocación respetando el contrato T4 del anti-flash. Tests de contrato +6 en `anti-flash.test.ts`; QA del reviewer sobre `dist/` ✓. Commits `472bc1d` `a75e7fa` `0025a21` `f17cd78` `00a8268`; suite **472/41**, build ✓; detalle §XXVIII. Resuelve `docs/BACKLOG.md` → "Metadatos y Open Graph"; **"SEO por idioma" queda abierto** (metadatos solo en inglés, sin `hreflang` ni `og:locale`). |
 | **Proyectos en Resume (2026-11-14)** | ✅ **Cambio #118**: colección `projects` en el esquema y el contenido (el proyecto `cv-agentic` salió de `experience`) y sección Projects en Resume, entre Experience y Education, con ícono `code` (Foundation T20 + ResumePage T6; 479/41, build verde). |
-| **Avatar en WebP (2026-11-15)** | ✅ **Cambio #119**: `public/images/avatar.webp` (512×512 con alfa, 30 KB) reemplaza al PNG de 270 KB que PageSpeed marcaba con 263 KiB de ahorro; contenido y ejemplos apuntan a `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pendiente: push y volver a medir en PageSpeed. |
+| **Avatar en WebP (2026-11-15)** | ✅ **Cambio #119**: `public/images/avatar.webp` (512×512 con alfa, 30 KB) reemplaza al PNG de 270 KB que PageSpeed marcaba con 263 KiB de ahorro; contenido y ejemplos apuntan a `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pusheado y publicado (WebP servido, PNG en 404); falta volver a medir en PageSpeed. |
 | Post-entrega / próximos trabajos (2026-11-14) | Todo pusheado y publicado en GitHub Pages (metadatos #117 y sección Projects #118 verificados en el sitio servido). Sin pendientes bloqueantes; quedan solo los opcionales de la tabla **Abiertos** de `docs/diagnostics.md` (deudas de forma, StrictMode/F1-F2) y lo postergado en `docs/BACKLOG.md`. |
 
-Detalle y decisiones: [docs/diagnostics.md](docs/diagnostics.md).
+Detalle y decisiones: [docs/diagnostics.md](diagnostics.md).
 
 ## Estructura
 
 ```
 cv-agentic/
-├─ README.md          este índice
+├─ README.md          presentación del repo, en inglés
 ├─ AGENTS.md          convenciones para los agentes (OpenCode lo lee desde la raíz)
-├─ docs/              documentación (constitution, README completo, DESIGN, BACKLOG, diagnostics, agent-system.md, tokens/)
+├─ docs/              documentación (constitution, STATUS —este archivo—, README completo, DESIGN, BACKLOG, diagnostics, agent-system.md, tokens/)
 ├─ tokens/            tokens.css (lo importa la app)
 ├─ foundations/       tipografía · layout · movimiento · theming · i18n
 ├─ specs/             una carpeta por pieza (<categoria>/<Name>/spec.md) + motion/proposal.md
@@ -59,10 +62,11 @@ cv-agentic/
 
 ## Mantenimiento (modo actual — desde 2026-10-08)
 
-El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (479 tests,
+El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (482 tests,
 build, validate:content, QA en navegador y en papel; últimos trabajos:
 Node 26 LTS y quality gates en el deploy, 2026-11-12; motion 4/4, 2026-11-13;
-metadatos SEO y Open Graph #117 y sección Projects #118, 2026-11-14).
+metadatos SEO y Open Graph #117 y sección Projects #118, 2026-11-14;
+avatar en WebP #119, 2026-11-15).
 Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 `.opencode/agents/`:
 
@@ -81,11 +85,11 @@ typecheck + test por tarea, `build` al cerrar pieza/puerta.
 
 ## Por dónde empezar
 
-1. [docs/constitution.md](docs/constitution.md): las reglas no negociables
+1. [docs/constitution.md](constitution.md): las reglas no negociables
    del proyecto (están por encima de todo).
-2. [docs/README.md](docs/README.md): qué es el kit, cómo lo usa la app,
+2. [docs/README.md](README.md): qué es el kit, cómo lo usa la app,
    dependencias aprobadas y registro de decisiones.
-3. [docs/DESIGN.md](docs/DESIGN.md): lenguaje visual y reglas duras.
-4. [specs/README.md](specs/README.md): índice de specs y orden de construcción.
-5. [AGENTS.md](AGENTS.md) y [docs/agent-system.md](docs/agent-system.md): cómo trabajan los agentes.
-6. [docs/memory.md](docs/memory.md): memoria del proyecto (estado y decisiones recientes).
+3. [docs/DESIGN.md](DESIGN.md): lenguaje visual y reglas duras.
+4. [specs/README.md](../specs/README.md): índice de specs y orden de construcción.
+5. [AGENTS.md](../AGENTS.md) y [docs/agent-system.md](agent-system.md): cómo trabajan los agentes.
+6. [docs/memory.md](memory.md): memoria del proyecto (estado y decisiones recientes).

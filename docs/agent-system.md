@@ -39,7 +39,7 @@ agente, se edita acá.
 
 | Agente | edit | bash | task | skill | steps |
 |---|---|---|---|---|---|
-| orchestrator | `README.md`, `docs/diagnostics.md` (log; formato, tabla Abiertos y poda #98), `docs/memory.md` (estado y memoria); `docs/qa-report.md` (informe de F5, #85); `docs/README.md` y `docs/agent-system.md` (registro de decisiones y doc de agentes, #95); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend` ni `--no-verify`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
+| orchestrator | `docs/STATUS.md` (estado, #120), `docs/diagnostics.md` (log; formato, tabla Abiertos y poda #98), `docs/memory.md` (estado y memoria); `docs/qa-report.md` (informe de F5, #85); `docs/README.md` y `docs/agent-system.md` (registro de decisiones y doc de agentes, #95); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend` ni `--no-verify`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
 | foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git [-c user.name=…] commit -m` permitidos; `push`, `--amend`, `--no-verify`, `reset --hard` y `rm -rf` denegados | deny | `sdd` | 150 |
 | component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`) | deny | `sdd` | 80 |
 | integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`; `npm run dev` denegado, #91) | deny | `sdd` | 120 |
@@ -62,7 +62,7 @@ component-builder e integrator, con `git -c user.name="jmiban" commit -m` (ident
 con la implementación → `fix(<Name>): Tn` si hay correcciones. `feat`/`fix` no
 tocan tests; `test` solo agrega. El orchestrator marca la tarea en
 `tasks.md` cuando el reviewer la aprueba y **commitea él mismo los
-documentos** (`git add` acotado a `README.md`, `docs/*` y `specs/*` +
+documentos** (`git add` acotado a `docs/*` y `specs/*` +
 `git commit -m`, solo con el repo en verde, con mensaje en inglés y sin
 `git add .`/`-A`). `--amend`, `--no-verify` (#93), `reset --hard` y `push` están denegados. El
 reviewer no commitea.
@@ -74,7 +74,7 @@ esté en staging. La garantía "el orchestrator solo commitea documentos" la dan
 dos controles: el orchestrator revisa `git diff --cached --name-only` antes de
 cada commit, y el reviewer, en cada revisión completa de pieza y de fase,
 verifica con `git show --stat` que los commits `docs(...)` desde la puerta
-anterior solo tocan `README.md`, `docs/**` o `specs/**`.
+anterior solo tocan `docs/**` o `specs/**`.
 
 ## Agentes
 
