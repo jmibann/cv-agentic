@@ -1,80 +1,11 @@
-// Tests de T2 (specs/layout/Sidebar/tasks.md) — RF-1, RF-6 (redes), RF-8 y
-// parte de RF-9: estructura base del landmark. Escenarios de spec → Tests
-// esperados cubiertos acá: #1 (`getByRole("complementary", { name:
-// labels.region })`, raíz `<aside>` que CONTIENE avatar/nombre/headline/redes
-// — RF-1), #2 (nombre, headline en Badge y avatar con su alt; el nombre es
-// `<p>`, NO heading — spec → Anatomía y "No hacer"), #3 (un link por red con
-// `aria-label` de la marca, `href` correcto, `target="_blank"` y
-// `rel="noopener noreferrer"` con `BrandIcon` dentro) y la mitad `social` del
-// #8 / RF-9 (`social=[]` → no renderiza la lista de redes). Decisión 9
-// (spec → Estilos y tokens, Avatar): el `<img>` NO lleva atributos HTML
-// `width`/`height` ni `decoding` explícito — dimensiona solo el CSS (T6) — y
-// se asertan los tres atributos ausentes.
-//
-// Marca del link (plan → Decisiones; spec → Accesibilidad): `BRAND_NAMES` de
-// BrandIcon es un registro `Record<SocialNetwork, string>` (network → nombre
-// visible). BrandIcon renderiza SU `<svg>` siempre `aria-hidden="true"` y sin
-// nombre propio (su spec RF-3: "el nombre accesible lo aporta el link
-// contenedor con `aria-label={BRAND_NAMES[network]}` (Sidebar, su spec)"), así
-// que el `aria-label` va en el `<a>` y NO duplica nada: el logo queda
-// decorativo y la marca la lee la tecnología de asistencia del link. Los
-// literales del test ("GitHub"/"LinkedIn") son los valores que BRAND_NAMES
-// fija por diseño (BrandIcon → RF-2), no se leen del registro para no volver
-// el test tautológico.
-//
-// Diferidos por tasks.md (todavía no hay nada que asertar sobre ellos): contactos
-// (T3), disclosure CornerTab (T4), CTA Download CV (T5) y `contact` por props
-// queda sin uso observable hasta T3. RF-8 (la pieza no importa `useCv()` ni
-// `useLocale()` — C2/plan → Interfaz) y las clases de Anatomía con el módulo
-// CSS y `index.ts` se verifican por INSPECCIÓN del reviewer (jsdom no computa
-// estilos; #101); el cierre `expectNoA11yViolations` llega con T6 junto al CSS
-// y el barrel (tasks.md → T6; criterio NavTabs, donde el cierre vive en la
-// última tarea). Las redes usan `BrandIcon` con `fill="currentColor"` (sin
-// gradiente) y `Badge` no monta SVG: no hacen falta `AccentGradientDefs` ni
-// `HexAvatarDefs` de armazón (plan → Estrategia de tests).
-//
-// Justificación de las queries (constitución T3): todo por rol y nombre
-// accesible — `complementary`/`img` con el alt, `list` con `labels.social`,
-// `listitem`, `link` con la marca — y `within(...)` para la contención del
-// landmark y el orden de la lista. Las tres consultas estructurales justificadas:
-// `tagName` del nombre (`P`, spec → Anatomía + "No usar nombre como h1") y del
-// Badge (`SPAN`, su spec → API) y del raíz (`ASIDE`, Anatomía), y
-// `link.querySelector("svg")` para el BrandIcon — un `aria-hidden` no tiene
-// query por rol posible; mismo criterio justificado en BrandIcon T2. Sin
-// `data-testid`.
-//
-// Armazón: render aislado con props fixture (plan → Estrategia de tests): sin
-// providers (todo llega por props; RF-8). Fixture calcado de
-// `src/content/cv.en.json` (D4: persona ficticia "Alex Rivera"); sin
-// `downloadCvUrl` (la rama con CTA es T5).
-//
-// Rojo on-arrival: "Failed to resolve import ./Sidebar" — el componente no
-// existe aún (patrón aprobado en NavTabs/CornerTab/ControlsBar T1).
-
 import { render, screen, within } from "@testing-library/react";
-// T4: interacción del disclosure (click / segundo click), mismo criterio que
-// NavTabs/ControlsBar. Import puro: no toca lo anterior.
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
-// T3: armazón de las defs del gradiente que resuelve el glyph de los IconBox
-// de contactos (patrón IconBox.test.tsx/SectionTitle.test.tsx; en la app las
-// monta AppLayout una sola vez). Import puro: no toca lo anterior.
 import { AccentGradientDefs } from "../Icon";
 
-// T7 (Cambio F5): eliminado el import de CornerTab.module.css que usaba T4 —
-// la tab ya no existe en el disclosure (Anatomía nueva: botón directo). Las
-// aserciones que fijaba (base + `sm`, wrapper del botón) se reubican al botón
-// directo más abajo (precedente F3 TC-T5, aprobado por el usuario en la puerta
-// F5, decisión #104b).
-
-// T5: clase `fullWidth` del módulo de Button (la Anatomía exige
-// `Button … fullWidth`; criterio #99/patrón NavTabs T4: import del módulo del
-// hijo). Import puro: no toca lo anterior.
 import buttonStyles from "../Button/Button.module.css";
 
-// T4: clases del módulo propio (nace en T4 con el colapso por clase; criterio
-// #99 `styles.name ?? "name"`, patrón CornerTab/NavTabs/Button). Import puro.
 import styles from "./Sidebar.module.css";
 
 import { Sidebar } from "./Sidebar";
@@ -82,13 +13,8 @@ import type { SidebarLabels, SidebarProps } from "./Sidebar";
 
 import type { ContactItem, Profile, SocialLink } from "@data/cv.types.generated";
 
-// T6: helper de cierre a11y (constitución T4; el archivo termina con
-// `expectNoA11yViolations` — Tests esperados 9). Import puro: no toca los
-// casos de T2–T5 (precedente NavTabs T4 / CornerTab T4).
 import { expectNoA11yViolations } from "../../test/a11y";
 
-// Fixture de perfil/redes según `src/content/cv.en.json` (D4: ficticia). El
-// avatar SIN `width`/`height`: son del CSS (decisión 9), no del tipo.
 const PROFILE: Profile = {
   name: "Alex Rivera",
   headline: "Frontend Developer",
@@ -96,8 +22,6 @@ const PROFILE: Profile = {
   about: ["Example bio paragraph for the About panel."],
 };
 
-// `contact` llega por props (API completa de la spec) pero NO se renderiza
-// hasta T3: el fixture existe para que el helper compile con `SidebarProps`.
 const CONTACT: readonly ContactItem[] = [
   { id: "email", type: "email", value: "alex@example.com" },
 ];
@@ -107,8 +31,6 @@ const SOCIAL: readonly SocialLink[] = [
   { id: "linkedin", network: "linkedin", url: "https://www.linkedin.com/in/example" },
 ];
 
-// Labels de interfaz en inglés (valores de ejemplo de spec → API; C3: la
-// pieza los recibe traducidos, no los produce).
 const LABELS: SidebarLabels = {
   region: "Profile",
   social: "Social profiles",
@@ -124,8 +46,6 @@ const LABELS: SidebarLabels = {
   },
 };
 
-// Render de la pieza sola (plan → Estrategia de tests) con overrides para las
-// variantes de lista (RF-9).
 function renderSidebar(overrides: Partial<SidebarProps> = {}) {
   const props: SidebarProps = {
     profile: PROFILE,
@@ -141,15 +61,9 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
   it("renders a complementary <aside> named by labels.region containing identity and social", () => {
     renderSidebar();
 
-    // RF-1 + spec → Accesibilidad / Tests 1: landmark `complementary` con el
-    // `aria-label` traducido que LLEGA POR PROPS (la pieza no consume
-    // useLocale — RF-8, inspección). Raíz `<aside>` (Anatomía: `Box
-    // as="aside"`; el rol podría venir de `role=`, por eso el tagName fija el
-    // elemento).
     const region = screen.getByRole("complementary", { name: LABELS.region });
     expect(region.tagName).toBe("ASIDE");
 
-    // RF-1: el landmark CONTENIENE avatar, nombre, rol (Badge) y redes.
     within(region).getByRole("img", { name: LABELS.avatarAlt });
     within(region).getByText(PROFILE.name);
     within(region).getByText(PROFILE.headline);
@@ -159,18 +73,13 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
   it("shows the name in a <p> and the headline in a Badge, rendering no heading", () => {
     renderSidebar();
 
-    // Tests 2 + "No hacer" (No usar el nombre como h1): ningún heading en la
-    // pieza; el único h1 de la página es el del tabpanel (AppLayout).
     expect(screen.queryAllByRole("heading")).toHaveLength(0);
 
-    // spec → Anatomía: nombre = `<p class="name">` (query por texto; el
-    // tagName se aserta porque "que NO sea heading" solo con el rol ausente
-    // no fijaría el elemento).
+    // The tag name is asserted too: "not a heading" alone would not pin down the
+    // element.
     const name = screen.getByText(PROFILE.name);
     expect(name.tagName).toBe("P");
 
-    // Tests 2: headline en el Badge (`<span>` por default según su spec →
-    // API/Anatomía).
     const headline = screen.getByText(PROFILE.headline);
     expect(headline.tagName).toBe("SPAN");
   });
@@ -178,13 +87,9 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
   it("renders the avatar img with its alt and without width, height or decoding attributes", () => {
     renderSidebar();
 
-    // Tests 2 + spec → Accesibilidad: alt desde `labels.avatarAlt`.
     const avatar = screen.getByRole("img", { name: LABELS.avatarAlt });
     expect(avatar).toHaveAttribute("src", PROFILE.avatar.src);
 
-    // Decisión 9 (spec → Estilos y tokens): el tamaño es del token
-    // (`--size-avatar-sidebar`, CSS en T6) y escala por breakpoint — no hay un
-    // único valor honesto para los atributos HTML — y SIN `decoding` explícito.
     expect(avatar).not.toHaveAttribute("width");
     expect(avatar).not.toHaveAttribute("height");
     expect(avatar).not.toHaveAttribute("decoding");
@@ -193,12 +98,9 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
   it("renders a named social list with one external link per network labeled by its brand", () => {
     renderSidebar();
 
-    // spec → Accesibilidad / Anatomía: `ul` nombrada con `labels.social`, un
-    // `li` por entrada en el orden recibido.
     const list = screen.getByRole("list", { name: LABELS.social });
     expect(within(list).getAllByRole("listitem")).toHaveLength(SOCIAL.length);
 
-    // Tests 3: un link por red con `aria-label` de la marca y en orden.
     const links = within(list).getAllByRole("link");
     expect(links).toHaveLength(SOCIAL.length);
     expect(links.map((link) => link.getAttribute("aria-label"))).toEqual([
@@ -206,8 +108,6 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
       "LinkedIn",
     ]);
 
-    // RF-6 (redes) + D6: externos SIEMPRE con `target="_blank"` y
-    // `rel="noopener noreferrer"`; `href` = `link.url` de la entrada.
     const github = within(list).getByRole("link", { name: "GitHub" });
     expect(github).toHaveAttribute("href", "https://github.com/example");
     expect(github).toHaveAttribute("target", "_blank");
@@ -218,10 +118,6 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
     expect(linkedin).toHaveAttribute("target", "_blank");
     expect(linkedin).toHaveAttribute("rel", "noopener noreferrer");
 
-    // Anatomía: cada link contiene el `BrandIcon` de su red. El `<svg>` es
-    // decorativo (`aria-hidden="true"`, su RF-3) → sin query por rol posible;
-    // selección estructural justificada (criterio BrandIcon T2). El nombre lo
-    // aporta el `aria-label` del link (lo de arriba): nada duplicado.
     for (const link of links) {
       const svg = link.querySelector("svg");
       expect(svg).toBeInTheDocument();
@@ -232,14 +128,7 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
   it("does not render the social list when social is empty", () => {
     renderSidebar({ social: [] });
 
-    // RF-9 (mitad `social`; Tests 8): sin entrada, sin `<ul>` — una lista
-    // nombrada vacía no se monta. La identidad y el landmark siguen ahí.
     expect(screen.queryByRole("list", { name: LABELS.social })).toBeNull();
-    // Fix T3 aprobado por el usuario: la aserción global de links de T2
-    // sobreasertaba (era cierta solo porque los contactos aún no existían);
-    // con T3 los links de contacto existen por spec (Test 4). El contrato de
-    // este caso (Test 8 / RF-9 mitad `social`) es "sin links DE REDES": se
-    // acota a las marcas del fixture SOCIAL sin debilitarlo.
     expect(screen.queryByRole("link", { name: "GitHub" })).toBeNull();
     expect(screen.queryByRole("link", { name: "LinkedIn" })).toBeNull();
     expect(screen.getByRole("complementary", { name: LABELS.region })).toBeInTheDocument();
@@ -247,62 +136,6 @@ describe("Sidebar landmark, identity and social structure (T2: RF-1, RF-6, RF-8,
   });
 });
 
-// ============================================================================
-// Tests de T3 (specs/layout/Sidebar/tasks.md) — RF-5 (uso de `getContactHref`
-// en el render), RF-6 (contactos: `mailto:`/`tel:` sin target; whatsapp y
-// `href` explícito de sitio externos con target/rel), RF-9 (lista de contactos
-// y `Separator`) — Tests esperados #4 y la mitad `contact` del #8.
-//
-// Escenarios (spec → Tests esperados):
-// - #4: un ítem por contacto con su label traducido (Overhead); email/phone/
-//   whatsapp son links con el `href` derivado por `getContactHref` (valores
-//   literales del Test 7); location NO es link; `mailto:`/`tel:` **sin**
-//   `target`/`rel`; whatsapp y un `href` explícito de sitio con
-//   `target="_blank"` + `rel="noopener noreferrer"` (RF-6, decisión 10, D6).
-//   El `title` con el valor completo (spec → Estilos y tokens, tabla
-//   Contactos: "el valor completo va en `title`") es comportamiento DOM
-//   observable y se aserta acá, no en T6.
-// - #8 (mitad `contact` + RF-9): `contact=[]` no renderiza la lista de
-//   contactos; sin contactos **y** sin `downloadCvUrl` tampoco el `Separator`;
-//   con `downloadCvUrl` (el CTA llega en T5) el Separator se mantiene.
-// - extra: phone cuyo valor no conserva dígitos → texto, no link (RF-5: "el
-//   resultado es `undefined` y el valor se muestra como texto"): edge
-//   observable en el render que la derivación pura (test 7) no cubre.
-//
-// Justificación de las queries (constitución T3): los links de contacto por
-// rol `link` + nombre accesible = valor visible (el Overhead es hermano del
-// link en el DOM, no contenido suyo, así que no entra en el nombre). Los
-// labels por texto exacto (Overhead RF-4: las mayúsculas son solo visuales;
-// el DOM conserva "Email"/"WhatsApp"). El `IconBox` de cada fila es
-// decorativo (su RF-2: `aria-hidden="true"`) → sin rol ni nombre posible y la
-// API no define testid: selección **estructural justificada**, mismo criterio
-// de IconBox T1 y SectionTitle T4 — primer hijo del `li` = `<span
-// aria-hidden>` conteniendo el `<svg>` con `stroke="url(#accent-gradient)"`
-// (el `<svg>` defs del armazón no lleva `stroke` y la query está acotada al
-// `li`). El mapeo exacto tipo→glifo (mail/phone/message-circle/map-pin) lo
-// ancla en compile el tipo exhaustivo `Record<ContactItem["type"], IconName>`
-// (criterio ICON_MAP de Icon) + inspección del reviewer: en jsdom distinguir
-// paths específicos sería acoplarse a internals de lucide. El `Separator` (un
-// `<div aria-hidden>` sin nombre) se verifica por selección estructural
-// acotada con la constante `SEPARATOR_IN_ADDITIONAL`:
-// `#sidebar-contacts div[aria-hidden="true"]` descendiente (reescritura C9/
-// #106 vigente: misma aserción, blindada contra el wrapper `additionalBody`
-// del Cambio motion 3) — es el ÚNICO div aria-hidden del subárbol del bloque
-// (la lista es `ul`, los IconBox son `span` anidados en los `li` y el wrapper
-// no declara `aria-hidden`); criterio declarado, sin testid.
-//
-// Armazón: helper `renderSidebarWithDefs` propio de T3 (no se toca
-// `renderSidebar` de T2, P4/T2) que monta `AccentGradientDefs` junto a la
-// pieza. Fixtures: `CONTACT_FULL` calcado de `src/content/cv.en.json` (D4:
-// persona ficticia) y `PROFILE_WITH_CV` con `downloadCvUrl` de placeholder
-// ficticio (rama CV de RF-9).
-//
-// Rojo on-arrival: contra el estado T2 no existe el bloque `.additional` ni
-// los links/valores de contactos — los 8 casos fallen por falta de
-// implementación (la variante `contact=[]` sin CV falla además por el
-// contenedor `#sidebar-contacts` ausente, no por la lista).
-
-// Contactos de T3: los cuatro tipos con los valores de `cv.en.json` (D4).
 const CONTACT_FULL: readonly ContactItem[] = [
   { id: "email", type: "email", value: "alex@example.com" },
   { id: "phone", type: "phone", value: "+54 11 5555-0100" },
@@ -310,16 +143,13 @@ const CONTACT_FULL: readonly ContactItem[] = [
   { id: "location", type: "location", value: "Buenos Aires, Argentina" },
 ];
 
-// Profile con `downloadCvUrl` (rama CV de RF-9; el botón CTA en sí es T5).
 const PROFILE_WITH_CV: Profile = {
   ...PROFILE,
   downloadCvUrl: "/cv/alex-rivera-cv.pdf",
 };
 
-// Selector estructural del Separator dentro del bloque (criterio arriba).
 const SEPARATOR_IN_ADDITIONAL = '#sidebar-contacts div[aria-hidden="true"]';
 
-// Render de T3 con las defs del gradiente (armazón, patrón IconBox T1).
 function renderSidebarWithDefs(overrides: Partial<SidebarProps> = {}) {
   const props: SidebarProps = {
     profile: PROFILE,
@@ -342,24 +172,18 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
 
     const region = screen.getByRole("complementary", { name: LABELS.region });
 
-    // Anatomía: el bloque `.additional` existe con el id del disclosure
-    // (RF-10). En T3 se monta siempre; la lógica de colapso llega en T4.
     expect(container.querySelector("#sidebar-contacts")).not.toBeNull();
 
-    // Dos listas en el landmark: redes (nombrada, T2) y contactos (Anatomía:
-    // `ul.contacts`, sin nombre propio; por eso se la cuenta, no se la
-    // consulta por nombre). Una fila por contacto recibido.
+    // The contacts list has no name of its own, so the lists are counted instead
+    // of queried by name.
     const lists = within(region).getAllByRole("list");
     expect(lists).toHaveLength(2);
     expect(within(region).getByRole("list", { name: LABELS.social })).toBeInTheDocument();
 
     for (const item of CONTACT_FULL) {
-      // Label traducido por tipo, recibido por props (RF-8): Overhead =
-      // `<span>` con el texto tal cual (su RF-4).
       const label = screen.getByText(LABELS.contact[item.type]);
       expect(label.tagName).toBe("SPAN");
 
-      // Fila (Anatomía): el `li` que contiene el label; vive en una `ul`.
       const row = label.closest("li");
       if (row === null) {
         throw new Error(
@@ -368,26 +192,18 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
       }
       expect(row.parentElement?.tagName).toBe("UL");
 
-      // IconBox (Anatomía: primer hijo del `li`, decorativo): criterio
-      // estructural justificado en el encabezado — span aria-hidden cuyo
-      // glyph trae el trazo del gradiente.
       const iconBox = row.firstElementChild;
       expect(iconBox?.tagName).toBe("SPAN");
       expect(iconBox).toHaveAttribute("aria-hidden", "true");
       expect(iconBox?.querySelector('svg[stroke="url(#accent-gradient)"]')).not.toBeNull();
     }
 
-    // RF-9 (a contrario): con contactos hay Separator entre la info base y
-    // la lista (Anatomía: Separator + `ul.contacts` en `.additional`).
     expect(container.querySelectorAll(SEPARATOR_IN_ADDITIONAL)).toHaveLength(1);
   });
 
   it("renders email and phone as mailto/tel links without target or rel", () => {
     renderSidebarWithDefs();
 
-    // RF-5 (uso) + Tests 4: `href` derivado por `getContactHref` (valores
-    // literales del Test 7). RF-6 + D6: `mailto:`/`tel:` se abren SIN
-    // `target` ni `rel`.
     const email = screen.getByRole("link", { name: "alex@example.com" });
     expect(email).toHaveAttribute("href", "mailto:alex@example.com");
     expect(email).not.toHaveAttribute("target");
@@ -398,7 +214,6 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
     expect(phone).not.toHaveAttribute("target");
     expect(phone).not.toHaveAttribute("rel");
 
-    // Tabla Contactos (spec → Estilos y tokens): valor completo en `title`.
     expect(email).toHaveAttribute("title", "alex@example.com");
     expect(phone).toHaveAttribute("title", "+54 11 5555-0100");
   });
@@ -406,8 +221,6 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
   it("opens the derived whatsapp link in a new tab with noopener noreferrer", () => {
     renderSidebarWithDefs();
 
-    // RF-6 (decisión 10): el whatsapp derivado es `https://wa.me/…` → link
-    // externo con target/rel (Tests 4).
     const whatsapp = screen.getByRole("link", { name: "+54 9 11 5555-0100" });
     expect(whatsapp).toHaveAttribute("href", "https://wa.me/5491155550100");
     expect(whatsapp).toHaveAttribute("target", "_blank");
@@ -416,8 +229,6 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
   });
 
   it("opens a contact with an explicit site href as an external link too", () => {
-    // Tests 4: "un `href` explícito de sitio" — el explícito prioriza sobre
-    // la derivación (tabla API, Test 7) y siendo http(s) es externo (RF-6).
     renderSidebarWithDefs({
       contact: [
         {
@@ -439,8 +250,6 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
   it("renders location as plain text, not a link", () => {
     renderSidebarWithDefs();
 
-    // RF-5/RF-6 + Tests 4: location → sin link (`getContactHref` devuelve
-    // `undefined`); el valor se muestra como texto con su `title`.
     expect(screen.queryByRole("link", { name: "Buenos Aires, Argentina" })).toBeNull();
     const value = screen.getByText("Buenos Aires, Argentina");
     expect(value.tagName).toBe("P");
@@ -448,11 +257,7 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
   });
 
   it("shows a phone value without digits as plain text", () => {
-    // extra: RF-5 "SI tras la limpieza `phone` o `whatsapp` no conserva
-    // dígitos, ENTONCES el resultado es `undefined` y el valor se muestra
-    // como texto". La derivación la fija el Test 7 de `getContactHref`; acá
-    // se verifica la rama de render (texto, no link) — edge evidente que la
-    // lista de tests no discriminaba en el componente.
+    // extra: a phone or WhatsApp value with no digits is shown as plain text.
     renderSidebarWithDefs({
       contact: [{ id: "phone-bad", type: "phone", value: "N/D" }],
     });
@@ -466,10 +271,6 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
   it("renders no contacts list and no Separator when contact is empty and there is no downloadCvUrl", () => {
     const { container } = renderSidebarWithDefs({ contact: [] });
 
-    // RF-9 + Tests 8: sin contactos → sin lista (queda solo la de redes),
-    // sin labels; sin contactos **y** sin `downloadCvUrl` → sin Separator.
-    // El contenedor `#sidebar-contacts` se monta igual en T3 (T4 lo vuelve
-    // colapsable; RF-10).
     const region = screen.getByRole("complementary", { name: LABELS.region });
     expect(within(region).getAllByRole("list")).toHaveLength(1);
     for (const contactLabel of Object.values(LABELS.contact)) {
@@ -480,8 +281,6 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
   });
 
   it("keeps the Separator when contact is empty but downloadCvUrl exists", () => {
-    // RF-9 omite el Separator solo sin contactos **y** sin CV; con CV el
-    // Separator se mantiene (el CTA que lo acompaña llega en T5).
     const { container } = renderSidebarWithDefs({
       contact: [],
       profile: PROFILE_WITH_CV,
@@ -493,88 +292,27 @@ describe("Sidebar contacts: derived links, labels and separator (T3: RF-5, RF-6,
   });
 });
 
-// ============================================================================
-// Tests de T4 (specs/layout/Sidebar/tasks.md) — RF-3 (disclosure < xl: botón
-// con `aria-expanded` + `aria-controls`, colapso por CLASE del módulo) y RF-4
-// (nombre accesible alterno showContacts/hideContacts; chevron decorativo con
-// clase de rotación) — actualizados por T7 al modelo icon-only del Cambio F5
-// 2026-10-08 (decisión #104b; spec → Anatomía y Tests 5/10). Tests esperados
-// #5 (estado inicial, click → expandido, `aria-controls` apunta a un elemento
-// existente) más la reversión al segundo click ("Hecho cuando" de la tarea) y
-// la decoración del chevron (RF-4: `Icon name="chevron-down"` sin `label` →
-// `aria-hidden`, spec → Accesibilidad: patrón disclosure).
-//
-// Colapso en jsdom = por clase (spec → plan → Decisión CSS-only 8=a; RF-10):
-// la visibilidad ≥ xl la da el `@media (min-width: 1200px)` del módulo y NO es
-// testeable acá (jsdom no aplica @media — nota de spec → Tests esperados;
-// inspección en T6). El aserto "el colapso no usa `style` inline" se fija por
-// el atributo `style` ausente en `#sidebar-contacts` (observable en el DOM;
-// la prohibición general `style={{}}` es además inspección del reviewer).
-// Criterio #99 para las clases (`styles.name ?? "name"`, prohibidos `!` y
-// `as string`, patrón CornerTab/NavTabs).
-//
-// No se asierta la ROTACIÓN del chevron (transform/--duration-base: valores
-// computados, jsdom no carga hojas de estilos — #101; inspección T6), solo su
-// presencia decorativa dentro del botón. La rotación 180° es texto de spec
-// (Estados/Colapsable) y el reviewer la verifica en T6.
-//
-// Orden DOM (spec → Anatomía, verificable en jsdom aunque sea "clase" de
-// layout; REUBICADO por T7 — Cambio F5, decisión #104b): el botón de
-// disclosure va PRIMERO en el DOM del `<aside>` (el módulo lo posiciona
-// absoluto arriba-derecha del raíz; Box `.outer` ya es `position: relative`,
-// verificado en Box.module.css — el anclaje lo da el propio landmark). Ya no
-// hay CornerTab (Test 10: "sin CornerTab en el DOM del <aside>"): la selección
-// estructural pasa al botón directo — `button.parentElement` es el landmark y
-// `region.firstElementChild` es el botón. Los dos asserts que antes fijaban la
-// tab (base + variante `sm` vía `cornerTabStyles`) se reubican acá como prueba
-// de la AUSENCIA de wrapper; ningún otro assert de T2/T3/T5/T6 se toca.
-//
-// Rojo on-arrival (T4): el botón disclosure no existe todavía — histórico.
-// Rojo on-arrival (T7): contra la implementación T4 (que aún monta la tab)
-// fallan el `parentElement`/`firstElementChild` del botón directo, el
-// `data-print-hide` del raíz y el `queryByText(showContacts)` nulo (hoy el
-// botón lleva texto visible), y se va el texto del `it` por la tab.
-// ============================================================================
-
-// Clase de colapso de `.additional` (clase del módulo; RF-3/RF-10: nunca
-// `style` inline). Criterio #99. (T7: las consts de CornerTab `cornerTabBase`
-// /`cornerTabSm` se reubican como se declaró arriba — la tab ya no existe.)
 const collapsedClass = styles.additionalCollapsed ?? "additionalCollapsed";
 
-// Id del contenedor del disclosure (literal de spec → RF-10 y Anatomía; mismo
-// criterio del selector `SEPARATOR_IN_ADDITIONAL` de T3: el id es contrato
-// público de la pieza, se aserta literal, no importado del TSX).
 const CONTACTS_ID = "sidebar-contacts";
 
 describe("Sidebar icon-only contacts disclosure (T4/T7: RF-3, RF-4)", () => {
   it("mounts the disclosure button collapsed, wired to the contacts block, as first child of the landmark", () => {
     const { container } = renderSidebarWithDefs();
 
-    // Tests 5 + RF-3/RF-4: botón disclosure presente con estado inicial
-    // colapsado. `type="button"`: no es un submit (patrón ThemeToggle/
-    // LanguageSwitcher). Desde T7 el nombre accesible lo da el `aria-label`
-    // `showContacts` (icon-only, sin texto visible — Test 10), llega por props
-    // (RF-8).
     const button = screen.getByRole("button", { name: LABELS.showContacts });
     expect(button).toHaveAttribute("type", "button");
     expect(button).toHaveAttribute("aria-expanded", "false");
     expect(button).toHaveAttribute("aria-controls", CONTACTS_ID);
 
-    // Tests 5: `aria-controls` apunta a un elemento EXISTENTE (el div de T3,
-    // montado siempre — RF-10 id alcanzable).
     const contacts = container.querySelector(`#${CONTACTS_ID}`);
     expect(contacts).not.toBeNull();
 
-    // "Hecho cuando" T4: en jsdom el estado colapsado es por CLASE del módulo
-    // (la visibilidad ≥ xl la da el @media — inspección T6) y nunca por
-    // `style` inline (RF-10: los estilos compartidos de impresión deben poder
-    // forzar la expansión).
+    // The collapsed state is a module class, never an inline style, so the print
+    // rules can override it.
     expect(contacts).toHaveClass(collapsedClass);
     expect(contacts).not.toHaveAttribute("style");
 
-    // Anatomía (T7; reubica los asserts de la tab de T4, encabezado): el botón
-    // cuelga DIRECTO del landmark (sin wrapper CornerTab) y va PRIMERO en su
-    // DOM (esquina superior derecha absoluta).
     const region = screen.getByRole("complementary", { name: LABELS.region });
     expect(button.parentElement).toBe(region);
     expect(region.firstElementChild).toBe(button);
@@ -586,16 +324,11 @@ describe("Sidebar icon-only contacts disclosure (T4/T7: RF-3, RF-4)", () => {
 
     await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
 
-    // RF-4 (T7): alterna el NOMBRE ACCESIBLE (`aria-label` show→hide; el de
-    // colapsado ya no existe — un solo botón; Test 5 del Cambio F5).
     const button = screen.getByRole("button", { name: LABELS.hideContacts });
     expect(screen.queryByRole("button", { name: LABELS.showContacts })).toBeNull();
 
-    // RF-3/Tests 5: `aria-expanded` pasa a "true".
     expect(button).toHaveAttribute("aria-expanded", "true");
 
-    // "Hecho cuando": `.additional` pasa de la clase de colapso a visible (en
-    // jsdom: sin la clase; sigue sin `style` inline).
     const contacts = container.querySelector(`#${CONTACTS_ID}`);
     expect(contacts).not.toBeNull();
     expect(contacts).not.toHaveClass(collapsedClass);
@@ -609,8 +342,6 @@ describe("Sidebar icon-only contacts disclosure (T4/T7: RF-3, RF-4)", () => {
     await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
     await user.click(screen.getByRole("button", { name: LABELS.hideContacts }));
 
-    // "Hecho cuando" T4: el segundo click reviere todo (estado, nombre
-    // accesible — T7 — y clase de colapso).
     const button = screen.getByRole("button", { name: LABELS.showContacts });
     expect(button).toHaveAttribute("aria-expanded", "false");
 
@@ -620,11 +351,6 @@ describe("Sidebar icon-only contacts disclosure (T4/T7: RF-3, RF-4)", () => {
   });
 
   it("renders the chevron inside the button as a decorative aria-hidden icon", () => {
-    // RF-4: chevron = `Icon name="chevron-down"` sin `label` → decorativo
-    // (Icon RF-3: `aria-hidden="true"`). El svg no tiene rol ni nombre
-    // posibles: selección estructural justificada (criterio BrandIcon/T2 de
-    // esta pieza). La rotación (transform + --duration-base en la clase del
-    // módulo) NO se asiértan acá: jsdom no computa CSS (#101), inspección T6.
     renderSidebarWithDefs();
 
     const button = screen.getByRole("button", { name: LABELS.showContacts });
@@ -634,14 +360,6 @@ describe("Sidebar icon-only contacts disclosure (T4/T7: RF-3, RF-4)", () => {
   });
 
   it("is icon-only: data-print-hide root, aria-hidden chevron, no visible text and no CornerTab (T7: Test 10)", () => {
-    // Test 10 (Cambio F5 2026-10-08; spec → Tests esperados y RF-10): la raíz
-    // del botón renderiza el hook `data-print-hide` del contrato de impresión
-    // (#103/#104a — global.css lo alcanza con la variante compuesta (0,1,1)),
-    // el glyph es decorativo y NO hay texto visible: el nombre accesible lo da
-    // SOLO el `aria-label` alterno (RF-4). Cero CornerTab en el DOM del
-    // `<aside>`: se fija vía `parentElement`/`firstElementChild` (el assert
-    // reubicado del `it` de arriba) y, acá, que el contenido del botón es el
-    // svg y nada de texto (`textContent` vacío + `queryByText` nulo del label).
     const { container } = renderSidebarWithDefs();
 
     const button = screen.getByRole("button", { name: LABELS.showContacts });
@@ -653,83 +371,32 @@ describe("Sidebar icon-only contacts disclosure (T4/T7: RF-3, RF-4)", () => {
     expect(chevron).toBeInTheDocument();
     expect(chevron).toHaveAttribute("aria-hidden", "true");
 
-    // Sin CornerTab en el landmark: el único contenedor del botón es el aside.
     const region = screen.getByRole("complementary", { name: LABELS.region });
     expect(button.parentElement).toBe(region);
-    // El glyph no vive en otro sitio del landmark (era el svg dentro de la
-    // tab): el único botón del aside es el disclosure.
     expect(within(region).getAllByRole("button")).toHaveLength(1);
     expect(container.querySelectorAll("button")).toHaveLength(1);
   });
 });
 
-// ============================================================================
-// Tests de T5 (specs/layout/Sidebar/tasks.md) — RF-2: CTA "Download CV".
-// Escenarios (spec → Tests esperados #6):
-// - Con `profile.downloadCvUrl`: existe `getByRole("link", { name:
-//   labels.downloadCv })` con ESE `href` y el atributo `download` presente
-//   ("Hecho cuando"). La Anatomía lo fija como `Button href… download
-//   icon="download" fullWidth` DENTRO de `.additional`, después de la lista de
-//   contactos: se asertan también la clase `fullWidth` del módulo de Button
-//   (criterio #99, patrón CornerTab T4/NavTabs — es parte de la Anatomía
-//   exigida, no un estilo "por si acaso") y el glyph decorativo del `icon`
-//   (mismo criterio que el svg de T4/BrandIcon: aria-hidden, sin rol posible).
-// - Sin `downloadCvUrl`: `queryByRole("link", { name })` → null y el resto del
-//   bloque queda intacto (link de contacto + Separator de T3). Nota del review
-//   de T3: la condición RF-9 (`contact=[]` + CV → Separator) ya la cubre
-//   "keeps the Separator when contact is empty but downloadCvUrl exists"; con
-//   el CTA real ese caso sigue en verde sin tocarlo, así que no se duplica.
-//
-// `toHaveAttribute("download")`: Button transmite `download={true}` y React lo
-// renderiza como atributo vacío; la PRESENCIA es lo que pide RF-2.
-//
-// Posición dentro de `.additional`: selección estructural justificada —
-// `closest("#sidebar-contacts")` (el id es contrato público: RF-10, criterio
-// CONTACTS_ID de T4) + `previousElementSibling` = la `ul` de contactos (la
-// Anatomía manda el CTA después de la lista; con el fixture completo el orden
-// de hijos es Separator, ul, CTA).
-//
-// Tone del icono (declaración pedida por el encargo): Button renderiza su
-// `icon` con `<Icon name={icon} />` SIN `tone` (Button.tsx T4) → el default
-// del Icon es `"current"` (Icon.tsx), sin gradiente: el CTA NO necesita
-// `AccentGradientDefs`. Se reutiliza igual `renderSidebarWithDefs` porque el
-// fixture trae contactos con `IconBox` tone gradient (criterio T3).
-//
-// Rojo on-arrival: el caso 1 falla por `getByRole("link", { name:
-// LABELS.downloadCv })` — el CTA no existe todavía (falta la implementación de
-// T5). El caso 2 es guard de regresión de RF-2 y pasa también en verde final.
-// ============================================================================
-
-// Clase fullWidth del Button (criterio #99; patrón Button.test.tsx T5).
 const ctaFullWidthClass = buttonStyles.fullWidth ?? "fullWidth";
 
 describe("Sidebar Download CV call-to-action (T5: RF-2)", () => {
   it("renders the Download CV link with its exact href and download attribute after the contacts", () => {
     renderSidebarWithDefs({ profile: PROFILE_WITH_CV });
 
-    // Tests 6 + "Hecho cuando": link con el nombre del label por props
-    // (RF-8: el texto lo aporta `labels.downloadCv`, no está hardcodeado).
     const link = screen.getByRole("link", { name: LABELS.downloadCv });
     expect(link.tagName).toBe("A");
 
-    // El `href` EXACTO de `profile.downloadCvUrl` (mismo literal del fixture
-    // `PROFILE_WITH_CV` de T3: `/cv/alex-rivera-cv.pdf`).
     expect(link).toHaveAttribute("href", "/cv/alex-rivera-cv.pdf");
 
-    // RF-2: con atributo `download`.
     expect(link).toHaveAttribute("download");
 
-    // Anatomía: `fullWidth` de la primitiva Button (su clase del módulo).
     expect(link).toHaveClass(ctaFullWidthClass);
 
-    // Anatomía: `icon="download"` → Icon decorativo dentro del link (svg
-    // aria-hidden; sin query por rol posible — criterio T2/T4 de la pieza).
     const glyph = link.querySelector("svg");
     expect(glyph).toBeInTheDocument();
     expect(glyph).toHaveAttribute("aria-hidden", "true");
 
-    // Anatomía: vive dentro de `.additional`, después de la lista de
-    // contactos (justificación en el encabezado).
     expect(link.closest("#sidebar-contacts")).not.toBeNull();
     expect(link.previousElementSibling?.tagName).toBe("UL");
   });
@@ -737,84 +404,15 @@ describe("Sidebar Download CV call-to-action (T5: RF-2)", () => {
   it("renders no Download CV link when downloadCvUrl is absent and keeps the rest intact", () => {
     const { container } = renderSidebarWithDefs();
 
-    // RF-2 (SI no existe, ENTONCES no renderiza el botón): el fixture base
-    // `PROFILE` de T2 no trae `downloadCvUrl`.
     expect(screen.queryByRole("link", { name: LABELS.downloadCv })).toBeNull();
 
-    // El resto de `.additional` queda intacto (T3 sigue vigente: lista de
-    // contactos con sus links y Separator).
     expect(screen.getByRole("link", { name: "alex@example.com" })).toBeInTheDocument();
     expect(container.querySelectorAll(SEPARATOR_IN_ADDITIONAL)).toHaveLength(1);
   });
 });
 
-// ============================================================================
-// Tests del Cambio motion 3 (T9: RF-11 — specs/layout/Sidebar/spec.md →
-// "Entrada de contactos"; Tests esperados 11–13; tasks.md → "Cambio motion 3",
-// puerta Spec+Plan+Tareas aprobada en 3 rondas, decisiones #106/#116).
-//
-// Alcance: SOLO tests de la estructura del wrapper y del atributo de entrada.
-// La implementación (wrapper `.additionalBody` + `data-contacts-animate` en
-// `Sidebar.tsx`, CSS de entrada en el módulo) es T10/T11: este commit se
-// deja en rojo a propósito en los tests 11 y 12.
-//
-// Rojo on-arrival esperado (solo tests 11 y 12):
-// - Test 11: hoy `#sidebar-contacts` renderiza Separator + `ul.contacts` +
-//   CTA como hijos DIRECTOS (Anatomía pre-Cambio); ningún hijo lleva la clase
-//   del wrapper (`additionalBody` no existe ni en el TSX ni en el módulo —
-//   verificado). El filtro por clase da 0 y `toHaveLength(1)` falla.
-// - Test 12: `data-contacts-animate` no aparece en el markup actual (RF-11/
-//   P1': refleja `expanded`; lo monta T10). El rojo cae exactamente donde
-//   debe: la ausencia inicial pasa porque el atributo efectivamente no está,
-//   y `toHaveAttribute` tras el primer click de expandir es el rojo (y sus
-//   dos hermanos de re-expansión).
-//
-// Verdes de llegada declarados (#101, los fija el body del commit):
-// - Test 13 (green on-arrival): la clase de colapso existe desde T4 (misma
-//   `collapsedClass` del bloque T4/T7, canon #99) y `aria-expanded="false"`
-//   es el estado inicial vigente. SIN `toBeVisible()`: jsdom no aplica los
-//   estilos de los CSS Modules ni los `@media` (#101); "fuera del foco y del
-//   árbol de accesibilidad" se verifica en QA en navegador (spec → Tests 13).
-// - Reescritura C9 (#106) de la constante `SEPARATOR_IN_ADDITIONAL` (bloque
-//   T3, una línea): de `> div[aria-hidden="true"]` a ` div[aria-hidden="
-//   true"]` descendiente — MISMA aserción de fondo, blindada contra el
-//   wrapper que llega en T10; sigue siendo el Separator el único
-//   `div[aria-hidden]` del subárbol (`IconBox` es `<span>`, `Icon` es `<svg>`
-//   — verificado en T3). Los 4 usos (:379/:475/:489/:744) quedan intactos
-//   con sus `toHaveLength(n)`.
-//
-// Justificación de las queries (constitución T3): el wrapper se selecciona
-// por su CLASE del módulo (canon #99 `styles.name ?? "name"`, patrones
-// `collapsedClass` de T4 y `ctaFullWidthClass` de T5): "único div de
-// contenido" no tiene rol ni nombre accesibles (es contenedor de layout).
-// Dentro del wrapper: la lista de contactos por rol `list` con `within`
-// (ÚNICA `ul` del wrapper: la de redes vive en `baseInfo`, fuera de
-// `#sidebar-contacts`) y el CTA por rol `link` + nombre `downloadCv`
-// (prueba de contención, no duplica el test 6 de T5). El Separator (`<div
-// aria-hidden>` sin rol por contrato, su RF-1) por selección estructural
-// acotada al wrapper — criterio declarado en T3, ahora `body.querySelector`
-// (único `div[aria-hidden]` de su subárbol). El orden Separator→lista es
-// INCONDICIONAL (la fixture trae lista) vía
-// `compareDocumentPosition(...) & Node.DOCUMENT_POSITION_FOLLOWING` (truthy):
-// no depende del CSS, observable en jsdom. Test 12: atributo por
-// presencia/ausencia (literal de spec → Anatomía/Estados; criterio
-// `data-print-hide` de T7). Sin `data-testid`.
-//
-// Armazón: `renderSidebarWithDefs` (T3). Test 11: con `PROFILE_WITH_CV`
-// (la prueba pide Separator + lista + CTA: fixture con `downloadCvUrl` para
-// tener los tres). Tests 12 y 13: fixture base completo (4 contactos) — el
-// disclosure opera sobre el bloque con contenido; el CTA no interviene.
-// ============================================================================
-
-// Clase del wrapper de contenido del bloque (canon #99; spec → Anatomía del
-// Cambio motion 3: `additionalBody`, único hijo de contenido, dueña de la
-// pila vertical).
 const bodyClass = styles.additionalBody ?? "additionalBody";
 
-// Literal del atributo de entrada (spec → Anatomía/Estados, RF-11/P1':
-// presente SOLO cuando `expanded`; mismo criterio de literalidad del id
-// `CONTACTS_ID` de T4: es contrato público de la pieza, no se importa del
-// TSX).
 const CONTACTS_ANIMATE_ATTR = "data-contacts-animate";
 
 describe("contacts entrance (Cambio motion 3)", () => {
@@ -828,7 +426,6 @@ describe("contacts entrance (Cambio motion 3)", () => {
       );
     }
 
-    // Test 11: UN único div hijo de contenido con la clase del wrapper.
     const wrappers = Array.from(contacts.children).filter(
       (child): child is HTMLElement =>
         child instanceof HTMLElement && child.classList.contains(bodyClass),
@@ -842,8 +439,6 @@ describe("contacts entrance (Cambio motion 3)", () => {
     }
     expect(body.tagName).toBe("DIV");
 
-    // Ese hijo contiene Separator + ul.contacts + el CTA (Anatomía del
-    // Cambio motion 3: la pila migra de `.additional` al wrapper).
     const separator = body.querySelector('div[aria-hidden="true"]');
     if (separator === null) {
       throw new Error("expected the wrapper to contain the Separator (div[aria-hidden])");
@@ -851,8 +446,6 @@ describe("contacts entrance (Cambio motion 3)", () => {
     const contactsList = within(body).getByRole("list");
     within(body).getByRole("link", { name: LABELS.downloadCv });
 
-    // Orden INCONDICIONAL (la fixture trae lista): el Separator precede a
-    // `ul.contacts` — compareDocumentPosition con DOCUMENT_POSITION_FOLLOWING.
     expect(
       separator.compareDocumentPosition(contactsList) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
@@ -867,30 +460,21 @@ describe("contacts entrance (Cambio motion 3)", () => {
       throw new Error(`expected #${CONTACTS_ID} to exist (RF-10)`);
     }
 
-    // RF-11/P1': nada anima en el render inicial — el atributo NO debe
-    // existir (también cubre "nada anima en la carga" observable en jsdom).
     expect(contacts).not.toHaveAttribute(CONTACTS_ANIMATE_ATTR);
 
-    // Expandir: presente.
     await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
     expect(contacts).toHaveAttribute(CONTACTS_ANIMATE_ATTR);
 
-    // Colapsar: ausente otra vez (el cierre no anima los ítems; RF-11).
     await user.click(screen.getByRole("button", { name: LABELS.hideContacts }));
     expect(contacts).not.toHaveAttribute(CONTACTS_ANIMATE_ATTR);
 
-    // Reexpandir: presente de nuevo (el atributo refleja `expanded`; el
-    // reinicio observable de la animación lo verifica el reviewer en
-    // navegador — T13).
     await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
     expect(contacts).toHaveAttribute(CONTACTS_ANIMATE_ATTR);
   });
 
   it("marks the collapsed state with the module collapsed class and aria-expanded=false, without visibility assertions (test 13: RF-3/RF-11)", () => {
-    // VERDE DE LLEGADA (#101): la clase de colapso existe desde T4 (canon
-    // #99, misma const del bloque T4/T7) y `aria-expanded="false"` es el
-    // estado inicial vigente. SIN `toBeVisible()`: jsdom no aplica los
-    // estilos de los CSS Modules (spec → Tests 13).
+    // No toBeVisible() here: jsdom does not apply CSS Module styles, so the class
+    // is what gets asserted.
     const { container } = renderSidebarWithDefs();
 
     const contacts = container.querySelector(`#${CONTACTS_ID}`);
@@ -903,39 +487,8 @@ describe("contacts entrance (Cambio motion 3)", () => {
   });
 });
 
-// ============================================================================
-// Tests de T6 (specs/layout/Sidebar/tasks.md) — cierre a11y de la pieza
-// (Tests esperados #9: `expectNoA11yViolations` sin violaciones, colapsado Y
-// expandido; constitución T4: el archivo termina con este caso) y covering
-// check de RF-7/RF-10 por INSPECCIÓN.
-//
-// #101 VERDE ON-ARRIVAL DECLARADO (encargo de T6; criterio NavTabs T4 /
-// CornerTab T4): T6 agrega el módulo CSS completo, las clases de la Anatomía
-// y `index.ts` — nada de eso es discriminate-testable en jsdom: "jsdom no
-// aplica `@media`: los tests verifican el comportamiento del disclosure, no la
-// visibilidad por breakpoint" (spec → Tests esperados, nota final) y las
-// hojas de estilo no se cargan (#101). Fabricar un rojo leyendo el CSS como
-// texto está explícitamente descartado. El markup ya era accesible desde
-// T2–T5 (roles, nombres, `aria-*`, links y disclosure asertados allí con sus
-// casos); el valor de este cierre es la regresión futura sobre el markup
-// completo en AMBOS estados del disclosure. Se inspeccionan (reviewer + QA
-// F5): grilla `auto 1fr` < md y `md–lg`, 2/1 columnas de contactos, columna
-// xl con avatar sobresaliente (fórmula −0.71 de foundations/layout.md),
-// `--sidebar-*` tokens, hover/foco de redes y contactos, el `@media` 1200
-// (desde T7 oculta `.disclosure` y pisa `.additionalCollapsed`), el tramo del Separator
-// sin acumular `gap` y cero `@media print` propio (RF-10).
-//
-// Armazón: `renderSidebarWithDefs` (T3) — fixture completo (4 contactos con
-// `IconBox` tone gradient + redes) junto a `AccentGradientDefs`; la expansión
-// se logra con `user.click` sobre el botón (patrón T4), no manipulando clases.
-// Sin `HexAvatarDefs`: la pieza no usa HexAvatar.
-// ============================================================================
-
 describe("Sidebar accessibility audit collapsed and expanded (T6: Tests 9)", () => {
   it("has no accessibility violations with the contacts collapsed", async () => {
-    // Estado inicial del disclosure en todo < xl (decisión 11): colapsado por
-    // clase; el id del `aria-controls` existe (RF-10) y todo el contenido
-    // accesible del landmark pasa axe.
     const { container } = renderSidebarWithDefs();
 
     await expectNoA11yViolations(container);
@@ -945,8 +498,6 @@ describe("Sidebar accessibility audit collapsed and expanded (T6: Tests 9)", () 
     const user = userEvent.setup();
     const { container } = renderSidebarWithDefs();
 
-    // Tests 9: la auditoría también en expandido — click real del botón
-    // (misma interacción que T4; el estado observable es `aria-expanded`).
     await user.click(screen.getByRole("button", { name: LABELS.showContacts }));
     expect(screen.getByRole("button", { name: LABELS.hideContacts })).toHaveAttribute(
       "aria-expanded",

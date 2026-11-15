@@ -1,84 +1,5 @@
-/* Sidebar — specs/layout/Sidebar/spec.md → Estilos y tokens / Responsive /
-   Estados. Nació en T4 con las clases mínimas del disclosure; T6 conecta el
-   módulo completo (RF-7, RF-10 y el cierre de RF-3 por CSS); T7 (Cambio F5
-   2026-10-08, decisión #104b) rediseña el disclosure a botón icon-only sin
-   CornerTab (`.disclosure` absoluto, `.chevron*` intactos) y reubica el media
-   1200 de la tab a `.disclosure` (la grilla < md/md–lg ya alineaba la
-   identidad al inicio junto al avatar — el Cambio agrega acá la reserva
-   anti-solape `< md` de `.identity` y el centrado de redes). Grilla `auto
-   1fr` base (< md y md–lg, filas de la tabla Responsive — el avatar y la
-   tipografía escalan SOLO por tokens: --size-avatar-sidebar (base → 9rem
-   ≥768 → 11.25rem ≥1200; el valor base del tramo < md lo fija el usuario en
-    tokens.css por el Cambio F5 −15%, no se hardcodea acá), --font-size-name,
-    --size-avatar-border, --radius-avatar-sidebar,
-    --size-social-icon, --sidebar-name-gap, --sidebar-cta-gap,
-    --font-size-contact-value, todos de tokens/tokens.css), columna vertical
-    centrada en xl con el avatar sobresaliente, redes/links con hover/foco, y
-    el `@media (min-width: 1200px)` — el ÚNICO media de comportamiento xl del
-    módulo (decisión 8=a: oculta el botón de disclosure `.disclosure` — desde
-    T7, antes la CornerTab — y fuerza visible el bloque de contactos; desde el
-    Cambio motion 3/P5' lo hace sobre `.additionalCollapsed` a secas (0,1,0)
-    al final del media, con `transition: none`) más el `@media (min-width:
-    768px)` de la grilla de
-   contactos (2 columnas expandidas en md–lg; 1 columna < md y xl), que es
-   cambio puro de layout. Dentro de ambos `@media` solo hay keywords de
-   layout, tokens, `calc()` de tokens y `0` (docs/tokens/breakpoints.md →
-   Reglas; los tracks `1fr`/`minmax(0, 1fr)` son el ejemplo canónico de ese
-    documento). Cero `@media print` propio (RF-10; Cambio motion 3: el print
-    de RF-10/RF-11 para el grid `0fr↔1fr` — expansión forzada, resets de
-    animación y `visibility` — vive en `global.css` sobre el id
-    `#sidebar-contacts`, tarea T12; no va acá): la expansión forzada y la
-    ocultación del botón en impresión son de los estilos compartidos (G-D,
-    foundations/layout.md → Impresión), que alcanzan este bloque por su id
-    `#sidebar-contacts` y por la clase de colapso — por eso el colapso es por
-    CLASE y nunca `style` inline. Cero colores literales (regla 1 de
-   docs/DESIGN.md): el módulo no declara ningún color fuera de tokens
-   semánticos; los pares usados están registrados en docs/tokens/contrast.md
-   (redes `text-muted` sobre surface 5.02/6.01 y su hover/foco
-   `accent-text` sobre surface 5.87/12.06 — sección "Íconos informativos";
-    contactos e identidad `heading` sobre surface 8.92/16.11; botón de
-    disclosure T7 `accent-text` sobre `surface` del aside 5.87/12.06
-    — el MISMO par ya registrado para hover/foco de redes, contrast.md →
-    "Íconos informativos"; el botón no tiene fondo propio, así que ya no
-    aplica el par sobre `surface-raised` de la CornerTab 5.47/10.60). Transiciones de PROPIEDADES
-   concretas con su par duration+ease (Do/Don't de DESIGN: nunca
-   `transition: all`): `--duration-base`/`--ease-standard` en chevron y redes,
-   y desde el Cambio motion 3 (RF-11) el par de entrada
-   `--duration-slow`/`--ease-enter` y el de salida
-   `--duration-exit`/`--ease-exit` SOLO en las clases `.additional` y
-   `.additionalCollapsed` (0,1,0) — regla #116 aclarada: prohibida toda
-   `transition` que anime en selectores (0,2,0)+; el `transition: none` del
-   override ≥1200 está excluido (desactiva, no anima) y la entrada de ítems
-   es `animation` (0,3,0), no `transition`. Bajo prefers-reduced-motion no
-   hay regla propia (P6'): `--duration-base`/`--duration-slow`/
-   `--duration-exit`/`--duration-stagger` colapsan a 0.01ms en tokens.css y
-   todo —duraciones y delays derivados de `calc()`— se vuelve imperceptible.
-   Literales del módulo: SOLO los que
-   la spec fija textualmente y se citan en cada regla (180° del chevron —
-   RF-4—, la fórmula `-0.71` del avatar, compartida con
-   foundations/layout.md, el `4px` del `@keyframes item-enter` — RF-11:
-   "translateY(4px)→0"—, y los `0` de resets/posicionamiento permitidos por
-   breakpoints.md); toda medida que cambia por breakpoint es token (la del
-   avatar del xl escala vía --size-avatar-sidebar, no hay literal de
-   tamaño). Sin margen externo en el raíz (Do/Don't): ni `.baseInfo` ni
-   `.additional` ni `.additionalBody` declaran margen; ver "pila sin
-   acumulación" abajo. */
-
-/* Contenedor del disclosure (Anatomía `.additional`, id `sidebar-contacts`
-   desde T3 — `aria-controls`/RF-10). CAMBIO MOTION 3 (RF-11; spec → tabla
-   "Entrada de contactos"; plan → Anexo P3'/P4'): grid de UNA fila cuya altura
-   anima con el track `0fr↔1fr` — la ÚNICA excepción a "no animar altura" del
-   kit (spec → No hacer; C3 de foundations/motion.md, excepción que redacta el
-   orchestrator en T13). Esta base es el estado EXPANDIDO: `1fr` + visible,
-   entrada con `--duration-slow`/`--ease-enter`; el `visibility 0s` SIN delay
-   mantiene el bloque accesible durante toda la entrada, y el
-   `visibility 0s var(--duration-exit)` del colapso (abajo) difiere el hidden
-   hasta el final del cierre (RF-11: colapsado = fuera del árbol de
-   accesibilidad y del foco — se verifica en QA en navegador, no en jsdom).
-   Transiciones SOLO acá y en `.additionalCollapsed`, ambas (0,1,0) — #116
-   aclarada: cero `transition` que anime en selectores (0,2,0)+. La pila
-   vertical (decisión 11) ya no vive en este contenedor: MIGRÓ a
-   `.additionalBody` (abajo) con el wrapper de T10. */
+/* A one-row grid whose track animates between 0fr and 1fr: the only place in
+   the kit where height is animated. */
 .additional {
   display: grid;
   grid-template-rows: 1fr;
@@ -87,18 +8,8 @@
     visibility 0s;
 }
 
-/* Colapso del bloque de contactos (nace en T4 por `display: none`; CAMBIO
-   MOTION 3, RF-11: pasa a `grid-template-rows: 0fr` + `visibility: hidden`,
-   nunca `style` inline — RF-10: el print de T12 y el media ≥1200 abajo deben
-   poder forzar la apertura pisando esta CLASE). La clase se aplica SOLO
-   cuando `expanded === false` (ternaria en el TSX, T4). Salida
-   `--duration-exit`/`--ease-exit` y `visibility` recién a los
-   `--duration-exit` (0fr durante todo el cierre, fuera del árbol al
-   terminar). P3': MISMA especificidad (0,1,0) que la base y declarada
-   DESPUÉS en el archivo → gana por orden determinista dentro del módulo
-   (descartado depender del orden compuesto/simple y descartado `!important`;
-   el viejo mecanismo compuesto del media 1200 se reemplaza en T11/T12 por el
-   override a secas de P5', al final del archivo). */
+/* Collapsed through a class, never an inline style, so print and the 1200px
+   media query can force it open by overriding it. */
 .additionalCollapsed {
   grid-template-rows: 0fr;
   visibility: hidden;
@@ -106,50 +17,21 @@
     visibility 0s var(--duration-exit);
 }
 
-/* Pila del bloque SIN acumulación en el tramo del Separator — dueña del
-   mecanismo desde el Cambio motion 3: `.additionalBody` (decisión 11 +
-   Separator RF-4; plan → Anexo P4': "recibe la pila de `.additional`"; el
-   mecanismo elegido en T6 se MIGRA intacto, solo cambia el contenedor).
-   El contenedor NO usa `gap` ni márgenes propios — flujo normal de bloque y
-   el espacio entre sus hijos (Separator, lista, CTA) lo aporta SOLO el
-   margen propio de cada hijo: el `Separator` trae su `margin-block:
-   var(--separator-gap)` de su propio módulo (así el tramo línea↔contactos lo
-   da solo el separador, sin suma del contenedor) y el CTA trae su
-   `margin-top: var(--sidebar-cta-gap)` (fila "Download CV" de la tabla, vía
-   la clase `.cta` unida al raíz del Button). El contenedor no suma nada en
-   ningún tramo. Verificación `#sidebar-contacts` VACÍO (nota de T3): sin
-   hijos no hay márgenes ni gap que pinten — cero spacing fantasma. Edge
-   documentado para F5: sin contactos y con CTA, Separator y CTA quedan
-   adyacentes en flujo block y sus márgenes verticales COLAPSAN (máximo, no
-   suma); en flex serían suma — se mantiene el flujo block heredado de T3/T6;
-   lo que cambia con el Cambio motion 3 es el contenedor EXTERNO
-   (`.additional`, grid de una fila), no el modelo interno del wrapper. */
 .additionalBody {
-  /* `min-height: 0`: necesidad MECÁNICA del grid padre — el track solo
-     encoge bajo el contenido si el ítem puede encogerse (0 permitido).
-     `overflow: hidden`: recorta el contenido durante el cierre 0fr (RF-11;
-     tabla "Entrada de contactos", fila wrapper). */
+  /* min-height: 0 lets the grid track shrink below its content; overflow:
+     hidden clips it while closing. */
   min-height: 0;
   overflow: hidden;
 }
 
-/* Entrada de ítems del wrapper (RF-11; tabla "Entrada de contactos"; plan →
-   Anexo P2'). Gated por `data-contacts-animate` (P1': el atributo SOLO
-   existe cuando `expanded` — nada anima en el render inicial ni en la carga
-   ≥ xl; los clics rápidos quedan guiados por clases, sin timers JS). Es
-   `animation`, no `transition`: el selector compuesto (0,3,0) NO viola #116,
-   que solo restringe transiciones. `backwards` (P2'): los ítems no se ven
-   antes de su paso. Un `li` de la lista NO es hijo directo del wrapper: los
-   ítems animados son Separator, lista y CTA. */
+/* An animation, not a transition, gated by an attribute that only exists
+   while expanded: nothing animates on the first render. */
 .additional[data-contacts-animate] .additionalBody > * {
   animation: item-enter var(--duration-base) var(--ease-enter) backwards;
 }
 
-/* Delays escalonados 0/30/60/90 ms: `calc(n × --duration-stagger)` con n =
-   0–3 por posición (tabla, fila delays) y CAP al 4.º paso para un eventual
-   5.º hijo+ (fila cap; con los hijos típicos del wrapper nunca interviene).
-   P6' reduced motion: `--duration-stagger` colapsa a 0.01ms en tokens.css →
-   los delays derivados se achican solos, sin regla propia acá. */
+/* Staggered delays derived from the stagger token, so they collapse with it
+   under reduced motion. */
 .additional[data-contacts-animate] .additionalBody > :nth-child(1) {
   animation-delay: calc(0 * var(--duration-stagger));
 }
@@ -170,10 +52,6 @@
   animation-delay: calc(4 * var(--duration-stagger));
 }
 
-/* Keyframes de la entrada (tabla, fila `@keyframes item-enter`, textual de
-   RF-11): opacity 0→1 + translateY(4px)→0. El `4px` es el LITERAL fijado por
-   la spec ("`translateY(4px)→0`"); el `none` del to es keyword de
-   transformación, no medida. */
 @keyframes item-enter {
   from {
     opacity: 0;
@@ -186,64 +64,21 @@
   }
 }
 
-/* Chevron del disclosure (T4, RF-4; spec → Responsive, Colapsable: "el
-   chevron rota 180° cuando está expandido (`transform`, `--duration-base`)").
-   Clase base unida al `<svg>` del Icon (la unión la aplica Icon en su raíz,
-   su RF-6): siempre presente para que la transición anime también el cierre
-   (criterio LanguageSwitcher: "declarada en la base para que también anime la
-   vuelta"). `--ease-standard` acompaña al `--duration-base` del texto de la
-   spec por el canon de la fase (ThemeToggle/LanguageSwitcher/NavTabs: todo
-   transition de propiedad concreta lleva par duration+ease, ambos tokens; la
-   spec no fija otra curva). */
+/* Always present so the transition also animates the closing rotation. */
 .chevron {
   transition: transform var(--duration-base) var(--ease-standard);
 }
 
-/* Estado expandido (T4, RF-4; inspección T6/QA F5: jsdom no computa
-   transformaciones, #101). El `180deg` es medida FIJA definida textualmente
-   por la spec (RF-4/Estados: "rota el chevron 180°") y no cambia por
-   breakpoint: literal permitido por docs/tokens/breakpoints.md (mismo
-   criterio de CornerTab `.sm`). El chevron queda con el tamaño default de
-   Icon (--size-icon por fallback de --icon-size): la tabla de la spec no
-   fija un --icon-size propio para él (verificación pedida en tasks.md → T4;
-   T6 confirma que ningún estilo de la spec lo pide) y no se inventa uno. */
 .chevronRotated {
   transform: rotate(180deg);
 }
 
-/* baseInfo (Anatomía; spec → Responsive "< md" y "md–lg": "Grilla `auto
-   1fr`: avatar a la izquierda; nombre y badge a la derecha; redes debajo de
-   la identidad"). Fila `< md` y fila `md–lg` comparten layout ("Igual"):
-   una sola regla base, mobile-first; el avatar y el texto más grande de md
-   escalan SOLO por tokens (--size-avatar-sidebar 9rem y --font-size-name
-   27px ≥768 en tokens.css), sin @media de 768 para la grilla.
-   - `auto` = columna del avatar (su ancho es --size-avatar-sidebar);
-     `minmax(0, 1fr)` evita que un valor largo de identidad inflé la columna
-     (breakpoints.md → ejemplo canónico de tracks en grid).
-   - `gap: var(--space-4)`: la spec no fija la separación avatar↔identidad
-     ni identidad↔redes; se usa un token de espaciado existente del kit
-     (16px fijo, no cambia por breakpoint → no requiere token nuevo ni
-     literal). */
 .baseInfo {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--space-4);
 }
 
-/* Avatar (Anatomía `figure.avatar > img`; spec → Estilos y tokens, bloque
-   "Avatar" — valores textuales de la tabla, cada uno con su token):
-   tamaño --size-avatar-sidebar (escala por breakpoint en tokens.css: base —
-   el −15% del Cambio F5 lo aplica el usuario ahí, no se hardcodea acá — →
-   9rem ≥768 → 11.25rem ≥1200; el img hereda 100% del contenedor, decisión
-   9), radio
-   --radius-avatar-sidebar (20 <768 → 32 ≥768), borde --size-avatar-border
-   (5→6px ≥768) `solid var(--color-surface)`, sombra --shadow-avatar, fondo
-   --color-surface-muted (placeholder mientras carga la imagen de
-   public/) y `overflow: hidden` para recortar la foto al radio.
-   `margin: 0`: reset del margen de UA del <figure> (necesidad MECÁNICA, 0
-   permitido por breakpoints.md; sin esto el avatar correría 1em/40px y
-   rompería la grilla). La protrusión de xl (margin-top negativo) va en el
-   media 1200, abajo. */
 .avatar {
   width: var(--size-avatar-sidebar);
   height: var(--size-avatar-sidebar);
@@ -255,46 +90,18 @@
   overflow: hidden;
 }
 
-/* Fila "Avatar" de la tabla (textual): `img { object-fit: cover; width:
-   100%; height: 100%; }` — el 100% referencia el size del token (decisión
-   9: el img NO lleva atributos width/height HTML; dimensiona solo el CSS). */
 .avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Identidad (Anatomía `div.identity`: `p.name` + `Badge`). Sin estilo
-   propio en la spec; `min-width: 0` es la necesidad MECÁNICA de que la
-   columna 1fr pueda encogerse con un nombre largo (el nombre NO tiene
-   elipsis en la spec: sin overflow hidden, simplemente no expande la
-   columna del grid).
-   T7 (Cambio F5, spec → Responsive "< md" y Colapsable: "la identidad NO
-   pasa por debajo: reserva con `padding-inline-end: calc()` de tokens en
-   < md si el nombre lo alcanza"): DECISIÓN del builder — el nombre SÍ puede
-   alcanzar la esquina a 375px (columna ≈ 227px desde x≈133; un nombre largo
-   llega a x≈360 y la franja del botón cubre y 0–26 con el nombre en
-   y≈15–48; por eso D1 midió solape, ahora con un objetivo de 26px en vez de
-   la tab de 164px). Reserva en la BASE (mobile-first) solo del ancho del
-   área táctil del disclosure + aire: `calc(var(--size-icon) + var(--space-4))`
-   = 18 + 16 = 34px ≥ 26px del botón + 2×offset del anillo de foco (4px), con
-   margen. A md–lg/xl NO aplica (filas md–lg/xl: identidad junto a un avatar
-   de 9rem en ≥768px y columna centrada en xl: el nombre no alcanza la
-   esquina; se corta en el media 768 con `0`, permitido por breakpoints.md —
-   el remedido lo fija F5, criterio (d)). Afecta solo al lado derecho: la
-   alineación al INICIO del bloque no cambia (fila "< md" del Cambio). */
+/* min-width: 0 lets the 1fr column shrink with a long name. */
 .identity {
   min-width: 0;
   padding-inline-end: calc(var(--size-icon) + var(--space-4));
 }
 
-/* Nombre (Anatomía `p.name`; spec → Estilos y tokens, fila "Nombre" —
-   textuales: --font-size-name, --font-weight-medium, --color-heading,
-   `margin-bottom: var(--sidebar-name-gap)` (10px <768 → 14px ≥768, token
-   responsive)). `margin-top: 0`: reset del margen de UA del <p> (0
-   permitido; sin él el 1em de arriba separía nombre y badge más que el
-   token). El <p> es el elemento que fija la Anatomía ("el único h1 de la
-   página es el del tabpanel" — spec → No hacer). */
 .name {
   margin-top: 0;
   margin-bottom: var(--sidebar-name-gap);
@@ -303,19 +110,6 @@
   color: var(--color-heading);
 }
 
-/* Redes (Anatomía `ul.social`; spec → Estilos y tokens, fila "Redes"):
-   fila con wrap y separación FIJA "0.75rem" de la tabla — se aplica con
-   `var(--space-3)`, el token del kit con ese valor exacto (regla dura 2 de
-   DESIGN: tokens semánticos; la tabla no lo define como literal propio del
-   componente). `grid-column: 2`: "redes DEBAJO DE LA IDENTIDAD" (filas < md
-   y md–lg de la tabla Responsive — auto-placement las pondría en la
-   columna 1 bajo el avatar); ignorado en xl donde el contenedor pasa a
-   flex. T7 (Cambio F5, spec → Anatomía/Responsive): `justify-content:
-   center` — "redes centradas en el espacio disponible" en < xl (la fila
-   "Redes" de Estilos no fija alineación; es textual del Cambio); en xl el
-   `align-items: center` del media 1200 ya centra la lista y el centro
-   propio queda inocuo. Resets de <ul> de UA (margin/padding/list-style con
-   0, permitidos: necesidad mecánica). */
 .social {
   grid-column: 2;
   display: flex;
@@ -328,23 +122,7 @@
   list-style: none;
 }
 
-/* Link de red (Estados, fila "Link de red social": reposo
-   --color-text-muted; hover/foco --color-accent-text; foco con anillo
-   estándar; transición de `color` --duration-base — textos literales de
-   spec → Estilos y tokens "Redes" y de la tabla Estados). El color recae
-   en el link y el `BrandIcon` lo hereda con su `fill="currentColor"`
-   (BrandIcon RF-5: monocromo heredado del padre; sin `opacity`, decisión de
-   la tabla: contraste directo 5.02 claro / 6.01 oscuro, registrado en
-   docs/tokens/contrast.md → "Íconos informativos"; hover/foco 5.87/12.06
-   con --color-accent-text, regla dura 5 de DESIGN y Do/Don't: texto de
-   acento SIEMPRE --color-accent-text).
-   Área táctil ≥24×24px (fila "Redes": "Área táctil mínima 24×24px
-   (padding en el link)"): `padding: var(--space-1)` (4px) sobre el ícono
-   default --size-social-icon → 16px+8 = 24px <580 y 18px+8 = 26px ≥580;
-   cumple el mínimo en todos los breakpoints sin medir el ícono acá.
-   `:focus-visible` (no `:focus`): canon del anillo estándar (regla dura 7
-   de DESIGN); el color de hover/foco se aplica también en `:focus-visible`
-   para replicar "hover/foco" de la tabla Estados. */
+/* The color sits on the link; the brand icon inherits it. */
 .social a {
   display: inline-flex;
   align-items: center;
@@ -364,41 +142,7 @@
   outline-offset: var(--focus-ring-offset);
 }
 
-/* Botón de disclosure (T7 — Cambio F5 2026-10-08; Anatomía nueva: botón
-   icon-only DIRECTO, sin CornerTab; RF-3/RF-4/RF-10). FUERA del @media 1200
-   el botón es visible en todos los < xl (RF-3); solo el media xl lo oculta
-   (abajo, decisión 8=a: se monta siempre, sin render condicional por ancho).
-
-   Posición (spec → Colapsable, textual: "posicionado absoluto en la esquina
-   superior derecha del raíz"): `top: 0; right: 0` con `0` de posicionamiento
-   permitido por breakpoints.md; el anclaje lo da Box `.outer`
-    (`position: relative`, verificado en Box.module.css — declarada allí como
-    "ancla de CornerTab" en su T4; acá ancla este botón, sin clase extra en
-    el raíz de Sidebar). El color del glyph: par `accent-text` sobre `surface`
-    del aside, 5.87/12.06 — ver cabecera y contrast.md.
-
-   Estilo (fila "Botón de disclosure" de spec → Estados + párrafo "Botón" de
-   Colapsable): "sin fondo ni border (cero superficie propia)" →
-   `border: none; background: none` (resets de <button> de UA; criterio
-   NavTabs `.tab`; `none`/`transparent` no son colores literales — regla 1 de
-   DESIGN); `color: var(--color-accent-text)` (el chevron hereda el trazo:
-   Icon tone default `current` → `stroke="currentColor"`); foco con el anillo
-   estándar (`--focus-ring-*`, regla dura 7): `outline: none` en la BASE para
-   suprimir el outline UA en click de mouse y el anillo SOLO en
-   `:focus-visible` — mismo criterio de anillo único del ::after de
-   TestimonialCard (T4 F5), acá aplicado directo al botón. SIN
-   `cursor: pointer`: ni la tabla Estados ni Colapsable de ESTA spec lo
-   listan (criterio ThemeToggle/LanguageSwitcher).
-
-   Área táctil ≥24×24px (spec → Colapsable: "con padding... si hace falta
-   área táctil ≥24px con padding"): glyph `--size-icon` (18px por fallback de
-   `--icon-size`, tamaño default del Icon — verificación T4/T6: la tabla no
-   fija uno propio) + `padding: var(--space-1)` (4px por lado) = 26×26px ≥ 24
-   en todos los breakpoints; ningún literal nuevo. `inline-flex` + align/
-   justify center: necesidad MECÁNICA de centrar el único hijo (svg) en el
-   box del botón (criterio `.social a`). `font-*`/`gap` de la vieja
-   `.disclosureButton` se eliminan: el botón ya no tiene texto (RF-4: el
-   nombre lo da `aria-label`; Test 10). */
+/* Mounted at every width; only the 1200px media query hides it. */
 .disclosure {
   position: absolute;
   top: 0;
@@ -418,16 +162,6 @@
   outline-offset: var(--focus-ring-offset);
 }
 
-/* Contactos (Anatomía `ul.contacts`; spec → Estilos y tokens, bloque
-   "Contactos" + Responsive: 1 columna < md, 2 columnas md–lg CUANDO el
-   usuario expande (decisión 11: default `false` en todo < xl — la grilla de
-   2 columnas describe el bloque expandido, no un estado inicial), 1
-   columna xl; los cambios de columnas van en los dos @media, abajo).
-   Tracks `minmax(0, 1fr)`: permiten que el valor se recorte con elipsis
-   dentro del track (ejemplo canónico de breakpoints.md; `0` permitido).
-   `gap: var(--space-4)`: separación entre filas/columnas — la tabla de la
-   spec no la fija; token de espaciado existente del kit, fijo (no cambia
-   por breakpoint). Resets de <ul> de UA con 0 (mecánicos). */
 .contacts {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -437,36 +171,18 @@
   list-style: none;
 }
 
-/* Fila de contacto (textual de la tabla "Contactos"): "ítem `display:
-   flex; align-items: center; gap: var(--space-4);` IconBox + bloque de
-   texto". El IconBox (3rem --size-icon-box) ya trae `flex-shrink: 0` de su
-   módulo; el bloque de texto se lo permite encoger abajo (min-width: 0). */
 .contacts li {
   display: flex;
   align-items: center;
   gap: var(--space-4);
 }
 
-/* Bloque de texto del `li` (Anatomía: `div` con Overhead + valor):
-   `min-width: 0` deja que el valor largo se recorte con elipsis en vez de
-   ensanchar el item (necesidad MECÁNICA del elipsis de la fila "Contactos";
-   0 permitido). */
+/* min-width: 0 lets a long value be cut with an ellipsis instead of widening
+   the item. */
 .contacts li > div {
   min-width: 0;
 }
 
-/* Valor del contacto (`<a>` o `<p>` según `getContactHref` — RF-5; el
-   `title` con el valor completo ya está en el DOM desde T3, tabla
-   "Contactos"). Textuales de la fila: color --color-heading (inspección
-   pedida en la nota de T3: ellipsis + --color-heading conectados acá),
-   `font-size: var(--font-size-contact-value)` (13px <580 → 14px ≥580,
-   token responsive), "una línea con `text-overflow: ellipsis`" →
-   `overflow: hidden; white-space: nowrap; text-overflow: ellipsis`.
-   `display: block` (necesidad MECÁNICA: el ellipsis no aplica a un inline
-   y el <a> lo sería por UA; el <p> ya es block; criterio HexAvatar T2
-   "necesidad mecánica fiel") para que el recorte y el anillo de foco cubran
-   la línea. `margin: 0`: reset de UA del <p> (0 permitido; el espacio entre
-   bloques lo rigen Separator/CTA, no el valor). */
 .contacts a,
 .contacts p {
   display: block;
@@ -478,15 +194,6 @@
   text-overflow: ellipsis;
 }
 
-/* Link de contacto (Estados, fila "Link de contacto": "sin subrayado;
-   subrayado en hover/foco; foco con anillo estándar" + fila "Contactos":
-   "Links sin subrayado; subrayado en hover/foco"). CAMBIO MOTION 3
-   (propuesta §3.4; el menor quedó registrado en tasks.md → T6): se ELIMINA
-   la `transition: color` que T6 declaró — era inerte: la tabla Estados de
-   contactos no fija cambio de color (el color queda --color-heading en
-   reposo/hover/foco) y el contrato de entrada de RF-11 no la incluye. Los
-   <a> de contacto NO son decorativos como los de redes: son texto, por eso
-   el subrayado (no cambian de color al hover — tabla Estados). */
 .contacts a {
   text-decoration: none;
 }
@@ -501,31 +208,10 @@
   outline-offset: var(--focus-ring-offset);
 }
 
-/* Download CV (Anatomía: `Button … fullWidth`; spec → Estilos y tokens,
-   fila "Download CV": "`margin-top: var(--sidebar-cta-gap)`" — textual; el
-   token es responsive (16px <580 → 20px 580–767 → 32px 768–1199 → 30px ≥1200
-   en tokens.css) por lo que NO hay @media acá. La clase se UNE al raíz del
-   Button por su prop `className` (su API; el T5 dejó el CTA sin clase a
-   propósito: "el margen --sidebar-cta-gap es T6"). Es el margen PROPIO del
-   hijo que el mecanismo de pila documentado arriba (cabecera) exige: el
-   espaciado contactos↔CTA lo da SOLO este margen-top, sin gap del
-   contenedor. */
 .cta {
   margin-top: var(--sidebar-cta-gap);
 }
 
-/* md (768): contacto expandido en 2 columnas (fila "md–lg (768–1199)" de la
-   tabla Responsive: "Contactos expandidos en 2 COLUMNAS"; cambio puro de
-   layout — columnas — permitido en el @media del componente; el track
-   `repeat(2, minmax(0, 1fr))` es el ejemplo textual de
-   docs/tokens/breakpoints.md). La separación y el resto escalan por tokens
-   (--space-4 también da el column-gap; --sidebar-* y --font-size-* ya
-   saltaron en tokens.css). A partir de acá la grilla base `auto 1fr` de
-   baseInfo NO cambia ("Igual", fila md–lg).
-   T7: desde md la identidad NO reserva la esquina del disclosure (decisión
-   documentada en `.identity`: a ≥768px el nombre no alcanza la esquina);
-   `padding-inline-end: 0` es el `0` de reset permitido por
-   breakpoints.md dentro de un media de layout, y rige también en xl. */
 @media (min-width: 768px) {
   .contacts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -536,16 +222,9 @@
   }
 }
 
-/* xl (≥1200) — ÚNICO media de comportamiento xl del módulo (RF-3, decisión
-   8=a CSS-only; RF-7). Sin `@media print` en todo el archivo (RF-10;
-   inspección). Nada ramifica en JS por ancho: el botón de disclosure (T7) se
-   monta siempre (T4) y acá deja de ser visible/operable. */
+/* The only width-dependent behavior of the sidebar, done in CSS: nothing
+   branches in JS. */
 @media (min-width: 1200px) {
-  /* "Vertical y centrado" (fila xl de la tabla Responsive; Anatomía de
-     foundations/layout.md): la grilla `auto 1fr` pasa a columna flex
-     centrada; nombre/badge/redes centrados (align-items + text-align;
-     "centrados" es textual de la fila). El gap de la base sigue rigiendo
-     (propiedad común a grid y flex). */
   .baseInfo {
     display: flex;
     flex-direction: column;
@@ -553,57 +232,17 @@
     text-align: center;
   }
 
-  /* Avatar "sobresaliendo arriba" (fila xl, textual):
-     `margin-top: calc(var(--size-avatar-sidebar) * -0.71)` ≈ −8rem con
-     11.25rem — FÓRMULA COMPARTIDA con foundations/layout.md → "xl: sidebar
-     + contenido" ("El avatar sobresale: margin-top: calc(var(
-     --size-avatar-sidebar) * -0.71) … centrado"; el `-0.71` no es un valor
-     inventado acá: es el coeficiente del par protrusión/top del sticky, y
-     por eso el `top` del sticky lo incluye — AppLayout). El HEADROOM de
-     página para la protrusión (el espacio --gutter-top de 10rem en xl) lo
-     aporta AppLayout sobre el contenedor (layout.md: "está contemplado en
-     los 10rem"; el Box raíz ya es `overflow: visible` — su RF-6 — y no
-     recorta). Gana sobre el `margin: 0` de la base por ORDEN (misma
-     especificidad 0-1-0, declarada después dentro del media; dentro de un
-     mismo archivo el orden es determinista). */
+  /* The avatar sticks out above the card. The -0.71 factor is shared with the
+     page layout, which reserves the same space. */
   .avatar {
     margin-top: calc(var(--size-avatar-sidebar) * -0.71);
   }
 
-  /* Contactos "siempre visibles en 1 columna" en xl (fila xl de la tabla
-     Responsive; revierte las 2 columnas de md). */
   .contacts {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* RF-3 (decisión 8=a; tabla Responsive/Colapsable en ≥ xl tras el Cambio
-     motion 3: "un @media (min-width: 1200px) del propio módulo fuerza
-     `grid-template-rows: 1fr` + `visibility: visible` sobre
-     `.additionalCollapsed` (0,1,0, al final) y oculta el botón"), más el
-     control #116/P5' del cierre:
-     - `.disclosure { display: none }`: INTACTO desde T7 — el media y la
-       clase base del botón viven en el MISMO módulo, misma especificidad
-       (0,1,0) que la base `.disclosure` y ORDEN determinista dentro del
-       archivo (el media va después). Sin `!important`. El botón queda "no
-       visible ni operable" (RF-3: sigue montado, sin render condicional por
-       ancho); su `data-print-hide` es además el hook del contrato de
-       impresión (RF-10, decisión #104a).
-     - `.additionalCollapsed` A SECAS (0,1,0; P5', al final del media y del
-       archivo): fuerza `grid-template-rows: 1fr` + `visibility: visible`
-       sobre la clase de colapso — misma especificidad que la base y que el
-       colapso, gana por ORDEN (este media es el último bloque del módulo y
-       la regla va la última dentro de él; dentro de un mismo archivo el
-       orden es determinista, criterio del `margin-top` del avatar arriba).
-       No hace falta el `display` del viejo bloque: `.additional` ya es grid
-       por su base (0,1,0) y el colapso nuevo no declara `display` — nada
-       que pisar acá. El `transition: none` (P5') evita que AGRANDAR la
-       ventana con el bloque colapsado dispare la animación de altura
-       (RF-11: en ≥1200 nada anima al cambiar el tamaño); es legal bajo #116
-       aclarada (desactiva, no anima) y es el único `transition: none` del
-       módulo. El viejo compuesto `.additional.additionalCollapsed` (0,2,0)
-       con `display: block` se elimina: el colapso ya no es por `display`
-       (RF-11) y el abierto forzado de impresión lo resuelve el bloque de
-       T12 en `global.css` sobre el id, no el media. */
+  /* Forces the contacts open over the collapsed class and hides the button. */
   .disclosure {
     display: none;
   }
