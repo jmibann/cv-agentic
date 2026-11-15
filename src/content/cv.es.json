@@ -5,7 +5,7 @@
     "name": "Juan Manuel Ibáñez",
     "headline": "Frontend Engineer",
     "avatar": {
-      "src": "/images/avatar.png"
+      "src": "/images/avatar.webp"
     },
     "about": [
       "Frontend Engineer con más de 7 años construyendo productos en React/TypeScript para clientes de Estados Unidos y Europa en healthtech, e-commerce y turismo. Fui responsable end-to-end de funcionalidades de pagos, compliance y analítica, impulsé migraciones de design system y de herramientas de build, y lideré code reviews enfocadas en type safety y uso correcto de hooks.",

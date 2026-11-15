@@ -5,7 +5,7 @@
     "name": "Juan Manuel Ibáñez",
     "headline": "Frontend Engineer",
     "avatar": {
-      "src": "/images/avatar.png"
+      "src": "/images/avatar.webp"
     },
     "about": [
       "Frontend Engineer with 7+ years building React/TypeScript products for US and European clients across healthtech, e-commerce and travel. I've owned payment, compliance and analytics features end-to-end, driven design-system and build-tool migrations, and led code reviews focused on type safety and hook correctness.",
