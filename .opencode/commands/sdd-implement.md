@@ -1,20 +1,20 @@
 ---
-description: "SDD · Ejecuta UNA tarea con el flujo de agentes (uso: /sdd-implement <categoria>/<Name> T3)"
+description: "SDD · Runs ONE task through the agent flow (usage: /sdd-implement <category>/<Name> T3)"
 agent: orchestrator
 ---
 
-Ejecutá SOLO la tarea `$2` de `specs/$1/tasks.md`, siguiendo la skill `sdd`, `docs/constitution.md`
-y tus secciones "Cómo delegar una tarea" y "Después de cada tarea":
+Run ONLY task `$2` of `specs/$1/tasks.md`, following the `sdd` skill, `docs/constitution.md`
+and your sections "How to delegate a task" and "After each task":
 
-1. Verificá que `spec.md`, `plan.md` y `tasks.md` estén aprobados y que `$2` no esté marcada.
-2. Delegá `$2` al subagente que corresponde (`foundation` en F1, `component-builder` en F2–F3,
-   `integrator` en F4):
-   tests primero (commit `test(<Name>): $2`), implementación (commit `feat(<Name>): $2`).
-3. Confirmá que el repo quede en verde y pedí al `reviewer` la revisión de la tarea contra su
-   "Hecho cuando".
-4. Si el reviewer aprueba, marcá `$2` en `tasks.md` con el hash del commit `feat` y
-   commiteá ese cambio (`git add specs/$1/tasks.md` → `docs(sdd): <Name> Tn`).
-   Si rechaza, aplicá la regla de rondas (máximo 3).
-5. Mostrame el resultado: qué RF cubre, commits e informe del reviewer.
+1. Check that `spec.md`, `plan.md` and `tasks.md` are approved and that `$2` is not marked.
+2. Delegate `$2` to the matching subagent (`foundation` in F1, `component-builder` in F2–F3,
+   `integrator` in F4):
+   tests first (commit `test(<Name>): $2`), implementation (commit `feat(<Name>): $2`).
+3. Confirm that the repo is green and ask the `reviewer` to review the task against its
+   "Done when".
+4. If the reviewer approves, mark `$2` in `tasks.md` with the hash of the `feat` commit and
+   commit that change (`git add specs/$1/tasks.md` → `docs(sdd): <Name> Tn`).
+   If it rejects, apply the rounds rule (at most 3).
+5. Show me the result: which RFs it covers, the commits and the reviewer's report.
 
-Después PARÁ. No empieces la siguiente tarea.
+Then STOP. Do not start the next task.

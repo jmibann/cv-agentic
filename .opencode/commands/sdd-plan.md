@@ -1,35 +1,35 @@
 ---
-description: "SDD · Plan + tareas de una fase completa o el plan de una pieza suelta (uso: /sdd-plan F1…F4 | /sdd-plan <categoria>/<Name>)"
+description: "SDD · Plan + tasks for a whole phase, or the plan for a standalone piece (usage: /sdd-plan F1…F4 | /sdd-plan <category>/<Name>)"
 agent: orchestrator
 ---
 
-Cargá la skill `sdd` (secciones Plan, Tareas y "Ejecución con agentes") y leé
-`docs/constitution.md`, `AGENTS.md` y `specs/README.md`. **No escribas código.**
+Load the `sdd` skill (sections Plan, Tasks and "Running with agents") and read
+`docs/constitution.md`, `AGENTS.md` and `specs/README.md`. **Do not write code.**
 
-**Si `$1` es una fase (`F1`, `F2`, `F3` o `F4`; F5 no tiene plan ni tareas, decisión #85):** puerta de Plan + Tareas por
-fase. Para cada pieza de esa fase (tabla de `specs/README.md`, en orden; en
-F1 la única pieza es `foundation/Foundation`),
-redactá `plan.md` y `tasks.md` (formato de la skill). Si alguna spec no tiene
-`Estado: aprobada` o tiene `[NECESITA ACLARACIÓN]` abiertas, frená y avisame
-antes de redactar nada. Si la Clarificación de alguna pieza no se hizo, pedísela
-al `reviewer` (como `/sdd-clarify`) y presentame solo las que tengan hallazgos
-(decisión #90). Presentá todo junto con el formato de tu sección "Al
-llegar a una puerta" y esperá mi aprobación de la fase.
+**If `$1` is a phase (`F1`, `F2`, `F3` or `F4`; F5 has no plan or tasks, decision #85):** Plan + Tasks gate per
+phase. For each piece of that phase (table in `specs/README.md`, in order; in
+F1 the only piece is `foundation/Foundation`),
+draft `plan.md` and `tasks.md` (the skill's format). If any spec does not have
+`Status: approved` or has open `[NEEDS CLARIFICATION]` marks, stop and tell me
+before drafting anything. If the Clarification of a piece was not done, request it
+from the `reviewer` (as `/sdd-clarify`) and present to me only the ones with findings
+(decision #90). Present everything together using the format of your section "When
+reaching a gate" and wait for my approval of the phase.
 
-**Si `$1` es `<categoria>/<Name>`** (pieza fuera de una fase, o un Cambio):
-leé `specs/$1/spec.md`; si no tiene `Estado: aprobada` o tiene
-`[NECESITA ACLARACIÓN]` abiertas, frená y avisame. Redactá solo
-`specs/$1/plan.md` y esperá mi aprobación (puerta de Plan); las tareas van con
+**If `$1` is `<category>/<Name>`** (a piece outside a phase, or a Change):
+read `specs/$1/spec.md`; if it does not have `Status: approved` or has open
+`[NEEDS CLARIFICATION]` marks, stop and tell me. Draft only
+`specs/$1/plan.md` and wait for my approval (Plan gate); the tasks go through
 `/sdd-task`.
 
-Cada `plan.md` incluye:
+Every `plan.md` includes:
 
-- Archivos que se crean o modifican y la responsabilidad de cada uno.
-- Funciones puras de lógica (con "hoy" como parámetro solo si dependen de la fecha).
-- Algoritmo en pseudocódigo (solo si hay lógica no trivial).
-- Cómo se pinta en la interfaz.
-- Decisiones técnicas justificadas, con su alternativa descartada.
-- Estrategia de tests con `npm test` (Vitest + Testing Library + `expectNoA11yViolations`).
+- Files created or modified and the responsibility of each one.
+- Pure logic functions (with "today" as a parameter only if they depend on the date).
+- Algorithm in pseudocode (only if there is non-trivial logic).
+- How it is rendered in the interface.
+- Justified technical decisions, each with its discarded alternative.
+- Test strategy with `npm test` (Vitest + Testing Library + `expectNoA11yViolations`).
 
-Todo respeta la constitución y cubre todos los RF; marcá qué RF cubre cada parte.
-Mostrame lo redactado y esperá mi aprobación.
+Everything respects the constitution and covers every RF; mark which RFs each part covers.
+Show me what you drafted and wait for my approval.

@@ -1,13 +1,13 @@
 ---
-description: "SDD · Dónde estamos: fase y siguiente paso de una spec (uso: /sdd-status <categoria>/<Name>)"
+description: "SDD · Where we are: phase and next step of a spec (usage: /sdd-status <category>/<Name>)"
 agent: orchestrator
 ---
 
-Leé `specs/$1/` (`spec.md`, `plan.md` y `tasks.md`, los que existan), `docs/memory.md` y
-`git log --oneline -- src/` si hace falta. **No modifiques ningún archivo.**
+Read `specs/$1/` (`spec.md`, `plan.md` and `tasks.md`, whichever exist), `docs/memory.md` and
+`git log --oneline -- src/` if needed. **Do not modify any file.**
 
-Decime en pocas líneas:
+Tell me in a few lines:
 
-1. En qué fase del flujo SDD está la pieza y su `Estado`.
-2. Tareas hechas y pendientes (x de y).
-3. El siguiente paso exacto, con el comando `/sdd-*` que tengo que ejecutar.
+1. Which phase of the SDD flow the piece is in and its `Status`.
+2. Tasks done and pending (x of y).
+3. The exact next step, with the `/sdd-*` command I have to run.

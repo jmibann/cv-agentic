@@ -1,176 +1,176 @@
-# Agentes (OpenCode)
+# Agents (OpenCode)
 
-Los 5 agentes se escribieron **desde cero** para este proyecto y el proyecto
-arranca **sin base de aprendizajes**; la memoria entre sesiones vive en
-`docs/memory.md` (solo la edita el orchestrator).
+The 5 agents were written **from scratch** for this project and the project
+starts **with no base of learnings**; the memory between sessions lives in
+`docs/memory.md` (only the orchestrator edits it).
 
-Ya están en su **ubicación final**: OpenCode lee `AGENTS.md` (raíz) y los
-agentes de **`.opencode/agents/`** (carpeta en plural, según la documentación
-vigente de OpenCode). No hay plantillas ni paso de instalación: si se edita un
-agente, se edita acá.
+They are already in their **final location**: OpenCode reads `AGENTS.md` (root) and the
+agents in **`.opencode/agents/`** (plural folder, as in OpenCode's current
+documentation). There are no templates and no install step: if an agent is
+edited, it is edited here.
 
-> Esta documentación vive en `docs/agent-system.md` y **no** dentro de
-> `.opencode/agents/` a propósito: OpenCode trataría cualquier `.md` de esa
-> carpeta como un agente. Se llamaba `docs/agents.md`: se renombró
-> (decisión #92) porque en sistemas de archivos que no distinguen mayúsculas
-> (macOS) chocaba con `AGENTS.md` y algunas herramientas lo tomaban como
-> instrucciones del directorio `docs/`.
+> This documentation lives in `docs/agent-system.md` and **not** inside
+> `.opencode/agents/` on purpose: OpenCode would treat any `.md` in that
+> folder as an agent. It used to be called `docs/agents.md`: it was renamed
+> (decision #92) because on case-insensitive file systems
+> (macOS) it clashed with `AGENTS.md` and some tools took it as
+> instructions for the `docs/` directory.
 
-## Formato de los agentes
+## Agent format
 
-- Encabezado YAML con `description` (entre comillas), `mode`
-  (`primary` | `subagent`), `permission` y, en los subagentes, `steps`.
-- **`permission` reemplaza a `tools`**, que OpenCode marca como obsoleto.
-  Claves usadas: `edit` (cubre write y patch), `bash` (reglas por patrón;
-  **gana la última que coincide**, por eso `"*"` va primero), `task` (qué
-  subagentes puede invocar), `skill` (qué skills puede cargar: `"*": deny` +
-  lista de permitidas, o `allow` para todas) y `webfetch`.
-- **`skill` (decisiones #78 y #87)** está declarada en los 5 agentes, siempre
-  como lista explícita (`"*": deny` + permitidas): los 5 cargan **`sdd`** y el
-  reviewer además la global `browser-testing-with-devtools` (QA visual). OpenCode
-  también ve las skills globales de `~/.agents/skills` y `~/.claude/skills`
-  (por ejemplo `spec-driven-development`, que crearía un `SPEC.md` paralelo, o
-  `git-workflow-and-versioning`): ninguna queda habilitada. El flujo TDD va
-  embebido en los prompts.
-- **Sin `model`**: el orchestrator usa el modelo global y los subagentes
-  heredan el del agente que los invoca.
-- `steps`: tope de iteraciones por invocación (valores iniciales, ajustables);
-  refuerza la regla de máximo 3 rondas de corrección.
+- YAML header with `description` (in quotes), `mode`
+  (`primary` | `subagent`), `permission` and, in subagents, `steps`.
+- **`permission` replaces `tools`**, which OpenCode marks as obsolete.
+  Keys used: `edit` (covers write and patch), `bash` (pattern rules;
+  **the last match wins**, which is why `"*"` goes first), `task` (which
+  subagents it may invoke), `skill` (which skills it may load: `"*": deny` +
+  a list of allowed ones, or `allow` for all) and `webfetch`.
+- **`skill` (decisions #78 and #87)** is declared in the 5 agents, always
+  as an explicit list (`"*": deny` + allowed ones): all 5 load **`sdd`** and the
+  reviewer also the global `browser-testing-with-devtools` (visual QA). OpenCode
+  also sees the global skills in `~/.agents/skills` and `~/.claude/skills`
+  (for example `spec-driven-development`, which would create a parallel `SPEC.md`, or
+  `git-workflow-and-versioning`): none is enabled. The TDD flow is
+  embedded in the prompts.
+- **No `model`**: the orchestrator uses the global model and subagents
+  inherit that of the agent that invokes them.
+- `steps`: cap of iterations per invocation (initial values, adjustable);
+  it reinforces the rule of at most 3 correction rounds.
 
-| Agente | edit | bash | task | skill | steps |
+| Agent | edit | bash | task | skill | steps |
 |---|---|---|---|---|---|
-| orchestrator | `docs/STATUS.md` (estado, #120), `docs/diagnostics.md` (log; formato, tabla Abiertos y poda #98), `docs/memory.md` (estado y memoria); `docs/qa-report.md` (informe de F5, #85); `docs/README.md` y `docs/agent-system.md` (registro de decisiones y doc de agentes, #95); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `docs/*` y `specs/*` (decisión #76; sin `--amend` ni `--no-verify`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
-| foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git [-c user.name=…] commit -m` permitidos; `push`, `--amend`, `--no-verify`, `reset --hard` y `rm -rf` denegados | deny | `sdd` | 150 |
-| component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`) | deny | `sdd` | 80 |
-| integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`; `npm run dev` denegado, #91) | deny | `sdd` | 120 |
-| reviewer | deny | solo verificaciones, build, `validate:content`, lectura de git y `grep`; único con el MCP `chrome-devtools_*` | deny | `sdd`, `browser-testing-with-devtools` | 60 |
+| orchestrator | `docs/STATUS.md` (status, #120), `docs/diagnostics.md` (log; format, Open items table and pruning #98), `docs/memory.md` (status and memory); `docs/qa-report.md` (F5 report, #85); `docs/README.md` and `docs/agent-system.md` (decision register and agent docs, #95); `specs/**/plan.md` and `specs/**/tasks.md` (it drafts them and marks tasks); `spec.md` only with `ask` | verifications, reading git, and `git add`/`git [-c user.name=…] commit -m` limited to `docs/*` and `specs/*` (decision #76; no `--amend` or `--no-verify`, no `git add .`/`-A`) | only the 4 subagents | `sdd` | — |
+| foundation | only the app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` by default; install, scaffold, `git init`, `git add` and `git [-c user.name=…] commit -m` allowed; `push`, `--amend`, `--no-verify`, `reset --hard` and `rm -rf` denied | deny | `sdd` | 150 |
+| component-builder | only `src/components/**` | verifications (lint, typecheck, test), reading git, `git add` and `git [-c user.name=…] commit -m` (no `--amend` or `--no-verify`) | deny | `sdd` | 80 |
+| integrator | only `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verifications, build, `validate:content`, `git add` and `git [-c user.name=…] commit -m` (no `--amend` or `--no-verify`; `npm run dev` denied, #91) | deny | `sdd` | 120 |
+| reviewer | deny | only verifications, build, `validate:content`, reading git and `grep`; the only one with the `chrome-devtools_*` MCP | deny | `sdd`, `browser-testing-with-devtools` | 60 |
 
-**Edición por grupo** (decisiones #72 y #73): foundation, component-builder e
-integrator tienen `edit` con `"*": deny` y solo permiten las rutas de su grupo
-(tabla de arriba). El kit (`README.md`, `AGENTS.md`, `opencode.json`, `docs/**`,
-`tokens/**`, `foundations/**`, `specs/**`, `data/**`, `.opencode/**`) queda
-denegado para los tres. El límite es por grupo, no por pieza: component-builder
-puede escribir en cualquier `src/components/<Name>/`; que use solo el de su
-tarea lo fija su prompt y lo controla el reviewer. Fuera de esas rutas (por
-ejemplo `src/test/`) ningún subagente escribe después de F1. Los `data/*.generated.*` no son excepción de `edit`: se
-regeneran solo con scripts (`gen:types`, `build:validator`). El permiso `edit`
-no cubre bash (`cp`, `npm run`): eso lo cubren la regla del prompt y el reviewer.
+**Editing per group** (decisions #72 and #73): foundation, component-builder and
+integrator have `edit` with `"*": deny` and only allow the paths of their group
+(table above). The kit (`README.md`, `AGENTS.md`, `opencode.json`, `docs/**`,
+`tokens/**`, `foundations/**`, `specs/**`, `data/**`, `.opencode/**`) is
+denied to all three. The limit is per group, not per piece: component-builder
+may write in any `src/components/<Name>/`; using only the one of its
+task is set by its prompt and checked by the reviewer. Outside those paths (for
+example `src/test/`) no subagent writes after F1. The `data/*.generated.*` files are not an `edit` exception: they are
+regenerated only with scripts (`gen:types`, `build:validator`). The `edit` permission
+does not cover bash (`cp`, `npm run`): that is covered by the prompt rule and the reviewer.
 
-**Commits (decisiones F3, #69 y #76):** los de código los hacen foundation,
-component-builder e integrator, con `git -c user.name="jmiban" commit -m` (identidad por flag, decisión #83). **Por cada tarea (Tn de
-`tasks.md`):** `test(<Name>): Tn` con los tests en rojo → `feat(<Name>): Tn`
-con la implementación → `fix(<Name>): Tn` si hay correcciones. `feat`/`fix` no
-tocan tests; `test` solo agrega. El orchestrator marca la tarea en
-`tasks.md` cuando el reviewer la aprueba y **commitea él mismo los
-documentos** (`git add` acotado a `docs/*` y `specs/*` +
-`git commit -m`, solo con el repo en verde, con mensaje en inglés (subject y cuerpo, #121) y sin
-`git add .`/`-A`). `--amend`, `--no-verify` (#93), `reset --hard` y `push` están denegados. El
-reviewer no commitea.
+**Commits (decisions F3, #69 and #76):** code commits are made by foundation,
+component-builder and integrator, with `git -c user.name="jmiban" commit -m` (identity by flag, decision #83). **For each task (Tn of
+`tasks.md`):** `test(<Name>): Tn` with the tests in red → `feat(<Name>): Tn`
+with the implementation → `fix(<Name>): Tn` if there are corrections. `feat`/`fix` do not
+touch tests; `test` only adds. The orchestrator marks the task in
+`tasks.md` when the reviewer approves it and **commits the documents
+itself** (`git add` limited to `docs/*` and `specs/*` +
+`git commit -m`, only with the repo green, with the message in English (subject and body, #121) and no
+`git add .`/`-A`). `--amend`, `--no-verify` (#93), `reset --hard` and `push` are denied. The
+reviewer does not commit.
 
-**Límite conocido de los patrones bash (decisión #88):** en OpenCode `*`
-acepta cualquier texto, espacios incluidos, así que `"git add specs/*"` también
-deja pasar `git add specs/x src/y`, y `git commit -m *` commitea todo lo que
-esté en staging. La garantía "el orchestrator solo commitea documentos" la dan
-dos controles: el orchestrator revisa `git diff --cached --name-only` antes de
-cada commit, y el reviewer, en cada revisión completa de pieza y de fase,
-verifica con `git show --stat` que los commits `docs(...)` desde la puerta
-anterior solo tocan `docs/**` o `specs/**`.
+**Known limit of bash patterns (decision #88):** in OpenCode `*`
+accepts any text, spaces included, so `"git add specs/*"` also
+lets `git add specs/x src/y` through, and `git commit -m *` commits whatever
+is staged. The guarantee "the orchestrator only commits documents" comes from
+two controls: the orchestrator checks `git diff --cached --name-only` before
+each commit, and the reviewer, in each full review of a piece and of a phase,
+verifies with `git show --stat` that the `docs(...)` commits since the previous
+gate only touch `docs/**` or `specs/**`.
 
-## Agentes
+## Agents
 
-| Agente | Modo | Escribe código | Responsabilidad |
+| Agent | Mode | Writes code | Responsibility |
 |---|---|---|---|
-| [orchestrator](../.opencode/agents/orchestrator.md) | primary | No | Recorre F1–F5, delega, frena en cada puerta para aprobación del usuario |
-| [foundation](../.opencode/agents/foundation.md) | subagent | Sí | F1: una Tn por vez de `specs/foundation/Foundation/` (decisión #84): scaffold de la app en la raíz, tooling, alias `@data`, tokens, fuente, providers, script anti-flash |
-| [component-builder](../.opencode/agents/component-builder.md) | subagent | Sí | F2–F3: un componente por vez, TDD estricto desde su spec |
-| [integrator](../.opencode/agents/integrator.md) | subagent | Sí | F4: páginas, contenido en/es, `useHashTab`, AppLayout, print |
-| [reviewer](../.opencode/agents/reviewer.md) | subagent | No | F5 y al final de cada fase: verificación independiente con contexto limpio |
+| [orchestrator](../.opencode/agents/orchestrator.md) | primary | No | Goes through F1–F5, delegates, stops at each gate for the user's approval |
+| [foundation](../.opencode/agents/foundation.md) | subagent | Yes | F1: one Tn at a time of `specs/foundation/Foundation/` (decision #84): scaffold of the app at the root, tooling, `@data` alias, tokens, font, providers, anti-flash script |
+| [component-builder](../.opencode/agents/component-builder.md) | subagent | Yes | F2–F3: one component at a time, strict TDD from its spec |
+| [integrator](../.opencode/agents/integrator.md) | subagent | Yes | F4: pages, en/es content, `useHashTab`, AppLayout, print |
+| [reviewer](../.opencode/agents/reviewer.md) | subagent | No | F5 and at the end of each phase: independent verification with a clean context |
 
-## Flujo
+## Flow
 
 ```
-Usuario ──► orchestrator
+User ──► orchestrator
               │
-   F1 ────────┼──► spec de foundation/Foundation (/sdd-spec) ──► PUERTA spec
-              │    plan.md + tasks.md de Foundation ──► PUERTA Plan + Tareas
-              │    foundation × Tn (test → feat) ──► reviewer por tarea y pieza
-              │                                   ──► PUERTA F1
-   F2 ────────┼──► Clarificación de cada pieza (reviewer detecta; puerta solo con hallazgos, #90)
-              │    plan.md + tasks.md de las 11 primitivas ──► PUERTA Plan + Tareas
-              │    component-builder × N (de a una pieza, de a una Tn)
-              │        └─► reviewer por tarea y por pieza ──► PUERTA por pieza
-              │                                   ──► PUERTA F2
-   F3 ────────┼──► ídem F2 con los 12 compuestos (en orden de dependencias)
-              │                                   ──► PUERTA F3
-   F4 ────────┼──► ídem con integrator            ──► PUERTA F4
-   F5 ────────┴──► reviewer (QA completo: 4 viewports × 2 temas × 2 idiomas; sin Tn, #85)
-                   └─► informe en docs/qa-report.md ──► defectos como tareas de su pieza
-                                                  ──► PUERTA FINAL
+   F1 ────────┼──► spec of foundation/Foundation (/sdd-spec) ──► spec GATE
+              │    plan.md + tasks.md of Foundation ──► Plan + Tasks GATE
+              │    foundation × Tn (test → feat) ──► reviewer per task and piece
+              │                                   ──► F1 GATE
+   F2 ────────┼──► Clarification of each piece (reviewer detects; gate only with findings, #90)
+              │    plan.md + tasks.md of the 11 primitives ──► Plan + Tasks GATE
+              │    component-builder × N (one piece at a time, one Tn at a time)
+              │        └─► reviewer per task and per piece ──► GATE per piece
+              │                                   ──► F2 GATE
+   F3 ────────┼──► same as F2 with the 12 composites (in dependency order)
+              │                                   ──► F3 GATE
+   F4 ────────┼──► same with integrator           ──► F4 GATE
+   F5 ────────┴──► reviewer (full QA: 4 viewports × 2 themes × 2 languages; no Tn, #85)
+                   └─► report in docs/qa-report.md ──► defects as tasks of their piece
+                                                  ──► FINAL GATE
 ```
 
-El orden y las dependencias de los componentes están en
+The order and dependencies of the components are in
 [specs/README.md](../specs/README.md).
 
-## Modo mantenimiento (desde 2026-10-08)
+## Maintenance mode (since 2026-10-08)
 
-F1–F5 cerradas (ver §XII en `docs/diagnostics.md` y `docs/qa-report.md`). No
-quedan puertas de fase abiertas; el sistema sigue operativo para mantenimiento
-con los mismos 5 agentes, la skill `sdd` y los `/sdd-*`. Trabajo abierto al
-2026-11-15: base de deploy (§XIV), **CV real** con su Cambio de spec (§XV, #109),
-**QA visual aprobada** (§XVI) y **CI** (§XVII: Node 26 LTS desde `.nvmrc`, #110;
-`lint` → `test` → `build` antes de publicar, #111) y **testimonios reales** (§XVIII–§XIX, #112–#113) , **Resume en una columna** (§XX, #114) y **favicon + título** (§XXI, #115) cerrados; **motion COMPLETO 4/4** (§XXIV–§XXVII, #106/#116 — #116 es regla permanente en `foundations/motion.md` y `AGENTS.md`) y **metadatos SEO y Open Graph** (§XXVIII, #117: primera reapertura de una pieza cerrada por un pedido nuevo — spec→plan→T19→QA sobre `dist/`—) y **sección Projects en Resume** (§XXIX, #118: colección `projects` en el esquema y el contenido) también cerrados; además **avatar en WebP** (§XXXI, #119) y **README público en inglés con el estado en `docs/STATUS.md`** (§XXXII, #120); todo pusheado y publicado. Queda solo lo
-postergado en el BACKLOG ("SEO por idioma", PDF por idioma, imágenes,
-contraste automatizado…).
-El workflow `.github/workflows/deploy.yml` lo mantiene el usuario (ningún agente lo
-edita). Tareas futuras:
+F1–F5 closed (see §XII in `docs/diagnostics.md` and `docs/qa-report.md`). No
+phase gates remain open; the system stays operational for maintenance
+with the same 5 agents, the `sdd` skill and the `/sdd-*` commands. Work opened as of
+2026-11-15: deploy base (§XIV), **real CV** with its spec Change (§XV, #109),
+**visual QA approved** (§XVI) and **CI** (§XVII: Node 26 LTS from `.nvmrc`, #110;
+`lint` → `test` → `build` before publishing, #111) and **real testimonials** (§XVIII–§XIX, #112–#113) , **Resume in one column** (§XX, #114) and **favicon + title** (§XXI, #115) closed; **motion COMPLETE 4/4** (§XXIV–§XXVII, #106/#116 — #116 is a permanent rule in `foundations/motion.md` and `AGENTS.md`) and **SEO and Open Graph metadata** (§XXVIII, #117: the first reopening of a closed piece for a new request — spec→plan→T19→QA on `dist/`—) and the **Projects section in Resume** (§XXIX, #118: `projects` collection in the schema and the content) closed as well; plus the **avatar in WebP** (§XXXI, #119) and the **public README in English with the status in `docs/STATUS.md`** (§XXXII, #120); all pushed and published. Only what is
+postponed in the BACKLOG remains ("SEO per language", PDF per language, images,
+automated contrast…).
+The workflow `.github/workflows/deploy.yml` is maintained by the user (no agent
+edits it). Future tasks:
 
-| Tarea futura | Flujo | Dueño |
+| Future task | Flow | Owner |
 |---|---|---|
-| Actualizar el CV (contenido bilingüe, avatar, `downloadCvUrl`) | sin spec nueva: encargo simple + `npm run validate:content` + `npm test`; si toca contrato, es Cambio | `integrator` (`src/content/**`) |
-| Modificar una pieza existente | `/sdd-change <cat>/<Name>` (spec con `ask` → plan → tareas → Tn) | su builder (F2/F3) o `integrator` (F4) |
-| Pieza/función nueva (BACKLOG) | `/sdd-spec` → `/sdd-plan <cat>/<Name>` → Tn (`/sdd-implement`) → `/sdd-validate` | según su carpeta |
-| Verificar en el sitio servido | `/sdd-validate` o una pasada corta priorizada (el presupuesto del reviewer se agota en pasadas amplias — lección F5) | `reviewer` (único con MCP de Chrome) |
+| Update the CV (bilingual content, avatar, `downloadCvUrl`) | no new spec: a simple assignment + `npm run validate:content` + `npm test`; if it touches the contract, it is a Change | `integrator` (`src/content/**`) |
+| Modify an existing piece | `/sdd-change <cat>/<Name>` (spec with `ask` → plan → tasks → Tn) | its builder (F2/F3) or `integrator` (F4) |
+| New piece/function (BACKLOG) | `/sdd-spec` → `/sdd-plan <cat>/<Name>` → Tn (`/sdd-implement`) → `/sdd-validate` | depends on its folder |
+| Verify on the served site | `/sdd-validate` or a short prioritized pass (the reviewer's budget runs out in broad passes — F5 lesson) | `reviewer` (the only one with the Chrome MCP) |
 
-Cuentas de cada loop: marcar tareas + commitear docs (orchestrator), revisión
-independiente (reviewer), y **push siempre del usuario** (#91/#76: ningún agente
-sube ni toca `git config`). La memoria (`docs/memory.md`) se actualiza ante
-decisiones de reglas o al cerrar puertas de pieza suelta; el log, con su
-formato (#98).
+Duties of each loop: marking tasks + committing docs (orchestrator), independent
+review (reviewer), and **push always by the user** (#91/#76: no agent
+pushes or touches `git config`). The memory (`docs/memory.md`) is updated on
+rule decisions or when closing gates of a standalone piece; the log, with its
+format (#98).
 
-## Comandos `/sdd-*`
+## `/sdd-*` commands
 
-Atajos del flujo SDD en `.opencode/commands/`. Cada uno corre con un agente
-del proyecto (nunca con los nativos `plan`/`build`), así que respeta sus
-permisos, la constitución y la skill `sdd`. El argumento es la carpeta de la
-spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
+Shortcuts for the SDD flow in `.opencode/commands/`. Each one runs with a project
+agent (never with the native `plan`/`build`), so it respects its
+permissions, the constitution and the `sdd` skill. The argument is the folder of the
+spec, `<category>/<Name>` (for example `primitives/Badge`).
 
-| Comando | Agente | Qué hace |
+| Command | Agent | What it does |
 |---|---|---|
-| `/sdd-status <cat>/<Name>` | orchestrator | Fase, tareas hechas y siguiente comando (no modifica nada) |
-| `/sdd-spec <cat>/<Name> <idea>` | orchestrator | Entrevista y redacta una spec nueva (`spec.md` con `ask`) |
-| `/sdd-clarify <cat>/<Name>` | reviewer | QA de la spec: ambigüedades, contradicciones, RF sin test; no resuelve (lo resuelve el orchestrator con el usuario). "Sin hallazgos" en una spec aprobada → sin puerta (#90) |
-| `/sdd-change <cat>/<Name> <cambio>` | orchestrator | Propone el cambio en la spec (con `ask`); después siguen plan y tareas |
-| `/sdd-plan F1…F4` · `/sdd-plan <cat>/<Name>` | orchestrator | Con una fase: `plan.md` + `tasks.md` de todas sus piezas, una sola puerta. Con una pieza suelta o un Cambio: solo `plan.md` (puerta de Plan) |
-| `/sdd-task <cat>/<Name>` | orchestrator | `tasks.md` de una pieza suelta o de un Cambio (puerta de Tareas) |
-| `/sdd-implement <cat>/<Name> Tn` | orchestrator | Delega UNA tarea (test → feat), pide revisión, marca la tarea y para |
-| `/sdd-validate <cat>/<Name>` | reviewer | Revisión completa RF por RF: `npm test` + `npm run build` + MCP de Chrome DevTools (app servida por el usuario, #91) |
+| `/sdd-status <cat>/<Name>` | orchestrator | Phase, tasks done and next command (it modifies nothing) |
+| `/sdd-spec <cat>/<Name> <idea>` | orchestrator | Interviews and drafts a new spec (`spec.md` with `ask`) |
+| `/sdd-clarify <cat>/<Name>` | reviewer | QA of the spec: ambiguities, contradictions, RFs with no test; it does not resolve (the orchestrator resolves it with the user). "No findings" on an approved spec → no gate (#90) |
+| `/sdd-change <cat>/<Name> <change>` | orchestrator | Proposes the change in the spec (with `ask`); plan and tasks follow |
+| `/sdd-plan F1…F4` · `/sdd-plan <cat>/<Name>` | orchestrator | With a phase: `plan.md` + `tasks.md` of all its pieces, a single gate. With a standalone piece or a Change: only `plan.md` (Plan gate) |
+| `/sdd-task <cat>/<Name>` | orchestrator | `tasks.md` of a standalone piece or a Change (Tasks gate) |
+| `/sdd-implement <cat>/<Name> Tn` | orchestrator | Delegates ONE task (test → feat), requests the review, marks the task and stops |
+| `/sdd-validate <cat>/<Name>` | reviewer | Full review RF by RF: `npm test` + `npm run build` + Chrome DevTools MCP (app served by the user, #91) |
 
-- **`/sdd-validate` y el MCP:** `opencode.json` (raíz) declara el servidor
-  local `chrome-devtools` con versión fija (`npx -y chrome-devtools-mcp@1.10.1`,
-  decisión #91; requiere Node ≥ 20.19, el proyecto usa 26 (`.nvmrc`, #110); subirla es una
-  decisión del usuario). Con `enabled: true` el servidor arranca en todas las
-  sesiones aunque solo el reviewer pueda usarlo (OpenCode no habilita un MCP por
-  agente; es un costo de arranque aceptado). Sus herramientas se llaman `chrome-devtools_*`:
-  `opencode.json` las deniega para todos (`"permission": {"chrome-devtools_*": "deny"}`)
-  y **solo el reviewer** las habilita en su encabezado (la regla del agente se
-  aplica después de la global; verificado con `opencode debug agent`). **Servidor de desarrollo (#91):** ningún agente
-  corre `npm run dev` (es un proceso que no termina y bloquea al agente). Lo
-  levanta **el usuario** en su terminal antes de `/sdd-validate`, del cierre de
-  pieza con QA visual y de F5; el orchestrator lo pide antes de invocar al
-  reviewer y le pasa la URL (`http://localhost:5173`). Si la app no responde o
-  el MCP falla, el reviewer no frena a mitad: lista esos RF como "sin verificar
-  (QA visual)" y lo dice en el informe.
-- **`/constitution` fue eliminado** (decisión #79): el prompt original ya no
-  aplica y `docs/constitution.md` es la fuente viva.
-- Los comandos son opcionales: lo mismo se le puede pedir al orchestrator en
-  lenguaje natural.
+- **`/sdd-validate` and the MCP:** `opencode.json` (root) declares the local
+  server `chrome-devtools` with a pinned version (`npx -y chrome-devtools-mcp@1.10.1`,
+  decision #91; it requires Node ≥ 20.19, the project uses 26 (`.nvmrc`, #110); raising it is a
+  user decision). With `enabled: true` the server starts in every
+  session even though only the reviewer can use it (OpenCode does not enable an MCP per
+  agent; it is an accepted startup cost). Its tools are called `chrome-devtools_*`:
+  `opencode.json` denies them for everyone (`"permission": {"chrome-devtools_*": "deny"}`)
+  and **only the reviewer** enables them in its header (the agent's rule is
+  applied after the global one; verified with `opencode debug agent`). **Development server (#91):** no agent
+  runs `npm run dev` (it is a process that never ends and blocks the agent). The
+  **user** starts it in their terminal before `/sdd-validate`, before closing a
+  piece with visual QA and before F5; the orchestrator requests it before invoking the
+  reviewer and passes it the URL (`http://localhost:5173`). If the app does not respond or
+  the MCP fails, the reviewer does not stop halfway: it lists those RFs as "not verified
+  (visual QA)" and says so in the report.
+- **`/constitution` was removed** (decision #79): the original prompt no longer
+  applies and `docs/constitution.md` is the living source.
+- The commands are optional: the same can be asked of the orchestrator in
+  natural language.

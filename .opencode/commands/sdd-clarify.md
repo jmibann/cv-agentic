@@ -1,20 +1,20 @@
 ---
-description: "SDD · Revisa una spec como QA: solo detecta, no resuelve (uso: /sdd-clarify <categoria>/<Name>)"
+description: "SDD · Reviews a spec as QA: it only detects, it does not resolve (usage: /sdd-clarify <category>/<Name>)"
 agent: reviewer
 ---
 
-Revisá `specs/$1/spec.md` como un QA muy profesional, con contexto limpio. Cargá la skill
-`sdd` y leé `docs/constitution.md` y `specs/README.md`.
+Review `specs/$1/spec.md` as a very professional QA, with a clean context. Load the `sdd`
+skill and read `docs/constitution.md` and `specs/README.md`.
 
-Listá:
+List:
 
-1. Ambigüedades (requisitos que no se pueden verificar).
-2. Contradicciones entre requisitos o entre secciones de la spec.
-3. Casos límite no cubiertos.
-4. RF sin contraparte en "Tests esperados" (y viceversa).
-5. Conflictos con `docs/constitution.md` o con la plantilla de `specs/README.md`.
+1. Ambiguities (requirements that cannot be verified).
+2. Contradictions between requirements or between sections of the spec.
+3. Edge cases that are not covered.
+4. RFs with no counterpart in "Expected tests" (and vice versa).
+5. Conflicts with `docs/constitution.md` or with the template in `specs/README.md`.
 
-No propongas soluciones ni modifiques archivos: solo detectá. Formato: lista numerada.
-Si no encontrás nada, respondé exactamente **"Sin hallazgos"**: con la spec ya `aprobada`,
-la pieza sigue sin puerta de Clarificación (decisión #90). Las respuestas a los hallazgos
-las aplica el orchestrator en `spec.md` (con tu aprobación).
+Do not propose solutions or modify files: only detect. Format: numbered list.
+If you find nothing, answer exactly **"No findings"**: with the spec already `approved`,
+the piece continues without a Clarification gate (decision #90). The answers to the findings
+are applied by the orchestrator in `spec.md` (with your approval).

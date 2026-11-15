@@ -1,21 +1,21 @@
 ---
-description: "SDD · Revisión completa de una pieza RF por RF: tests + Chrome DevTools (uso: /sdd-validate <categoria>/<Name>)"
+description: "SDD · Full review of a piece, RF by RF: tests + Chrome DevTools (usage: /sdd-validate <category>/<Name>)"
 agent: reviewer
 ---
 
-Hacé la **revisión completa de la pieza** `specs/$1/spec.md` (tu checklist + skill `sdd`,
-sección Validación), con contexto limpio. **No arregles nada.**
+Do the **full review of the piece** `specs/$1/spec.md` (your checklist + the `sdd` skill,
+Validation section), with a clean context. **Do not fix anything.**
 
-1. Recorré la spec requisito por requisito. Para cada RF indicá qué test lo cubre y el
-   resultado de `npm test`.
-2. Los RF de interfaz que no se puedan verificar con `npm test`, verificalos con el MCP de
-   Chrome DevTools (configurado en `opencode.json`), incluida la vista móvil de 375 px y
-   ambos temas. Precondición: la app la sirve el usuario (`npm run dev`,
-   `http://localhost:5173`; vos no podés iniciarla, decisión #91). Si no responde o el MCP
-   falla, no frenes a mitad: listá esos RF como "sin verificar (QA visual)" e indicá que
-   hay que servir la app y repetir `/sdd-validate`.
-3. Comprobá los criterios de finalización de la pieza (incluye `npm run build` en
-   verde, que solo corre al cerrar la pieza) y que todas las tareas de `tasks.md`
-   estén marcadas.
+1. Go through the spec requirement by requirement. For each RF state which test covers it and the
+   result of `npm test`.
+2. Interface RFs that cannot be verified with `npm test` are verified with the Chrome DevTools
+   MCP (configured in `opencode.json`), including the 375 px mobile view and
+   both themes. Precondition: the app is served by the user (`npm run dev`,
+   `http://localhost:5173`; you cannot start it, decision #91). If it does not respond or the MCP
+   fails, do not stop halfway: list those RFs as "not verified (visual QA)" and state that
+   the app has to be served and `/sdd-validate` repeated.
+3. Check the completion criteria of the piece (they include a green `npm run build`,
+   which only runs when closing the piece) and that every task in `tasks.md`
+   is marked.
 
-Veredicto con tu formato de informe: **¿la spec está cumplida?**
+Verdict in your report format: **is the spec fulfilled?**

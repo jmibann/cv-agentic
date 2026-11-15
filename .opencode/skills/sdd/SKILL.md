@@ -1,213 +1,213 @@
 ---
 name: sdd
-description: Úsala siempre que trabajes con Spec-Driven Development en este proyecto (docs/constitution.md o cualquier archivo dentro de specs/) - redactar, revisar o cambiar specs, planes y tareas, o implementar y validar tareas de una spec.
+description: Use it whenever you work with Spec-Driven Development in this project (docs/constitution.md or any file inside specs/) - drafting, reviewing or changing specs, plans and tasks, or implementing and validating the tasks of a spec.
 ---
 
 # Spec-Driven Development (SDD)
 
-## Flujo
+## Flow
 
-Constitución → Spec → Clarificación → Plan → Tareas → Implementación → Validación.
+Constitution → Spec → Clarification → Plan → Tasks → Implementation → Validation.
 
-Cambio: puede ocurrir en cualquier momento y siempre vuelve a empezar por la Spec.
+Change: it can happen at any time and always starts again from the Spec.
 
-- Nunca pases a la siguiente fase sin la aprobación explícita del usuario.
-  Dos excepciones:
-  - Dentro de Implementación las tareas avanzan una a una sin puerta (cada una
-    validada al terminar); la puerta de Implementación + Validación se abre tras
-    la revisión completa de la pieza contra la spec.
-  - **Clarificación sin hallazgos** sobre una spec ya `aprobada` no abre
-    puerta (decisión #90; ver Clarificación).
-  - **Plan y Tareas se aprueban por fase F** (F1–F4): se redactan `plan.md` y
-    `tasks.md` de todas las piezas de la fase y se aprueban juntos en una sola
-    puerta (ver "Ejecución con agentes"). Una pieza fuera de una fase (spec
-    nueva suelta) y todo Cambio mantienen las puertas de Plan y de Tareas propias.
-- La spec manda: si algo no está en la spec, no se implementa. Si falta una decisión, para y pregunta.
-- Cada spec vive en su carpeta: `specs/<categoria>/<Name>/` con `spec.md`
-  (obligatorio desde el inicio) y `plan.md` / `tasks.md` (se redactan en sus
-  puertas). Categorías del kit: `foundation` (la pieza `Foundation` de F1,
-  decisión #84), `primitives`, `controls`, `layout`, `content`, `pages`,
-  `hooks`. F5 (QA) no tiene carpeta en `specs/` (decisión #85).
-- **Documentos de estado (decisiones #86 y #98):** al cerrar cada **puerta F**
-  (F1–F5) y cuando el usuario aprueba una decisión que cambia reglas (nueva
-  entrada en el registro de `docs/README.md`), actualiza `docs/memory.md`, el
-  `docs/STATUS.md` ("Estado actual") y agrega una entrada en
-  `docs/diagnostics.md` con el formato fijo de su "Plantilla de entrada",
-  actualizando su tabla **Abiertos** (lo cerrado **sale** de la tabla). Ese
-  archivo no lleva secciones de estado: el estado vive en `docs/STATUS.md` y en
-  `docs/memory.md`. Si pasa de **150 líneas**, el orchestrator reduce, en esa
-  misma puerta F, a **una línea** cada entrada anterior a las de las dos
-  últimas puertas F: `fecha · título · #n · git show <hash>:docs/diagnostics.md`
-  (hash de creación); el detalle queda en git. Las puertas de pieza (spec,
-  Clarificación, Plan + Tareas, Implementación) solo actualizan `spec.md`
-  (`Estado`) y `tasks.md`.
+- Never move to the next phase without the user's explicit approval.
+  Two exceptions:
+  - Within Implementation the tasks advance one by one with no gate (each one
+    validated when it ends); the Implementation + Validation gate opens after
+    the full review of the piece against the spec.
+  - **Clarification with no findings** on a spec that is already `approved` does
+    not open a gate (decision #90; see Clarification).
+  - **Plan and Tasks are approved per F phase** (F1–F4): the `plan.md` and
+    `tasks.md` of every piece in the phase are drafted and approved together in a
+    single gate (see "Running with agents"). A piece outside a phase (a new
+    standalone spec) and every Change keep their own Plan and Tasks gates.
+- The spec rules: if something is not in the spec, it is not implemented. If a decision is missing, stop and ask.
+- Each spec lives in its own folder: `specs/<category>/<Name>/` with `spec.md`
+  (mandatory from the start) and `plan.md` / `tasks.md` (drafted at their
+  gates). Categories of the kit: `foundation` (the `Foundation` piece of F1,
+  decision #84), `primitives`, `controls`, `layout`, `content`, `pages`,
+  `hooks`. F5 (QA) has no folder in `specs/` (decision #85).
+- **Status documents (decisions #86 and #98):** when closing each **F gate**
+  (F1–F5) and when the user approves a decision that changes rules (a new
+  entry in the register in `docs/README.md`), update `docs/memory.md`,
+  `docs/STATUS.md` ("Current status") and add an entry to
+  `docs/diagnostics.md` using the fixed format of its "Entry template",
+  updating its **Open items** table (what is closed **leaves** the table). That
+  file has no status sections: the status lives in `docs/STATUS.md` and in
+  `docs/memory.md`. If it goes over **150 lines**, the orchestrator reduces, at
+  that same F gate, to **one line** every entry older than those of the last
+  two F gates: `date · title · #n · git show <hash>:docs/diagnostics.md`
+  (creation hash); the detail stays in git. Piece gates (spec,
+  Clarification, Plan + Tasks, Implementation) only update `spec.md`
+  (`Status`) and `tasks.md`.
 
-## Constitución
+## Constitution
 
-`docs/constitution.md` debe existir y estar aprobada antes de cualquier spec. Solo
-la cambia el usuario. Si una spec o un plan la contradice, para y pregunta.
+`docs/constitution.md` must exist and be approved before any spec. Only
+the user changes it. If a spec or a plan contradicts it, stop and ask.
 
-## Plantilla de spec (spec.md)
+## Spec template (spec.md)
 
-Para las piezas de este kit la plantilla canónica es la de
-[`specs/README.md`](../../../specs/README.md) → "Plantilla de spec":
+For the pieces of this kit the canonical template is the one in
+[`specs/README.md`](../../../specs/README.md) → "Spec template":
 
 ```text
 # <Name>
-Estado: borrador | aprobada | implementada
+Status: draft | approved | implemented
 
-## Propósito
-## Requisitos (EARS)
-## Anatomía
+## Purpose
+## Requirements (EARS)
+## Anatomy
 ## API
-## Estilos y tokens
-## Estados
+## Styles and tokens
+## States
 ## Responsive
-## Accesibilidad
-## Tests esperados
-## No hacer
+## Accessibility
+## Expected tests
+## Do not
 ```
 
-- `Estado:` va justo debajo del título y **solo cambia con aprobación del usuario**.
-- `## Requisitos (EARS)` va justo después de `## Propósito`, antes de la sección que le sigue (formato más abajo).
-- Las 10 secciones son obligatorias y explícitas, aunque su contenido sea
-  "No es interactivo" o "No aplica" (los hooks marcan "No aplica" donde corresponde).
-- Si queda alguna duda, se agrega además `## Dudas abiertas` con
-  `- [NECESITA ACLARACIÓN] <duda>`.
+- `Status:` goes right below the title and **only changes with the user's approval**.
+- `## Requirements (EARS)` goes right after `## Purpose`, before the section that follows it (format below).
+- The 10 sections are mandatory and explicit, even if their content is
+  "Not interactive" or "Not applicable" (hooks mark "Not applicable" where it fits).
+- If any doubt remains, `## Open questions` is added as well, with
+  `- [NEEDS CLARIFICATION] <question>`.
 
-La spec de una pieza **sí** incluye stack y nombres de archivos (API, tokens,
-estructura HTML): es el contrato que verifican el implementador y el reviewer.
-La regla "solo el QUÉ y el POR QUÉ" aplica a specs de dominio nuevas que no
-sean piezas del kit.
+The spec of a piece **does** include stack and file names (API, tokens,
+HTML structure): it is the contract the implementer and the reviewer verify.
+The rule "only the WHAT and the WHY" applies to new domain specs that are
+not pieces of the kit.
 
-## Requisitos en EARS (en español)
+## Requirements in EARS (in English)
 
-- RF-x: CUANDO <evento>, EL SISTEMA <respuesta>.
-- RF-x: SI <condición no deseada>, ENTONCES EL SISTEMA <respuesta>.
-- RF-x: MIENTRAS <estado>, EL SISTEMA <respuesta>.
-- RF-x: EL SISTEMA <comportamiento permanente>.
+- RF-x: WHEN <event>, THE SYSTEM <response>.
+- RF-x: IF <unwanted condition>, THEN THE SYSTEM <response>.
+- RF-x: WHILE <state>, THE SYSTEM <response>.
+- RF-x: THE SYSTEM <permanent behavior>.
 
-Cada RF debe ser verificable: nada de "rápido", "intenso" o "bonito" sin un criterio
-medible.
+Every RF must be verifiable: no "fast", "intense" or "pretty" without a measurable
+criterion.
 
-Reglas de redacción:
+Drafting rules:
 
-- Numeración `RF-1 … RF-n` **por spec** (se reinicia en cada pieza).
-- Un solo verbo observable por RF; comprobable con un test.
-- **Nunca se inventa alcance**: un RF de una pieza del kit solo se deriva de las
-  secciones ya existentes (`Propósito`, `Estados`, `Responsive`,
-  `Accesibilidad`, `Tests esperados`). Si un RF no tiene contraparte en
-  `Tests esperados`, **no se agrega el test**: se reporta al usuario.
+- Numbering `RF-1 … RF-n` **per spec** (it restarts in each piece).
+- A single observable verb per RF; checkable with a test.
+- **Scope is never invented**: an RF of a piece of the kit is derived only from the
+  sections that already exist (`Purpose`, `States`, `Responsive`,
+  `Accessibility`, `Expected tests`). If an RF has no counterpart in
+  `Expected tests`, **the test is not added**: it is reported to the user.
 
-## Clarificación
+## Clarification
 
-Lista todas las `[NECESITA ACLARACIÓN]` y cualquier ambigüedad, y pregunta al
-usuario. La spec solo se edita con sus respuestas. Cuando no quedan dudas y el
-usuario la aprueba, pasa a `Estado: aprobada`.
+List every `[NEEDS CLARIFICATION]` and any ambiguity, and ask the
+user. The spec is edited only with their answers. When no doubts remain and the
+user approves it, it moves to `Status: approved`.
 
-Con agentes (decisión #90) hay **un solo camino**: el reviewer **detecta**
-(`/sdd-clarify`, contexto limpio, sin proponer soluciones) y el orchestrator
-**resuelve** (presenta los hallazgos al usuario y aplica sus respuestas en
-`spec.md` con permiso `ask`). **Puerta solo si hay hallazgos:** si el reviewer
-informa "Sin hallazgos" sobre una spec ya `aprobada`, la pieza sigue sin
-puerta de Clarificación.
+With agents (decision #90) there is **a single path**: the reviewer **detects**
+(`/sdd-clarify`, clean context, without proposing solutions) and the orchestrator
+**resolves** (it presents the findings to the user and applies their answers in
+`spec.md` with `ask` permission). **A gate only if there are findings:** if the reviewer
+reports "No findings" on a spec that is already `approved`, the piece continues without
+a Clarification gate.
 
 ## Plan (plan.md)
 
-Archivos y responsabilidades · Funciones puras (si hay lógica que depende de la
-fecha, con "hoy" como parámetro) · Algoritmo en pseudocódigo (solo si hay lógica
-no trivial) · Interfaz · Decisiones justificadas con su alternativa descartada ·
-Estrategia de tests con `npm test` (vitest). Indica qué RF cubre cada parte.
+Files and responsibilities · Pure functions (if there is logic that depends on the
+date, with "today" as a parameter) · Algorithm in pseudocode (only if there is
+non-trivial logic) · Interface · Justified decisions with their discarded alternative ·
+Test strategy with `npm test` (vitest). State which RFs each part covers.
 
-## Tareas (tasks.md)
+## Tasks (tasks.md)
 
 ```text
-- [ ] **Tn. <Descripción>.** RF-x, RF-y
-  - Hecho cuando: <comprobación verificable>.
+- [ ] **Tn. <Description>.** RF-x, RF-y
+  - Done when: <verifiable check>.
 ```
 
-Máximo 20-30 min por tarea, en orden de dependencia. Si salen más de 10, propón dividir
-la spec.
+At most 20-30 min per task, in dependency order. If there are more than 10, propose splitting
+the spec.
 
-## Implementación
+## Implementation
 
-Una sola tarea cada vez: tests primero (en rojo), después el código, `npm run lint`,
-`npm run typecheck` y `npm test` en verde, reportar y parar. **Quien implementa
-no marca la tarea**: la marca el orchestrator en `tasks.md` después del OK del
-reviewer (los subagentes no escriben en `specs/`).
+One task at a time: tests first (red), then the code, `npm run lint`,
+`npm run typecheck` and `npm test` green, report and stop. **Whoever implements
+does not mark the task**: the orchestrator marks it in `tasks.md` after the
+reviewer's OK (subagents do not write in `specs/`).
 
-## Validación
+## Validation
 
-- Cada tarea se verifica contra su "Hecho cuando": por tarea alcanza `lint` +
-  `typecheck` + `test` en verde; el `build` corre **al cerrar la pieza** y en
-  cada puerta (decisión #80).
-- Al terminar la última tarea, revisión completa contra la spec (cada RF, casos
-  límite y criterios de finalización).
-- Con la revisión OK y la aprobación del usuario, la spec pasa a
-  `Estado: implementada`.
+- Each task is verified against its "Done when": per task, a green `lint` +
+  `typecheck` + `test` is enough; the `build` runs **when closing the piece** and at
+  every gate (decision #80).
+- When the last task ends, a full review against the spec (every RF, edge
+  cases and completion criteria).
+- With the review OK and the user's approval, the spec moves to
+  `Status: implemented`.
 
-## Cambio
+## Change
 
-Un cambio de requisitos se hace primero en la spec, luego en el plan y las tareas, y
-por último en el código. Cada paso requiere la aprobación del usuario.
+A requirements change is made first in the spec, then in the plan and the tasks, and
+finally in the code. Each step requires the user's approval.
 
-## Ejecución con agentes (sitio CV)
+## Running with agents (CV site)
 
-Esta sección no cambia el flujo SDD: define quién ejecuta cada fase cuando se
-trabaja con el orquestador.
+This section does not change the SDD flow: it defines who runs each phase when
+working with the orchestrator.
 
-- **Dos niveles.** Las fases F1–F5 del orquestador organizan el proyecto. Dentro
-  de cada fase, cada pieza (componente, hook, página, y en F1 la pieza
-  `foundation/Foundation`) recorre el flujo SDD completo y respeta sus puertas
-  de aprobación. F1–F4 siguen el modelo Tn (decisión #84).
-- **F5 (QA) no produce código ni tiene Tn (decisión #85).** Es una pasada del
-  `reviewer` sobre la app completa, con la sección "QA de F5" de
-  `reviewer.md` como contrato: sin `specs/qa/`, sin `plan.md`/`tasks.md` y sin
-  commits `test`→`feat` (P4 no aplica porque no hay tareas ni código). El
-  orchestrator guarda el informe en `docs/qa-report.md` y lo commitea
-  (`docs(qa): F5 report`). Cada defecto vuelve a su pieza: si el código no
-  cumple la spec, como **tarea nueva** en su `tasks.md` (puerta de Tareas de
-  pieza suelta, después `/sdd-implement`); si la spec está mal, como
-  **Cambio**. Con los defectos corregidos, el reviewer repite la pasada y el
-  usuario cierra la puerta F5.
-- **Puerta de Plan + Tareas por fase.** Al empezar F1, F2, F3 o F4, y con la
-  Clarificación de todas sus piezas cerrada, el orquestador redacta `plan.md` y
-  `tasks.md` de cada pieza de la fase (en el orden de `specs/README.md`) y los
-  presenta juntos: una tabla por pieza (archivos, RF cubiertos, cantidad de
-  tareas, decisiones con alternativa descartada) con links a los archivos. El
-  usuario aprueba la fase completa o señala piezas a corregir; solo esas se
-  rehacen y se vuelven a presentar. Si al implementar una pieza cambia algo que
-  afecta el plan de otra ya aprobada, eso es un Cambio de esa otra pieza.
-- **Roles.** El orquestador planifica, delega y frena en cada puerta; no escribe
-  código ni tests. `foundation`, `component-builder` e `integrator` implementan.
-  `reviewer` valida con contexto limpio: recibe la spec, la tarea (Tn con su
-  "Hecho cuando") y la ruta del código, nada más.
-- **Unidad de trabajo: una tarea de `tasks.md`.** Cada encargo a un subagente es
-  exactamente una tarea (Tn). El subagente sigue la sección Implementación:
-  tests en rojo, implementa, deja lint + typecheck + tests en verde, reporta y
-  para. El orchestrator marca la tarea en `tasks.md` cuando el reviewer la
-  aprueba.
-- **Commits por tarea.** `test(<Name>): Tn` con los tests en rojo, después
-  `feat(<Name>): Tn` con la implementación, y `fix(<Name>): Tn` si hubo
-  correcciones. Los de código los hace quien implementa; el orchestrator
-  commitea **solo documentos** (`docs/*`, `specs/*`), en verde y
-  con rutas explícitas, nunca `git add .`/`-A` (decisión #76). Si un hook de
-  pre-commit bloquea el commit en rojo, no se usa
-  `--no-verify`: se frena y se consulta al usuario.
-- **Tests que no se debilitan (por tarea).** Los commits `feat(<Name>): Tn` y
-  `fix(<Name>): Tn` **no tocan** archivos de test; los commits
-  `test(<Name>): Tn` solo **agregan** tests (no borran ni cambian líneas de
-  tests de tareas anteriores). El reviewer lo verifica con `git log -p` sobre
-  los archivos de test de la pieza.
-- **Una tarea por vez.** No se paraleliza. Nunca se invoca al reviewer con el repo
-  en rojo (entre el commit de test y el de implementación).
-- **Validación.** El reviewer verifica cada tarea contra su "Hecho cuando". Al
-  terminar la última tarea de una pieza, hace una revisión completa contra la
-  spec. Si se rechaza, o si el repo queda en rojo tras la tarea, la tarea vuelve
-  al mismo subagente con la salida exacta; cada vuelta cuenta como una ronda, con
-  un máximo de 3. Después de eso, se frena y se reporta al usuario.
-- **Cambio.** Si un subagente propone cambiar una spec, debilitar un test o
-  agregar una dependencia, se frena y se consulta al usuario (coincide con
-  "si falta una decisión, para y pregunta").
-- **Prioridad.** `docs/constitution.md` > esta skill > spec > definición del
-  agente > cualquier opinión de un agente.
+- **Two levels.** The orchestrator's phases F1–F5 organize the project. Within
+  each phase, each piece (component, hook, page, and in F1 the piece
+  `foundation/Foundation`) goes through the full SDD flow and respects its approval
+  gates. F1–F4 follow the Tn model (decision #84).
+- **F5 (QA) produces no code and has no Tn (decision #85).** It is a pass by the
+  `reviewer` over the whole app, with the "F5 QA" section of
+  `reviewer.md` as its contract: no `specs/qa/`, no `plan.md`/`tasks.md` and no
+  `test`→`feat` commits (P4 does not apply because there are no tasks or code). The
+  orchestrator saves the report in `docs/qa-report.md` and commits it
+  (`docs(qa): F5 report`). Each defect goes back to its piece: if the code does not
+  meet the spec, as a **new task** in its `tasks.md` (Tasks gate of a
+  standalone piece, then `/sdd-implement`); if the spec is wrong, as a
+  **Change**. With the defects fixed, the reviewer repeats the pass and the
+  user closes the F5 gate.
+- **Plan + Tasks gate per phase.** When starting F1, F2, F3 or F4, and with the
+  Clarification of all its pieces closed, the orchestrator drafts the `plan.md` and
+  `tasks.md` of each piece in the phase (in the order of `specs/README.md`) and
+  presents them together: one table per piece (files, RFs covered, number of
+  tasks, decisions with their discarded alternative) with links to the files. The
+  user approves the whole phase or points out pieces to correct; only those are
+  redone and presented again. If implementing a piece changes something that
+  affects the plan of another already approved one, that is a Change of that other piece.
+- **Roles.** The orchestrator plans, delegates and stops at each gate; it does not write
+  code or tests. `foundation`, `component-builder` and `integrator` implement.
+  `reviewer` validates with a clean context: it receives the spec, the task (Tn with its
+  "Done when") and the path of the code, nothing else.
+- **Unit of work: one task of `tasks.md`.** Each assignment to a subagent is
+  exactly one task (Tn). The subagent follows the Implementation section:
+  tests in red, implements, leaves lint + typecheck + tests green, reports and
+  stops. The orchestrator marks the task in `tasks.md` when the reviewer
+  approves it.
+- **Commits per task.** `test(<Name>): Tn` with the tests in red, then
+  `feat(<Name>): Tn` with the implementation, and `fix(<Name>): Tn` if there were
+  corrections. Code commits are made by whoever implements; the orchestrator
+  commits **documents only** (`docs/*`, `specs/*`), with the repo green and
+  with explicit paths, never `git add .`/`-A` (decision #76). If a
+  pre-commit hook blocks the red commit, `--no-verify` is not
+  used: stop and ask the user.
+- **Tests that are not weakened (per task).** `feat(<Name>): Tn` and
+  `fix(<Name>): Tn` commits **do not touch** test files; `test(<Name>): Tn`
+  commits only **add** tests (they do not delete or change lines of
+  tests from earlier tasks). The reviewer verifies it with `git log -p` on
+  the piece's test files.
+- **One task at a time.** No parallel work. The reviewer is never invoked with the repo
+  in red (between the test commit and the implementation one).
+- **Validation.** The reviewer verifies each task against its "Done when". When
+  the last task of a piece ends, it does a full review against the
+  spec. If it is rejected, or if the repo is red after the task, the task goes back
+  to the same subagent with the exact output; each return counts as one round, with
+  a maximum of 3. After that, stop and report to the user.
+- **Change.** If a subagent proposes changing a spec, weakening a test or
+  adding a dependency, stop and ask the user (it matches
+  "if a decision is missing, stop and ask").
+- **Priority.** `docs/constitution.md` > this skill > spec > agent
+  definition > any agent's opinion.
