@@ -1,54 +1,19 @@
-/* HexAvatar — specs/primitives/HexAvatar/spec.md → Forma / Estilos y tokens.
-   T1: `.defs`, el <svg> de las definiciones compartidas (RF-3).
-   T2: `.wrap`/`.border`/`.image` con la tabla "Estilos y tokens" (RF-1) y los
-   clip-path url(#…) de cada clase (RF-3; su resolución se verifica por
-   INSPECCIÓN: jsdom no aplica clip-path — "Hecho cuando" de T2).
-   T4: el `filter: var(--filter-avatar-drop)` del wrap (RF-4) conectado; la
-   sombra es drop-shadow NUNCA box-shadow (spec → "No hacer"; el token define
-   solo funciones drop-shadow, inspección RF-4/RF-5 — jsdom no computa filter).
-   Tamaño fijo en todos los breakpoints (spec → Responsive; RF-5): el módulo
-   no declara ningún `@media` — las medidas que escalan son tokens de
-   tokens.css y las fijas (0.25rem/0.5rem, definidas textualmente por la
-   tabla de la spec) no escalan (docs/tokens/breakpoints.md). Cero colores
-   literales (DESIGN.md regla 1): solo --color-surface/--color-track. Sin
-   margen externo (DESIGN.md → Do/Don't): el padre posiciona con gap. Sin
-   pseudo-estados ni transiciones (spec → Estados: no es interactivo). */
-
-/* <svg> de HexAvatarDefs: invisible por tamaño (width/height="0" como
-   atributos en el componente), sacado del flujo con posición absoluta.
-   Nunca display:none: algunos navegadores no resuelven referencias url(#…)
-   a definiciones dentro de un SVG no renderizado (spec → Forma; precedente
-   exacto Icon.module.css .defs). */
+/* Never display: none: some browsers do not resolve url(#…) references into
+   an SVG that is not rendered. */
 .defs {
   position: absolute;
 }
 
-/* Wrap (T2, RF-1; T4, RF-4; fila "Wrap" de la tabla, replicada literal en su
-   conjunto): `display: inline-block; width: fit-content; filter:
-   var(--filter-avatar-drop)`. La sombra va acá con `drop-shadow` porque
-   `box-shadow` no respeta el recorte hexagonal (spec → Forma y "No hacer":
-   NUNCA `box-shadow` en ningún elemento del módulo — RF-4, inspección; el
-   token de tokens.css solo compone funciones drop-shadow y vale `none` en
-   impresión). En jsdom `filter` no se computa (decisión #101): el cierre T4
-   lo verifica por inspección y el axe sobre el conjunto completo. */
+/* The shadow is a drop-shadow filter because box-shadow ignores the
+   hexagonal clip. */
 .wrap {
   display: inline-block;
   width: fit-content;
   filter: var(--filter-avatar-drop);
 }
 
-/* Contorno (T2, RF-1; fila "Contorno"): el hexágono exterior con el color
-   de la superficie. Tamaños sobre los tokens de la caja de la spec → Forma
-   (80×88 px = 5rem × 5.5rem; tokens.css). `background: var(--color-surface)`
-   literal de la tabla. `clip-path: url(#hex-avatar-outer)` referencia el
-   clipPath de HexAvatarDefs (RF-3; caja 80×88 en objectBoundingBox; se
-   verifica por inspección — jsdom no aplica clip-path; sin prefijo
-   -webkit-, resolución H-8). */
 .border {
-  /* display:block: necesidad mecánica no listada en la tabla — clip-path y
-     width/height NO aplican a una caja inline no reemplazada (CSS Masking)
-     y .border es un <span> de la Anatomía; sin bloque su fila de la tabla
-     simplemente no pintaría. No contradice ningún valor de la tabla. */
+  /* clip-path and width/height do not apply to a non-replaced inline box. */
   display: block;
   width: var(--size-testimonial-avatar-w);
   height: var(--size-testimonial-avatar-h);
@@ -56,29 +21,11 @@
   clip-path: url(#hex-avatar-outer);
 }
 
-/* Imagen (T2, RF-1; fila "Imagen"): el hexágono interior que recorta la
-   foto. Los offsets `top/left: 0.25rem` = los 4 px del anillo del contorno
-   (spec → Forma: "el anillo del contorno es de 4 px en los tramos rectos")
-   y los tamaños `calc()` restan 0.5rem = 2 × 4 px (un lado por dimensión):
-   la caja de la imagen queda 72×80, la caja propia del clipPath inner
-   (spec → Forma; objectBoundingBox la mapea exacta sobre el img).
-   0.25rem/0.5rem son literales FIJOS definidos textualmente en la tabla de
-   la spec, permitidos por docs/tokens/breakpoints.md ("Las medidas fijas
-   (que no cambian por breakpoint) pueden ser literales en el CSS del
-   componente si su spec las define"; misma justificación aprobada del 1px
-   de Separator/CornerTab; no existe token de grosor del anillo para
-   testimonial y --size-avatar-border es la medida interna del avatar del
-   Sidebar, no reutilizable). `background: var(--color-track)`: placeholder
-   natural si la imagen falla o es transparente (spec → Estados; H-4 del
-   plan; sin onError). `clip-path: url(#hex-avatar-inner)` (RF-3,
-   inspección). */
+/* The 0.25rem offsets are the 4px ring of the outline; the sizes subtract
+   twice that. */
 .image {
-  /* display:block: necesidad mecánica igual que .border — como inline
-     reemplazado el <img> se alinea por línea base contra el strut y su
-     posición estática desplaza unos píxeles, rompiendo el inset geométrico
-     de 4 px que la spec exige ("el <img> mide 72×80 y va offseteado 4 px
-     respecto del border" → Forma); como bloque su posición estática es la
-     esquina del content box y los offsets de la tabla quedan exactos. */
+  /* As an inline replaced element the image would align to the baseline and
+     shift a few pixels, breaking the 4px inset. */
   display: block;
   position: relative;
   top: 0.25rem;
