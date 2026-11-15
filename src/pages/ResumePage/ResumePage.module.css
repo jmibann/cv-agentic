@@ -1,34 +1,12 @@
-/* ResumePage — módulo de estilos (specs/pages/ResumePage/spec.md → "Estilos y
-   tokens"; T4 cierra RF-6, T5 reescribe RF-3; verificación por INSPECCIÓN +
-   QA: jsdom no computa). SOLO layout: cero estilos visuales, cero colores
-   literales, cero pseudo-estados/transiciones; toda medida es un token
-   semántico de tokens.css (--stack-gap). Sin @media desde T5 (#114): las
-   secciones se apilan en una sola columna en todos los anchos.
-
-   Orden de cascada: no hay empates que dirimir por orden dentro del módulo
-   (cada selector gobierna un nodo distinto); el `.testimonials`-análogo de esta
-   página no existe: el par h2→contenido de skills lo resuelve el
-   `margin-bottom` del SectionTitle, como en servicios de AboutPage, sin
-   `margin-top: 0` propio. */
-
-/* Tabla → .page (RF-6): FLUJO DE BLOQUE NORMAL — sin `display: flex/grid` y
-   sin `overflow` distinto de visible: un contexto de formato propio angostaría
-   entero el raíz junto a la solapa flotante de NavTabs (CornerTab
-   placement="float") en vez de dejar fluir el h1 (los bloques internos que
-   vienen después — .columns, la <section> de skills — sí pueden ser grid/
-   flujo propio: la solapa ya terminó cuando empiezan). La regla fija la
-   separación vertical entre bloques hijos del raíz; skills queda a ancho
-   completo debajo por ser bloque en flujo normal (spec → Responsive). */
+/* Normal block flow on purpose. A flex or grid container, or any overflow
+   other than visible, would make the whole root shrink beside the floated
+   tab instead of letting the h1 flow next to it. */
 .page > * + * {
   margin-top: var(--stack-gap);
 }
 
-/* Tabla → .columns (RF-3, T5 #114): grid de UNA sola columna en todos los
-   anchos — Experience arriba y Education debajo, cada una con su timeline a
-   ancho completo (antes, desde md, iban lado a lado y quedaban angostas). El
-   orden lo da el DOM (ResumePage.tsx), no `order`: lectura y foco siguen el
-   orden visual. Con una sola sección presente ocupa el ancho completo sin
-   regla extra. El nombre `.columns` se conserva (lo afirman los tests). */
+/* The order comes from the DOM, not from CSS `order`, so reading and focus
+   order match the visual one. */
 .columns {
   display: grid;
   row-gap: var(--stack-gap);
