@@ -1,4 +1,4 @@
-// GENERADO — no editar. Regenerar con: npm run build:validator
+// GENERATED — do not edit. Regenerate with: npm run build:validator
 // Declaraciones escritas por src/scripts/build-validator.ts (el código
 // standalone de ajv no emite tipos).
 

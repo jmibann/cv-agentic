@@ -104,8 +104,8 @@ test); queda en rojo porque el runner o el código todavía no existen, y el
      declara `validateCv(data: unknown): data is CvData` y `validateCv.errors`),
      `validate:content` (valida `src/content/cv.*.json` con el validador
      generado) y `prebuild` = `gen:types && build:validator && validate:content`.
-     Los `*.generated.*` se commitean y llevan un encabezado "GENERADO — no
-     editar".
+     Los `*.generated.*` se commitean y llevan un encabezado "GENERATED — do not
+     edit" (en inglés, #121).
    - `.gitignore` y `git init` si no existe. Los commits son por tarea (ver
      "Proceso por tarea"); las correcciones van en commits nuevos, sin `--amend`.
    - **Placeholders de imágenes** en `public/images/`: `avatar.svg` y

@@ -8,7 +8,7 @@ import Ajv from "ajv";
 import standaloneCode from "ajv/dist/standalone/index.js";
 import type { AnySchemaObject, Schema } from "ajv";
 
-const BANNER = "// GENERADO — no editar. Regenerar con: npm run build:validator";
+const BANNER = "// GENERATED — do not edit. Regenerate with: npm run build:validator";
 
 const repoPath = (relativeFromRoot: string): string =>
   fileURLToPath(new URL(`../../${relativeFromRoot}`, import.meta.url));

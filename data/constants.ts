@@ -1,14 +1,5 @@
-/**
- * cv-agentic — constantes del contrato de datos (en la app: `@data/constants`).
- *
- * El formato de los datos lo define `data/cv.schema.json` (fuente de verdad);
- * los tipos (`CvData`, `Locale`, `SocialNetwork`…) se GENERAN desde ahí en
- * `data/cv.types.generated.ts` (script `gen:types`, Fase 1).
- *
- * Estas listas existen porque el código necesita recorrerlas en runtime
- * (tests de BrandIcon e Icon, LanguageSwitcher, etc.). Deben coincidir con
- * los `enum` del esquema: lo verifica `src/content/schema.test.ts` (Fase 1).
- */
+// Runtime lists that mirror the enums of data/cv.schema.json, which is the
+// source of truth. A test keeps them in sync with the schema.
 
 export const LOCALES = ["en", "es"] as const;
 export const DEFAULT_LOCALE: (typeof LOCALES)[number] = "en";

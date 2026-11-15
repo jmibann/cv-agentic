@@ -1,31 +1,31 @@
-/* GENERADO — no editar. Regenerar con: npm run gen:types */
+/* GENERATED — do not edit. Regenerate with: npm run gen:types */
 
 /**
- * Idioma del archivo. Debe coincidir con el nombre (cv.<locale>.json). Difiere entre archivos por definición (no entra en la comparación de paridad).
+ * Language of the file. Must match its name (cv.<locale>.json). Differs between files by definition (it is left out of the parity comparison).
  */
 export type Locale = "en" | "es";
 /**
- * Ruta pública del sitio (empieza con /) o URL https. No traducible.
+ * Public path of the site (starts with /) or an https URL. Not translatable.
  */
 export type PublicPath = string;
 /**
- * Ruta pública del sitio (empieza con /) o URL https. No traducible.
+ * Public path of the site (starts with /) or an https URL. Not translatable.
  */
 export type PublicPath1 = string;
 /**
- * Identificador estable, en minúsculas con guiones. No traducible.
+ * Stable identifier, lowercase with hyphens. Not translatable.
  */
 export type Id = string;
 /**
- * Lista cerrada: agregar un tipo exige código (ícono y label de interfaz). No traducible.
+ * Closed list: adding a type requires code (icon and interface label). Not translatable.
  */
 export type ContactType = "email" | "phone" | "whatsapp" | "location";
 /**
- * Lista cerrada: agregar una red exige código (logo en BrandIcon). No traducible.
+ * Closed list: adding a network requires code (logo in BrandIcon). Not translatable.
  */
 export type SocialNetwork = "github" | "linkedin" | "x" | "instagram" | "facebook" | "dribbble" | "behance";
 /**
- * Lista cerrada de íconos de lucide-react: agregar uno exige código (mapa de Icon). No traducible.
+ * Closed list of lucide-react icons: adding one requires code (Icon map). Not translatable.
  */
 export type ServiceIcon =
   | "code"
@@ -41,65 +41,65 @@ export type ServiceIcon =
   | "gauge"
   | "shield";
 /**
- * Fecha "YYYY" o "YYYY-MM" (año 1900–2099, mes 01–12). No traducible.
+ * Date as "YYYY" or "YYYY-MM" (year 1900–2099, month 01–12). Not translatable.
  */
 export type YearMonth = string;
 
 /**
- * Contenido del CV para un idioma (cv.en.json / cv.es.json). Fuente de verdad del formato: los tipos TS se generan desde este archivo (data/cv.types.generated.ts). Los campos 'No traducible' deben ser idénticos entre idiomas (lo verifica content.test.ts).
+ * CV content for one language (cv.en.json / cv.es.json). Source of truth for the format: the TypeScript types are generated from this file (data/cv.types.generated.ts). Fields marked 'Not translatable' must be identical across languages (content.test.ts checks it).
  */
 export interface CvData {
   /**
-   * Ruta a este esquema, para autocompletado y validación en el editor. No se usa en la app.
+   * Path to this schema, for autocompletion and validation in the editor. Not used by the app.
    */
   $schema?: string;
   locale: Locale;
   profile: Profile;
   /**
-   * Datos de contacto del Sidebar, en el orden en que se muestran.
+   * Sidebar contact details, in display order.
    */
   contact: ContactItem[];
   /**
-   * Redes sociales del Sidebar, en el orden en que se muestran.
+   * Sidebar social links, in display order.
    */
   social: SocialLink[];
   /**
-   * Tarjetas de 'What I'm Doing' en el panel About.
+   * Cards of 'What I'm Doing' in the About panel.
    */
   services: Service[];
   /**
-   * Timeline de Education (orden de los datos = orden en pantalla).
+   * Education timeline (data order = display order).
    */
   education: TimelineEntry[];
   /**
-   * Timeline de Experience (orden de los datos = orden en pantalla).
+   * Experience timeline (data order = display order).
    */
   experience: TimelineEntry[];
   /**
-   * Timeline de Projects: proyectos personales, fuera de la experiencia laboral (orden de los datos = orden en pantalla).
+   * Projects timeline: personal projects, apart from work experience (data order = display order).
    */
   projects: TimelineEntry[];
   /**
-   * Lista plana de chips, en el orden en que se muestran. Sin porcentajes ni categorías.
+   * Flat list of chips, in display order. No percentages or categories.
    */
   skills: string[];
   /**
-   * Testimonios del carrusel (sin fecha).
+   * Carousel testimonials (no date).
    */
   testimonials: Testimonial[];
 }
 export interface Profile {
   /**
-   * Nombre completo.
+   * Full name.
    */
   name: string;
   /**
-   * Rol que se muestra en el Badge del Sidebar. Ej: "Frontend Developer".
+   * Role shown in the Sidebar badge. E.g. "Frontend Developer".
    */
   headline: string;
   avatar: Image;
   /**
-   * Párrafos del panel About.
+   * Paragraphs of the About panel.
    */
   about: string[];
   downloadCvUrl?: PublicPath1;
@@ -111,11 +111,11 @@ export interface ContactItem {
   id: Id;
   type: ContactType;
   /**
-   * Valor visible. Ej: "hello@example.com", "Buenos Aires, Argentina".
+   * Visible value. E.g. "hello@example.com", "Buenos Aires, Argentina".
    */
   value: string;
   /**
-   * Destino del link (no traducible). Si falta se deriva del tipo: email → mailto:, phone → tel:, whatsapp → https://wa.me/<dígitos>, location → sin link.
+   * Link target (not translatable). If missing it is derived from the type: email → mailto:, phone → tel:, whatsapp → https://wa.me/<digits>, location → no link.
    */
   href?: string;
 }
@@ -123,7 +123,7 @@ export interface SocialLink {
   id: Id;
   network: SocialNetwork;
   /**
-   * URL del perfil (https). No traducible.
+   * Profile URL (https). Not translatable.
    */
   url: string;
 }
@@ -136,16 +136,16 @@ export interface Service {
 export interface TimelineEntry {
   id: Id;
   /**
-   * Carrera (Education), puesto (Experience) o nombre del proyecto (Projects).
+   * Degree (Education), position (Experience) or project name (Projects).
    */
   title: string;
   /**
-   * Institución, empresa o, en Projects, el contexto del proyecto.
+   * Institution, company or, in Projects, the project's context.
    */
   organization: string;
   start: YearMonth;
   /**
-   * Fecha de fin ("YYYY" o "YYYY-MM") o null si es la actualidad ("Present" / "Actualidad"). No traducible.
+   * End date ("YYYY" or "YYYY-MM") or null if ongoing ("Present" / "Actualidad"). Not translatable.
    */
   end: YearMonth | null;
   description: string;
@@ -153,21 +153,21 @@ export interface TimelineEntry {
 export interface Testimonial {
   id: Id;
   /**
-   * Nombre propio (normalmente igual en ambos idiomas).
+   * Person's name (normally the same in both languages).
    */
   author: string;
   /**
-   * Rol y empresa del autor.
+   * Author's role and company.
    */
   role: string;
   avatar: TestimonialAvatar;
   /**
-   * Texto completo; la card muestra un extracto recortado por CSS.
+   * Full text; the card shows an excerpt clamped with CSS.
    */
   text: string;
 }
 /**
- * Avatar de testimonio: solo src. Es decorativo (alt="") porque el nombre está al lado.
+ * Testimonial avatar: src only. It is decorative (alt="") because the name is next to it.
  */
 export interface TestimonialAvatar {
   src: PublicPath;

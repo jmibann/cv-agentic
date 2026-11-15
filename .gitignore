@@ -1,4 +1,4 @@
-# Dependencias
+# Dependencies
 node_modules/
 .pnp
 .pnp.js
@@ -17,7 +17,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Editor y sistema
+# Editor and OS
 .vscode/*
 !.vscode/extensions.json
 .idea/
@@ -27,13 +27,13 @@ lerna-debug.log*
 **/.DS_Store
 Thumbs.db
 
-# Variables de entorno
+# Environment variables
 .env
 .env.local
 .env.*.local
 
-# Vitest / cobertura
+# Vitest / coverage
 coverage/
 
-# Servidor local de Vite
+# Vite local server
 *.local

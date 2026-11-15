@@ -1,5 +1,5 @@
-// Config única de Vite y de Vitest (decisión 1 del plan de Foundation):
-// el bloque `test` vive acá, no en un `vitest.config.ts` separado.
+// Single config for Vite and Vitest: the `test` block lives here.
+
 import { fileURLToPath } from "node:url";
 
 import react from "@vitejs/plugin-react";
@@ -9,20 +9,15 @@ export default defineConfig({
   plugins: [react()],
   base: process.env.DEPLOY_TARGET === "gh-pages" ? "/cv-agentic/" : "/",
   resolve: {
-    // Alias @data/* → data/* (decisión #42), el mismo de tsconfig.json;
-    // también lo usa Vitest.
+    // Same alias as tsconfig.json; Vitest uses it too.
     alias: {
       "@data": fileURLToPath(new URL("./data", import.meta.url)),
     },
   },
   test: {
     environment: "jsdom",
-    // `globals: false` (decisión #48): los tests importan describe/it/expect
-    // desde "vitest".
+    // Tests import describe/it/expect from "vitest" explicitly.
     globals: false,
-    // Setup global de los tests (T2): jest-dom, afterEach(cleanup) explícito,
-    // mocks de matchMedia/ResizeObserver/scrollTo/dialog y limpieza de
-    // localStorage, data-theme, lang y hash entre tests.
     setupFiles: ["./src/test/setup.ts"],
   },
 });

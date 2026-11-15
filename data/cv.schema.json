@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://cv-agentic.local/data/cv.schema.json",
   "title": "CvData",
-  "description": "Contenido del CV para un idioma (cv.en.json / cv.es.json). Fuente de verdad del formato: los tipos TS se generan desde este archivo (data/cv.types.generated.ts). Los campos 'No traducible' deben ser idénticos entre idiomas (lo verifica content.test.ts).",
+  "description": "CV content for one language (cv.en.json / cv.es.json). Source of truth for the format: the TypeScript types are generated from this file (data/cv.types.generated.ts). Fields marked 'Not translatable' must be identical across languages (content.test.ts checks it).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,7 +20,7 @@
   "properties": {
     "$schema": {
       "type": "string",
-      "description": "Ruta a este esquema, para autocompletado y validación en el editor. No se usa en la app."
+      "description": "Path to this schema, for autocompletion and validation in the editor. Not used by the app."
     },
     "locale": {
       "$ref": "#/definitions/Locale"
@@ -30,49 +30,49 @@
     },
     "contact": {
       "type": "array",
-      "description": "Datos de contacto del Sidebar, en el orden en que se muestran.",
+      "description": "Sidebar contact details, in display order.",
       "items": {
         "$ref": "#/definitions/ContactItem"
       }
     },
     "social": {
       "type": "array",
-      "description": "Redes sociales del Sidebar, en el orden en que se muestran.",
+      "description": "Sidebar social links, in display order.",
       "items": {
         "$ref": "#/definitions/SocialLink"
       }
     },
     "services": {
       "type": "array",
-      "description": "Tarjetas de 'What I'm Doing' en el panel About.",
+      "description": "Cards of 'What I'm Doing' in the About panel.",
       "items": {
         "$ref": "#/definitions/Service"
       }
     },
     "education": {
       "type": "array",
-      "description": "Timeline de Education (orden de los datos = orden en pantalla).",
+      "description": "Education timeline (data order = display order).",
       "items": {
         "$ref": "#/definitions/TimelineEntry"
       }
     },
     "experience": {
       "type": "array",
-      "description": "Timeline de Experience (orden de los datos = orden en pantalla).",
+      "description": "Experience timeline (data order = display order).",
       "items": {
         "$ref": "#/definitions/TimelineEntry"
       }
     },
     "projects": {
       "type": "array",
-      "description": "Timeline de Projects: proyectos personales, fuera de la experiencia laboral (orden de los datos = orden en pantalla).",
+      "description": "Projects timeline: personal projects, apart from work experience (data order = display order).",
       "items": {
         "$ref": "#/definitions/TimelineEntry"
       }
     },
     "skills": {
       "type": "array",
-      "description": "Lista plana de chips, en el orden en que se muestran. Sin porcentajes ni categorías.",
+      "description": "Flat list of chips, in display order. No percentages or categories.",
       "items": {
         "type": "string",
         "minLength": 1
@@ -80,7 +80,7 @@
     },
     "testimonials": {
       "type": "array",
-      "description": "Testimonios del carrusel (sin fecha).",
+      "description": "Carousel testimonials (no date).",
       "items": {
         "$ref": "#/definitions/Testimonial"
       }
@@ -89,7 +89,7 @@
   "definitions": {
     "Locale": {
       "title": "Locale",
-      "description": "Idioma del archivo. Debe coincidir con el nombre (cv.<locale>.json). Difiere entre archivos por definición (no entra en la comparación de paridad).",
+      "description": "Language of the file. Must match its name (cv.<locale>.json). Differs between files by definition (it is left out of the parity comparison).",
       "type": "string",
       "enum": [
         "en",
@@ -98,19 +98,19 @@
     },
     "Id": {
       "title": "Id",
-      "description": "Identificador estable, en minúsculas con guiones. No traducible.",
+      "description": "Stable identifier, lowercase with hyphens. Not translatable.",
       "type": "string",
       "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
     },
     "PublicPath": {
       "title": "PublicPath",
-      "description": "Ruta pública del sitio (empieza con /) o URL https. No traducible.",
+      "description": "Public path of the site (starts with /) or an https URL. Not translatable.",
       "type": "string",
       "pattern": "^(/|https://)\\S+$"
     },
     "YearMonth": {
       "title": "YearMonth",
-      "description": "Fecha \"YYYY\" o \"YYYY-MM\" (año 1900–2099, mes 01–12). No traducible.",
+      "description": "Date as \"YYYY\" or \"YYYY-MM\" (year 1900–2099, month 01–12). Not translatable.",
       "type": "string",
       "pattern": "^(19|20)\\d{2}(-(0[1-9]|1[0-2]))?$"
     },
@@ -129,7 +129,7 @@
     },
     "TestimonialAvatar": {
       "title": "TestimonialAvatar",
-      "description": "Avatar de testimonio: solo src. Es decorativo (alt=\"\") porque el nombre está al lado.",
+      "description": "Testimonial avatar: src only. It is decorative (alt=\"\") because the name is next to it.",
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -155,19 +155,19 @@
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "Nombre completo."
+          "description": "Full name."
         },
         "headline": {
           "type": "string",
           "minLength": 1,
-          "description": "Rol que se muestra en el Badge del Sidebar. Ej: \"Frontend Developer\"."
+          "description": "Role shown in the Sidebar badge. E.g. \"Frontend Developer\"."
         },
         "avatar": {
           "$ref": "#/definitions/Image"
         },
         "about": {
           "type": "array",
-          "description": "Párrafos del panel About.",
+          "description": "Paragraphs of the About panel.",
           "items": {
             "type": "string",
             "minLength": 1
@@ -175,13 +175,13 @@
         },
         "downloadCvUrl": {
           "$ref": "#/definitions/PublicPath",
-          "description": "URL del PDF del CV (no traducible por ahora; ver docs/BACKLOG.md). Si falta, el botón Download CV no se muestra."
+          "description": "URL of the CV PDF (not translatable for now; see docs/BACKLOG.md). If missing, the Download CV button is not shown."
         }
       }
     },
     "ContactType": {
       "title": "ContactType",
-      "description": "Lista cerrada: agregar un tipo exige código (ícono y label de interfaz). No traducible.",
+      "description": "Closed list: adding a type requires code (icon and interface label). Not translatable.",
       "type": "string",
       "enum": [
         "email",
@@ -209,18 +209,18 @@
         "value": {
           "type": "string",
           "minLength": 1,
-          "description": "Valor visible. Ej: \"hello@example.com\", \"Buenos Aires, Argentina\"."
+          "description": "Visible value. E.g. \"hello@example.com\", \"Buenos Aires, Argentina\"."
         },
         "href": {
           "type": "string",
           "pattern": "^(https?://|mailto:|tel:|/)\\S+$",
-          "description": "Destino del link (no traducible). Si falta se deriva del tipo: email → mailto:, phone → tel:, whatsapp → https://wa.me/<dígitos>, location → sin link."
+          "description": "Link target (not translatable). If missing it is derived from the type: email → mailto:, phone → tel:, whatsapp → https://wa.me/<digits>, location → no link."
         }
       }
     },
     "SocialNetwork": {
       "title": "SocialNetwork",
-      "description": "Lista cerrada: agregar una red exige código (logo en BrandIcon). No traducible.",
+      "description": "Closed list: adding a network requires code (logo in BrandIcon). Not translatable.",
       "type": "string",
       "enum": [
         "github",
@@ -251,13 +251,13 @@
         "url": {
           "type": "string",
           "pattern": "^https://\\S+$",
-          "description": "URL del perfil (https). No traducible."
+          "description": "Profile URL (https). Not translatable."
         }
       }
     },
     "ServiceIcon": {
       "title": "ServiceIcon",
-      "description": "Lista cerrada de íconos de lucide-react: agregar uno exige código (mapa de Icon). No traducible.",
+      "description": "Closed list of lucide-react icons: adding one requires code (Icon map). Not translatable.",
       "type": "string",
       "enum": [
         "code",
@@ -320,18 +320,18 @@
         "title": {
           "type": "string",
           "minLength": 1,
-          "description": "Carrera (Education), puesto (Experience) o nombre del proyecto (Projects)."
+          "description": "Degree (Education), position (Experience) or project name (Projects)."
         },
         "organization": {
           "type": "string",
           "minLength": 1,
-          "description": "Institución, empresa o, en Projects, el contexto del proyecto."
+          "description": "Institution, company or, in Projects, the project's context."
         },
         "start": {
           "$ref": "#/definitions/YearMonth"
         },
         "end": {
-          "description": "Fecha de fin (\"YYYY\" o \"YYYY-MM\") o null si es la actualidad (\"Present\" / \"Actualidad\"). No traducible.",
+          "description": "End date (\"YYYY\" or \"YYYY-MM\") or null if ongoing (\"Present\" / \"Actualidad\"). Not translatable.",
           "oneOf": [
             {
               "$ref": "#/definitions/YearMonth"
@@ -365,12 +365,12 @@
         "author": {
           "type": "string",
           "minLength": 1,
-          "description": "Nombre propio (normalmente igual en ambos idiomas)."
+          "description": "Person's name (normally the same in both languages)."
         },
         "role": {
           "type": "string",
           "minLength": 1,
-          "description": "Rol y empresa del autor."
+          "description": "Author's role and company."
         },
         "avatar": {
           "$ref": "#/definitions/TestimonialAvatar"
@@ -378,7 +378,7 @@
         "text": {
           "type": "string",
           "minLength": 1,
-          "description": "Texto completo; la card muestra un extracto recortado por CSS."
+          "description": "Full text; the card shows an excerpt clamped with CSS."
         }
       }
     }

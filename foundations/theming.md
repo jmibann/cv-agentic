@@ -34,9 +34,9 @@ para que el primer frame ya tenga el tema y el idioma correctos:
         t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       }
       d.dataset.theme = t;
-      // theme-color inicial: tokens.css todavía no cargó, así que van los
-      // valores de --palette-light-bg / --palette-dark-bg (un test verifica
-      // que coincidan con tokens.css; ver regla dura 1 de docs/DESIGN.md)
+      // Initial theme-color: tokens.css has not loaded yet, so these are the
+      // values of --palette-light-bg / --palette-dark-bg (a test checks that
+      // they match tokens.css)
       var m = document.querySelector('meta[name="theme-color"]');
       if (m) m.setAttribute("content", t === "dark" ? "#151517" : "#eceef4");
       var l = localStorage.getItem("cv:locale");

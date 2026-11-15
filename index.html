@@ -3,17 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Valor de --palette-light-bg (tokens.css); el anti-flash lo ajusta
-         según el tema resuelto. Único exceptuado de la regla dura 1 de
-         docs/DESIGN.md, fijado por test (src/test/anti-flash.test.ts). -->
+    <!-- Value of --palette-light-bg in tokens.css; the anti-flash script
+         below adjusts it to the resolved theme. It is the one color literal
+         allowed outside tokens.css, and a test keeps the two in sync. -->
     <meta name="theme-color" content="#eceef4" />
     <title>Juan Manuel Ibáñez · Frontend Engineer</title>
-    <!-- #117 (T19, RF-11): metadatos de compartir. Los valores literales los
-         fija la tabla "Metadatos de compartir" de specs/foundation/Foundation/
-         spec.md y los verifica src/test/anti-flash.test.ts: no se editan. Van
-         después del <title> y antes del anti-flash (plan #117, decisión 1):
-         una etiqueta meta no es un link ni un script con src, el contrato T4
-         (anti-flash.test.ts) no se viola. -->
+    <!-- Sharing metadata. The literal values are fixed and checked by a
+         test: do not edit them. They may sit before the anti-flash script
+         because a meta tag is neither a link element nor an external
+         script, which are the only things that must not precede it. -->
     <meta name="description" content="Frontend Engineer with 7+ years in React and TypeScript: design systems, accessibility and AI-assisted development." />
     <meta property="og:type" content="profile" />
     <meta property="og:title" content="Juan Manuel Ibáñez · Frontend Engineer" />
@@ -30,9 +28,9 @@
         t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       }
       d.dataset.theme = t;
-      // theme-color inicial: tokens.css todavía no cargó, así que van los
-      // valores de --palette-light-bg / --palette-dark-bg (un test verifica
-      // que coincidan con tokens.css; ver regla dura 1 de docs/DESIGN.md)
+      // Initial theme-color: tokens.css has not loaded yet, so these are the
+      // values of --palette-light-bg / --palette-dark-bg (a test checks that
+      // they match tokens.css)
       var m = document.querySelector('meta[name="theme-color"]');
       if (m) m.setAttribute("content", t === "dark" ? "#151517" : "#eceef4");
       var l = localStorage.getItem("cv:locale");
@@ -47,18 +45,15 @@
     }
   })();
 </script>
-    <!-- D4 (hallazgo F5, T13): favicon SVG para evitar el 404 de /favicon.ico.
-         Va después del anti-flash porque el contrato de T4 (verificado por
-         src/test/anti-flash.test.ts) no admite ningún <link> antes del script. -->
+    <!-- SVG favicon, so the browser does not request /favicon.ico and get a
+         404. It comes after the anti-flash script: no link element may
+         precede that script (a test enforces it). -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- #115 (T14): mismo ícono a 180×180 para "Agregar a pantalla de inicio". -->
+    <!-- The same icon at 180×180 for "Add to Home Screen". -->
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <!-- #117 (T19, RF-13): canonical y JSON-LD van después del anti-flash y
-         del bloque de íconos, al final del head. El contrato del JSON-LD es
-         el objeto parseado (RF-12, seis claves exactas); el formato del
-         bloque en el HTML no lo es. La imagen la sirve /og-image.png (RF-14,
-         PNG 1200×630 en public/); las URLs son absolutas al deploy de GitHub
-         Pages: Vite no las reescribe en este archivo. -->
+    <!-- Canonical and JSON-LD go last in the head, after the anti-flash
+         script. The URLs are absolute to the GitHub Pages deploy because
+         Vite does not rewrite them in this file. -->
     <link rel="canonical" href="https://jmibann.github.io/cv-agentic/" />
     <script type="application/ld+json">
       {

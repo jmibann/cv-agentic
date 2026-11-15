@@ -187,7 +187,7 @@ src/test/setup.ts           ← jest-dom/vitest, afterEach(cleanup) explícito, 
 src/test/a11y.ts            ← expectNoA11yViolations sobre axe-core
                               (desactiva color-contrast y region; ver foundation.md 5b)
 data/cv.types.generated.ts       ← gen:types   ┐ GENERADOS — no editar,
-data/validate-cv.generated.{js,d.ts} ← build:validator ┘ commiteados, encabezado "GENERADO"
+data/validate-cv.generated.{js,d.ts} ← build:validator ┘ commiteados, encabezado "GENERATED" (#121)
 ```
 
 ## API

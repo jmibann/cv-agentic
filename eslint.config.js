@@ -1,17 +1,13 @@
-// ESLint 10, flat config (decisión #35). Sin eslint-plugin-jsx-a11y
-// (incompatible con ESLint 10; la accesibilidad se verifica con axe en los
-// tests y en la revisión). Sin eslint:recommended explícito para no importar
-// `@eslint/js` ni `globals` (fuera de la tabla de dependencias aprobadas):
-// la cobertura viene de typescript-eslint strict + react-hooks + react-refresh.
+// Flat config. No eslint-plugin-jsx-a11y (incompatible with ESLint 10):
+// accessibility is checked with axe in the tests.
+
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    // node_modules ya se ignora por default; se explicita igual.
-    // Los `data/*.generated.*` no se retocan y no pueden pasar `strict`
-    // (decisión 2 del plan de Foundation).
+    // Generated files are never hand-edited and cannot pass the strict rules.
     ignores: ["node_modules/", "dist/", "data/*.generated.*"],
   },
 
@@ -19,21 +15,14 @@ export default tseslint.config(
 
   {
     files: ["**/*.{ts,tsx}"],
-    // `configs.flat[...]`: la variante flat (plugins como objeto); la raíz
-    // `configs["recommended-latest"]` es eslintrc y rompe ESLint 10.
+    // `configs.flat[...]` is the flat variant; the root "recommended-latest" is
+    // an eslintrc config and breaks ESLint 10.
     extends: [
       reactHooks.configs.flat["recommended-latest"],
       reactRefresh.configs.vite,
     ],
-    // Excepción aprobada por el usuario (Cambio T5b, plan §decisión 2 enmendada):
-    // los providers spíados exportan su hook junto al componente (spec.md §API:
-    // ThemeProvider + useTheme; LocaleProvider + useLocale + useCv). La regla
-    // identifica componentes por mayúscula inicial y no tiene caso para hooks;
-    // allowExportNames evita dividir los providers (alternativa descartada:
-    // hooks en .ts aparte, viola la Anatomía).
-    // Extensión aprobada por el usuario 2026-10-06 (mecanismo #100): se agrega
-    // "getTabId" a allowExportNames por F3/NavTabs T1 (export puro junto al
-    // componente, mismo caso que BRAND_NAMES de #96).
+    // The rule only recognises components by their capital initial, so hooks
+    // and pure exports that live next to a component are allowed by name.
     rules: {
       "react-refresh/only-export-components": [
         "error",
@@ -52,8 +41,8 @@ export default tseslint.config(
   },
 
   {
-    // Regla dura 1 de docs/DESIGN.md: cero colores literales en componentes;
-    // solo tokens. El `\b` evita falsos positivos en `url(#accent-gradient)`.
+    // No color literals in components, only tokens. The `\b` avoids false
+    // positives on url(#accent-gradient).
     files: ["**/*.tsx"],
     rules: {
       "no-restricted-syntax": [
