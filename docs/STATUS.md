@@ -40,6 +40,7 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **Metadatos SEO y Open Graph (2026-11-14)** | ✅ **Cambio #117 CERRADO** en Foundation (única tarea T19): `meta description`, canonical, Open Graph (5), `twitter:card`, JSON-LD `Person` cruzado con `cv.en.json` e identidad canonical≡`og:url`≡`url`, `public/og-image.png` 1200×630 intacta; colocación respetando el contrato T4 del anti-flash. Tests de contrato +6 en `anti-flash.test.ts`; QA del reviewer sobre `dist/` ✓. Commits `472bc1d` `a75e7fa` `0025a21` `f17cd78` `00a8268`; suite **472/41**, build ✓; detalle §XXVIII. Resuelve `docs/BACKLOG.md` → "Metadatos y Open Graph"; **"SEO por idioma" queda abierto** (metadatos solo en inglés, sin `hreflang` ni `og:locale`). |
 | **Proyectos en Resume (2026-11-14)** | ✅ **Cambio #118**: colección `projects` en el esquema y el contenido (el proyecto `cv-agentic` salió de `experience`) y sección Projects en Resume, entre Experience y Education, con ícono `code` (Foundation T20 + ResumePage T6; 479/41, build verde). |
 | **Avatar en WebP (2026-11-15)** | ✅ **Cambio #119**: `public/images/avatar.webp` (512×512 con alfa, 30 KB) reemplaza al PNG de 270 KB que PageSpeed marcaba con 263 KiB de ahorro; contenido y ejemplos apuntan a `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pusheado y publicado (WebP servido, PNG en 404); falta volver a medir en PageSpeed. |
+| **README en inglés (2026-11-15)** | ✅ **#120**: el `README.md` de la raíz presenta el repo en inglés (texto del usuario, diagrama del sistema de agentes, captura claro/oscuro); este tablero se mudó a `docs/STATUS.md` y los agentes apuntan acá. |
 | Post-entrega / próximos trabajos (2026-11-14) | Todo pusheado y publicado en GitHub Pages (metadatos #117 y sección Projects #118 verificados en el sitio servido). Sin pendientes bloqueantes; quedan solo los opcionales de la tabla **Abiertos** de `docs/diagnostics.md` (deudas de forma, StrictMode/F1-F2) y lo postergado en `docs/BACKLOG.md`. |
 
 Detalle y decisiones: [docs/diagnostics.md](diagnostics.md).
@@ -76,7 +77,7 @@ Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 | Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
 | Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
 | Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
-| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#119: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
+| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#120: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
 Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
 (P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;

@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-15** (Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
+Última actualización: **2026-11-15** (README en inglés y `docs/STATUS.md` §XXXII, #120; Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `docs/STATUS.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#119 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#120 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -47,6 +47,13 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### §XXXII · 2026-11-15 — README público en inglés y tablero de estado a `docs/STATUS.md`
+- Qué: el tablero interno deja la raíz (`git mv README.md docs/STATUS.md`) y los agentes, la skill y AGENTS.md apuntan ahí; README nuevo en inglés con el texto del usuario, diagrama Mermaid del sistema de agentes y captura claro/oscuro (`docs/images/preview.png`). Hecho por Claude Code a pedido del usuario.
+- Checks: lint · typecheck · test (482/41) · build; enlaces relativos del README y de STATUS comprobados por script; afirmaciones del README verificadas contra el repo. Falta ver el render en GitHub tras el push.
+- Decisiones: #120 → `docs/README.md`.
+- Commits: `b21b041` (mudanza) + el del README.
+- Abre: —; cierra: —.
+
 ### §XXXI · 2026-11-15 — Cambio #119: avatar del sitio en WebP
 - Qué: `public/images/avatar.png` (269.794 bytes; PageSpeed estimaba 263 KiB de ahorro) se reemplaza por `avatar.webp` (512×512 con alfa, `cwebp -q 82`, 29.650 bytes, −89 %); `profile.avatar.src` actualizado en el contenido y en los ejemplos del kit. Foundation T21, hecha por Claude Code a pedido del usuario.
 - Checks: lint · typecheck · test (482/41) · build · validate:content; imagen decodificada comparada a la vista con el original. Sin verificación en navegador ni PageSpeed post-deploy.
@@ -54,19 +61,9 @@ de la entrada); el detalle queda en git.
 - Commits: `df85c61` (spec) · `23cd835` → `37f6659` (T21).
 - Abre: —; cierra: en parte BACKLOG → "Imágenes" (queda `srcset`/AVIF).
 
-### §XXX · 2026-11-14 — Saneado de documentación tras #117 y #118 (auditoría)
-- Qué: fuera los pendientes ya cumplidos (push, deploy, contenido real, "registro de la categoría motion") en memory, README, agent-system y BACKLOG; Projects y "una sola columna" en los textos que aún nombraban solo Education/Experience o "lado a lado" (specs de ResumeSection, Timeline y SectionTitle, breakpoints, typography, alcance de `docs/README.md`, descripciones de `TimelineEntry` en el esquema + generados). Sin cambios de RF ni de tests.
-- Checks: lint · typecheck · test (479/41) · build · validate:content; sitio publicado verificado (metadatos #117 y Projects #118).
-- Decisiones: ninguna nueva.
-- Commits: el docs de este saneado.
-- Abre: comentarios viejos en `ResumePage.tsx` ("dos `ResumeSection`") y en `ResumePage.test.tsx` ("contenido de ejemplo del kit"; el test usa `src/content/`), sumados a las deudas de forma; cierra: —.
+### 2026-11-14 · §XXX — Saneado de documentación tras #117 y #118 (auditoría) · — · `git show e0b6104:docs/diagnostics.md`
 
-### §XXIX · 2026-11-14 — Cambio #118: colección `projects` y sección Projects en Resume
-- Qué: el proyecto `cv-agentic` sale de `experience` y pasa a `projects` (obligatorio en el esquema, `TimelineEntry`); Resume muestra Experience → Projects → Education → Skills, con ícono `code`. Foundation T20 + ResumePage T6, hechas por Claude Code a pedido del usuario.
-- Checks: lint · typecheck · test (479/41) · build · validate:content; navegador (sección visible, sin errores de consola).
-- Decisiones: #118 → `docs/README.md` (tres aserciones existentes del test de ResumePage cambiadas, autorizadas ahí).
-- Commits: `b005014` (spec) · `4c63dc3`+`9b0f0f8` → `4ae17a1` (T20) · `a48ddef` → `fc50777` (T6).
-- Abre: —; cierra: —.
+### 2026-11-14 · §XXIX — Cambio #118: colección `projects` y sección Projects en Resume · #118 · `git show b22655a:docs/diagnostics.md`
 
 ### 2026-11-14 · §XXVIII — Cierre del Cambio #117 (Foundation: metadatos SEO y para compartir) · #117 · `git show 3d22bf8:docs/diagnostics.md`
 
