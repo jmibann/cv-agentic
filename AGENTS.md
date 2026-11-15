@@ -108,12 +108,18 @@ reviewer **al cerrar la pieza** y en cada puerta (decisión #80).
   hay cambios de layout (y, si hace falta, tokens, `calc()` de tokens o `0`).
 - Foco: siempre el anillo estándar (`--focus-ring-width` / `--focus-ring-offset`).
 - `z-index` siempre con un token `--z-*`.
+- Comentarios (#121): **en inglés y solo el porqué** — una restricción no obvia, un
+  rodeo por un bug de navegador o de jsdom, una razón de accesibilidad, un orden
+  que no se puede cambiar, la procedencia o licencia de un recurso. No se comenta
+  qué hace el código, no se repite la spec ni se narra la historia de tareas, y no
+  hay referencias internas (RF-n, Tn, decisión n, #n, §n): la trazabilidad vive en
+  `specs/`. Mensajes de error, también en inglés.
 - Motion (#116): ninguna `transition` que anime en selectores (0,2,0)+;
   `transition: none` excluido (es supresión). Contrato en `foundations/motion.md`.
 - Textos: contenido desde `useCv()` (solo en páginas/AppLayout), interfaz
   desde `useLocale().t`. Nada hardcodeado en componentes.
 - **Unidad de trabajo: una tarea (Tn) de `specs/<cat>/<Name>/tasks.md`** (skill `sdd`).
-  Commits (Conventional Commits) por tarea, en este orden:
+  Commits (Conventional Commits, **subject y cuerpo en inglés**, #121) por tarea, en este orden:
   `test(<Name>): Tn` (solo tests, en rojo) → `feat(<Name>): Tn` →
   `fix(<Name>): Tn` si hay correcciones.
   Sin `--amend`, sin reescribir historia, sin push (salvo pedido del usuario).

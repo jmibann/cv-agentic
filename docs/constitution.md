@@ -41,6 +41,6 @@ Cada regla indica cómo verificarla.
 - **D6** Los links externos abren con `rel="noopener noreferrer"`. *Verificar:* tests de los componentes.
 
 ## 6. Idioma
-- **L1** Español para toda la documentación (`docs/`, `specs/`, `foundations/`, `AGENTS.md`, `.opencode/`) y los comentarios del código.
-- **L2** Inglés para el código: identificadores, nombres de archivos, nombres de tests y mensajes de commit.
+- **L1** Español para toda la documentación (`docs/`, `specs/`, `foundations/`, `AGENTS.md`, `.opencode/`). Los **comentarios del código van en inglés** y solo explican **por qué** (#121): sin describir qué hace el código, sin repetir la spec y sin referencias internas (RF-n, Tn, decisión n, #n, §n); la trazabilidad vive en `specs/`. *Verificar:* `src/test/comments.test.ts`.
+- **L2** Inglés para el código: identificadores, nombres de archivos, nombres de tests, mensajes de error y mensajes de commit (subject y cuerpo, #121).
 - **L3** El contenido visible para el usuario existe en inglés y español solo en `src/content/cv.{en,es}.json` y `src/i18n/ui.{en,es}.ts`.

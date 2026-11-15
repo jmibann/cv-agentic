@@ -67,8 +67,10 @@ mínimo, en cada entrega:
 - **D2/D3/D5** `grep -rEn "fetch\(|XMLHttpRequest|sendBeacon" src`,
   `grep -rn "localStorage" src` (solo `cv:theme`/`cv:locale`, en `try/catch`),
   sin `.env` ni claves en el repo.
-- **L1/L2** comentarios y documentación en español; identificadores, nombres
-  de archivos, nombres de tests y commits en inglés.
+- **L1/L2** documentación en español; comentarios del código **en inglés y solo
+  el porqué**, sin referencias internas (RF-n, Tn, decisión n, #n; decisión #121);
+  identificadores, nombres de archivos, nombres de tests, mensajes de error y
+  commits (subject y cuerpo) en inglés.
 - **Commits de documentos** (solo en revisión completa de pieza o de fase,
   decisión #88): con `git log --format="%h %s"` y `git show --stat <hash>`, los
   commits `docs(...)` desde la puerta anterior solo tocan

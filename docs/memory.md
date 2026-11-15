@@ -2,7 +2,7 @@
 
 Memoria entre sesiones. Máximo ~50 líneas: resume o elimina lo que ya no aporte.
 Solo la edita el orchestrator al cerrar puerta F o ante decisión de reglas (#86).
-El detalle histórico vive en `docs/diagnostics.md` (§I–§XXXIII) y `docs/README.md` (#1–#120, con la enmienda de #116: `transition: none` excluido).
+El detalle histórico vive en `docs/diagnostics.md` (§I–§XXXIV) y `docs/README.md` (#1–#121, con la enmienda de #116: `transition: none` excluido).
 
 ## Estado actual (2026-11-15)
 
@@ -25,8 +25,8 @@ El detalle histórico vive en `docs/diagnostics.md` (§I–§XXXIII) y `docs/REA
   pieza nueva → `/sdd-spec` + `/sdd-plan <cat>/<Name>` (puertas de pieza suelta);
   verificación visual → `reviewer` con app servida por el usuario (#91; el MCP de Chrome
   es solo del reviewer).
-- Commits: unidad = 1 tarea; `test(<Name>): Tn` (subject a secas, #102: subject EN, cuerpo
-  ES **sin tildes**; `feat`/`fix` no tocan tests; `test` solo agrega) → `feat(<Name>): Tn`;
+- Commits: unidad = 1 tarea; `test(<Name>): Tn` (subject a secas; #121: subject **y cuerpo en
+  inglés**; comentarios del código en inglés y solo el porqué; `feat`/`fix` no tocan tests; `test` solo agrega) → `feat(<Name>): Tn`;
   identidad `git -c user.name="jmiban" commit`; sin `--amend`/`--no-verify`/push; `git add`
   con rutas explícitas + `git diff --cached --name-only` antes (un subagente puede dejar
   staged ajeno). Docs los commitea el orchestrator; el código, sus builders.

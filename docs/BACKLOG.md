@@ -46,6 +46,11 @@ necesita decisión del usuario antes de implementarse (flujo por tipo de tarea:
 - **Carga de idiomas.** Hoy ambos JSON de contenido van en el bundle (import
   estático). Si se suman idiomas o el contenido crece: `import()` dinámico por
   idioma en `content/index.ts`.
+- **Documentación interna en inglés.** (**Abierto**, 2026-11-15, #121.) El
+  código ya va en inglés; `docs/`, `specs/`, `foundations/`, `AGENTS.md` y
+  `.opencode/` siguen en español (L1). Traducirlos es una etapa aparte: ~90
+  documentos, incluidos los prompts de los agentes, que habría que volver a
+  probar.
 - **Aprendizajes entre tareas.** Hoy los aprendizajes viven en
   `docs/memory.md` ("Reglas no negociables para cualquier tarea futura", máximo ~50 líneas, solo
   lo edita el orchestrator al cerrar cada puerta F). Si se ve que se repiten

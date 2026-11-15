@@ -55,7 +55,7 @@ los commits de la skill `sdd` (cargala al empezar).
 1. **Enumerá los escenarios de la tarea Tn**: los casos de "Tests esperados"
    de la spec que cubre esta tarea (según su "Hecho cuando" y los RF que
    lista). Si detectás un caso que la spec no cubre (un edge case evidente),
-   agregalo y marcalo con un comentario `// extra: <motivo>`.
+   agregalo y marcalo con un comentario en inglés `// extra: <reason>`.
 2. **Agregá esos tests** a `<Name>.test.tsx` (crealo en la primera tarea)
    usando queries por rol/nombre. El archivo termina con el caso
    `expectNoA11yViolations` (se agrega en la primera tarea).

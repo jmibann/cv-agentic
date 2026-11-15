@@ -63,7 +63,7 @@ con la implementación → `fix(<Name>): Tn` si hay correcciones. `feat`/`fix` n
 tocan tests; `test` solo agrega. El orchestrator marca la tarea en
 `tasks.md` cuando el reviewer la aprueba y **commitea él mismo los
 documentos** (`git add` acotado a `docs/*` y `specs/*` +
-`git commit -m`, solo con el repo en verde, con mensaje en inglés y sin
+`git commit -m`, solo con el repo en verde, con mensaje en inglés (subject y cuerpo, #121) y sin
 `git add .`/`-A`). `--amend`, `--no-verify` (#93), `reset --hard` y `push` están denegados. El
 reviewer no commitea.
 

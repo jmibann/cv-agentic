@@ -77,7 +77,7 @@ Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
 | Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
 | Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
 | Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
-| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#120: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
+| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#121: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
 Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
 (P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;

@@ -212,7 +212,7 @@ actualizás en las puertas y al marcar tareas (`docs/STATUS.md`,
   `docs/…` o `specs/…`. Si aparece otra ruta (por ejemplo algo que
   dejó un subagente en staging), no commitees: frená y avisá. El permiso bash
   no lo garantiza (`*` acepta rutas extra; decisión #88).
-- Solo con el repo en verde y con mensajes Conventional Commits en inglés
+- Solo con el repo en verde y con mensajes Conventional Commits en inglés (subject y cuerpo, #121)
   (p. ej. `docs(state): update status after F2 gate`,
   `docs(sdd): Badge T1 approved`).
 - Identidad por flag (`AGENTS.md`, decisión #83):

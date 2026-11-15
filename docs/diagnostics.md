@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-15** (auditoría general y saneado §XXXIII; README en inglés y `docs/STATUS.md` §XXXII, #120; Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
+Última actualización: **2026-11-15** (decisión #121, comentarios en inglés §XXXIV; auditoría general y saneado §XXXIII; README en inglés y `docs/STATUS.md` §XXXII, #120; Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `docs/STATUS.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#120 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#121 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -48,19 +48,16 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
-### §XXXIII · 2026-11-15 — Auditoría general y saneado
-- Qué: dependencias actualizadas dentro de los rangos (`npm update` + `npm audit fix`, solo `package-lock.json`); comentarios viejos de `ResumePage.tsx` y `assetUrl.ts`; docs al día ("Modo mantenimiento" con #119/#120, árboles de AGENTS/`docs/README.md`/STATUS sin "los crea la Fase 1", `public/` y `src/utils`·`src/scripts`, fila de STATUS en "Qué contiene", ejemplo de `i18n.md`, BACKLOG). Hecho por Claude Code a pedido del usuario.
-- Checks: lint · typecheck · test (482/41) · build · validate:content. `npm audit`: 0 en producción; quedan 7 moderados de desarrollo (un solo `minimatch` transitivo de `typescript-eslint`, sin versión corregida en el rango).
-- Decisiones: ninguna nueva.
-- Commits: `b44cea9` (deps) · `d6b5a4b` (comentarios) + el docs de este saneado.
-- Abre: PDF descargable (dice "445 tests" y trae teléfono), "About" del repo en GitHub, re-medición en PageSpeed, `minimatch`; cierra: comentario viejo de `ResumePage.tsx`.
+### §XXXIV · 2026-11-15 — Decisión #121: comentarios "why-only" en inglés (reglas)
+- Qué: enmienda de L1/L2 (comentarios del código en inglés y solo el porqué, sin referencias internas; errores y commits enteros en inglés); AGENTS, reviewer, component-builder, orchestrator, agent-system y memory alineados. La limpieza del código va por lotes (piloto → `src/` → mensajes → fuera de `src/` → test guardián) y se registra al cierre.
+- Checks: lint · typecheck · test (482/41).
+- Decisiones: #121 → `docs/README.md`.
+- Commits: el docs de esta decisión.
+- Abre: limpieza de comentarios en curso; traducción de la documentación interna (BACKLOG); cierra: —.
 
-### §XXXII · 2026-11-15 — README público en inglés y tablero de estado a `docs/STATUS.md`
-- Qué: el tablero interno deja la raíz (`git mv README.md docs/STATUS.md`) y los agentes, la skill y AGENTS.md apuntan ahí; README nuevo en inglés con el texto del usuario, diagrama Mermaid del sistema de agentes y captura claro/oscuro (`docs/images/preview.png`). Hecho por Claude Code a pedido del usuario.
-- Checks: lint · typecheck · test (482/41) · build; enlaces relativos del README y de STATUS comprobados por script; afirmaciones del README verificadas contra el repo. Falta ver el render en GitHub tras el push.
-- Decisiones: #120 → `docs/README.md`.
-- Commits: `b21b041` (mudanza) + el del README.
-- Abre: —; cierra: —.
+### 2026-11-15 · §XXXIII — Auditoría general y saneado (deps en rango, docs al día) · — · `git show f450e4e:docs/diagnostics.md`
+
+### 2026-11-15 · §XXXII — README público en inglés y tablero de estado a `docs/STATUS.md` · #120 · `git show f836812:docs/diagnostics.md`
 
 ### 2026-11-15 · §XXXI — Cambio #119: avatar del sitio en WebP · #119 · `git show 6f06934:docs/diagnostics.md`
 
