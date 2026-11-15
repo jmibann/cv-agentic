@@ -3,19 +3,14 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-/**
- * T4 (RF-1): test de contrato entre archivos crudos del repo — `index.html` ↔
- * `tokens/tokens.css` ↔ `foundations/theming.md` — leídos con `node:fs`
- * (plan.md, decisión 7: documentar contratos, no el DOM). El bundle nunca se
- * carga: `/src/main.tsx` solo existe a partir de T11 (plan.md, decisión 6).
- */
+// Contract test between raw repo files (index.html, tokens.css and
+// foundations/theming.md), read from disk. The bundle is never loaded.
 const readRepoFile = (relativeFromThisFile: string): string =>
   readFileSync(
     fileURLToPath(new URL(relativeFromThisFile, import.meta.url)),
     "utf8",
   );
 
-/** Grupo 1 de `pattern`; lanza si falta (test en rojo, nunca `undefined`). */
 function capture(source: string, pattern: RegExp, label: string): string {
   const value = pattern.exec(source)?.[1];
   if (value === undefined) {
@@ -24,7 +19,6 @@ function capture(source: string, pattern: RegExp, label: string): string {
   return value;
 }
 
-/** Grupos 1 y 2 de `pattern`; lanza si faltan. */
 function captures2(
   source: string,
   pattern: RegExp,
@@ -39,10 +33,8 @@ function captures2(
   return [first, second];
 }
 
-/**
- * El `<script>` inline: una etiqueta `<script>` plana, sin atributos (la
- * etiqueta module del bundle lleva `type`/`src`, así que nunca matchea acá).
- */
+// A bare <script> with no attributes: the bundle's tag carries type/src and
+// never matches.
 function extractInlineScript(source: string, label: string): string {
   const value = /<script>[\s\S]*?<\/script>/.exec(source)?.[0];
   if (value === undefined) {
@@ -51,11 +43,8 @@ function extractInlineScript(source: string, label: string): string {
   return value;
 }
 
-/**
- * Extracción robusta del bloque anti-flash canónico de
- * `foundations/theming.md`: el primer bloque de código ```html cercado,
- * reducido a su elemento `<script>` (así ambos lados comparan la misma forma).
- */
+// The first fenced html block of theming.md, reduced to its <script> element
+// so both sides compare the same shape.
 function extractThemingScriptBlock(markdown: string): string {
   const block = /```html\n([\s\S]*?)```/.exec(markdown)?.[1];
   if (block === undefined) {
@@ -96,7 +85,6 @@ describe("index.html anti-flash (RF-1)", () => {
   });
 
   it("uses the palette token values as the two theme-color literals in the script", () => {
-    // Literales del script: `m.setAttribute("content", t === "dark" ? "#151517" : "#eceef4");`
     const [darkLiteral, lightLiteral] = captures2(
       inlineScript,
       /t === "dark" \? "(#[0-9a-fA-F]{3,8})" : "(#[0-9a-fA-F]{3,8})"/,
@@ -144,10 +132,7 @@ describe("index.html anti-flash (RF-1)", () => {
   });
 
   it("ships an SVG favicon linked from the <head>", () => {
-    // T13 (Cambio F5, hallazgo D4 de docs/qa-report.md): el navegador pedía
-    // /favicon.ico → 404. El link debe vivir en el <head>; su posición exacta
-    // (después del anti-flash) ya la garantiza el test "runs before the
-    // bundle" de arriba, que no admite ningún <link> antes del script.
+    // The browser used to request /favicon.ico and get a 404.
     const head = capture(
       indexHtml,
       /<head>([\s\S]*?)<\/head>/,
@@ -157,25 +142,15 @@ describe("index.html anti-flash (RF-1)", () => {
       /<link rel="icon" type="image\/svg\+xml" href="\/favicon\.svg" \/>/,
     );
 
-    // `public/favicon.svg` debe existir (readFileSync lanza si no: rojo) y ser
-    // XML simple válido sin parser nuevo: raíz <svg> abierta y cerrada.
     const faviconSvg = readRepoFile("../../public/favicon.svg");
     expect(faviconSvg.trimStart().startsWith("<svg")).toBe(true);
     expect(faviconSvg).toMatch(/<\/svg>\s*$/);
-    // Contrato del asset con la spec (Anatomía → public/favicon.svg):
-    // hexágono pointy-top sobre viewBox cuadrado 64×64 y fill #304cfd, el
-    // valor de --color-accent (T13b: el original #ffb729 era un error del
-    // brief, enmendado en spec/tasks).
-    // El literal vive acá y en el SVG (asset público, no CSS de app).
     expect(faviconSvg).toMatch(/viewBox="0 0 64 64"/);
     expect(faviconSvg).toContain('fill="#304cfd"');
-    expect(faviconSvg).not.toMatch(/<text\b/); // sin texto ni marcas
+    expect(faviconSvg).not.toMatch(/<text\b/);
   });
 
   it("ships the app-style favicon, a touch icon and a real page title", () => {
-    // T14 (#115): el título deja de ser el nombre del repo; el favicon pasa a
-    // ícono tipo app (cuadrado redondeado + hexágono + monograma JM en
-    // paths) y se agrega el apple-touch-icon para la pantalla de inicio.
     const head = capture(
       indexHtml,
       /<head>([\s\S]*?)<\/head>/,
@@ -192,9 +167,9 @@ describe("index.html anti-flash (RF-1)", () => {
     expect(faviconSvg).toMatch(/<rect\b[^>]*\brx="14"[^>]*fill="#304cfd"/);
     expect(faviconSvg).toMatch(/stroke="#fff"/);
 
-    // PNG real de 180×180: firma PNG + ancho/alto del chunk IHDR. La ruta va
-    // en una variable: con un literal, Vite reescribe `new URL("….png",
-    // import.meta.url)` como URL de asset y deja de ser `file:` (T14b).
+    // The path goes in a variable: with a literal, Vite rewrites
+    // `new URL("….png", import.meta.url)` into an asset URL and it stops being a
+    // file: URL.
     const touchIconPath = "../../public/apple-touch-icon.png";
     const png = readFileSync(
       fileURLToPath(new URL(touchIconPath, import.meta.url)),
@@ -205,10 +180,8 @@ describe("index.html anti-flash (RF-1)", () => {
   });
 
   it("ships a well-formed favicon SVG that browsers can parse", () => {
-    // T14c (#115): un `--` dentro de un comentario XML deja el SVG mal
-    // formado; el servidor lo entrega con 200 pero el navegador no lo puede
-    // dibujar y la pestaña cae al ícono cacheado. Se parsea como lo haría el
-    // navegador (image/svg+xml) y no debe haber <parsererror>.
+    // A `--` inside an XML comment makes the SVG malformed: the server still
+    // answers 200 but the browser cannot draw it. Parsed here as the browser does.
     const faviconSvg = readRepoFile("../../public/favicon.svg");
     const doc = new DOMParser().parseFromString(faviconSvg, "image/svg+xml");
     expect(doc.getElementsByTagName("parsererror")).toHaveLength(0);
@@ -216,11 +189,6 @@ describe("index.html anti-flash (RF-1)", () => {
   });
 });
 
-/**
- * Valor declarado de `--token` dentro de `source` (hasta el `;`, recortado);
- * lanza si la declaración no existe (rojo por ausencia, nunca `undefined`).
- * Con `noUncheckedIndexedAccess`, `capture` es el único acceso a grupos.
- */
 function declaredValue(source: string, token: string): string {
   const value = capture(
     source,
@@ -230,21 +198,11 @@ function declaredValue(source: string, token: string): string {
   return value.trim();
 }
 
-/**
- * T17 (RF-10, Cambio motion #106): test de contrato de la escala de motion de
- * `tokens/tokens.css` leída con `fs` (plan.md, decisión 4: se extiende este
- * archivo, que ya lee los tokens). Régimen #101: commit único de test, verde
- * al escribirse porque aserta el documento aprobado que T15 (`c2befd1`) ya
- * aplicó; cualquier edición de esos valores sin Cambio de spec rompe acá.
- * El test NO escribe `tokens.css` (kit, fuera del permiso de foundation).
- */
 describe("motion tokens scale in tokens/tokens.css (RF-10, #106)", () => {
   const tokensCss = readRepoFile("../../tokens/tokens.css");
 
-  // Las cinco duraciones se declaran dos veces en el archivo (alcance base y
-  // override de reduced motion). Se separan las dos zonas para que cada
-  // aserción lea la declaración que le corresponde, sin depender del orden
-  // de `capture` sobre todo el archivo.
+  // The durations are declared twice (base scope and the reduced-motion
+  // override). The two zones are split so each assertion reads its own.
   const reducedBlock = capture(
     tokensCss,
     /@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*?)\n\}/,
@@ -252,9 +210,6 @@ describe("motion tokens scale in tokens/tokens.css (RF-10, #106)", () => {
   );
   const baseScope = tokensCss.slice(0, tokensCss.indexOf(reducedBlock));
 
-  // Valores textuales exactos de la escala aprobada (spec.md → RF-10 y
-  // "Tests esperados" → "Motion tokens"): `--ease-standard` y
-  // `--ease-emphasized` se asertan intactos junto con los tokens nuevos.
   const MOTION_SCALE: ReadonlyArray<readonly [token: string, value: string]> =
     [
       ["--duration-fast", "0.15s"],
@@ -289,32 +244,16 @@ describe("motion tokens scale in tokens/tokens.css (RF-10, #106)", () => {
   });
 });
 
-/**
- * Forma mínima de `src/content/cv.en.json` para el cruce con el JSON-LD
- * (T19, RF-12): solo las claves que usa el test. El JSON se lee con `node:fs`
- * como contrato entre documentos (plan de Foundation, decisión 7), sin
- * imports de React ni del módulo de contenido.
- */
 interface CvEnDocument {
   profile: { name: string; headline: string };
   social: Array<{ url: string }>;
 }
 
-/**
- * T19 (RF-11…RF-14, Cambio #117): metadatos de compartir en `index.html`.
- * Los literales de la tabla "Metadatos de compartir" de spec.md (Anatomía)
- * los fijó el usuario y se copian carácter por carácter: no se editan.
- * Régimen #101 declarado en tasks.md: la aserción del PNG (grupo f) nace en
- * verde porque `public/og-image.png` ya existe en el working tree; el commit
- * `test(Foundation): T19` sigue rojo por (a)–(e), las etiquetas ausentes.
- */
 describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
   const indexHtml = readRepoFile("../../index.html");
 
-  // Grupo (a): ocho etiquetas de una línea con su literal exacto (el `·` y la
-  // ó de "Ibáñez" incluidos). La novena de la tabla es el bloque JSON-LD, cuyo
-  // contrato es el objeto parseado (grupo e, RF-12): acá se aserta solo su
-  // etiqueta de apertura.
+  // These literals were fixed by the site owner and are copied character by
+  // character.
   const SHARING_TAGS: ReadonlyArray<string> = [
     '<meta name="description" content="Frontend Engineer with 7+ years in React and TypeScript: design systems, accessibility and AI-assisted development." />',
     '<meta property="og:type" content="profile" />',
@@ -334,8 +273,7 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
   });
 
   it("ships exactly five og: metas and one twitter: meta (RF-11)", () => {
-    // Grupo (b): el conteo exacto cubre el "ninguna otra etiqueta fuera de la
-    // lista" de RF-11 (plan #117, decisión 5; condición 1 de #117).
+    // The exact count is what enforces "no other tags".
     const ogCount = [...indexHtml.matchAll(/<meta\s+property="og:/g)].length;
     const twitterCount = [
       ...indexHtml.matchAll(/<meta\s+name="twitter:/g),
@@ -345,7 +283,6 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
   });
 
   it("keeps og:title identical to the <title> text (RF-11)", () => {
-    // Grupo (c).
     const titleText = capture(
       indexHtml,
       /<title>([\s\S]*?)<\/title>/,
@@ -360,9 +297,6 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
   });
 
   it("places the canonical link and the JSON-LD block after the anti-flash script (RF-13)", () => {
-    // Grupo (d): refuerzo explícito del contrato T4 ("runs before the bundle",
-    // arriba). Sin la etiqueta, `indexOf` da -1 y el `toBeGreaterThan` falla:
-    // rojo por ausencia, nunca `undefined`.
     const scriptIndex = indexHtml.indexOf("<script>");
     expect(scriptIndex).toBeGreaterThanOrEqual(0);
     expect(indexHtml.indexOf('<link rel="canonical"')).toBeGreaterThan(
@@ -374,8 +308,8 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
   });
 
   it("embeds a parsed JSON-LD Person of six keys synced with cv.en.json (RF-12)", () => {
-    // Grupo (e): comparación sobre el objeto parseado (`toEqual` contra las
-    // seis claves exactas; el formato del bloque en el HTML no es contrato).
+    // Compared as a parsed object: how the block is formatted in the HTML is not
+    // part of the contract.
     const rawBlock = capture(
       indexHtml,
       /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
@@ -394,8 +328,8 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
       ],
     });
 
-    // Cruce con el contenido real leído con `fs` (decisión 3 del plan del
-    // #117): si el CV cambia y el JSON-LD no lo sigue, el desfase rompe acá.
+    // Cross-checked with the real content: if the CV changes and the JSON-LD does
+    // not follow, it breaks here.
     const cvEn = JSON.parse(
       readRepoFile("../../src/content/cv.en.json"),
     ) as CvEnDocument;
@@ -403,8 +337,8 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
     expect(jsonLd["jobTitle"]).toBe(cvEn.profile.headline);
     expect(jsonLd["sameAs"]).toEqual(cvEn.social.map((entry) => entry.url));
 
-    // Identidad url del JSON-LD ≡ href del canonical ≡ og:url, además del
-    // literal: si algún día cambia el dominio, no queda una etiqueta desfasada.
+    // The JSON-LD url, the canonical href and og:url must be the same string, so
+    // a domain change cannot leave one of them behind.
     const canonicalHref = capture(
       indexHtml,
       /<link rel="canonical" href="([^"]*)"/,
@@ -421,10 +355,7 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
   });
 
   it("ships public/og-image.png as a real 1200×630 PNG (RF-14)", () => {
-    // Grupo (f): firma PNG + IHDR, como el apple-touch de T14. La ruta va en
-    // una variable: con un literal, Vite reescribe `new URL("….png",
-    // import.meta.url)` como URL de asset y deja de ser `file:` (T14b).
-    // Nace en verde: el PNG ya existe (régimen #101, declarado en tasks).
+    // Path in a variable for the same reason as the touch icon above.
     const ogImagePath = "../../public/og-image.png";
     const png = readFileSync(
       fileURLToPath(new URL(ogImagePath, import.meta.url)),

@@ -1,7 +1,3 @@
-// Tests del setup global de Vitest (T2): cleanup de Testing Library entre
-// tests, mock de `window.matchMedia` (con disparo de `change`, la puerta que
-// usa T5) y limpieza global de `localStorage`, `data-theme`, `lang` y
-// `location.hash`. Los nombres de scenario remiten a "Hecho cuando" de T2.
 import { createElement } from "react";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
@@ -9,8 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 import { simulateMediaChange } from "./setup";
 
 describe("DOM cleanup between tests (afterEach(cleanup) in setup.ts)", () => {
-  // Sin el cleanup explícito (globals: false desactiva el automático de RTL),
-  // el botón del test A quedaría en document.body y el test B vería dos.
+  // Without the explicit cleanup, test A's button would still be in the body
+  // and test B would find two.
   it("test A: renders a button and it is in the DOM (jest-dom extended)", () => {
     render(createElement("button", null, "x"));
     expect(screen.getByRole("button", { name: "x" })).toBeInTheDocument();
@@ -29,11 +25,9 @@ describe("window.matchMedia mock", () => {
     const mql = window.matchMedia(query);
 
     expect(typeof mql.matches).toBe("boolean");
-    // Default controlado del mock: sin hoja de estilos real, nada matchea.
     expect(mql.matches).toBe(false);
 
     mql.addEventListener("change", listener);
-    // Puerta abierta para T5: el test simula el cambio del sistema.
     simulateMediaChange(query, true);
     expect(mql.matches).toBe(true);
     expect(listener).toHaveBeenCalledTimes(1);
@@ -41,7 +35,6 @@ describe("window.matchMedia mock", () => {
     mql.removeEventListener("change", listener);
     simulateMediaChange(query, false);
     expect(mql.matches).toBe(false);
-    // Tras removeEventListener el listener ya no escucha nada.
     expect(listener).toHaveBeenCalledTimes(1);
   });
 });

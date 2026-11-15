@@ -23,8 +23,7 @@ describe("expectNoA11yViolations", () => {
   });
 
   it("ignores the region rule for isolated components", async () => {
-    // Contenido fuera de cualquier landmark: la regla `region` lo marcaría
-    // si estuviera habilitada.
+    // Content outside any landmark: the `region` rule would flag it if enabled.
     const { container } = render(
       createElement("p", null, "Standalone paragraph, no landmark needed."),
     );

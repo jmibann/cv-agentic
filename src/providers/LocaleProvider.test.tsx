@@ -1,9 +1,3 @@
-// Tests de LocaleProvider (T10): RF-5 (storage que lanza no rompe) y RF-6
-// (setLocale fija lang + persiste + conmuta t/useCv) de
-// specs/foundation/Foundation/spec.md, y la sección "LocaleProvider" de
-// "Tests esperados" (spec.md y foundations/i18n.md).
-// 5 tests, en el orden literal de tasks.md → T10.
-
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { type ReactNode } from "react";
@@ -13,10 +7,8 @@ import { cvByLocale } from "../content";
 
 import { LocaleProvider, useCv, useLocale } from "./LocaleProvider";
 
-// Sonda de test: expone el idioma del contexto, un texto de `t` y el primer
-// párrafo de `perfil.about` de `useCv()` como texto, y dos botones que llaman
-// `setLocale` (queries por rol y nombre accesible). Ese párrafo difiere entre
-// en y es en el contenido real, así que prueba que useCv() conmuta de verdad.
+// The first `about` paragraph differs between en and es in the real content,
+// which proves that useCv() really switches.
 function Probe(): ReactNode {
   const { locale, setLocale, t } = useLocale();
   const cv = useCv();
@@ -35,9 +27,7 @@ function Probe(): ReactNode {
   );
 }
 
-// Simula el estado que deja el script anti-flash: `lang` resuelto en <html>
-// antes de montar el provider (foundations/i18n.md → "Resolución del idioma
-// inicial": el provider toma su estado inicial de ahí).
+// Simulates what the anti-flash script leaves: `lang` already on <html>.
 function renderProbe(initialLang: string): void {
   document.documentElement.lang = initialLang;
   render(
@@ -49,10 +39,8 @@ function renderProbe(initialLang: string): void {
 
 describe("LocaleProvider", () => {
   it("takes the initial locale from <html lang> without recomputing", () => {
-    // lang="es" sin cv:locale guardado: un provider que recalculera
-    // (navigator → default "en") terminaría en "en". Debe tomar el valor ya
-    // resuelto por el anti-flash, y servir t y useCv() en ese idioma.
-    localStorage.setItem("cv:locale", "en"); // el provider NO debe leerlo: gana <html lang>
+    // A stored value the provider must not read: <html lang> wins.
+    localStorage.setItem("cv:locale", "en");
     renderProbe("es");
 
     expect(screen.getByText("locale: es")).toBeInTheDocument();
@@ -64,7 +52,6 @@ describe("LocaleProvider", () => {
   });
 
   it("setLocale changes lang, persists cv:locale and switches t and useCv() to the active locale", async () => {
-    // RF-6 en las dos direcciones: en → es → en.
     const user = userEvent.setup();
     renderProbe("en");
     expect(screen.getByText("t: Resume")).toBeInTheDocument();
@@ -92,9 +79,6 @@ describe("LocaleProvider", () => {
   });
 
   it("changes the locale in memory when localStorage throws", async () => {
-    // RF-5: modo privado / storage bloqueado. El spy lanza en setItem y el
-    // provider sigue: el estado, lang, t y useCv() cambian, sin error hacia
-    // afuera (mismo mecanismo que el test equivalente de T5).
     const user = userEvent.setup();
     renderProbe("en");
 
@@ -120,10 +104,7 @@ describe("LocaleProvider", () => {
   });
 
   it("throws a descriptive error when useLocale is used outside the provider", () => {
-    // Estados de la spec: "Providers sin wrapper" (spec.md ~186): useLocale
-    // fuera del provider lanza error descriptivo. Spy de console.error como
-    // en T5: React registra el error no capturado del render; el assert lo
-    // hace toThrowError.
+    // React logs the uncaught render error; the spy keeps the output clean.
     const consoleErrorSpy = vi
       .spyOn(console, "error")
       .mockImplementation(() => undefined);
@@ -140,7 +121,6 @@ describe("LocaleProvider", () => {
   });
 
   it("throws a descriptive error when useCv is used outside the provider", () => {
-    // Idem, para useCv (spec.md ~186: ambos hooks con error descriptivo).
     const consoleErrorSpy = vi
       .spyOn(console, "error")
       .mockImplementation(() => undefined);

@@ -1,7 +1,3 @@
-// Tests de T9 (RF-7): contenido inicial validado. Fuente de los casos:
-// spec.md §Tests esperados y foundations/i18n.md → "Tests esperados"
-// (paridad en/es con la lista canónica de campos no traducibles, orden de
-// fechas con los 3 casos fijados y rechazos del validador en memoria).
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -16,27 +12,18 @@ import enContent from "./cv.en.json";
 import esContent from "./cv.es.json";
 import { cvByLocale } from "./index";
 
-// T20 (#118): textos de interfaz de la seccion Projects.
 import { uiEn } from "../i18n/ui.en";
 import { uiEs } from "../i18n/ui.es";
 
-/** Ruta relativa que declaran los JSON de `src/content` (Hecho cuando de T9). */
 const SCHEMA_REF = "../../data/cv.schema.json";
 
 type WithId = { id: string };
 
-/** Ids de una colección, en el orden de los datos (identidad estable). */
 function idsOf(entries: readonly WithId[]): string[] {
   return entries.map((entry) => entry.id);
 }
 
-/**
- * Instantánea de los campos no traducibles según la lista canónica de
- * foundations/i18n.md: todos los `id`, `profile.avatar.src`,
- * `profile.downloadCvUrl`, `contact[].type/href`, `social[].network/url`,
- * `services[].icon`, `education[].start/end`, `experience[].start/end` y
- * `testimonials[].avatar.src`. `locale` NO entra: difiere por definición.
- */
+/** `locale` is left out on purpose: it differs by definition. */
 function nonTranslatable(cv: CvData): unknown {
   return {
     contactIds: idsOf(cv.contact),
@@ -56,9 +43,8 @@ function nonTranslatable(cv: CvData): unknown {
   };
 }
 
-// Normalización "solo para comparar" (plan.md, Funciones puras de T9):
-// "YYYY" → "YYYY-01" en start y "YYYY-12" en end; con ambos en "YYYY-MM"
-// la comparación de strings ya es cronológica (foundations/i18n.md).
+// For comparison only: "YYYY" becomes "YYYY-01" as a start and "YYYY-12" as an
+// end, so a plain string comparison is chronological.
 function normalizeStart(value: string): string {
   return value.length === 4 ? `${value}-01` : value;
 }
@@ -68,12 +54,10 @@ function normalizeEnd(value: string): string {
 }
 
 function isOrdered(start: string, end: string | null): boolean {
-  // `end: null` es "present": entrada abierta, siempre válida.
   return end === null || normalizeStart(start) <= normalizeEnd(end);
 }
 
-// Copias mutadas en memoria para los rechazos (no se escribe ningún archivo
-// en el repo): la base es el JSON de ejemplo, intacto.
+// Mutated copies kept in memory; nothing is written to the repo.
 const exampleBase = structuredClone(exampleEn) as unknown as CvData;
 
 function withExperienceStart(cv: CvData, start: string): unknown {
@@ -95,7 +79,6 @@ function withSocialNetwork(cv: CvData, network: string): unknown {
 }
 
 function withExtraField(cv: CvData): unknown {
-  // La raíz del esquema fija `additionalProperties: false`.
   return { ...cv, uncampoquennadieniepide: true };
 }
 
@@ -106,9 +89,8 @@ describe("cv.{en,es}.json content files (RF-7)", () => {
   });
 
   it("validates both kit examples against the shared schema", () => {
-    // El contenido real ya no es una copia de los ejemplos del kit; los
-    // ejemplos siguen siendo la fuente de fixtures válidos para los tests.
-    // Ambos deben cumplir el mismo validador que usa `load()`.
+    // The site content is no longer a copy of the examples, but the examples
+    // remain the source of valid fixtures.
     expect(validateCv(exampleEn)).toBe(true);
     expect(validateCv(exampleEs)).toBe(true);
   });
@@ -187,13 +169,6 @@ describe("validateCv rejects invalid content in memory (RF-7)", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// T20 (#118): coleccion `projects` (proyectos personales, fuera de
-// `experience`). Mismo contrato que `experience`: array obligatorio de
-// `TimelineEntry`, paridad en/es y orden de fechas. Solo se agregan tests; los
-// de T9 quedan intactos.
-// ---------------------------------------------------------------------------
-
 function withoutProjects(cv: CvData): unknown {
   const copy: Record<string, unknown> = { ...cv };
   delete copy.projects;
@@ -201,7 +176,6 @@ function withoutProjects(cv: CvData): unknown {
 }
 
 function withProjectEntry(cv: CvData): unknown {
-  // La entrada sale de una `TimelineEntry` valida del ejemplo (sin literales).
   return { ...cv, projects: cv.experience.slice(0, 1) };
 }
 
@@ -244,14 +218,9 @@ describe("projects collection (T20, #118)", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// T21 (#119): el avatar del sitio pasa de PNG (263 KiB) a WebP. Contrato entre
-// el contenido y el archivo servido desde `public/`. Solo se agregan tests.
-// ---------------------------------------------------------------------------
-
 describe("site avatar ships as WebP (T21, #119)", () => {
-  // Las rutas van en variables: con un literal, Vite reescribe
-  // `new URL("…", import.meta.url)` como URL de asset (leccion T14b).
+  // Paths go in variables: with a literal, Vite rewrites
+  // `new URL("…", import.meta.url)` into an asset URL.
   const avatarWebpPath = "../../public/images/avatar.webp";
   const avatarPngPath = "../../public/images/avatar.png";
 
