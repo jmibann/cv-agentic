@@ -138,7 +138,7 @@ tsconfig.json               ← único; strict, noUnusedLocals, noUnusedParamete
 eslint.config.js            ← flat: typescript-eslint (strict), react-hooks,
                               react-refresh; --max-warnings 0; no-restricted-syntax
                               que prohíbe #[0-9a-fA-F]{3,8}\b|rgb(|hsl( en .tsx
-public/images/              ← avatar.png (foto real del sitio), testimonials/{magrael,
+public/images/              ← avatar.webp (foto real del sitio; WebP 512×512 con alfa, #119), testimonials/{magrael,
                               jptigani,dharari}.jpg (fotos reales de los testimonios, #112) y
                               testimonials/{maria,john,lena}.svg (silueta neutra, sin texto
                               ni marcas, viewBox cuadrado). El sitio ya no muestra las
@@ -279,8 +279,8 @@ crean a mano.
   de especificidad (0,2,0) o mayor (lo verifica el reviewer en cada Cambio).
   El anti-flash de `index.html` no se toca: la supresión rige solo los cambios
   interactivos.
-- Imágenes en `public/images/`: son contenido, no estilos. `avatar.png` es la foto
-  real del sitio; los `testimonials/*.svg` se conservan como fixture del ejemplo
+- Imágenes en `public/images/`: son contenido, no estilos. `avatar.webp` es la foto
+  real del sitio (WebP desde #119; el PNG de 263 KiB se retiró); los `testimonials/*.svg` se conservan como fixture del ejemplo
   `data/cv.example.{en,es}.json` aunque el sitio no los muestre (`testimonials: []`).
   El contenido real sí trae `downloadCvUrl`: el PDF vive en `public/cv/…` y se sirve
   con `assetUrl` para respetar el `base` de despliegue (#107, decisión #109).
@@ -353,6 +353,10 @@ Fuente: `foundations/theming.md`, `foundations/i18n.md`,
     PNG ya existe, esta aserción **nace en verde** (régimen #101, declarado
     en el cuerpo de T19); el commit `test(Foundation): T19` sigue rojo por
     las etiquetas ausentes en `index.html`.
+- **Avatar en WebP (#119, T21)** — se agregan a `src/content/content.test.ts`:
+  `profile.avatar.src` es `/images/avatar.webp` en `cv.en.json` y `cv.es.json`;
+  `public/images/avatar.webp` es un WebP real (firma `RIFF`…`WEBP`, ruta en
+  una variable, lección T14b); `public/images/avatar.png` ya no existe.
 
 **Helper de accesibilidad (`src/test/a11y.ts`):**
 - Un `<img>` sin `alt` produce una violación (el helper falla).
