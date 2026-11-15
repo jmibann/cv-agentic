@@ -1,5 +1,5 @@
 // Antepone el `base` de Vite a rutas de assets de /public.
-// "/images/avatar.png" → "/cv-agentic/images/avatar.png" en GitHub Pages,
+// "/images/avatar.webp" → "/cv-agentic/images/avatar.webp" en GitHub Pages,
 // y queda igual en local o en Vercel (base "/").
 // Las URLs externas (http, //, data:) no se tocan.
 export function assetUrl(path: string): string {

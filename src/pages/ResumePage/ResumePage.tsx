@@ -1,7 +1,7 @@
 // ResumePage — panel Resume (specs/pages/ResumePage/spec.md). T1 (RF-1,
 // RF-2 columns, RF-5): raíz `div.page` con el `h1` de `t.resume.title` como
 // PRIMER hijo (`SectionTitle as="h1" decorated`, spec → Anatomía) y `.columns`
-// con dos `ResumeSection` (experience/education desde T5), cada una montada SOLO si su
+// con tres `ResumeSection` (experience/projects/education, #114 y #118), cada una montada SOLO si su
 // colección no está vacía (RF-2: "SI un conjunto está vacío, ENTONCES no
 // aparece su sección"; la rama vacía se testa en T2 con mock). La página FIXA
 // los `timelineIdPrefix` ("edu"/"exp", decisión 14 de ResumeSection: sin
