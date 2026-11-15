@@ -2,6 +2,9 @@
 // spec.md §Tests esperados y foundations/i18n.md → "Tests esperados"
 // (paridad en/es con la lista canónica de campos no traducibles, orden de
 // fechas con los 3 casos fijados y rechazos del validador en memoria).
+import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, it } from "vitest";
 
 import exampleEn from "@data/cv.example.en.json";
@@ -238,5 +241,35 @@ describe("projects collection (T20, #118)", () => {
   it("declares the Projects section title in both interface locales", () => {
     expect(uiEn.resume.projects.length).toBeGreaterThan(0);
     expect(uiEs.resume.projects.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// T21 (#119): el avatar del sitio pasa de PNG (263 KiB) a WebP. Contrato entre
+// el contenido y el archivo servido desde `public/`. Solo se agregan tests.
+// ---------------------------------------------------------------------------
+
+describe("site avatar ships as WebP (T21, #119)", () => {
+  // Las rutas van en variables: con un literal, Vite reescribe
+  // `new URL("…", import.meta.url)` como URL de asset (leccion T14b).
+  const avatarWebpPath = "../../public/images/avatar.webp";
+  const avatarPngPath = "../../public/images/avatar.png";
+
+  it("points profile.avatar.src to the WebP file in both locales", () => {
+    expect(cvByLocale.en.profile.avatar.src).toBe("/images/avatar.webp");
+    expect(cvByLocale.es.profile.avatar.src).toBe("/images/avatar.webp");
+  });
+
+  it("ships public/images/avatar.webp as a real WebP", () => {
+    const file = fileURLToPath(new URL(avatarWebpPath, import.meta.url));
+    expect(existsSync(file)).toBe(true);
+    const webp = readFileSync(file);
+    expect(webp.subarray(0, 4).toString("ascii")).toBe("RIFF");
+    expect(webp.subarray(8, 12).toString("ascii")).toBe("WEBP");
+  });
+
+  it("no longer ships the PNG avatar", () => {
+    const file = fileURLToPath(new URL(avatarPngPath, import.meta.url));
+    expect(existsSync(file)).toBe(false);
   });
 });
