@@ -1,36 +1,3 @@
-/* ControlsBar — specs/controls/ControlsBar/spec.md. T2 completa la clase base
-   del raíz con TODAS las propiedades de la tabla "Estilos y tokens" (el
-   diferido de T1 queda hecho; verificación por INSPECCIÓN del CSS — decisión
-   #101: layout, capa y ausencia de @media no son testeables en jsdom):
-   RF-1 (flex-right, alto --size-control, capa --z-controls), RF-5 (cero
-   texto/color propio) y RF-6 (igual en todos los breakpoints: el único valor
-   que escala es el gap, por token, sin @media propios). Cero @media — ni de
-   layout ni print (spec → Responsive y "No hacer"; G-D: en impresión la
-   ocultan los estilos compartidos de src/styles/global.css, F4). Cero colores
-   literales (regla 1 de docs/DESIGN.md) y cero fondo/borde/gradiente/texto
-   propios: la barra no pinta nada, el texto que muestra viene de sus hijos,
-   que traen sus tokens sobre --color-bg (RF-5; spec → Estilos: nunca
-   --color-text-muted). Sin margen externo (docs/DESIGN.md → Do/Don't): el
-   padre/AppLayout posiciona (la posición vertical en --gutter-top y el ancho
-   full-width del <header> son de AppLayout, spec → RF-1). */
-
-/* Clase base del único elemento raíz (<header>, spec → Anatomía). Valores
-   exactos de la tabla "Estilos y tokens":
-   - Layout (fila "Layout"): display: flex con justify-content: flex-end y
-     align-items: center — los controles quedan alineados a la derecha y
-     fuera de las cards (RF-1; el único hijo del flujo es el group, spec →
-     Anatomía). El gap NO vive acá: el header tiene un solo hijo flex (el
-     group), así que un gap en el header sería inerte. El gap real está en
-     `.group` (ver abajo), que es el contenedor flex de ThemeToggle y
-     LanguageSwitcher (T4, bug-fix de alineación).
-   - Alto (fila "Alto"): height --size-control (2.5rem, tokens.css línea
-     206 —ThemeToggle/LanguageSwitcher; no escala por breakpoint).
-   - Capa (fila "Capa"): position: relative con z-index --z-controls (20,
-     tokens.css línea 232; z-index SIEMPRE con token --z-*, regla dura 2 de
-     docs/DESIGN.md).
-   - Cero width/max-width/padding: el ancho full-width y la posición
-     vertical los define AppLayout (fila "Posición vertical"; RF-1) — no se
-     inventa alcance. */
 .controlsBar {
   display: flex;
   justify-content: flex-end;
@@ -40,16 +7,8 @@
   z-index: var(--z-controls);
 }
 
-/* T4: el `div[role="group"]` interno es el contenedor flex real de los dos
-   controles. Antes era `display: block`, de modo que ThemeToggle y
-   LanguageSwitcher (ambos `inline-flex`) se alineaban por baseline y el botón
-   de tema quedaba unos píxeles más abajo; además el gap del header no tenía
-   efecto. Con `display: flex` + `align-items: center` ambos quedan centrados
-   en la misma fila y el gap entre ellos escala SOLO por token (RF-6):
-   --controls-gap = var(--space-2) (8px) < 580 → var(--space-3) (12px) ≥ 580
-   (tokens.css líneas 265 y 318; el @media vive en tokens.css, nunca acá —
-   docs/tokens/breakpoints.md: un componente jamás redefine una medida en su
-   propio @media). */
+/* Flex container for the two controls: as a block they aligned by baseline
+   and the theme button sat a few pixels lower. */
 .group {
   display: flex;
   align-items: center;
