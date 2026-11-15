@@ -2,7 +2,7 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-15** (decisión #121, comentarios en inglés §XXXIV; auditoría general y saneado §XXXIII; README en inglés y `docs/STATUS.md` §XXXII, #120; Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
+Última actualización: **2026-11-15** (cierre de #121, código en inglés §XXXV; reglas §XXXIV; auditoría general y saneado §XXXIII; README en inglés y `docs/STATUS.md` §XXXII, #120; Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
@@ -41,19 +41,21 @@ de la entrada); el detalle queda en git.
 
 | Ítem | Qué falta | Se cierra en |
 |---|---|---|
-| Pendientes post-F5 (residuos) | **Deudas de forma**: comentario inglés `useHashTab.test.ts:143`, jerga "asiértan/asiértala" en tests (transversal), `lang="es"` sin restaurar en AppLayout.test (nota), `<script>` anti-flash en columna 0 en `index.html` (preexistente de T4, menor de §XXVIII), comentarios viejos en `ResumePage.test.tsx` (§XXX; el de `ResumePage.tsx` se corrigió en §XXXIII) — pase único solo si el usuario lo decide · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
-| Del usuario (§XXXIII) | **PDF descargable** `public/cv/…pdf`: dice "445 tests" (hoy 482) e incluye el teléfono, que el sitio no muestra por decisión; **"About" del repo en GitHub**: descripción vieja y sin enlace al sitio; **PageSpeed**: volver a medir tras #119. **Dependencias**: 7 avisos moderados de desarrollo por `minimatch` vía `typescript-eslint` (esperar versión corregida; no forzar) | Usuario; `minimatch`: próxima actualización de dependencias |
+| Pendientes post-F5 (residuos) | **Deudas de forma**: `lang="es"` sin restaurar en AppLayout.test (nota), `<script>` anti-flash en columna 0 en `index.html` (preexistente de T4, menor de §XXVIII), títulos de test con referencias internas (`T1: RF-1`) y fragmentos en español (§XXXV; cambiarlos toca ~625 títulos, ninguna aserción) — pase único solo si el usuario lo decide (las deudas de comentarios en tests se cerraron con #121) · opcionales kit: `cursor: pointer` no listado en controles/bullets, fila `contrast.md` regla 6 para ServiceCard | Decisión del usuario; sin fecha |
+| Del usuario (§XXXIII, §XXXV) | **README raíz**: dice "482 tests in 41 files" y "#1–#120" (hoy 485/42 y #121; solo cambia a pedido del usuario, #120). **PDF descargable** `public/cv/…pdf`: dice "445 tests" (hoy 485) e incluye el teléfono, que el sitio no muestra por decisión; **"About" del repo en GitHub**: descripción vieja y sin enlace al sitio; **PageSpeed**: volver a medir tras #119. **Dependencias**: 7 avisos moderados de desarrollo por `minimatch` vía `typescript-eslint` (esperar versión corregida; no forzar) | Usuario; `minimatch`: próxima actualización de dependencias |
 | Deudas menores de F1 | `StrictMode` sin mandato (si se quiere, es Cambio), `value` de contexto sin `useMemo` en ambos providers, typos "recalculera", rastro `07eead6`; detalle en `docs/memory.md`. Reevaluadas al cerrar F2 (2026-10-06): **permanecen**, sin impacto en F2 | Sin fecha; decisión del usuario si se reparan |
 | Deudas menores de F2 | (a) AGENTS.md "parámetros sin usar: prefijo `_`" es impreciso con el eslint real (`after-used`, sin `argsIgnorePattern`: el `_` no protege el último parámetro) → enmienda a decidir por el usuario; (b) nota #99: con el proxy CSS-Modules de Vitest la rama de fallback puede no ejercitarse nunca — la validez del patrón está en compartir el objeto `styles` entre test e implementación; (c) stderr preexistente `act(...)` en 2 tests de `ThemeProvider.test.tsx` (pasan) → decidir si repara | (a) y (c): decisión del usuario; (b): próxima revisión de la skill sdd |
 
 ## Entradas
 
-### §XXXIV · 2026-11-15 — Decisión #121: comentarios "why-only" en inglés (reglas)
-- Qué: enmienda de L1/L2 (comentarios del código en inglés y solo el porqué, sin referencias internas; errores y commits enteros en inglés); AGENTS, reviewer, component-builder, orchestrator, agent-system y memory alineados. La limpieza del código va por lotes (piloto → `src/` → mensajes → fuera de `src/` → test guardián) y se registra al cierre.
-- Checks: lint · typecheck · test (482/41).
-- Decisiones: #121 → `docs/README.md`.
-- Commits: el docs de esta decisión.
-- Abre: limpieza de comentarios en curso; traducción de la documentación interna (BACKLOG); cierra: —.
+### §XXXV · 2026-11-15 — Cierre de #121: código 100 % en inglés, comentarios "why-only"
+- Qué: limpieza completa de comentarios en `src/` (139 archivos, tests incluidos) y fuera de `src/` (`tokens.css`, `data/constants.ts`, descripciones del esquema + generados, banners, `index.html`, configs, `.gitignore`, nombre del workflow); mensajes de error e invariantes de test en inglés; test guardián `src/test/comments.test.ts` (Foundation T22). % de comentario: `.ts`/`.tsx` 54 → 12, CSS 66 → 15, tests 44 → 3. Hecho por Claude Code a pedido del usuario, con piloto revisado.
+- Checks: por commit, salida transpilada sin comentarios idéntica byte a byte; bundle de producción idéntico (hashes de clase normalizados) tras la etapa de solo comentarios; lista de nombres de test sin cambios; lint · typecheck · test (**485/42**) · build · validate:content; pasada en navegador sobre el build local (tabs, tema, idioma, diálogo) sin errores de consola.
+- Decisiones: #121 → `docs/README.md`. El comentario del script anti-flash se cambió también en `foundations/theming.md` (un test los compara literal) y el encabezado de generados pasa a "GENERATED" (línea de la spec de Foundation y prompt de `foundation` alineados).
+- Commits: `6405b72` (reglas) · `98c6bfb`…`fc269d9` (un `chore(<Name>)` por pieza) · `138f75b` `2cb90c9` (mensajes) · `ec45ee4` (fuera de `src/`) · `870aa69` (T22).
+- Abre: títulos de test con referencias internas y algo de español (no se tocaron); cifras del README raíz desactualizadas; cierra: deudas de forma de comentarios en tests.
+
+### 2026-11-15 · §XXXIV — Decisión #121: comentarios "why-only" en inglés (reglas) · #121 · `git show 6405b72:docs/diagnostics.md`
 
 ### 2026-11-15 · §XXXIII — Auditoría general y saneado (deps en rango, docs al día) · — · `git show f450e4e:docs/diagnostics.md`
 

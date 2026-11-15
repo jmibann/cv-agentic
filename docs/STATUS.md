@@ -41,6 +41,7 @@ claro/oscuro, en/es) construido por agentes de OpenCode con
 | **Proyectos en Resume (2026-11-14)** | ✅ **Cambio #118**: colección `projects` en el esquema y el contenido (el proyecto `cv-agentic` salió de `experience`) y sección Projects en Resume, entre Experience y Education, con ícono `code` (Foundation T20 + ResumePage T6; 479/41, build verde). |
 | **Avatar en WebP (2026-11-15)** | ✅ **Cambio #119**: `public/images/avatar.webp` (512×512 con alfa, 30 KB) reemplaza al PNG de 270 KB que PageSpeed marcaba con 263 KiB de ahorro; contenido y ejemplos apuntan a `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pusheado y publicado (WebP servido, PNG en 404); falta volver a medir en PageSpeed. |
 | **README en inglés (2026-11-15)** | ✅ **#120**: el `README.md` de la raíz presenta el repo en inglés (texto del usuario, diagrama del sistema de agentes, captura claro/oscuro); este tablero se mudó a `docs/STATUS.md` y los agentes apuntan acá. |
+| **Código en inglés (2026-11-15)** | ✅ **#121**: comentarios "why-only" en inglés en todo el código (`.ts`/`.tsx` 54 % → 12 % de comentario, CSS 66 % → 15 %, tests 44 % → 3 %), mensajes de error en inglés y test guardián `src/test/comments.test.ts` (Foundation T22). Código idéntico byte a byte sin comentarios; suite **485/42**. La documentación interna sigue en español (traducción en `docs/BACKLOG.md`). Pendiente: push. |
 | Post-entrega / próximos trabajos (2026-11-15) | Publicado en GitHub Pages (metadatos #117, sección Projects #118 y avatar WebP #119 verificados en el sitio servido; README #120 verificado en GitHub). Auditoría general §XXXIII: dependencias al día dentro de los rangos. Sin pendientes bloqueantes; quedan los opcionales de la tabla **Abiertos** de `docs/diagnostics.md` (deudas de forma, StrictMode/F1-F2, tres puntos del usuario: PDF, "About" de GitHub, PageSpeed) y lo postergado en `docs/BACKLOG.md`. |
 
 Detalle y decisiones: [docs/diagnostics.md](diagnostics.md).
@@ -63,7 +64,7 @@ cv-agentic/
 
 ## Mantenimiento (modo actual — desde 2026-10-08)
 
-El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (482 tests,
+El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (485 tests,
 build, validate:content, QA en navegador y en papel; últimos trabajos:
 Node 26 LTS y quality gates en el deploy, 2026-11-12; motion 4/4, 2026-11-13;
 metadatos SEO y Open Graph #117 y sección Projects #118, 2026-11-14;
