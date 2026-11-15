@@ -11,16 +11,16 @@ const CONTENT_FILES = ["src/content/cv.en.json", "src/content/cv.es.json"] as co
 function checkContentFile(repoRelPath: string): string | null {
   const absolute = fileURLToPath(new URL(`../../${repoRelPath}`, import.meta.url));
   if (!existsSync(absolute)) {
-    return `falta ${repoRelPath} (el contenido se crea en T9; este script no lo genera)`;
+    return `${repoRelPath} is missing (this script does not create it)`;
   }
   let raw: unknown;
   try {
     raw = JSON.parse(readFileSync(absolute, "utf8"));
   } catch (error) {
-    return `${repoRelPath} no es JSON válido: ${error instanceof Error ? error.message : String(error)}`;
+    return `${repoRelPath} is not valid JSON: ${error instanceof Error ? error.message : String(error)}`;
   }
   if (!validateCv(raw)) {
-    return `contenido inválido en ${repoRelPath}:\n${JSON.stringify(validateCv.errors, null, 2)}`;
+    return `invalid content in ${repoRelPath}:\n${JSON.stringify(validateCv.errors, null, 2)}`;
   }
   return null;
 }

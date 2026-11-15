@@ -14,7 +14,7 @@ import { ThemeProvider } from "./providers/ThemeProvider";
 
 const rootElement = document.getElementById("root");
 if (rootElement === null) {
-  throw new Error("main.tsx: no existe el elemento #root en index.html.");
+  throw new Error("main.tsx: the #root element is missing from index.html.");
 }
 
 createRoot(rootElement).render(

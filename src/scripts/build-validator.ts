@@ -20,7 +20,7 @@ function readSchema(): AnySchemaObject {
   const source = readFileSync(repoPath("data/cv.schema.json"), "utf8");
   const parsed: unknown = JSON.parse(source);
   if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
-    throw new Error("data/cv.schema.json no es un objeto JSON");
+    throw new Error("data/cv.schema.json is not a JSON object");
   }
   return parsed as AnySchemaObject;
 }
@@ -41,8 +41,8 @@ function toEsmRuntimeImports(moduleCode: string): string {
   });
   if (rewritten.includes("require(")) {
     throw new Error(
-      "El código standalone de ajv trae un require() no cubierto por la " +
-        "reescritura ESM; revisar AJV_RUNTIME_REQUIRE en este helper.",
+      "The ajv standalone code contains a require() that the ESM rewrite " +
+        "does not cover; check AJV_RUNTIME_REQUIRE in this helper.",
     );
   }
   const imports = [...aliases]
@@ -78,7 +78,7 @@ function main(): void {
   const schema = readSchema();
   const schemaId = schema["$id"];
   if (typeof schemaId !== "string" || schemaId.length === 0) {
-    throw new Error("data/cv.schema.json debe declarar $id (referencia raíz del validador)");
+    throw new Error("data/cv.schema.json must declare $id (the validator's root reference)");
   }
 
   // draft-07 needs the default Ajv class (not Ajv2019/Ajv2020), and

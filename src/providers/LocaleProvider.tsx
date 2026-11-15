@@ -61,7 +61,7 @@ export function useLocale(): LocaleContextValue {
   const context = useContext(LocaleContext);
   if (context === null) {
     throw new Error(
-      "useLocale() debe usarse dentro de <LocaleProvider>: envolvé el componente en el provider.",
+      "useLocale() must be used within <LocaleProvider>: wrap the component in the provider.",
     );
   }
   return context;
@@ -72,7 +72,7 @@ export function useCv(): CvData {
   const context = useContext(LocaleContext);
   if (context === null) {
     throw new Error(
-      "useCv() debe usarse dentro de <LocaleProvider>: envolvé el componente en el provider.",
+      "useCv() must be used within <LocaleProvider>: wrap the component in the provider.",
     );
   }
   return cvByLocale[context.locale];

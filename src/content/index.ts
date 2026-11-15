@@ -11,7 +11,7 @@ import { validateCv } from "@data/validate-cv.generated";
 function load(raw: unknown, file: string): CvData {
   if (!validateCv(raw)) {
     throw new Error(
-      `Contenido inválido en ${file}: ${JSON.stringify(validateCv.errors)}`,
+      `Invalid content in ${file}: ${JSON.stringify(validateCv.errors)}`,
     );
   }
   return raw;

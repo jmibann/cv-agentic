@@ -70,7 +70,7 @@ export function simulateMediaChange(query: string, matches: boolean): void {
   const mql = mediaQueryLists.get(query);
   if (!mql) {
     throw new Error(
-      `simulateMediaChange("${query}"): llamá primero a window.matchMedia("${query}")`,
+      `simulateMediaChange("${query}"): call window.matchMedia("${query}") first`,
     );
   }
   mql.emitChange(matches);

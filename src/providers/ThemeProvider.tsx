@@ -129,7 +129,7 @@ export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
   if (context === null) {
     throw new Error(
-      "useTheme() debe usarse dentro de <ThemeProvider>: envolvé el componente en el provider.",
+      "useTheme() must be used within <ThemeProvider>: wrap the component in the provider.",
     );
   }
   return context;
