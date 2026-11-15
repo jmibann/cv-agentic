@@ -1,65 +1,3 @@
-// TestimonialCarousel — carrusel de testimonios con scroll-snap nativo,
-// bullets por posición alcanzable y un único TestimonialDialog
-// (specs/content/TestimonialCarousel/spec.md, decisión 20). T2: la región
-// ÚNICA (RF-1): el carrusel es dueño de la `<section>` raíz con
-// `aria-roledescription="carousel"` — AboutPage NO lo envuelve en otra section
-// — nombrada por `labelledBy` (si se pasa) o `aria-label={labels.carousel}`
-// (una u otra, nunca ambas); un `<div role="group">` por testimonio (Cambio de
-// accesibilidad opción A, decisión del usuario 2026-10-07: track y slides
-// pasan de `<ul>`/`<li>` a `<div>` — `li[role="group"]` violaba
-// `aria-allowed-role` de axe; el contrato observable no cambia) con
-// `aria-roledescription="slide"` y nombre "n of N" vía `format` de i18n con
-// `current` 1-based y `total = testimonials.length` (spec → Comportamiento
-// "Nombre del slide": NO de stops); `testimonials = []` → no renderiza nada
-// (RF-1). Y el dialog ÚNICO cableado (RF-6): estado `selectedId`,
-// `onOpen(id)` de la card lo fija, `onClose` del dialog lo limpia a `null` y
-// el `testimonial` se DERIVA por `find` (nunca valor→valor sin `null`
-// intermedio; spec → Dialog y ciclo en `TestimonialDialog.md`: el padre
-// mantiene el dialog montado y alterna null ↔ valor, que es justo lo que su
-// effect de apertura por presencia soporta).
-// T3 (RF-3/RF-5): bullets por stops con `aria-current`. Los stops se miden
-// post-render (`measure`, effect de mount): `offsetLeft` de cada slide hijo
-// directo del track (`div` desde el Cambio de accesibilidad opción A; era `li`)
-// y `maxScroll = scrollWidth − clientWidth`, pasada a
-// `getScrollStops`/`getActiveStop` (T1). El layout medido vive en UN solo
-// state `{ slideOffsets, stops }`: la regla stop→n del nombre del bullet
-// necesita los offsets del MISMO render que sus stops (dos states alternarían
-// un commit con medición vieja mezclada con nueva). Con ≤1 stop la paginación
-// NO se renderiza (RF-3). Bullet activo inicial, una vez medidos los stops
-// (mount, scrollLeft 0): `getActiveStop` → el primero (decisión 21). El
-// `scroll` del track recalcula el activo con UN cálculo por frame (RF-5):
-// flag pending + `requestAnimationFrame`; en el callback el `scrollLeft` se
-// lee del NODO (el valor del frame, no el del último render) y los stops
-// vigentes de `layoutRef` (un re-measure entre el scroll y el frame no puede
-// usar un closure viejo). El cleanup cancela el frame pendiente y desconecta
-// el `ResizeObserver` sobre el track (RF-3, decisión 21 → QA F5, sin test
-// unitario), cableado real en T5: al cambiar el tamaño del track re-mide los
-// stops vía `measure`; la dep `testimonials` del effect de medición también
-// re-mide si el set de slides cambia sin desmontar (p. ej. al cambiar de
-// idioma).
-// T4 (RF-4): el click de un bullet llama a `track.scrollTo` con el `left` de
-// ese stop y `behavior: "smooth"` solo si
-// `window.matchMedia("(prefers-reduced-motion: no-preference)").matches`,
-// LEÍDO EN EL CLICK (decisión 21 / plan → Decisiones): sin estado vivo ni
-// listener de `change` (la spec no exige reaccionar en vivo al cambio de la
-// preferencia del sistema). Único acceso al `window` global de la pieza
-// (medición y scroll leen del trackRef y del nodo); en jsdom lo sirve el mock
-// del setup F1 (`matches=false` → "auto"; el caso "smooth" stub local del
-// test). Un `scrollTo` por click (ternaria de behavior, no dos llamadas) y
-// sin guard de bullet activo: RF-4 dice "un bullet" sin excepción, ir al stop
-// vigente es válido. T5 (RF-2/RF-7/RF-8 + Cambio de accesibilidad opción A):
-// track y slides pasan de `<ul>`/`<li>` a `<div>` con sus clases
-// (`.track`/`.slide`/`.pagination`/`.bullet` unidas al DOM; la estructura de
-// roles y nombres NO cambia: mismo contrato observable), el módulo declara la
-// tabla de estilos por tokens (grid+snap+headroom+scrollbar oculta, 2 columnas
-// ≥ md, bullet con ::after táctil, print apilado) y el effect conecta el
-// `ResizeObserver` de RF-3 sobre el track. Cierran la pieza el
-// `expectNoA11yViolations` (dos casos, Tests 12) e `index.ts`.
-// Decisiones 21 documentadas (spec → RF-2/RF-5): SIN flechas prev/next ni de
-// teclado (Tab entre los botones de las cards + scroll nativo/swipe), sin
-// autoplay, sin loop y sin región `aria-live` (el cambio de slide no se
-// anuncia).
-
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { Testimonial } from "@data/cv.types.generated";
@@ -73,42 +11,30 @@ import { getActiveStop, getScrollStops } from "./getScrollStops";
 
 import styles from "./TestimonialCarousel.module.css";
 
-// API (spec → API, COMPLETA): textos de interfaz crudos con placeholders que
-// la pieza interpola con `format` (C2/C3: llegan de ui.{en,es}.ts por props);
-// `labelledBy` es el id del heading visible que nombra la región EN LUGAR de
-// `aria-label` (decisión 20); `className` se une a la clase base del `<section>`
-// raíz (G-B).
 export interface TestimonialCarouselLabels {
-  carousel: string; // "Testimonials"
-  slide: string; // "{current} of {total}"
-  goToSlide: string; // "Go to slide {n}"
-  readMore: string; // "Read full testimonial from {author}"
-  close: string; // "Close"
+  carousel: string;
+  /** e.g. "{current} of {total}". */
+  slide: string;
+  /** e.g. "Go to slide {n}". */
+  goToSlide: string;
+  /** e.g. "Read full testimonial from {author}". */
+  readMore: string;
+  close: string;
 }
 
 export interface TestimonialCarouselProps {
   testimonials: readonly Testimonial[];
   labels: TestimonialCarouselLabels;
   labelledBy?: string;
-  /** Se une a la clase base de la `<section>` raíz (G-B). */
   className?: string;
 }
 
-// Tolerancia de la regla stop→n (decisión 21): "primer testimonio cuyo
-// `offsetLeft ≥ stop − 1px`". Es el MISMO 1px que el dedup de
-// `getScrollStops` (T1): son dos lecturas de la misma realidad medida, no dos
-// umbrales independientes.
+// The same 1px as the dedupe tolerance in getScrollStops: two readings of the
+// same measured layout, not two independent thresholds.
 const STOP_MATCH_TOLERANCE_PX = 1;
 
-/**
- * Nombre del bullet (spec → Comportamiento, "Nombre del bullet"): n = número
- * (1-based) del PRIMER testimonio cuyo `offsetLeft ≥ stop − 1px`. Cada stop
- * es `Math.min(offset, maxScroll)` de algún offset medido (invariante de
- * `getScrollStops`) y ese offset siempre cumple la condición: `findIndex`
- * nunca devuelve −1 y n ≥ 1 por construcción. En stops recortados a
- * `maxScroll` la regla mapea al primer slide que aún no pasó el borde
- * izquierdo (ej. offsets [0,300,600], stops [0,300] → 1 y 2).
- */
+// A bullet is named after the first testimonial whose offsetLeft is at or
+// past its stop.
 function bulletNumber(stop: number, slideOffsets: readonly number[]): number {
   return (
     slideOffsets.findIndex(
@@ -117,18 +43,13 @@ function bulletNumber(stop: number, slideOffsets: readonly number[]): number {
   );
 }
 
-/**
- * Layout medido post-render (T3). `slideOffsets` y `stops` viven JUNTOS en un
- * solo state porque el nombre de cada bullet (regla stop→n) se calcula con
- * los offsets del MISMO render que sus stops (plan → Decisiones: la medición
- * no es pura por el DOM; se hace y documenta acá).
- */
+// Offsets and stops live in one state: each bullet's name is computed from
+// the offsets of the same measurement as its stop.
 interface CarouselLayout {
   slideOffsets: readonly number[];
   stops: readonly number[];
 }
 
-// Sin medición aún (primer commit): no hay stops → no hay paginación (RF-3).
 const EMPTY_LAYOUT: CarouselLayout = { slideOffsets: [], stops: [] };
 
 export function TestimonialCarousel({
@@ -137,67 +58,43 @@ export function TestimonialCarousel({
   labelledBy,
   className,
 }: TestimonialCarouselProps) {
-  // RF-6 (plan → Decisiones): estado por id, nunca el objeto — el `testimonial`
-  // del dialog se deriva con `find` sobre `testimonials` (fuente única de la
-  // versión vigente). hooks antes del return condicional (reglas de hooks).
+  // Stored by id, never the object: the dialog's testimonial is looked up in
+  // the current list, so it follows a language change.
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // RF-3/RF-5 (T3): layout medido y stop activo.
   const [layout, setLayout] = useState<CarouselLayout>(EMPTY_LAYOUT);
   const [activeStop, setActiveStop] = useState(0);
 
-  // Track `div` (Cambio de accesibilidad opción A): `ref` HTMLDivElement.
   const trackRef = useRef<HTMLDivElement>(null);
-  // Ref sincronizado con el state de layout: el callback rAF lee los stops
-  // VIGENTES en el frame; si una re-medición cae entre el scroll y el frame,
-  // el closure del render que agendó quedaría obsoleto.
+  // Mirrors the layout state so the rAF callback reads the current stops; a
+  // re-measure between the scroll and the frame would leave the closure stale.
   const layoutRef = useRef<CarouselLayout>(EMPTY_LAYOUT);
-  // Gate "un cálculo por frame" (RF-5): flag + id del frame pendiente.
   const framePendingRef = useRef(false);
   const frameIdRef = useRef<number | null>(null);
 
-  // RF-3: medir offsets y calcular stops. Para medir, todo desde `trackRef`
-  // (el único `window` global de la pieza es `matchMedia` en el click de T4,
-  // RF-4); los tests fijan el layout mockeando los accessores de
-  // prototipo/instancia, spec → Tests esperados.
   const measure = useCallback((): void => {
     const track = trackRef.current;
     if (track === null) {
       return;
     }
-    // `slideOffsets` = `offsetLeft` de cada slide relativo al track (spec →
-    // Comportamiento): los hijos directos `div` del track (Anatomía, Cambio de
-    // accesibilidad opción A; la paginación es HERMANA del track, no hija, y
-    // dentro de la card no hay `div` directo del track).
     const slideOffsets = Array.from(
       track.querySelectorAll<HTMLElement>(":scope > div"),
     ).map((slide) => slide.offsetLeft);
-    // `maxScroll` = scrollWidth − clientWidth del track (spec → Comportamiento).
     const maxScroll = track.scrollWidth - track.clientWidth;
     const stops = getScrollStops(slideOffsets, maxScroll);
     const measured: CarouselLayout = { slideOffsets, stops };
     layoutRef.current = measured;
     setLayout(measured);
-    // Decisión 21: bullet activo inicial = `getActiveStop` con el scrollLeft
-    // vigente al medir (0 al montar) → el primero.
     setActiveStop(getActiveStop(stops, track.scrollLeft));
   }, []);
 
-  // RF-3: recalcular los stops al montar. La dep `testimonials` re-mide si
-  // cambia el set de slides sin desmontar la región (otro idioma): sin ella
-  // los offsets quedarían obsoletos. El `ResizeObserver` sobre el track
-  // re-mide los stops cada vez que cambia el tamaño del track (RF-3, cableado
-  // real en T5; el recálculo por resize NO tiene test unitario — decisión 21:
-  // se elimina el test, no el comportamiento; su validación es QA F5; en
-  // jsdom lo sirve el mock no-op del setup F1). El cleanup desconecta el
-  // observer y cancela el frame de scroll pendiente (RF-5).
+  // Re-measures when the set of slides changes without unmounting (another
+  // language) and, through ResizeObserver, whenever the track is resized.
   useEffect(() => {
     if (testimonials.length === 0) {
       return;
     }
     measure();
-    // Protegido: sin track montado no hay nodo que observar (RF-1 vacío ya
-    // devolvió null antes del render; esto cubre el ref sin montar).
     const track = trackRef.current;
     let resizeObserver: ResizeObserver | null = null;
     if (track !== null) {
@@ -215,10 +112,8 @@ export function TestimonialCarousel({
     };
   }, [testimonials, measure]);
 
-  // RF-5: el `scroll` del track recalcula el bullet activo con UN cálculo por
-  // frame: si ya hay un frame pendiente, el evento se ignora (los valores
-  // intermedios no se procesan; el callback lee el `scrollLeft` real del
-  // NODO en el frame, no el del último render).
+  // One calculation per frame: scroll events are ignored while a frame is
+  // pending, and the callback reads the node's real scrollLeft.
   const handleScroll = (): void => {
     if (framePendingRef.current) {
       return;
@@ -233,18 +128,13 @@ export function TestimonialCarousel({
       }
       setActiveStop(getActiveStop(layoutRef.current.stops, track.scrollLeft));
     });
-    // Con callback síncrono (mocks de test) el flag ya volvió a false: no
-    // queda ningún frame pendiente que cancelar (el id devuelto ya se ejecutó).
+    // With a synchronous callback (test mocks) the flag is already false: there
+    // is no pending frame left to cancel.
     frameIdRef.current = framePendingRef.current ? frameId : null;
   };
 
-  // RF-4 (T4): click de bullet → `track.scrollTo` al stop, UNA llamada por
-  // click. El `behavior` se decide LEYENDO `window.matchMedia` EN EL CLICK
-  // (decisión 21 / plan → Decisiones): sin estado vivo, sin listener de
-  // `change` — la spec no exige reaccionar en vivo al cambio de preferencia.
-  // Sin guard de bullet activo: RF-4 dice "un bullet" sin excepción, ir al
-  // stop vigente es un caso válido de "un click, una llamada". El track se lee
-  // vivo del ref (mismo criterio del scroll de RF-5: el nodo, no el estado).
+  // Reduced motion is read at click time, so no live state or change listener
+  // is needed.
   const handleBulletClick = (stop: number): void => {
     const track = trackRef.current;
     if (track === null) {
@@ -259,35 +149,23 @@ export function TestimonialCarousel({
     });
   };
 
-  // RF-1 (SI vacío): sin testimonios no hay región, ni track ni dialog.
+  // No testimonials: no region, no track and no dialog.
   if (testimonials.length === 0) {
     return null;
   }
 
-  // Unión G-B del raíz (criterio IconBox/SkillList/TestimonialCard): array +
-  // filtro de undefined + join, base primero, sin librerías; así no quedan
-  // clases vacías cuando `className` no se pasa. Las clases del módulo son
-  // `string | undefined` bajo noUncheckedIndexedAccess.
   const rootClassName = [styles.carousel, className]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 
-  // Derivación del seleccionado (RF-6): `null` (o un id inexistente) → dialog
-  // cerrado = nodo ausente del DOM (decisión 18=b de la primitiva).
   const selected =
     testimonials.find((testimonial) => testimonial.id === selectedId) ?? null;
 
-  // RF-3: con 1 stop o menos no se renderizan bullets (1 testimonio, y 2
-  // testimonios con 2 por vista — spec → Comportamiento).
+  // A single stop needs no pagination.
   const showBullets = layout.stops.length > 1;
 
   return (
-    // RF-1 / decisión 20: ESTA <section> es la única región del carrusel. El
-    // nombre accesible es uno u otro (nunca ambos): `labelledBy` referencia el
-    // id del heading visible (Anatomía nota: AboutPage renderiza SectionTitle
-    // y carrusel hermanos sin envolver); sin él, `aria-label` con
-    // `labels.carousel`. `aria-roledescription="carousel"` solo describe el
-    // rol region (patrón WAI-ARIA carousel; spec → Accesibilidad).
+    // The accessible name is either labelledBy or the label, never both.
     <section
       className={rootClassName}
       aria-roledescription="carousel"
@@ -295,27 +173,12 @@ export function TestimonialCarousel({
         ? { "aria-labelledby": labelledBy }
         : { "aria-label": labels.carousel })}
     >
-      {/* Track (Anatomía, Cambio de accesibilidad opción A: `div`, no `<ul>`):
-          `styles.track` = overflow-x + scroll-snap + headroom `padding-block`
-          (RF-2, RF-7) y `position: relative` como offsetParent de la medición
-          (necesidad mecánica, ver módulo); cada slide `div` lleva
-          `styles.slide` con `scroll-snap-align: start`. `onScroll` = RF-5 con
-          un cálculo por frame. Sin flechas prev/next ni navegación por teclado
-          (decisión 21; RF-2 → No hacer). */}
       <div
         ref={trackRef}
         className={styles.track}
         onScroll={handleScroll}
       >
         {testimonials.map((testimonial, index) => (
-          // Cada slide (`div` hijo directo del track): role="group" +
-          // aria-roledescription="slide" + nombre "n of N" (spec →
-          // Comportamiento: `current` = índice 1-based, `total =
-          // testimonials.length`, no de stops). La card canaliza el contenido
-          // (C2: llega por props desde el padre de la pieza) y su botón
-          // estirado emite `onOpen(testimonial.id)` → setSelectedId (RF-6;
-          // `openLabel` = `readMore` interpolado con el author de ESTA card,
-          // spec → API).
           <div
             key={testimonial.id}
             className={styles.slide}
@@ -337,19 +200,10 @@ export function TestimonialCarousel({
         ))}
       </div>
       {showBullets && (
-        // RF-3/RF-5 (Anatomía): `styles.pagination` con un <button
-        // type="button" class="bullet"> por stop, en orden ascendente. Nombre:
-        // `goToSlide` interpolado con la regla stop→n (`bulletNumber`,
-        // decisión 21); `aria-current="true"` SOLO en el activo según
-        // `getActiveStop` (los demás, SIN atributo: `undefined`, no "false").
-        // El área táctil 24×24 es el `::after` del módulo (conserva el
-        // `gap: 0.625rem` visual). `onClick` → `handleBulletClick(stop)` (T4,
-        // RF-4): scrollTo al stop con behavior leído en el click.
         <div className={styles.pagination}>
           {layout.stops.map((stop, index) => (
             <button
-              // stops sin duplicados (tolerancia 1px garantizada por
-              // `getScrollStops`, T1): el número del stop es clave única.
+              // Stops are deduplicated, so the value is a unique key.
               key={stop}
               type="button"
               className={styles.bullet}
@@ -362,11 +216,7 @@ export function TestimonialCarousel({
           ))}
         </div>
       )}
-      {/* RF-6: UNICO TestimonialDialog de la pieza, montado de forma
-          permanente con `testimonial` derivado (null = cerrado; su effect de
-          apertura por presencia cubre el ciclo null↔valor del carrusel —
-          nunca valor→valor: onClose limpia a null antes de otro onOpen).
-          `closeLabel` llega crudo de labels (la primitiva no interpola). */}
+      {/* A single dialog, always mounted; its testimonial is null when closed. */}
       <TestimonialDialog
         testimonial={selected}
         onClose={() => setSelectedId(null)}
