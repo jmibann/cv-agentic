@@ -2,12 +2,12 @@
 
 Log mínimo del proyecto (decisiones **#86** y **#98**): una entrada por cada
 cierre de puerta F y por cada decisión de reglas, con los hashes relevantes.
-Última actualización: **2026-11-14** (saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
+Última actualización: **2026-11-15** (Cambio #119, avatar en WebP §XXXI; saneado de docs §XXX; Cambio #118, colección `projects` §XXIX; Cambio #117, metadatos SEO §XXVIII; sistema motion completo §XXVII; cambios 3 §XXVI y 2 §XXV; puerta etapa 1 §XXIII).
 El proceso F1–F5 sigue cerrado (§XII); flujo y dueños en "Modo mantenimiento"
 de `docs/agent-system.md`.
 
 Lo vivo no vive aquí: estado → `README.md` ("Estado actual") · memoria →
-`docs/memory.md` · decisiones #1–#118 → `docs/README.md` · QA de F5 →
+`docs/memory.md` · decisiones #1–#119 → `docs/README.md` · QA de F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Dueño: orchestrator (`edit` por ruta). Las puertas de pieza no tocan este
@@ -47,6 +47,13 @@ de la entrada); el detalle queda en git.
 
 ## Entradas
 
+### §XXXI · 2026-11-15 — Cambio #119: avatar del sitio en WebP
+- Qué: `public/images/avatar.png` (269.794 bytes; PageSpeed estimaba 263 KiB de ahorro) se reemplaza por `avatar.webp` (512×512 con alfa, `cwebp -q 82`, 29.650 bytes, −89 %); `profile.avatar.src` actualizado en el contenido y en los ejemplos del kit. Foundation T21, hecha por Claude Code a pedido del usuario.
+- Checks: lint · typecheck · test (482/41) · build · validate:content; imagen decodificada comparada a la vista con el original. Sin verificación en navegador ni PageSpeed post-deploy.
+- Decisiones: #119 → `docs/README.md`.
+- Commits: `df85c61` (spec) · `23cd835` → `37f6659` (T21).
+- Abre: —; cierra: en parte BACKLOG → "Imágenes" (queda `srcset`/AVIF).
+
 ### §XXX · 2026-11-14 — Saneado de documentación tras #117 y #118 (auditoría)
 - Qué: fuera los pendientes ya cumplidos (push, deploy, contenido real, "registro de la categoría motion") en memory, README, agent-system y BACKLOG; Projects y "una sola columna" en los textos que aún nombraban solo Education/Experience o "lado a lado" (specs de ResumeSection, Timeline y SectionTitle, breakpoints, typography, alcance de `docs/README.md`, descripciones de `TimelineEntry` en el esquema + generados). Sin cambios de RF ni de tests.
 - Checks: lint · typecheck · test (479/41) · build · validate:content; sitio publicado verificado (metadatos #117 y Projects #118).
@@ -61,12 +68,7 @@ de la entrada); el detalle queda en git.
 - Commits: `b005014` (spec) · `4c63dc3`+`9b0f0f8` → `4ae17a1` (T20) · `a48ddef` → `fc50777` (T6).
 - Abre: —; cierra: —.
 
-### §XXVIII · 2026-11-14 — Cierre del Cambio #117 (Foundation: metadatos SEO y para compartir)
-- Qué: Cambio completo sobre la pieza Foundation, la primera vez que se reabrió una pieza tras F5 por un pedido nuevo (no por defecto): metadatos en `index.html` — `<meta>` (description, og×5, twitter) después del `<title>` y antes del anti-flash; `<link rel="canonical">` y JSON-LD `Person` después del bloque de íconos (contrato T4 respetado); literales fijados por el usuario en la puerta de spec; JSON-LD cruzado con `cv.en.json` (`name`/`jobTitle`/`sameAs`) y con identidad `url` ≡ canonical ≡ `og:url`; `public/og-image.png` 1200×630 aportada por el usuario, entró intacta al `feat` (no se regeneró). Flujo completo con las cuatro puertas: spec reaprobada con ajustes (estado en línea propia + conteo 5+1 como test + registro #117 adelantado al commit de spec) `472bc1d` · plan+tareas aprobados `a75e7fa` · T19: `test` rojo por (a)–(e) con el PNG nacido en verde (#101 declarado) `0025a21` → `feat` `f17cd78`; reviewer **APROBADO** por tarea y revisión completa del Cambio (QA sobre `dist/index.html`: literales y orden intactos, Vite no reescribió; `dist/og-image.png` presente — byte-a-byte verificado por tamaño + semántica de copia de Vite; 0 caracteres CJK en el repo, pedido explícito del usuario). Foundation → `Estado: implementada` otra vez. Menor registrada: `<script>` anti-flash en columna 0 (deuda preexistente de T4, si el archivo vuelve a tocarse). Nota de proceso: al reviewer le llegó una consigna del orchestrator con un carácter CJK propio ("no修改 nothing"), declarada y ajena a la entrega — cuidado futuro al redactar encargos.
-- Checks: lint ✓ · typecheck ✓ · test **472/41** (+6 contratos de #117) ✓ · build ✓ (prebuild + validate:content incluidos).
-- Decisiones: #117 → `docs/README.md`.
-- Commits: `472bc1d` `a75e7fa` `0025a21` `f17cd78` `00a8268` + el docs de este cierre.
-- Abre: nada. Cierra: **BACKLOG → "Metadatos y Open Graph"** (resuelto; "SEO por idioma" queda abierto; ninguna fila de la tabla **Abiertos** se veía afectada).
+### 2026-11-14 · §XXVIII — Cierre del Cambio #117 (Foundation: metadatos SEO y para compartir) · #117 · `git show 3d22bf8:docs/diagnostics.md`
 
 ### 2026-11-13 · §XXVII — Cierre del Cambio motion 4 y del sistema motion (4/4) · #116 · `git show 0bab158:docs/diagnostics.md`
 

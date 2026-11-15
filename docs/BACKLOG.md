@@ -12,8 +12,8 @@ necesita decisión del usuario antes de implementarse (flujo por tipo de tarea:
   `public/cv/Juan-Manuel-Ibanez-CV.pdf` y el botón del Sidebar lo descarga.
   Queda abierto: ¿un PDF por idioma? (`downloadCvUrl` distinto en cada
   `cv.<locale>.json`, que pasaría a ser campo traducible).
-- **Imágenes.** Formato (`.webp`/`.avif`), tamaños para `srcset` del avatar y
-  de los testimonios.
+- **Imágenes.** El avatar del sitio ya es WebP (#119). Queda abierto: AVIF,
+  tamaños para `srcset` del avatar y formato de los testimonios.
 
 ## Pendientes técnicos
 

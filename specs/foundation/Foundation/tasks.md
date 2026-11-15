@@ -275,5 +275,5 @@ T3b (deuda L1 detectada en su review).
 
 ## Cambio #119 — Avatar en WebP (pedido del usuario, 2026-11-15)
 
-- [ ] **T21. `avatar.png` → `avatar.webp`.** RF-7 (#119)
+- [x] **T21. `avatar.png` → `avatar.webp`.** RF-7 (#119) — 23cd835 (test, rojo ×3) · 37f6659 (feat) (lint/typecheck/482/41/validate:content/build verdes; `dist/images/avatar.webp` presente, sin `avatar.png`)
   - Hecho cuando: `test(Foundation): T21` (rojo) **solo agrega** a `src/content/content.test.ts`: `profile.avatar.src` es `/images/avatar.webp` en los dos idiomas; `public/images/avatar.webp` existe y tiene firma WebP (`RIFF`…`WEBP`, ruta en una variable); `public/images/avatar.png` no existe. `feat(Foundation): T21`: agrega `public/images/avatar.webp` (512×512 con alfa, `cwebp -q 82 -m 6 -alpha_q 100`), borra `public/images/avatar.png` y actualiza `profile.avatar.src` en `src/content/cv.{en,es}.json` y `data/cv.example.{en,es}.json`; lint, typecheck, test y `validate:content` verdes tras el `feat`; `build` al cierre (`dist/images/avatar.webp` presente, sin `avatar.png`).
