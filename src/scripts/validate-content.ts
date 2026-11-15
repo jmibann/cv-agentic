@@ -1,15 +1,6 @@
-/**
- * Helper del script `validate:content` (RF-7; spec.md §Estados "Contenido
- * inválido"): valida `src/content/cv.en.json` y `src/content/cv.es.json`
- * contra el validador standalone generado (`data/validate-cv.generated.js`)
- * y lista `validateCv.errors` al fallar.
- *
- * Lee los JSON por sistema de archivos (no con `import`) porque el contenido
- * llega en T9: si un archivo falta, el script termina con un error claro —
- * nunca éxito silencioso ni fallback. Corre dentro de `prebuild`, así que un
- * JSON inválido o ausente rompe `npm run build` (decisión del kit: cadena
- * en seco).
- */
+// Reads the JSON files from disk instead of importing them, so a missing file
+// fails with a clear error. Runs in `prebuild`: invalid content breaks the build.
+
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -17,7 +8,6 @@ import { validateCv } from "../../data/validate-cv.generated.js";
 
 const CONTENT_FILES = ["src/content/cv.en.json", "src/content/cv.es.json"] as const;
 
-/** Devuelve el motivo del fallo o `null` si el archivo existe y valida. */
 function checkContentFile(repoRelPath: string): string | null {
   const absolute = fileURLToPath(new URL(`../../${repoRelPath}`, import.meta.url));
   if (!existsSync(absolute)) {

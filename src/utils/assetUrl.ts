@@ -1,7 +1,5 @@
-// Antepone el `base` de Vite a rutas de assets de /public.
-// "/images/avatar.webp" → "/cv-agentic/images/avatar.webp" en GitHub Pages,
-// y queda igual en local o en Vercel (base "/").
-// Las URLs externas (http, //, data:) no se tocan.
+// Prefixes Vite's base to public asset paths so they resolve when the site is
+// served from a sub-path (GitHub Pages). External and data URLs are left alone.
 export function assetUrl(path: string): string {
   if (/^(https?:)?\/\//.test(path) || path.startsWith("data:")) return path;
   return import.meta.env.BASE_URL + path.replace(/^\//, "");

@@ -1,11 +1,3 @@
-// ThemeProvider + useTheme (T5): contrato de foundations/theming.md §ThemeProvider.
-// RF-2 (toggle alterna data-theme + persiste), RF-3 (segue al sistema sin
-// preferencia), RF-4 (meta theme-color sincronizado), RF-5 (storage que lanza
-// no rompe). El estado inicial NO se recalcula: lo dejó resuelto el script
-// anti-flash en `data-theme` (index.html).
-// T16 (Cambio motion #106) agrega RF-9: supresión de transiciones durante el
-// cambio de tema (data-theme-switching + doble requestAnimationFrame).
-
 import {
   createContext,
   useCallback,
@@ -21,8 +13,6 @@ export type Theme = "light" | "dark";
 
 export interface ThemeContextValue {
   theme: Theme;
-  // setTheme no tiene RF propio (Clarificación F1 #2, opción A): es la vía
-  // explícita de setTheme/toggleTheme, que sí persiste.
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
 }
@@ -31,22 +21,20 @@ export interface ThemeProviderProps {
   children: ReactNode;
 }
 
-// D3: las únicas claves de storage del sitio son cv:theme y cv:locale.
+// The site only ever writes two storage keys: cv:theme and cv:locale.
 const STORAGE_KEY = "cv:theme";
 const DARK_SCHEME_QUERY = "(prefers-color-scheme: dark)";
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-// Tema ya resuelto por el anti-flash: solo se lee el atributo. Un valor
-// ausente o inválido (no inyectó el script, p. ej. tests huérfanos) cae en
-// "light", el default de la resolución de theming.md.
+// The anti-flash script in index.html already resolved the theme; this only
+// reads it. Falls back to "light" when the attribute is missing (e.g. tests).
 function readInitialTheme(): Theme {
   return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
 }
 
-// Preferencia guardada, con lectura segura (RF-5): null si no hay o si
-// storage lanza (modo privado); en ese último caso seguir al sistema es el
-// fallback coherente con "no hay preferencia".
+// null when nothing is stored or when storage throws (private mode): both
+// mean "follow the system".
 function readStoredTheme(): Theme | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -59,19 +47,16 @@ function readStoredTheme(): Theme | null {
 export function ThemeProvider({ children }: ThemeProviderProps): ReactNode {
   const [theme, setThemeState] = useState<Theme>(readInitialTheme);
 
-  // RF-9: distingue el montaje inicial de los cambios interactivos
-  // (plan #106 §decisión 1). El primer paint ya lo resolvió el anti-flash,
-  // así que ahí no se suprime nada; el flag se levanta en el primer efecto.
+  // Tells the first mount from interactive changes: the first paint was already
+  // resolved by the anti-flash script, so nothing is suppressed there.
   const mountedRef = useRef(false);
 
-  // setTheme: actualiza el estado y guarda la elección (fin del seguimiento
-  // del sistema, RF-3). Si storage lanza, el cambio queda solo en memoria (RF-5).
   const setTheme = useCallback((next: Theme): void => {
     setThemeState(next);
     try {
       localStorage.setItem(STORAGE_KEY, next);
     } catch {
-      // storage bloqueado: nada que persistir, el estado ya cambió
+      // Storage is blocked: nothing to persist, the state already changed.
     }
   }, []);
 
@@ -79,17 +64,11 @@ export function ThemeProvider({ children }: ThemeProviderProps): ReactNode {
     setTheme(theme === "light" ? "dark" : "light");
   }, [setTheme, theme]);
 
-  // Un ÚNICO efecto aplica el tema resuelto, venga del toggle o de un cambio
-  // de prefers-color-scheme (theming.md): fija data-theme en <html> y luego
-  // sincroniza <meta name="theme-color"> con --color-bg leído después de
-  // aplicar data-theme. Así el meta nunca queda desincronizado (RF-4).
-  // RF-9 (plan #106 §decisión 1): es useLayoutEffect y en el MISMO commit
-  // agrega `data-theme-switching` ANTES de escribir el nuevo data-theme, para
-  // que la regla global de src/styles/global.css (`:root[data-theme-switching]
-  // *`, (0,2,0), sin `!important`) corte las transiciones de color del cambio.
-  // La remoción va tras doble requestAnimationFrame (§decisión 2); el cleanup
-  // corre al desmontar Y al re-entrar el efecto (segundo cambio rápido):
-  // cancela el frame pendiente y remueve el atributo sin dejar estado huérfano.
+  // A single effect applies the theme and then syncs <meta name="theme-color">
+  // with --color-bg, read after data-theme is set, so the two never drift.
+  // It is a layout effect because the switching attribute must be added in the
+  // same commit, before the new data-theme is written, for the global rule to
+  // cut the color transitions. It is removed two animation frames later.
   useLayoutEffect(() => {
     const root = document.documentElement;
     const interactive = mountedRef.current;
@@ -126,8 +105,7 @@ export function ThemeProvider({ children }: ThemeProviderProps): ReactNode {
     };
   }, [theme]);
 
-  // RF-3: mientras no exista preferencia guardada, los cambios del sistema
-  // se aplican en vivo; con preferencia, se ignoran.
+  // System changes apply live only while there is no stored preference.
   useEffect(() => {
     const mediaQueryList = window.matchMedia(DARK_SCHEME_QUERY);
     const handleChange = (event: MediaQueryListEvent): void => {

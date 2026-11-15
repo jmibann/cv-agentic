@@ -1,14 +1,11 @@
-// Claves de interfaz en inglés — fuente de las claves y de UiStrings
-// (foundations/i18n.md → "Textos de interfaz"). No se agregan claves aquí
-// sin actualizar ui.es.ts: `satisfies UiStrings` rompe el typecheck.
+// Source of the keys: ui.es.ts must match them or `satisfies UiStrings` fails
+// the type check.
 export const uiEn = {
   skipToContent: "Skip to content",
   nav: { label: "Sections", about: "About", resume: "Resume" },
   controls: {
     label: "Display settings",
     darkMode: "Dark mode",
-    // Cambio F3 (decisión 1=a): aria-label del toggle en tema oscuro
-    // (lo consume ThemeToggle en F3).
     lightMode: "Light mode",
     language: "Language",
   },
@@ -33,7 +30,7 @@ export const uiEn = {
   },
 } as const;
 
-// Mismas claves que uiEn, pero con valores string (no los literales en inglés)
+// Same keys as uiEn, with string values instead of the English literals.
 type DeepStringify<T> = {
   [K in keyof T]: T[K] extends string ? string : DeepStringify<T[K]>;
 };

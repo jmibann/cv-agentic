@@ -1,11 +1,3 @@
-/* Estilos base globales de la app (T11): reset mínimo + base tipográfica de
- * foundations/typography.md §"Estilos base" + bloqueo de scroll con <dialog>
- * abierto. Solo tokens (regla dura 1 de docs/DESIGN.md): los valores literales
- * viven en tokens/tokens.css, importado una sola vez desde src/main.tsx.
- * Sin @media propios (spec.md → Responsive): todo escala por tokens. */
-
-/* Reset mínimo: modelo de caja uniforme y cero márgenes del navegador en el
- * body (los márgenes de títulos los fija la base tipográfica de abajo). */
 *,
 *::before,
 *::after {
@@ -16,8 +8,7 @@ body {
   margin: 0;
 }
 
-/* Base tipográfica — replicada tal cual de foundations/typography.md
- * §"Estilos base". El cuerpo en peso 300 es identidad visual: no subirlo. */
+/* Body weight 300 is part of the visual identity: do not raise it. */
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-body);
@@ -36,67 +27,25 @@ h1, h2, h3, h4, h5, h6 {
 h4 { font-weight: var(--font-weight-medium); }
 strong, b { font-weight: var(--font-weight-semibold); color: var(--color-heading); }
 
-/* Con un <dialog> abierto se bloquea el scroll del fondo (spec.md §Anatomía:
- * el reset global agrega esta regla al lado de la base tipográfica). */
+/* Locks background scroll while a dialog is open. */
 html:has(dialog[open]) {
   overflow: hidden;
 }
 
-/* Supresión de transiciones al cambiar de tema (RF-9, T16 del Cambio motion
- * #106): ThemeProvider agrega data-theme-switching a <html> antes de aplicar
- * el nuevo data-theme y lo quita tras dos frames. El selector :root +
- * atributo + universal mide (0,2,0) y GANA a los selectores de módulo como
- * `.social a` / `.contacts a` (0,1,1): html[data-theme-switching] * empataría
- * con ellos y perdería por orden de carga (global.css se importa antes que
- * los componentes). Sin `!important` (spec → No hacer). Rige solo cambios
- * interactivos: el anti-flash de index.html no se toca (plan §decisión 6). */
+/* Suppresses transitions while the theme changes. `:root[attr] *` has
+   specificity (0,2,0) and beats module selectors such as `.social a` (0,1,1);
+   `html[attr] *` would tie with them and lose on source order. */
 :root[data-theme-switching] *,
 :root[data-theme-switching] *::before,
 :root[data-theme-switching] *::after {
   transition: none;
 }
 
-/* ---------------------------------------------------------------------------
- * IMPRESIÓN (`@media print`) — contrato transversal de
- * specs/layout/AppLayout/spec.md → "Impresión" + foundations/layout.md →
- * "Impresión" (T5 de AppLayout; regla dura 3 de docs/DESIGN.md: todos los
- * @media print transversales viven ACÁ, ningún componente los replica).
- * El contrato habla en `data-*`, NO en clases de CSS Modules (los nombres
- * de módulo se hashean y este archivo no puede apuntarlos).
- * **Actualización del Cambio F5 (decisión #104/#104a, tarea T7)**: los
- * selectores nativos simples del contrato anterior perdían por
- * especificidad — atributo/elemento (0,1,0) empata o pierde con la clase
- * hasheada del módulo de la pieza (0,1,0) según el orden de las hojas —
- * (hallazgos B-2 ControlsBar, B-3 disclosure del Sidebar y M-1 CornerTab
- * de `docs/qa-report.md`: los controles y el botón se imprimían, la solapa
- * quedaba como franja vacía). El contrato pasa a **hooks
- * `data-print-hide`** que las piezas renderizan en su raíz según sus
- * specs (Cambios: ControlsBar RF-6, CornerTab RF-7, Sidebar RF-4/RF-10) y
- * a variantes compuestas elemento+atributo (0,1,1), que ganan SIEMPRE a la
- * clase: `header[data-print-hide]` (ControlsBar — su `<header>` es el
- * único del documento, RF-2), `div[data-print-hide]` (CornerTab: la tab
- * entera, contenido y fondo) y `button[data-print-hide]` (disclosure del
- * Sidebar). `aside [download]` es el hook nativo y deliberado del CTA
- * "Download CV" (B-4/D4: el Button polimórfico con `href` renderiza `<a
- * download>`). Estos selectores compuestos son DELIBERADOS y forman parte
- * del contrato — decisión del usuario registrada en la spec →
- * "Impresión" —. Su efectividad se confirma en la re-pasada F5 con la app
- * servida (#91) y en un Ctrl+P manual del usuario: jsdom no computa
- * `@media print` (#101), por eso no hay test de esta tarea.
- * LA PALETA DE IMPRESIÓN NO SE TOCA ACÁ: los colores literales están
- * prohibidos (regla dura 1); el papel claro con fondo blanco y sin sombras
- * lo reasigna tokens/tokens.css en su propio @media print (líneas ~437+), y
- * TestimonialCarousel/TestimonialDialog ya resuelven su impresión en sus
- * módulos (excepción documentada G-D-1). Todo lo de arriba se verifica por
- * INSPECCIÓN del reviewer + QA F5 con la app servida (decisión #91): F4 fija
- * el contrato, F5 verifica el resultado.
- * ------------------------------------------------------------------------- */
+/* All shared print rules live here, not in components. They target data-*
+   attributes because CSS Module class names are hashed and cannot be
+   referenced from this file. */
 @media print {
-  /* RF-8: ambos paneles se imprimen SIEMPRE en orden About → Resume, con
-   * independencia del tab activo. La raíz común del stack (data-print-stack,
-   * AppLayout → Anatomía) se apila en columna y el orden sale del
-   * data-print-page: el tabpanel activo y el bloque inactivo se reordenan
-   * por atributo, nunca por posición en el DOM. */
+  /* Both panels always print, About first, whichever tab is active. */
   [data-print-stack] {
     display: flex;
     flex-direction: column;
@@ -108,36 +57,15 @@ html:has(dialog[open]) {
     order: 1;
   }
 
-  /* El bloque inactivo (hidden en pantalla: fuera del árbol de accesibilidad)
-   * se muestra en print. Gana al `display: none` del atributo `hidden` porque
-   * las reglas de AUTOR vencen a las de USER AGENT en el origen de cascada
-   * (spec → Impresión; sin esto el segundo panel desaparecería). */
+  /* Beats the `display: none` of the hidden attribute: author rules win over
+     user-agent rules. */
   [data-print-only] {
     display: block;
   }
 
-  /* Ocultar la chrome de pantalla (foundations → "Impresión"; contrato
-   * compuesto #104a, ver comentario del bloque). Cada variante
-   * elemento+atributo suma (0,1,1) y gana a la clase hasheada del módulo
-   * de la pieza, cosa que el simple (0,1,0) no lograba (B-2/B-3/M-1):
-   * - `header[data-print-hide]`: la barra de controles (ControlsBar).
-   * - `div[data-print-hide]`: la solapa COMPLETA (CornerTab: contenido y
-   *   fondo; M-1). Como NavTabs vive DENTRO de CornerTab, esto ya oculta
-   *   el tablist por ancestro.
-   * - `button[data-print-hide]`: el botón disclosure del Sidebar (B-3;
-   *   hook renderizado por su T7).
-   * - `[data-print-hide]` (simple): el skip link CONSERVA el selector
-   *   simple porque su módulo (AppLayout.module.css `.skipLink`) lo
-   *   oculta con `position: fixed` + `clip-path` y NUNCA declara
-   *   `display` — no hay clase con la que compita (documentado por
-   *   inspección en T7; también cubre cualquier raíz futura sin elemento
-   *   conocido).
-   * - `[role="tablist"]`: se MANTIENE como redundancia defensiva
-   *   (decisión del builder, permitida por el Hecho cuando de T7 y
-   *   documentada acá): hoy su único portador (NavTabs) cuelga de
-   *   `div[data-print-hide]`, así que ninguna regla depende de él y
-   *   borrarlo cambiaría el texto de foundations sin beneficio; si F5
-   *   prefiere eliminarlo, se decide con el usuario. */
+  /* element[attr] has specificity (0,1,1) and beats the hashed module class; the
+     bare attribute selector (0,1,0) did not. The skip link keeps the bare
+     selector because its module never sets `display`. */
   header[data-print-hide],
   div[data-print-hide],
   button[data-print-hide],
@@ -146,61 +74,14 @@ html:has(dialog[open]) {
     display: none;
   }
 
-  /* CTA "Download CV" del Sidebar (B-4/D4 de qa-report, #104a). El
-   * `aside button` del contrato anterior SALE del bloque: el único
-   * <button> nativo del aside es hoy el disclosure — ya oculto arriba por
-   * `button[data-print-hide]` (su T7 renderiza el hook) — y el CTA nunca
-   * fue <button>: es el Button polimórfico CON `href`, que renderiza
-   * `<a download>` (src/components/Sidebar/Sidebar.tsx T5 +
-   * src/components/Button/Button.tsx rama link, `download` transmitido
-   * por su RF-8), por eso el selector viejo no lo alcanzaba. El atributo
-   * `download` es el hook NATIVO, deliberado y estable del CTA (viene de
-   * `profile.downloadCvUrl`; sin URL el CTA no se renderiza — RF-9):
-   * `aside` (0,0,1) + `[download]` (0,1,0) = (0,1,1), gana a la clase
-   * hasheada del módulo por especificidad. La raíz `<aside>` es la de
-   * Sidebar (Box `as="aside"`, único complementary del documento). */
+  /* The CTA is an <a download>, not a button; this selector (0,1,1) beats its
+     module class. */
   aside [download] {
     display: none;
   }
 
-  /* Contactos SIEMPRE expandidos (foundations → "Impresión"; RF-10/RF-11,
-   * plan → Anexo P7' y propuesta §3.5 — Cambio motion 3, T12). Hook estable
-   * INSPECCIONADO (Sidebar.tsx): el contenedor lleva el id NATIVO estable
-   * `sidebar-contacts` (contrato público de la pieza: `aria-controls` +
-   * print, RF-10). El colapso de pantalla YA NO es `display: none` desde
-   * T11: es `grid-template-rows: 0fr` + `visibility: hidden` en las clases
-   * `.additional`/`.additionalCollapsed` (0,1,0) del módulo. El selector por
-   * ID (1,0,0) gana a ambas por ESPECIFICIDAD, sin importar el orden de las
-   * hojas (mismo criterio del contrato #104a con las clases hasheadas).
-   * Cascada verificada contra Sidebar.module.css (T11) — forma mínima
-   * correcta, el `display: block` del contrato viejo SALE de acá:
-   * - `visibility: visible` (1,0,0) pisa el `hidden` de
-   *   `.additionalCollapsed` (0,1,0).
-   * - `grid-template-rows: 1fr` (1,0,0) pisa el `0fr` (0,1,0) y abre la
-   *   fila al alto del contenido.
-   * - `display` NO hay que pisarlo: el contenedor conserva el
-   *   `display: grid` de la base `.additional` (0,1,0) del módulo porque el
-   *   colapso nuevo no declara `display` en ninguna parte — y así la
-   *   impresión reproduce el MISMO estado computado que el xl forzado (P5':
-   *   grid + 1fr + visible). Mantener `display: block` cambiaría el modelo
-   *   de layout en papel sin necesidad y volvería INERTE el
-   *   `grid-template-rows: 1fr` (propiedad solo de grid). El wrapper
-   *   `.additionalBody` (`min-height: 0; overflow: hidden`) no recorta nada
-   *   en una fila `1fr`: toma el alto completo del contenido.
-   * - Reset de animación: `#sidebar-contacts` y `#sidebar-contacts *`
-   *   ((1,0,0) con el universal) ganan a la entrada de ítems gated
-   *   `.additional[data-contacts-animate] .additionalBody > *` (0,3,0) —
-   *   con `backwards` los ítems se pintarían en su estado `from`
-   *   (`opacity: 0`) si imprimiera a mitad de la entrada — y a las
-   *   transiciones de altura/`visibility` del módulo. `animation: none`/
-   *   `transition: none` aquí son SUPRESIÓN: #116 aclarada los excluye del
-   *   límite de especificidad (desactivan, no animan).
-   * - `#sidebar-contacts li` (1,0,1): colchón literal de P7'/propuesta §3.5
-   *   para "el estado colapsado no puede dejar ítems `opacity: 0` en
-   *   papel"; desde T11 el `li` no recibe animación propia (los animados
-   *   son los hijos directos del wrapper), así que la regla es defensiva.
-   * Verificación: inspección + Ctrl+P del usuario con la app servida
-   * (#101/#91; sin test jsdom, como el resto del contrato de impresión). */
+  /* Contacts always print expanded. The id selector (1,0,0) beats the module
+     classes that collapse them on screen. */
   #sidebar-contacts {
     visibility: visible;
     grid-template-rows: 1fr;
@@ -217,9 +98,6 @@ html:has(dialog[open]) {
     transform: none;
   }
 
-  /* sin saltos de página dentro de ítems (foundations → "Impresión":
-   * break-inside en TimelineItem y ServiceCard; se aplica a la semántica
-   * nativa article/li que esas piezas producen) */
   article,
   li {
     break-inside: avoid;

@@ -1,24 +1,6 @@
-/**
- * Helper del script `build:validator` (T8; plan.md decisión 3: se ejecuta con
- * `node` directo vía type-stripping de Node 24 y vive en `src/scripts/` porque
- * es lo único que el agente foundation puede escribir; `data/` solo se toca a
- * través de los `*.generated.*` que generan estos scripts, nunca a mano).
- *
- * Compila `data/cv.schema.json` con ajv en modo *standalone* (build-time; la
- * librería ajv no entra en el bundle del navegador) y escribe:
- *
- *  - `data/validate-cv.generated.js`: función validadora precompilada, ESM,
- *    con export nombrado `validateCv`. Los `require("ajv/dist/runtime/…")`
- *    que emite ajv se reescriben a `import` estáticos porque `code.esm` solo
- *    cambia la forma del `export`, no las dependencias de runtime, y el repo
- *    es `"type": "module"`.
- *  - `data/validate-cv.generated.d.ts`: este helper lo escribe como texto
- *    fijo (ajv no genera tipos): `validateCv(data: unknown): data is CvData`
- *    y `validateCv.errors`, como exige `foundations/i18n.md` §Contenido.
- *
- * Determinismo: la entrada es el esquema; la reescritura es estable; no hay
- * marcas de tiempo. Reejecutar el script no produce `git diff`.
- */
+// Compiles the schema with ajv in standalone mode at build time, so ajv itself
+// never reaches the browser bundle.
+
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
@@ -28,17 +10,12 @@ import type { AnySchemaObject, Schema } from "ajv";
 
 const BANNER = "// GENERADO — no editar. Regenerar con: npm run build:validator";
 
-/** Ruta absoluta desde este archivo (`src/scripts/`) hasta la raíz del repo. */
 const repoPath = (relativeFromRoot: string): string =>
   fileURLToPath(new URL(`../../${relativeFromRoot}`, import.meta.url));
 
-/**
- * `require("ajv/dist/runtime/<modulo>").default` tal como lo emite la
- * generación standalone de ajv (p. ej. `ucs2length` para `minLength`).
- */
+// The exact form ajv's standalone output uses for its runtime helpers.
 const AJV_RUNTIME_REQUIRE = /require\("(ajv\/dist\/runtime\/[a-z0-9-]+)"\)\.default/g;
 
-/** Lee el esquema y valida lo mínimo: sin `any` y con errores claros. */
 function readSchema(): AnySchemaObject {
   const source = readFileSync(repoPath("data/cv.schema.json"), "utf8");
   const parsed: unknown = JSON.parse(source);
@@ -48,19 +25,10 @@ function readSchema(): AnySchemaObject {
   return parsed as AnySchemaObject;
 }
 
-/**
- * Reescribe los `require(...).default` del módulo generado a imports ESM con
- * interop: `import __ajvRuntimeN from "ajv/dist/runtime/<modulo>.js"` + un
- * shim `const __ajvRuntimeNm = { default: __ajvRuntimeN.default ??
- * __ajvRuntimeN }`. Por qué el shim (surface en T9, primer consumo bajo
- * Vite/Vitest): los runtime de ajv son CJS con `__esModule` + `exports.default`.
- * En Node ESM el default import es `module.exports` (objeto con `.default`);
- * Vite (dev, tests y build de navegador) desenvuelve `__esModule` y entrega el
- * default interno (`ucs2length`, una función) y `fn.default` es `undefined`.
- * `raw.default ?? raw` tolera ambas formas (y también un namespace import).
- * Alias numerados por orden de aparición: determinista. Si quedara algún
- * `require(` sin cubrir, el script falla en vez de emitir código roto.
- */
+// ajv's runtime helpers are CommonJS with `__esModule` and `exports.default`.
+// Node ESM hands over module.exports as the default import, while Vite unwraps
+// `__esModule` and hands over the inner default. `raw.default ?? raw` works
+// under both.
 function toEsmRuntimeImports(moduleCode: string): string {
   const aliases = new Map<string, string>();
   const rewritten = moduleCode.replace(AJV_RUNTIME_REQUIRE, (_match, modulePath: string) => {
@@ -69,7 +37,6 @@ function toEsmRuntimeImports(moduleCode: string): string {
       alias = `__ajvRuntime${aliases.size}`;
       aliases.set(modulePath, alias);
     }
-    // Uso a través del shim (`__ajvRuntimeNm.default`), no del import crudo.
     return `${alias}m.default`;
   });
   if (rewritten.includes("require(")) {
@@ -88,7 +55,6 @@ function toEsmRuntimeImports(moduleCode: string): string {
   return `${imports}\n${rewritten}`;
 }
 
-/** Declaraciones del validador (texto fijo, spec §API / foundations/i18n.md). */
 const DECLARATIONS = `${BANNER}
 // Declaraciones escritas por src/scripts/build-validator.ts (el código
 // standalone de ajv no emite tipos).
@@ -115,11 +81,11 @@ function main(): void {
     throw new Error("data/cv.schema.json debe declarar $id (referencia raíz del validador)");
   }
 
-  // draft-07: `Ajv` por defecto (no Ajv2019/Ajv2020). `source: true` es
-  // requisito de standaloneCode; `esm: true` exporta en ESM.
+  // draft-07 needs the default Ajv class (not Ajv2019/Ajv2020), and
+  // standaloneCode requires `source: true`.
   const ajv = new Ajv({ code: { source: true, esm: true } });
   ajv.compile(schema as Schema);
-  // Clave = nombre del export (`validateCv`), valor = $id de la raíz compilada.
+  // Key = export name, value = $id of the compiled root schema.
   const moduleCode = standaloneCode(ajv, { validateCv: schemaId });
 
   writeFileSync(
