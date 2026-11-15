@@ -1,20 +1,20 @@
 ---
-description: "SDD · Entrevista y redacta una spec nueva (uso: /sdd-spec <categoria>/<Name> <idea inicial>)"
+description: "SDD · Interviews and drafts a new spec (usage: /sdd-spec <category>/<Name> <initial idea>)"
 agent: orchestrator
 ---
 
-Carpeta de la spec: `specs/$1/` (por ejemplo `primitives/Badge`).
-Idea inicial: el texto de `$ARGUMENTS` que sigue a `$1`.
+Spec folder: `specs/$1/` (for example `primitives/Badge`).
+Initial idea: the text in `$ARGUMENTS` that follows `$1`.
 
-Cargá la skill `sdd` y leé `docs/constitution.md`, `specs/README.md` y `docs/memory.md`.
-**No escribas código.**
+Load the `sdd` skill and read `docs/constitution.md`, `specs/README.md` and `docs/memory.md`.
+**Do not write code.**
 
-1. Si `specs/$1/spec.md` ya existe, frená y avisame (para cambiarla se usa `/sdd-change`).
-2. Hacé preguntas de UNA en UNA para eliminar ambigüedades (casos límite, errores, qué queda
-   fuera de esta versión). Máximo 5 preguntas.
-3. Con mis respuestas, redactá `specs/$1/spec.md` con la plantilla de `specs/README.md`
-   (las 10 secciones, incluida `## Requisitos (EARS)`, más `Estado: borrador`). Si es una pieza del kit,
-   incluye API, tokens y estructura HTML; si es una spec de dominio nueva, solo el QUÉ y
-   el POR QUÉ (ver la skill).
-4. Mostrame el contenido y esperá mi aprobación antes de guardar (tu permiso sobre
-   `spec.md` es `ask`).
+1. If `specs/$1/spec.md` already exists, stop and tell me (changing it is done with `/sdd-change`).
+2. Ask questions ONE at a time to remove ambiguities (edge cases, errors, what is left
+   out of this version). At most 5 questions.
+3. With my answers, draft `specs/$1/spec.md` using the template in `specs/README.md`
+   (the 10 sections, including `## Requirements (EARS)`, plus `Status: draft`). If it is a piece of the kit,
+   include API, tokens and HTML structure; if it is a new domain spec, only the WHAT and
+   the WHY (see the skill).
+4. Show me the content and wait for my approval before saving (your permission on
+   `spec.md` is `ask`).

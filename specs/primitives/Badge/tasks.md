@@ -1,20 +1,21 @@
-# Tareas — Badge
+# Tasks — Badge
 
-- [x] **T1. Render `span` por defecto y `li` con `as`.** RF-1, RF-2 — 2d748da
-  - Hecho cuando: `getByText` encuentra el texto; el raíz es `span` por defecto
-    y `<li>` con `as="li"` (test con `<ul>` de armazón); verde tras
+- [x] **T1. Render `span` by default and `li` with `as`.** RF-1, RF-2 — 2d748da
+  - Done when: `getByText` finds the text; the root is `span` by default
+    and `<li>` with `as="li"` (test with a scaffold `<ul>`); green after
     `feat(Badge): T1`.
 
-- [x] **T2. `className` unida al raíz.** RF-3 — f0b7311
-  - Hecho cuando: la clase externa queda junto a la base en el único elemento
-    (aserción P2); verde tras `feat(Badge): T2`.
+- [x] **T2. `className` joined to the root.** RF-3 — f0b7311
+  - Done when: the external class sits next to the base one on the single
+    element (P2 assertion); green after `feat(Badge): T2`.
 
-- [x] **T3. Estilos por tokens, no interactivo y cierre a11y.** RF-4, RF-5, RF-6 — 10202fd
-  - Hecho cuando: el módulo resuelve fondo `--color-surface-muted`,
+- [x] **T3. Token-based styles, not interactive, and a11y closing case.** RF-4, RF-5, RF-6 — 10202fd
+  - Done when: the module resolves background `--color-surface-muted`,
     `--radius-8`, `--font-size-badge`, `--line-height-tight`, padding
-    `0.5rem 1rem`, `white-space: nowrap`, `inline-flex` (inspección: cero
-    literales de color, cero `@media`, cero reglas `:hover`/`:focus`); archivo
-    termina con `expectNoA11yViolations` (span y li-en-ul); lint + typecheck +
-    test verdes tras `feat(Badge): T3`.
-  - Nota para el cierre de pieza: `index.ts` re-exporta `Badge` y tipos (el plan
-    lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
+    `0.5rem 1rem`, `white-space: nowrap`, `inline-flex` (inspection: zero
+    color literals, zero `@media`, zero `:hover`/`:focus` rules); the file
+    ends with `expectNoA11yViolations` (span and li-in-ul); lint + typecheck +
+    test green after `feat(Badge): T3`.
+  - Note for closing the piece: `index.ts` re-exports `Badge` and types (the
+    plan lists it and the tasks did not cover it; gap found in the review of
+    Icon T1).
