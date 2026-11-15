@@ -39,7 +39,7 @@ agente, se edita acá.
 
 | Agente | edit | bash | task | skill | steps |
 |---|---|---|---|---|---|
-| orchestrator | `docs/STATUS.md` (estado, #120), `docs/diagnostics.md` (log; formato, tabla Abiertos y poda #98), `docs/memory.md` (estado y memoria); `docs/qa-report.md` (informe de F5, #85); `docs/README.md` y `docs/agent-system.md` (registro de decisiones y doc de agentes, #95); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `README.md`, `docs/*` y `specs/*` (decisión #76; sin `--amend` ni `--no-verify`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
+| orchestrator | `docs/STATUS.md` (estado, #120), `docs/diagnostics.md` (log; formato, tabla Abiertos y poda #98), `docs/memory.md` (estado y memoria); `docs/qa-report.md` (informe de F5, #85); `docs/README.md` y `docs/agent-system.md` (registro de decisiones y doc de agentes, #95); `specs/**/plan.md` y `specs/**/tasks.md` (los redacta y marca tareas); `spec.md` solo con `ask` | verificaciones, lectura de git, y `git add`/`git [-c user.name=…] commit -m` acotados a `docs/*` y `specs/*` (decisión #76; sin `--amend` ni `--no-verify`, sin `git add .`/`-A`) | solo los 4 subagentes | `sdd` | — |
 | foundation | solo la app: `src/**`, `public/**`, `index.html`, `package*.json`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `.nvmrc`, `.gitignore` | `ask` por defecto; instalación, scaffold, `git init`, `git add` y `git [-c user.name=…] commit -m` permitidos; `push`, `--amend`, `--no-verify`, `reset --hard` y `rm -rf` denegados | deny | `sdd` | 150 |
 | component-builder | solo `src/components/**` | verificaciones (lint, typecheck, test), lectura de git, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`) | deny | `sdd` | 80 |
 | integrator | solo `src/content/**`, `src/pages/**`, `src/lib/**`, `src/components/AppLayout/**`, `src/styles/**`, `src/i18n/**`, `src/App.tsx`, `src/main.tsx` | verificaciones, build, `validate:content`, `git add` y `git [-c user.name=…] commit -m` (sin `--amend` ni `--no-verify`; `npm run dev` denegado, #91) | deny | `sdd` | 120 |
@@ -157,7 +157,7 @@ spec, `<categoria>/<Name>` (por ejemplo `primitives/Badge`).
 
 - **`/sdd-validate` y el MCP:** `opencode.json` (raíz) declara el servidor
   local `chrome-devtools` con versión fija (`npx -y chrome-devtools-mcp@1.10.1`,
-  decisión #91; requiere Node ≥ 20.19, el proyecto usa 24; subirla es una
+  decisión #91; requiere Node ≥ 20.19, el proyecto usa 26 (`.nvmrc`, #110); subirla es una
   decisión del usuario). Con `enabled: true` el servidor arranca en todas las
   sesiones aunque solo el reviewer pueda usarlo (OpenCode no habilita un MCP por
   agente; es un costo de arranque aceptado). Sus herramientas se llaman `chrome-devtools_*`:

@@ -41,7 +41,7 @@ reviewer de limpiarlos **no se aplica**. Menor sin acción: `public/**/.DS_Store
 
 **Sin verificar:** vista de impresión y sticky 1440×800 (cubiertos en F5 y por el
 Ctrl+P real del usuario; nada de eso cambió desde entonces); axe en navegador (0
-violaciones en F5 y la suite con `expectNoA11yViolations` sigue verde 447/40); el
+violaciones en F5 y la suite con `expectNoA11yViolations` sigue verde 447/40 a esa fecha); el
 `base` real de GitHub Pages (`DEPLOY_TARGET=gh-pages` + deploy), en manos del usuario.
 
 ## RESOLUCIÓN (pasadas 3–4, tras el paquete #104)
