@@ -1,39 +1,21 @@
-/* Icon — specs/primitives/Icon/spec.md → Gradiente / Estilos y tokens.
-   T3: defs del gradiente de acento (RF-4). T4: `.toneAccent` (RF-4).
-   T5: `.icon`, tamaño solo por CSS (RF-6). */
-
-/* Tamaño solo por CSS (RF-6, spec → Estilos y tokens): cadena de fallback
-   exacta de la spec, sin prop `size` y sin `@media` propios (Responsive). El
-   CSS gana sobre los atributos width/height que lucide pone por defecto;
-   flex-shrink: 0 evita que el ícono se comprima en filas flex. El consumidor
-   fija --icon-size en su propia clase UNIDA al <svg> (registrada en
-   tokens.css con @property inherits:false: no se filtra a íconos anidados).
-   --size-icon (1.125rem) es el default del kit. */
+/* CSS wins over the width/height attributes lucide sets. flex-shrink: 0 keeps
+   the icon from being squeezed in flex rows. */
 .icon {
   width: var(--icon-size, var(--size-icon));
   height: var(--icon-size, var(--size-icon));
   flex-shrink: 0;
 }
 
-/* tone="accent" (RF-4/RF-6, spec → Estilos y tokens): el color de acento
-   sólido se aplica por clase, sin style inline ni atributos de color; el trazo
-   de lucide hereda el color con su stroke="currentColor" default. `tone`
-   "current" no agrega ninguna clase de color. */
 .toneAccent {
   color: var(--color-accent);
 }
 
-/* <svg> de AccentGradientDefs: invisible por tamaño (width/height="0" como
-   atributos en el componente), sacado del flujo con posición absoluta.
-   Nunca display:none: algunos navegadores no resuelven referencias url(#…)
-   a definiciones dentro de un SVG no renderizado (spec → Gradiente). */
+/* Never display: none: some browsers do not resolve url(#…) references into
+   an SVG that is not rendered. */
 .defs {
   position: absolute;
 }
 
-/* Colores de los <stop> solo desde tokens semánticos (regla dura 2 de
-   DESIGN.md): al ser custom properties, el gradiente cambia solo con el
-   tema. */
 .stopStart {
   stop-color: var(--gradient-accent-start);
 }

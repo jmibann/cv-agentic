@@ -1,9 +1,3 @@
-// Icon — único punto de entrada a lucide-react (specs/primitives/Icon/spec.md).
-// T1: mapa explícito nombre → componente y render de todos los IconName
-// (RF-1). T2: accesibilidad del conducto `label` (RF-2, RF-3, RF-7). T3:
-// AccentGradientDefs (RF-4). T4: conducto `tone` (RF-4). T5: tamaño solo por
-// CSS (clase `.icon`) y unión de `className` del consumidor (RF-6).
-
 import {
   BookOpen,
   Briefcase,
@@ -54,31 +48,26 @@ export type IconName = UiIconName | ServiceIcon;
 
 export interface IconProps {
   name: IconName;
-  /** current = hereda color; accent = --color-accent; gradient = trazo con gradiente. Default: "current". */
+  /** Defaults to "current", which inherits the color. */
   tone?: "current" | "accent" | "gradient";
-  /** Si se pasa, el ícono es informativo: role="img" + aria-label. Si no, aria-hidden. */
+  /** With a label the icon is informative (role="img"); without it, decorative. */
   label?: string;
-  /** Se UNE a la clase base `.icon` sobre el `<svg>` raíz; ahí el padre fija `--icon-size`. */
+  /** Added to the base class on the <svg>; the parent sets --icon-size there. */
   className?: string;
 }
 
-// Dueña única del id del gradiente (plan.md): AccentGradientDefs lo monta y
-// `tone="gradient"` lo referencia desde el atributo stroke (spec → Gradiente).
+// Single owner of the gradient id: AccentGradientDefs defines it and
+// tone="gradient" references it.
 const ACCENT_GRADIENT_ID = "accent-gradient";
 const ACCENT_GRADIENT_STROKE = `url(#${ACCENT_GRADIENT_ID})`;
 
-// Props que aplica cada tone. `current` no agrega ninguna (hereda el color del
-// control); `accent` usa la clase del CSS Module; `gradient`, el atributo
-// stroke (no es un color: spec → Estilos y tokens). Se arma un objeto y se
-// propaga en el JSX en vez de pasar `stroke={undefined}`: undefined pisaría el
-// stroke="currentColor" que lucide trae por defecto y el trazo no se dibuja.
+// Built as an object and spread instead of passing stroke={undefined}, which
+// would override lucide's default stroke="currentColor".
 type ToneProps = { className?: string; stroke?: string };
 
-// Mapa explícito (sin `import * as`, para tree-shaking). El tipo
-// Record<IconName, LucideIcon> exige una clave por cada valor de la unión:
-// si data/cv.schema.json agrega un ServiceIcon (y SERVICE_ICONS) sin entrada
-// acá, `tsc` falla (RF-5; el tipo generado es unión de literales). No se
-// exporta: la API pública es Icon + tipos (plan.md).
+// Explicit map (no `import * as`, for tree-shaking). Record<IconName, …>
+// requires one key per name: a new icon in the schema without an entry here
+// fails the type check.
 const ICON_MAP: Record<IconName, LucideIcon> = {
   mail: Mail,
   phone: Phone,
@@ -116,31 +105,14 @@ export function Icon({ name, tone = "current", label, className }: IconProps) {
         ? { className: styles.toneAccent }
         : {};
 
-  // RF-6 / T5 (spec → API y Estilos y tokens): el tamaño va solo por CSS, sin
-  // prop `size`. La clase base `.icon` (width/height con `var(--icon-size,
-  // var(--size-icon))` y `flex-shrink: 0`) se fija SIEMPRE sobre el propio
-  // <svg> raíz; a ella se UNE el `className` del consumidor (no la reemplaza:
-  // ahí el padre fija `--icon-size`, registrada en tokens.css con
-  // @property inherits:false, así que solo afecta a este <svg>) y, si tone
-  // es "accent", también la clase de color del módulo. Las tres conviven.
+  // The consumer's class is added to the base one and never replaces it: that
+  // is where the parent sets --icon-size.
   const svgClassName = [styles.icon, toneProps.className, className]
     .filter((cls): cls is string => cls !== undefined)
     .join(" ");
 
-  // El className explícito va después del spread de toneProps: pisa el de
-  // tone="accent", que ya está incorporado en svgClassName (`gradient` y
-  // `current` no traen className en toneProps, y pasar `stroke={undefined}`
-  // pisaría el currentColor de lucide: ver el comentario de ToneProps).
-  //
-  // RF-7: focusable="false" siempre, con y sin label.
-  // Accesibilidad (RF-2/RF-3): el marcado se fija explícitamente en el
-  // componente, sin depender del default interno de lucide (pasar cualquier
-  // prop aria-* o role desactiva su aria-hidden automático, y un valor
-  // undefined dejaría el <svg> sin marcar).
-  // `label === ""` no es un nombre accesible válido y la rama `if (label)` lo
-  // trata como decorativo: así lo define la spec → Accesibilidad, "Un `label`
-  // de string vacío se trata como **decorativo** (equivale a no pasarlo:
-  // `aria-label=""` no produce nombre accesible)".
+  // className goes after the spread so it overrides the one tone="accent"
+  // brings, which is already included in svgClassName.
   if (label) {
     return (
       <Glyph
@@ -158,17 +130,11 @@ export function Icon({ name, tone = "current", label, className }: IconProps) {
   );
 }
 
-// AccentGradientDefs — definiciones compartidas del gradiente de acento
-// (RF-4). Se monta una sola vez en AppLayout (RF-6 de su spec); los tests de
-// componentes con tone="gradient" lo montan como armazón. Dueña única del id
-// "accent-gradient" (plan.md: mismo módulo de Icon; descartado módulo defs
-// aparte).
+/** Mounted once by AppLayout; tests that use tone="gradient" mount it too. */
 export function AccentGradientDefs() {
   return (
-    // Invisible por tamaño (0×0 + posicionamiento por clase .defs): nunca
-    // display:none, porque algunos navegadores no resuelven referencias
-    // url(#…) a definiciones dentro de un SVG no renderizado (spec →
-    // Gradiente).
+    // Hidden by size, never with display: none: some browsers do not resolve
+    // url(#…) references into an SVG that is not rendered.
     <svg
       width="0"
       height="0"
@@ -176,12 +142,10 @@ export function AccentGradientDefs() {
       focusable="false"
       className={styles.defs}
     >
-      {/* gradientUnits="userSpaceOnUse" es obligatorio: con el default
-          (objectBoundingBox) cada trazo toma su propia caja y las líneas
-          rectas (caja de ancho o alto 0) no se dibujan. Los extremos
-          reproducen el ángulo 137.84° de --gradient-accent mapeados al
-          espacio 0–24 del viewBox de lucide; los offsets, las posiciones
-          26.31 % / 93.75 % (spec → Gradiente). */}
+      {/* userSpaceOnUse is required: with objectBoundingBox each stroke uses its
+          own box, and straight lines (zero width or height) are not drawn. The
+          end points map the angle of --gradient-accent onto lucide's 0–24
+          viewBox. */}
       <linearGradient
         id={ACCENT_GRADIENT_ID}
         gradientUnits="userSpaceOnUse"
@@ -190,9 +154,8 @@ export function AccentGradientDefs() {
         x2="23.38"
         y2="24.56"
       >
-        {/* Sin style inline (regla dura 3 de DESIGN.md): el color de cada
-            stop sale de los tokens por clase del CSS Module, así que el
-            gradiente cambia solo con el tema. */}
+        {/* Stop colors come from tokens through classes, so the gradient follows
+            the theme. */}
         <stop offset="0.2631" className={styles.stopStart} />
         <stop offset="0.9375" className={styles.stopEnd} />
       </linearGradient>
