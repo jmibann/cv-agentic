@@ -1,97 +1,97 @@
-# Estado del proyecto — cv-agentic
+# Project status — cv-agentic
 
-Tablero de estado interno (antes era el `README.md` de la raíz; se mudó acá con
-la decisión #120). La presentación del repo está en [README.md](../README.md).
+Internal status board (it used to be the root `README.md`; it moved here with
+decision #120). The presentation of the repo is in [README.md](../README.md).
 
-Sitio CV personal (**React + TypeScript + Vite + CSS Modules**, responsive,
-claro/oscuro, en/es) construido por agentes de OpenCode con
+Personal CV site (**React + TypeScript + Vite + CSS Modules**, responsive,
+light/dark, en/es) built by OpenCode agents with
 **spec-driven development**.
 
-## Estado actual (2026-11-15)
+## Current status (2026-11-15)
 
-| Qué | Estado |
+| What | Status |
 |---|---|
-| Kit de diseño (reglas, tokens, fundamentos, 28 specs, contrato de datos) | ✅ Completo y auditado; `## No hacer` en las 27 de componentes + Foundation (#89) |
-| Modelo único de spec (`specs/<categoria>/<Name>/{spec,plan,tasks}.md`, plantilla de la skill `sdd`, `Estado` + `Requisitos (EARS)` en las 27) | ✅ Migrado y aprobado (2026-10-02); `plan.md`/`tasks.md` los redacta el orchestrator en sus puertas |
-| Agentes OpenCode (5) | ✅ En `.opencode/agents/`; el orchestrator también edita el registro de decisiones y `docs/agent-system.md` (#95) |
-| Diagnóstico A, B, C, F, reestructuras H/I, auditoría J y constitución (K) | ✅ Cerrados |
-| Repositorio git (baseline) | ✅ Inicializado; primeros commits del modelo de spec |
-| Sticky del Sidebar en pantallas bajas | ✅ Resuelto: sticky solo con alto ≥ 900px |
-| Constitución (`docs/constitution.md`) | ✅ Vigente; P1 verificado contra `specs/**/<Name>/spec.md` (decisión #68); P2/P4/T2 por tarea (decisión #69); P2 aclarado (decisión #75) |
-| Comandos `/sdd-*` | ✅ Integrados: corren con el orchestrator o el reviewer, con argumento `<categoria>/<Name>` (decisión #71) |
-| Puertas | ✅ Plan + Tareas por fase F1–F4 (#74, #84, #85); Clarificación solo con hallazgos (#90): entre ~37 y ~65 puertas en lugar de ~113 |
-| Auditoría de arquitectura (agentes, skills, comandos) | ✅ Cerrada (2026-10-02): sin bloqueantes; 6 puntos corregidos (#75–#80); re-auditoría: 4 hallazgos medios corregidos (#81–#82); tercera auditoría: 2 altos (#83 identidad de git en permisos, #84 F1 como pieza `foundation/Foundation` con Tn) 7 medios (#85–#91) y bajos (#92–#94) corregidos; sin pendientes |
-| Unidad de trabajo y memoria | ✅ Por tarea (Tn) en todo el sistema; memoria única en `docs/memory.md` (decisiones #69 y #70) |
-| Contenido del CV en JSON (esquema + validación) | ✅ Operativo desde F1: esquema + generados (`gen:types`, `build:validator`) + `validate:content` en verde; contenido inicial en `src/content/cv.{en,es}.json` |
-| `spec.md` de `foundation/Foundation` + `plan.md` / `tasks.md` | ✅ Aprobados; Tareas de las demás piezas: al inicio de su fase F |
-| **F1 Foundation** (pieza `foundation/Foundation`, Tn por encargo) | ✅ **Cerrada (2026-10-03)**: spec `Estado: implementada`; T1–T11 + T2b/T3b/T5b/T8b aprobadas; revisión completa APROBADA; QA visual en navegador APROBADO. Cambios: `skipLibCheck`, #96 (`react-refresh` hooks), #97 (`ucs2length` aceptado). Deudas menores en `docs/memory.md` |
-| **F2 Primitivas** (Icon, BrandIcon, Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar — 11 piezas) | ✅ **CERRADA (2026-10-06)**: las 11 specs `Estado: implementada`; por pieza: revisión por tarea + revisión completa APROBADA + `build` ✅. Suite: 236 tests, 0 warnings. Decisiones aplicadas: #99, #100, #101 (verdes on-arrival declarados; commit único `feat` en IconBox T3; gaps de reparto cubiertos con notas en `tasks.md`: `index.ts` en todas, `className` en CornerTab T1). Entrada de cierre: §IX en `docs/diagnostics.md` (poda #98 aplicada). Deudas menores F2 y restricciones de uso diferidas → tabla **Abiertos** de diagnostics y líneas de abajo |
-| **F3 Compuestos** (12 piezas) | ✅ **CERRADA (2026-10-07)**: las 12 specs `Estado: implementada` (ThemeToggle, LanguageSwitcher, ControlsBar, NavTabs, Sidebar, Timeline, ResumeSection, SkillList, ServiceCard, TestimonialCard, TestimonialDialog, TestimonialCarousel). Por pieza: revisión por tarea + completa APROBADA + `build` ✅. Suite: **395 tests**, 0 warnings. Hitos: Foundation T12, extensión #100 `"getTabId"`, ajustes de aserción entre tareas con aprobación explícita (`4ff4424`, `b6efae7`), **Cambio accesibilidad opción A** (slides `div`, cierre axe verde sin filtros), 2 puertas r1→r2 (NavTabs, TestimonialDialog T1), decisión **#102**. Entrada de cierre: §X en `docs/diagnostics.md` (poda #98 aplicada). Seguimientos acumulados → fila "Seguimientos F3" en **Abiertos** de diagnostics |
-| **F4 Integración** (hooks/useHashTab, pages/AboutPage, pages/ResumePage, layout/AppLayout + contenido es/en + impresión) | ✅ **CERRADA (2026-10-08)**: las 4 specs `Estado: implementada` (17 tareas; `build` ✅ post-reparo `7e07fcc`). `App.tsx` definitivo sobre AppLayout; impresión fijada por contrato `data-*` + `global.css` con orden About→Resume estable (**decisión #103**; token nuevo `--z-skip` en `tokens.css`). Los heredados de F3 se verificaron: skip-link→ControlsBar ✓ test 8, banner único ✓ test 1, defs ×1 ✓ test 7, tabpanel único e ids sin duplicar ✓ tests 9/12 + escaneo anti-`duplicate-id`, no-BFC ✓ inspección, superficies RF-4 de primitivas en consumidores ✓. Hitos: guard `isTabId` sin tocar NavTabs, ajustes T2b/T3b con aprobación explícita, 3 verificaciones puras sin `feat` (#101), reparo comment-only de F2 (`*/` en comentario). Entrada de cierre: §XI en `docs/diagnostics.md`. **Seguimientos F4** (impresión real, sticky/float/contrastes…) → fila nueva en **Abiertos** → F5 |
-| **F5 QA** | ✅ **CERRADA (2026-10-08) — fin del proceso F1–F5**: 4 pasadas del reviewer con chrome-devtools MCP sobre la app servida + **Ctrl+P real aprobado por el usuario** (6/6 criterios de papel). Primera pasada detectó el paquete **#104** (print B-2/B-3/M-1, D1 solape 375, D2/D3 anillos, D4 favicon) → 8 tareas nuevas en sus piezas, todas aprobadas y re-verificadas en vivo; decisiones visuales **#105** (favicon cerrado, **F8 cerrado** `9rem` definitivo, base `< md` `6.375rem`, chevron con acento semántico). Informe con evidencia: `docs/qa-report.md`; cierre: §XII en diagnostics. **28/28 specs `implementada`, suite 445/40, build ✅.** Residuos no bloqueantes → fila "Pendientes post-F5" (contenido real + deudas de forma opcionales) |
-| **Mantenimiento (2026-11-06)** | ✅ **Bug-fix ControlsBar T4**: ThemeToggle y LanguageSwitcher alineados en una fila flex con `.group` (`display: flex; align-items: center; gap: var(--controls-gap)`); se eliminó el `gap` inerte del `<header>`. Sin cambio de API/ARIA/spec. Suite **446/40**, lint/typecheck/build ✅; QA visual 375/768/1024/1440 × claro/oscuro × en/es ✅. Commits `d65ac7a`/`9f9de59`; T4 en `specs/controls/ControlsBar/tasks.md`. |
-| **Deploy GitHub Pages (2026-11-11)** | ✅ `vite.config.ts` usa base `/cv-agentic/` solo con `DEPLOY_TARGET=gh-pages` (local/Vercel siguen en `/`); `src/utils/assetUrl.ts` antepone `BASE_URL` a assets públicos y deja intactas las URLs externas. `HexAvatar` y el CTA de descarga del `Sidebar` lo usan. Commits `c2d4232` y `5f6c0a6`; suite **447/40**, lint/typecheck/build ✅. |
-| **CV real (2026-11-11)** | ✅ **Cargado y validado**: `src/content/cv.{en,es}.json` con el CV real, 3 testimonios reales (desde 2026-11-12, #112), contact sin teléfono/WhatsApp y `downloadCvUrl` al PDF; avatar actualizado y `avatar.svg` retirado; tests adaptados con fixtures y expectativas derivadas del contenido. Commits `3855eb0` `befb0db` `63f6665`; `validate:content`/build ✅. Spec/plan/tasks de Foundation alineados con el contenido real y `headline`/cargos de `cv.es.json` en inglés por decisión editorial (decisión **#109**). **QA visual APROBADA (§XVI)**: grilla 375–1440 × temas × idiomas sin overflow ni solapes y gap chevron↔nombre a 375px con el nombre real = **72.84px** (→ `docs/qa-report.md`). |
-| **CI y Node 26 (2026-11-12)** | ✅ **Node 26 LTS** (`.nvmrc` `26`, `@types/node` `^26`; constitución S5 y entorno aprobado actualizados, **#110**) y `deploy.yml` lee `node-version-file: .nvmrc`. **Quality gates** en el deploy: `lint` → `test` → `build`; si algo falla no se publica (**#111**); sin la línea `VITE_API_URL`. Commits `cf28268` y `35dbf2d`; suite **447/40**, lint/typecheck/build ✅. Detalle: §XVII. |
-| **Testimonios (2026-11-12)** | ✅ 3 testimonios reales (María Angélica Grael, Pablo Tigani, Diego Rafael Harari) con sus fotos reales; textos literales en su idioma original y traducidos al otro (**#112**). Cambios de `TestimonialCard`: T5, la comilla ya no pisa nombres largos; T6 (**#113**), el avatar queda anclado arriba y alineado entre cards con cualquier cantidad de líneas. QA en navegador 375–1440 × claro/oscuro × en/es ✅. Commits `b0f19bc` `11d5edc` `7f7cbe3` `390bb06` `24faf70` `8bac5b7`; detalle §XVIII–§XIX. |
-| **Resume en una columna (2026-11-12)** | ✅ Experience arriba y Education debajo, cada una con su timeline a ancho completo, en todos los anchos (**#114**, ResumePage T5; antes iban lado a lado desde 768px). Orden invertido en el DOM para que lectura y foco sigan el visual. Commits `28e6ecf` `1c16bf5` `174bc4e`; detalle §XX. |
-| **Favicon y título (2026-11-12)** | ✅ Favicon tipo app (cuadrado azul, hexágono blanco y monograma JM), `apple-touch-icon.png` 180×180 y título de pestaña `Juan Manuel Ibáñez · Frontend Engineer` (**#115**, Foundation T14). Commits `a0d7b5f` `3b4db39` `516621a` `9ebcca4`; detalle §XXI. |
-| **Motion (2026-11-13)** | ✅ **SISTEMA COMPLETO 4/4** (#106/#116, §XXIV–§XXVII; propuesta marcada "IMPLEMENTADO"): 1 Foundation — escala de tokens, `data-theme-switching`, contrato y docs (`motion.md` C3 `5edfcb0`); 2 AppLayout — entrada de panel con dirección (`getTabDirection` pura, `key`, `backwards`, print en el módulo); 3 Sidebar — expansión grid `0fr↔1fr` (`data-contacts-animate`, stagger `calc`, P5' ≥1200, print id en `global.css`; Ctrl+P colapsado ✓ usuario); 4 TestimonialDialog — entrada `--ease-enter` con `@starting-style`, **cierre instantáneo medido en los 3 caminos**, hover close conserva standard (Ctrl+P dialog abierto ✓ usuario). Suite **466/41**, **28/28 `implementada`**, build ✓. **#116 es regla permanente** (`foundations/motion.md` + `AGENTS.md` → Convenciones, `11b475b`; aclaración `transition: none` excluido en `docs/README.md`). |
-| **Metadatos SEO y Open Graph (2026-11-14)** | ✅ **Cambio #117 CERRADO** en Foundation (única tarea T19): `meta description`, canonical, Open Graph (5), `twitter:card`, JSON-LD `Person` cruzado con `cv.en.json` e identidad canonical≡`og:url`≡`url`, `public/og-image.png` 1200×630 intacta; colocación respetando el contrato T4 del anti-flash. Tests de contrato +6 en `anti-flash.test.ts`; QA del reviewer sobre `dist/` ✓. Commits `472bc1d` `a75e7fa` `0025a21` `f17cd78` `00a8268`; suite **472/41**, build ✓; detalle §XXVIII. Resuelve `docs/BACKLOG.md` → "Metadatos y Open Graph"; **"SEO por idioma" queda abierto** (metadatos solo en inglés, sin `hreflang` ni `og:locale`). |
-| **Proyectos en Resume (2026-11-14)** | ✅ **Cambio #118**: colección `projects` en el esquema y el contenido (el proyecto `cv-agentic` salió de `experience`) y sección Projects en Resume, entre Experience y Education, con ícono `code` (Foundation T20 + ResumePage T6; 479/41, build verde). |
-| **Avatar en WebP (2026-11-15)** | ✅ **Cambio #119**: `public/images/avatar.webp` (512×512 con alfa, 30 KB) reemplaza al PNG de 270 KB que PageSpeed marcaba con 263 KiB de ahorro; contenido y ejemplos apuntan a `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pusheado y publicado (WebP servido, PNG en 404); falta volver a medir en PageSpeed. |
-| **README en inglés (2026-11-15)** | ✅ **#120**: el `README.md` de la raíz presenta el repo en inglés (texto del usuario, diagrama del sistema de agentes, captura claro/oscuro); este tablero se mudó a `docs/STATUS.md` y los agentes apuntan acá. |
-| **Código en inglés (2026-11-15)** | ✅ **#121**: comentarios "why-only" en inglés en todo el código (`.ts`/`.tsx` 54 % → 12 % de comentario, CSS 66 % → 15 %, tests 44 % → 3 %), mensajes de error en inglés y test guardián `src/test/comments.test.ts` (Foundation T22). Código idéntico byte a byte sin comentarios; suite **485/42**. La documentación interna sigue en español (traducción en `docs/BACKLOG.md`). Pusheado y publicado. |
-| Post-entrega / próximos trabajos (2026-11-15) | Publicado en GitHub Pages (metadatos #117, sección Projects #118 y avatar WebP #119 verificados en el sitio servido; README #120 verificado en GitHub). Auditoría general §XXXIII: dependencias al día dentro de los rangos. Sin pendientes bloqueantes; quedan los opcionales de la tabla **Abiertos** de `docs/diagnostics.md` (deudas de forma, StrictMode/F1-F2, tres puntos del usuario: PDF, "About" de GitHub, PageSpeed) y lo postergado en `docs/BACKLOG.md`. |
+| Design kit (rules, tokens, foundations, 28 specs, data contract) | ✅ Complete and audited; `## Do not` in the 27 component specs + Foundation (#89) |
+| Single spec model (`specs/<category>/<Name>/{spec,plan,tasks}.md`, template of the `sdd` skill, `Status` + `Requirements (EARS)` in the 27) | ✅ Migrated and approved (2026-10-02); `plan.md`/`tasks.md` are drafted by the orchestrator at its gates |
+| OpenCode agents (5) | ✅ In `.opencode/agents/`; the orchestrator also edits the decisions register and `docs/agent-system.md` (#95) |
+| Diagnosis A, B, C, F, restructurings H/I, audit J and constitution (K) | ✅ Closed |
+| Git repository (baseline) | ✅ Initialized; first commits of the spec model |
+| Sticky of the Sidebar on short screens | ✅ Resolved: sticky only with a height ≥ 900px |
+| Constitution (`docs/constitution.md`) | ✅ In force; P1 verified against `specs/**/<Name>/spec.md` (decision #68); P2/P4/T2 per task (decision #69); P2 clarified (decision #75) |
+| `/sdd-*` commands | ✅ Integrated: they run with the orchestrator or the reviewer, with the argument `<category>/<Name>` (decision #71) |
+| Gates | ✅ Plan + Tasks per phase F1–F4 (#74, #84, #85); Clarification only with findings (#90): between ~37 and ~65 gates instead of ~113 |
+| Architecture audit (agents, skills, commands) | ✅ Closed (2026-10-02): no blockers; 6 points corrected (#75–#80); re-audit: 4 medium findings corrected (#81–#82); third audit: 2 high (#83 git identity in permissions, #84 F1 as the piece `foundation/Foundation` with Tn) 7 medium (#85–#91) and low (#92–#94) corrected; nothing pending |
+| Unit of work and memory | ✅ Per task (Tn) across the whole system; single memory in `docs/memory.md` (decisions #69 and #70) |
+| CV content in JSON (schema + validation) | ✅ Operational since F1: schema + generated files (`gen:types`, `build:validator`) + `validate:content` green; initial content in `src/content/cv.{en,es}.json` |
+| `spec.md` of `foundation/Foundation` + `plan.md` / `tasks.md` | ✅ Approved; Tasks of the other pieces: at the start of their F phase |
+| **F1 Foundation** (piece `foundation/Foundation`, Tn per assignment) | ✅ **Closed (2026-10-03)**: spec `Status: implemented`; T1–T11 + T2b/T3b/T5b/T8b approved; full review APPROVED; visual QA in the browser APPROVED. Changes: `skipLibCheck`, #96 (`react-refresh` hooks), #97 (`ucs2length` accepted). Minor debts in `docs/memory.md` |
+| **F2 Primitives** (Icon, BrandIcon, Box, Button, Badge, Overhead, IconBox, SectionTitle, Separator, CornerTab, HexAvatar — 11 pieces) | ✅ **CLOSED (2026-10-06)**: the 11 specs `Status: implemented`; per piece: review per task + full review APPROVED + `build` ✅. Suite: 236 tests, 0 warnings. Decisions applied: #99, #100, #101 (green on-arrival declared; single `feat` commit in IconBox T3; distribution gaps covered with notes in `tasks.md`: `index.ts` in all of them, `className` in CornerTab T1). Closing entry: §IX in `docs/diagnostics.md` (pruning #98 applied). Minor F2 debts and deferred usage restrictions → **Open items** table of diagnostics and the lines below |
+| **F3 Composites** (12 pieces) | ✅ **CLOSED (2026-10-07)**: the 12 specs `Status: implemented` (ThemeToggle, LanguageSwitcher, ControlsBar, NavTabs, Sidebar, Timeline, ResumeSection, SkillList, ServiceCard, TestimonialCard, TestimonialDialog, TestimonialCarousel). Per piece: review per task + full review APPROVED + `build` ✅. Suite: **395 tests**, 0 warnings. Milestones: Foundation T12, extension #100 `"getTabId"`, assertion adjustments between tasks with explicit approval (`4ff4424`, `b6efae7`), **Accessibility change option A** (`div` slides, axe closing case green with no filters), 2 gates r1→r2 (NavTabs, TestimonialDialog T1), decision **#102**. Closing entry: §X in `docs/diagnostics.md` (pruning #98 applied). Accumulated follow-ups → row "F3 follow-ups" in **Open items** of diagnostics |
+| **F4 Integration** (hooks/useHashTab, pages/AboutPage, pages/ResumePage, layout/AppLayout + content es/en + print) | ✅ **CLOSED (2026-10-08)**: the 4 specs `Status: implemented` (17 tasks; `build` ✅ after the repair `7e07fcc`). Final `App.tsx` on top of AppLayout; print set by the `data-*` contract + `global.css` with a stable About→Resume order (**decision #103**; new token `--z-skip` in `tokens.css`). The items inherited from F3 were verified: skip-link→ControlsBar ✓ test 8, single banner ✓ test 1, defs ×1 ✓ test 7, single tabpanel and ids not duplicated ✓ tests 9/12 + anti-`duplicate-id` scan, no-BFC ✓ inspection, RF-4 surfaces of primitives in consumers ✓. Milestones: `isTabId` guard without touching NavTabs, adjustments T2b/T3b with explicit approval, 3 pure verifications with no `feat` (#101), comment-only repair of F2 (`*/` in a comment). Closing entry: §XI in `docs/diagnostics.md`. **F4 follow-ups** (real print, sticky/float/contrasts…) → new row in **Open items** → F5 |
+| **F5 QA** | ✅ **CLOSED (2026-10-08) — end of the F1–F5 process**: 4 passes of the reviewer with chrome-devtools MCP on the served app + **real Ctrl+P approved by the user** (6/6 paper criteria). The first pass detected the package **#104** (print B-2/B-3/M-1, D1 overlap 375, D2/D3 rings, D4 favicon) → 8 new tasks in their pieces, all approved and re-verified live; visual decisions **#105** (favicon closed, **F8 closed** `9rem` final, base `< md` `6.375rem`, chevron with semantic accent). Report with evidence: `docs/qa-report.md`; closing: §XII in diagnostics. **28/28 specs `implemented`, suite 445/40, build ✅.** Non-blocking residues → row "Post-F5 pending items" (real content + optional debts of form) |
+| **Maintenance (2026-11-06)** | ✅ **Bug fix ControlsBar T4**: ThemeToggle and LanguageSwitcher aligned in a flex row with `.group` (`display: flex; align-items: center; gap: var(--controls-gap)`); the inert `gap` of the `<header>` was removed. No change of API/ARIA/spec. Suite **446/40**, lint/typecheck/build ✅; visual QA 375/768/1024/1440 × light/dark × en/es ✅. Commits `d65ac7a`/`9f9de59`; T4 in `specs/controls/ControlsBar/tasks.md`. |
+| **GitHub Pages deploy (2026-11-11)** | ✅ `vite.config.ts` uses the base `/cv-agentic/` only with `DEPLOY_TARGET=gh-pages` (local/Vercel stay at `/`); `src/utils/assetUrl.ts` prefixes `BASE_URL` to public assets and leaves external URLs intact. `HexAvatar` and the download CTA of the `Sidebar` use it. Commits `c2d4232` and `5f6c0a6`; suite **447/40**, lint/typecheck/build ✅. |
+| **Real CV (2026-11-11)** | ✅ **Loaded and validated**: `src/content/cv.{en,es}.json` with the real CV, 3 real testimonials (since 2026-11-12, #112), contact with no phone/WhatsApp and `downloadCvUrl` to the PDF; avatar updated and `avatar.svg` removed; tests adapted with fixtures and expectations derived from the content. Commits `3855eb0` `befb0db` `63f6665`; `validate:content`/build ✅. Spec/plan/tasks of Foundation aligned with the real content and `headline`/job titles of `cv.es.json` in English by editorial decision (decision **#109**). **Visual QA APPROVED (§XVI)**: grid 375–1440 × themes × languages with no overflow or overlaps and chevron↔name gap at 375px with the real name = **72.84px** (→ `docs/qa-report.md`). |
+| **CI and Node 26 (2026-11-12)** | ✅ **Node 26 LTS** (`.nvmrc` `26`, `@types/node` `^26`; constitution S5 and approved environment updated, **#110**) and `deploy.yml` reads `node-version-file: .nvmrc`. **Quality gates** in the deploy: `lint` → `test` → `build`; if something fails nothing is published (**#111**); without the `VITE_API_URL` line. Commits `cf28268` and `35dbf2d`; suite **447/40**, lint/typecheck/build ✅. Detail: §XVII. |
+| **Testimonials (2026-11-12)** | ✅ 3 real testimonials (María Angélica Grael, Pablo Tigani, Diego Rafael Harari) with their real photos; literal texts in their original language and translated into the other one (**#112**). Changes of `TestimonialCard`: T5, the quote no longer covers long names; T6 (**#113**), the avatar stays anchored at the top and aligned between cards with any number of lines. QA in the browser 375–1440 × light/dark × en/es ✅. Commits `b0f19bc` `11d5edc` `7f7cbe3` `390bb06` `24faf70` `8bac5b7`; detail §XVIII–§XIX. |
+| **Resume in one column (2026-11-12)** | ✅ Experience at the top and Education below, each with its timeline at full width, at all widths (**#114**, ResumePage T5; previously they went side by side from 768px). Order inverted in the DOM so that reading and focus follow the visual one. Commits `28e6ecf` `1c16bf5` `174bc4e`; detail §XX. |
+| **Favicon and title (2026-11-12)** | ✅ App-style favicon (blue square, white hexagon and JM monogram), `apple-touch-icon.png` 180×180 and tab title `Juan Manuel Ibáñez · Frontend Engineer` (**#115**, Foundation T14). Commits `a0d7b5f` `3b4db39` `516621a` `9ebcca4`; detail §XXI. |
+| **Motion (2026-11-13)** | ✅ **COMPLETE SYSTEM 4/4** (#106/#116, §XXIV–§XXVII; proposal marked "IMPLEMENTED"): 1 Foundation — token scale, `data-theme-switching`, contract and docs (`motion.md` C3 `5edfcb0`); 2 AppLayout — panel entrance with direction (pure `getTabDirection`, `key`, `backwards`, print in the module); 3 Sidebar — grid expansion `0fr↔1fr` (`data-contacts-animate`, `calc` stagger, P5' ≥1200, print id in `global.css`; Ctrl+P collapsed ✓ user); 4 TestimonialDialog — entrance `--ease-enter` with `@starting-style`, **instant closing measured on the 3 paths**, close hover keeps standard (Ctrl+P dialog open ✓ user). Suite **466/41**, **28/28 `implemented`**, build ✓. **#116 is a permanent rule** (`foundations/motion.md` + `AGENTS.md` → Conventions, `11b475b`; clarification `transition: none` excluded in `docs/README.md`). |
+| **SEO and Open Graph metadata (2026-11-14)** | ✅ **Change #117 CLOSED** in Foundation (single task T19): `meta description`, canonical, Open Graph (5), `twitter:card`, JSON-LD `Person` cross-checked with `cv.en.json` and identity canonical≡`og:url`≡`url`, `public/og-image.png` 1200×630 intact; placement respecting the T4 contract of the anti-flash. Contract tests +6 in `anti-flash.test.ts`; the reviewer's QA on `dist/` ✓. Commits `472bc1d` `a75e7fa` `0025a21` `f17cd78` `00a8268`; suite **472/41**, build ✓; detail §XXVIII. It resolves `docs/BACKLOG.md` → "Metadata and Open Graph"; **"SEO per language" stays open** (metadata only in English, with no `hreflang` or `og:locale`). |
+| **Projects in Resume (2026-11-14)** | ✅ **Change #118**: `projects` collection in the schema and the content (the `cv-agentic` project left `experience`) and a Projects section in Resume, between Experience and Education, with the `code` icon (Foundation T20 + ResumePage T6; 479/41, build green). |
+| **Avatar in WebP (2026-11-15)** | ✅ **Change #119**: `public/images/avatar.webp` (512×512 with alpha, 30 KB) replaces the 270 KB PNG that PageSpeed flagged with 263 KiB of savings; content and examples point to `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pushed and published (WebP served, PNG at 404); measuring again in PageSpeed is still missing. |
+| **README in English (2026-11-15)** | ✅ **#120**: the root `README.md` presents the repo in English (the user's text, diagram of the agent system, light/dark capture); this board moved to `docs/STATUS.md` and the agents point here. |
+| **Code in English (2026-11-15)** | ✅ **#121**: "why-only" comments in English in all the code (`.ts`/`.tsx` 54 % → 12 % of comment, CSS 66 % → 15 %, tests 44 % → 3 %), error messages in English and guard test `src/test/comments.test.ts` (Foundation T22). Code identical byte for byte without comments; suite **485/42**. The internal documentation is still in Spanish (translation in `docs/BACKLOG.md`). Pushed and published. |
+| Post-delivery / next work (2026-11-15) | Published on GitHub Pages (metadata #117, Projects section #118 and WebP avatar #119 verified on the served site; README #120 verified on GitHub). General audit §XXXIII: dependencies up to date within the ranges. No blocking items pending; the optional ones of the **Open items** table of `docs/diagnostics.md` remain (debts of form, StrictMode/F1-F2, three points of the user: PDF, GitHub "About", PageSpeed) and what is postponed in `docs/BACKLOG.md`. |
 
-Detalle y decisiones: [docs/diagnostics.md](diagnostics.md).
+Detail and decisions: [docs/diagnostics.md](diagnostics.md).
 
-## Estructura
+## Structure
 
 ```
 cv-agentic/
-├─ README.md          presentación del repo, en inglés
-├─ AGENTS.md          convenciones para los agentes (OpenCode lo lee desde la raíz)
-├─ docs/              documentación (constitution, STATUS —este archivo—, README completo, DESIGN, BACKLOG, diagnostics, agent-system.md, tokens/)
-├─ tokens/            tokens.css (lo importa la app)
-├─ foundations/       tipografía · layout · movimiento · theming · i18n
-├─ specs/             una carpeta por pieza (<categoria>/<Name>/spec.md) + motion/proposal.md
-├─ data/              esquema JSON del CV (fuente de verdad) + ejemplos
-├─ .opencode/         agents/ (los 5 agentes), skills/sdd/, commands/ (/sdd-*)
-├─ opencode.json      config de OpenCode (MCP de Chrome DevTools, solo para el reviewer)
-└─ src/ · public/ · index.html · package.json   ← la app
+├─ README.md          presentation of the repo, in English
+├─ AGENTS.md          conventions for the agents (OpenCode reads it from the root)
+├─ docs/              documentation (constitution, STATUS —this file—, full README, DESIGN, BACKLOG, diagnostics, agent-system.md, tokens/)
+├─ tokens/            tokens.css (the app imports it)
+├─ foundations/       typography · layout · motion · theming · i18n
+├─ specs/             one folder per piece (<category>/<Name>/spec.md) + motion/proposal.md
+├─ data/              JSON schema of the CV (source of truth) + examples
+├─ .opencode/         agents/ (the 5 agents), skills/sdd/, commands/ (/sdd-*)
+├─ opencode.json      OpenCode config (Chrome DevTools MCP, only for the reviewer)
+└─ src/ · public/ · index.html · package.json   ← the app
 ```
 
-## Mantenimiento (modo actual — desde 2026-10-08)
+## Maintenance (current mode — since 2026-10-08)
 
-El proceso F1–F5 cerró; el sitio quedó **entregado y en verde** (485 tests,
-build, validate:content, QA en navegador y en papel; últimos trabajos:
-Node 26 LTS y quality gates en el deploy, 2026-11-12; motion 4/4, 2026-11-13;
-metadatos SEO y Open Graph #117 y sección Projects #118, 2026-11-14;
-avatar en WebP #119, 2026-11-15).
-Para reabrir trabajo, el flujo vive en la skill `sdd` y los agentes en
+The F1–F5 process closed; the site was **delivered and green** (485 tests,
+build, validate:content, QA in the browser and on paper; latest work:
+Node 26 LTS and quality gates in the deploy, 2026-11-12; motion 4/4, 2026-11-13;
+SEO and Open Graph metadata #117 and Projects section #118, 2026-11-14;
+avatar in WebP #119, 2026-11-15).
+To reopen work, the flow lives in the `sdd` skill and the agents in
 `.opencode/agents/`:
 
-| Quiero… | Cómo |
+| I want to… | How |
 |---|---|
-| Actualizar el CV (textos, avatar, testimonios, `downloadCvUrl`) | Editar `src/content/cv.{en,es}.json` (formato fijo por `data/cv.schema.json`) → `npm run validate:content` + `npm test`. Con el nombre real definitivo: re-observar 375px es/en el gap chevron↔nombre (fila "Pendientes post-F5" de diagnostics). Encargo al `integrator` (dueño de `src/content/**`) |
-| Cambiar comportamiento/estética de una pieza | **Cambio** sdd: spec → plan → tareas → código (puertas); defecto encontrado → tarea nueva en su `tasks.md` |
-| Pieza/función nueva (p. ej. las del `docs/BACKLOG.md`) | `/sdd-spec <categoria>/<Name>` → puerta spec → `/sdd-plan <cat>/<Name>` → puerta Plan+Tareas → delegación por Tn → reviewer |
-| Verificar algo en el sitio servido | `npm run dev` (lo corrés vos, #91) + pasada enfocada del `reviewer` con chrome-devtools |
-| Saber dónde está todo | Memoria: `docs/memory.md` · Log/pendientes: `docs/diagnostics.md` (**Abiertos**) · Decisiones #1–#121: `docs/README.md` · QA final: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
+| Update the CV (texts, avatar, testimonials, `downloadCvUrl`) | Edit `src/content/cv.{en,es}.json` (format fixed by `data/cv.schema.json`) → `npm run validate:content` + `npm test`. With the final real name: re-observe at 375px es/en the chevron↔name gap (row "Post-F5 pending items" of diagnostics). Assignment to the `integrator` (owner of `src/content/**`) |
+| Change the behavior/look of a piece | sdd **Change**: spec → plan → tasks → code (gates); defect found → new task in its `tasks.md` |
+| New piece/feature (e.g. those of `docs/BACKLOG.md`) | `/sdd-spec <category>/<Name>` → spec gate → `/sdd-plan <cat>/<Name>` → Plan+Tasks gate → delegation per Tn → reviewer |
+| Verify something on the served site | `npm run dev` (you run it, #91) + a focused pass of the `reviewer` with chrome-devtools |
+| Know where everything is | Memory: `docs/memory.md` · Log/pending: `docs/diagnostics.md` (**Open items**) · Decisions #1–#121: `docs/README.md` · Final QA: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
-Reglas que siguen vigentes sin excepción: specs intocables sin tu aprobación
-(P2/#94); `src/test/**` y configs, nadie los edita; `src/test/a11y.ts`, nunca;
-commits TDD por tarea sin `--amend` ni push (push: solo vos); DoD = lint +
-typecheck + test por tarea, `build` al cerrar pieza/puerta.
+Rules that stay in force with no exception: specs untouchable without your approval
+(P2/#94); `src/test/**` and configs, nobody edits them; `src/test/a11y.ts`, never;
+TDD commits per task with no `--amend` or push (push: only you); DoD = lint +
+typecheck + test per task, `build` when closing a piece/gate.
 
-## Por dónde empezar
+## Where to start
 
-1. [docs/constitution.md](constitution.md): las reglas no negociables
-   del proyecto (están por encima de todo).
-2. [docs/README.md](README.md): qué es el kit, cómo lo usa la app,
-   dependencias aprobadas y registro de decisiones.
-3. [docs/DESIGN.md](DESIGN.md): lenguaje visual y reglas duras.
-4. [specs/README.md](../specs/README.md): índice de specs y orden de construcción.
-5. [AGENTS.md](../AGENTS.md) y [docs/agent-system.md](agent-system.md): cómo trabajan los agentes.
-6. [docs/memory.md](memory.md): memoria del proyecto (estado y decisiones recientes).
+1. [docs/constitution.md](constitution.md): the non-negotiable rules
+   of the project (they are above everything).
+2. [docs/README.md](README.md): what the kit is, how the app uses it,
+   approved dependencies and decisions register.
+3. [docs/DESIGN.md](DESIGN.md): visual language and hard rules.
+4. [specs/README.md](../specs/README.md): index of specs and build order.
+5. [AGENTS.md](../AGENTS.md) and [docs/agent-system.md](agent-system.md): how the agents work.
+6. [docs/memory.md](memory.md): project memory (status and recent decisions).
