@@ -14,7 +14,7 @@
   ```
 
   Alternative with no dependency: `.woff2` in `public/fonts/` with its own
-  `@font-face` (`font-display: swap`, latin subset, which covers á é í ó ú ñ ¿ ¡).
+  `@font-face` (`font-display: swap`, latin subset, which covers `á é í ó ú ñ ¿ ¡`).
 - No italics: the design does not use them.
 - Fallback stack: `--font-family` (system-ui…).
 

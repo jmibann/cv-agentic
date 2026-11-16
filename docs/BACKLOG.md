@@ -46,11 +46,6 @@ needs a decision from the user before it is implemented (flow per type of task:
 - **Loading of languages.** Today both content JSON files go in the bundle (static
   import). If languages are added or the content grows: a dynamic `import()` per
   language in `content/index.ts`.
-- **Internal documentation in English.** (**Open**, 2026-11-15, #121.) The
-  code is already in English; `docs/`, `specs/`, `foundations/`, `AGENTS.md` and
-  `.opencode/` are still in Spanish (L1). Translating them is a separate stage: ~90
-  documents, including the agents' prompts, which would have to be tested
-  again.
 - **Learnings between tasks.** Today the learnings live in
   `docs/memory.md` ("Non-negotiable rules for any future task", at most ~50 lines, only
   the orchestrator edits it when closing each F gate). If it is seen that errors

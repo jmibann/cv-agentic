@@ -131,7 +131,7 @@ cv-agentic/
 
 ## Documentation
 
-Internal process documentation is written in Spanish (a project rule). Start here:
+Internal process documentation is written in English. Start here:
 
 - [docs/STATUS.md](docs/STATUS.md) — project status and full build log
 - [docs/constitution.md](docs/constitution.md) — non-negotiable rules

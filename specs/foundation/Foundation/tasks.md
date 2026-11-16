@@ -282,3 +282,8 @@ T3b (an L1 debt found in its review).
 
 - [x] **T22. Guard test of the comment policy.** L1/L2 (#121) — 870aa69 (a single test commit, green when written: regime #101 declared; checked by mutation that it fails on a comment in Spanish and on an internal reference)
   - Done when: `src/test/comments.test.ts` goes through `src/`, `tokens/`, `data/constants.ts`, `vite.config.ts`, `eslint.config.js` and `index.html` and fails if a comment is in Spanish or carries internal references (RF-n, Tn, decision n, #n, §n). The previous cleanup (one `chore(<Name>)` per piece, messages and code outside `src/`) has no task of its own: it changes no behavior and was verified with the mechanical proof of #121.
+
+## Change #122 — Documentation in English (user's request, 2026-11-15)
+
+- [x] **T23. Guard test of the documentation language.** L1 (#122) — 2866724 (a single test commit, green when written: regime #101 declared; checked by mutation that it fails on a sentence in Spanish)
+  - Done when: `src/test/comments.test.ts` also goes through `AGENTS.md`, `README.md`, `docs/`, `specs/`, `foundations/` and the agents, skill and commands of `.opencode/` and fails if a line of prose is in Spanish; code blocks, inline code, quoted interface strings and people's names are not prose. The translation itself (117 documents, one `docs(i18n)` commit per group) has no task of its own: it changes no code and was verified with a structure comparison per document.

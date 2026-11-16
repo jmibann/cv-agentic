@@ -7,7 +7,7 @@ Personal CV site (**React + TypeScript + Vite + CSS Modules**, responsive,
 light/dark, en/es) built by OpenCode agents with
 **spec-driven development**.
 
-## Current status (2026-11-15)
+## Current status (2026-11-16)
 
 | What | Status |
 |---|---|
@@ -41,7 +41,8 @@ light/dark, en/es) built by OpenCode agents with
 | **Projects in Resume (2026-11-14)** | ✅ **Change #118**: `projects` collection in the schema and the content (the `cv-agentic` project left `experience`) and a Projects section in Resume, between Experience and Education, with the `code` icon (Foundation T20 + ResumePage T6; 479/41, build green). |
 | **Avatar in WebP (2026-11-15)** | ✅ **Change #119**: `public/images/avatar.webp` (512×512 with alpha, 30 KB) replaces the 270 KB PNG that PageSpeed flagged with 263 KiB of savings; content and examples point to `/images/avatar.webp` (Foundation T21). Suite **482/41**. Pushed and published (WebP served, PNG at 404); measuring again in PageSpeed is still missing. |
 | **README in English (2026-11-15)** | ✅ **#120**: the root `README.md` presents the repo in English (the user's text, diagram of the agent system, light/dark capture); this board moved to `docs/STATUS.md` and the agents point here. |
-| **Code in English (2026-11-15)** | ✅ **#121**: "why-only" comments in English in all the code (`.ts`/`.tsx` 54 % → 12 % of comment, CSS 66 % → 15 %, tests 44 % → 3 %), error messages in English and guard test `src/test/comments.test.ts` (Foundation T22). Code identical byte for byte without comments; suite **485/42**. The internal documentation is still in Spanish (translation in `docs/BACKLOG.md`). Pushed and published. |
+| **Code in English (2026-11-15)** | ✅ **#121**: "why-only" comments in English in all the code (`.ts`/`.tsx` 54 % → 12 % of comment, CSS 66 % → 15 %, tests 44 % → 3 %), error messages in English and guard test `src/test/comments.test.ts` (Foundation T22). Code identical byte for byte without comments; suite **485/42**. The internal documentation was translated afterwards (#122). Pushed and published. |
+| **Documentation in English (2026-11-16)** | ✅ **#122**: the 117 kit documents (`AGENTS.md`, `docs/`, `foundations/`, `specs/`, `.opencode/`) translated in full, with the structural terms in English (`Status`, `Requirements (EARS)`, `Done when`, gate, `Open items`); the agents talk to the user in English; L1 amended; the guard test also covers the documents (Foundation T23). Suite **487/42**. Pending: run the OpenCode agents once with the translated prompts. |
 | Post-delivery / next work (2026-11-15) | Published on GitHub Pages (metadata #117, Projects section #118 and WebP avatar #119 verified on the served site; README #120 verified on GitHub). General audit §XXXIII: dependencies up to date within the ranges. No blocking items pending; the optional ones of the **Open items** table of `docs/diagnostics.md` remain (debts of form, StrictMode/F1-F2, three points of the user: PDF, GitHub "About", PageSpeed) and what is postponed in `docs/BACKLOG.md`. |
 
 Detail and decisions: [docs/diagnostics.md](diagnostics.md).
@@ -64,11 +65,11 @@ cv-agentic/
 
 ## Maintenance (current mode — since 2026-10-08)
 
-The F1–F5 process closed; the site was **delivered and green** (485 tests,
+The F1–F5 process closed; the site was **delivered and green** (487 tests,
 build, validate:content, QA in the browser and on paper; latest work:
 Node 26 LTS and quality gates in the deploy, 2026-11-12; motion 4/4, 2026-11-13;
 SEO and Open Graph metadata #117 and Projects section #118, 2026-11-14;
-avatar in WebP #119, 2026-11-15).
+avatar in WebP #119, 2026-11-15; code #121 and documentation #122 in English, 2026-11-16).
 To reopen work, the flow lives in the `sdd` skill and the agents in
 `.opencode/agents/`:
 
@@ -78,7 +79,7 @@ To reopen work, the flow lives in the `sdd` skill and the agents in
 | Change the behavior/look of a piece | sdd **Change**: spec → plan → tasks → code (gates); defect found → new task in its `tasks.md` |
 | New piece/feature (e.g. those of `docs/BACKLOG.md`) | `/sdd-spec <category>/<Name>` → spec gate → `/sdd-plan <cat>/<Name>` → Plan+Tasks gate → delegation per Tn → reviewer |
 | Verify something on the served site | `npm run dev` (you run it, #91) + a focused pass of the `reviewer` with chrome-devtools |
-| Know where everything is | Memory: `docs/memory.md` · Log/pending: `docs/diagnostics.md` (**Open items**) · Decisions #1–#121: `docs/README.md` · Final QA: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
+| Know where everything is | Memory: `docs/memory.md` · Log/pending: `docs/diagnostics.md` (**Open items**) · Decisions #1–#122: `docs/README.md` · Final QA: `docs/qa-report.md` · Motion: `specs/motion/proposal.md` |
 
 Rules that stay in force with no exception: specs untouchable without your approval
 (P2/#94); `src/test/**` and configs, nobody edits them; `src/test/a11y.ts`, never;

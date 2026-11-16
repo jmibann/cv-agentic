@@ -2,12 +2,11 @@
 
 Minimal log of the project (decisions **#86** and **#98**): one entry for each
 closing of an F gate and for each rules decision, with the relevant hashes.
-Last update: **2026-11-15** (closing of #121, code in English §XXXV; rules §XXXIV; general audit and cleanup §XXXIII; README in English and `docs/STATUS.md` §XXXII, #120; Change #119, avatar in WebP §XXXI; docs cleanup §XXX; Change #118, `projects` collection §XXIX; Change #117, SEO metadata §XXVIII; motion system complete §XXVII; changes 3 §XXVI and 2 §XXV; stage 1 gate §XXIII).
-The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode"
-of `docs/agent-system.md`.
+Last update: **2026-11-16** (closing of #122, documentation in English §XXXVI; closing of #121, code in English §XXXV; rules §XXXIV; general audit and cleanup §XXXIII; README in English and `docs/STATUS.md` §XXXII, #120; Change #119, avatar in WebP §XXXI; docs cleanup §XXX; Change #118, `projects` collection §XXIX; Change #117, SEO metadata §XXVIII; motion system complete §XXVII; changes 3 §XXVI and 2 §XXV; stage 1 gate §XXIII).
+The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
 
 What is live does not live here: status → `docs/STATUS.md` ("Current status") · memory →
-`docs/memory.md` · decisions #1–#121 → `docs/README.md` · QA of F5 →
+`docs/memory.md` · decisions #1–#122 → `docs/README.md` · QA of F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Owner: orchestrator (`edit` by path). The piece gates do not touch this
@@ -42,18 +41,20 @@ of the entry); the detail stays in git.
 | Item | What is missing | It closes in |
 |---|---|---|
 | Post-F5 pending items (residues) | **Debts of form**: `lang="es"` not restored in AppLayout.test (note), anti-flash `<script>` at column 0 in `index.html` (pre-existing from T4, the minor of §XXVIII), test titles with internal references (`T1: RF-1`) and fragments in Spanish (§XXXV; changing them touches ~625 titles, no assertion) — a single pass only if the user decides so (the debts of comments in tests were closed with #121) · optional kit items: `cursor: pointer` not listed in controls/bullets, `contrast.md` row rule 6 for ServiceCard | The user's decision; no date |
-| From the user (§XXXIII, §XXXV) | **Downloadable PDF** `public/cv/…pdf`: it says "445 tests" (today 485) and includes the phone, which the site does not show by decision; **"About" of the repo on GitHub**: old description and no link to the site; **PageSpeed**: measure again after #119. **Dependencies**: 7 moderate development advisories because of `minimatch` via `typescript-eslint` (wait for a fixed version; do not force) | User; `minimatch`: next dependency update |
+| From the user (§XXXIII, §XXXV, §XXXVI) | **OpenCode agents**: run `/sdd-status` and a small task once with the translated prompts (#122); **root README**: figures one step behind (485 tests, #1–#121; today 487 and #1–#122), it only changes at the user's request; **Downloadable PDF** `public/cv/…pdf`: it says "445 tests" (today 487) and includes the phone, which the site does not show by decision; **"About" of the repo on GitHub**: old description and no link to the site; **PageSpeed**: measure again after #119. **Dependencies**: 7 moderate development advisories because of `minimatch` via `typescript-eslint` (wait for a fixed version; do not force) | User; `minimatch`: next dependency update |
 | Minor debts of F1 | `StrictMode` with no mandate (if it is wanted, it is a Change), context `value` with no `useMemo` in both providers, typos "recalculera", trace `07eead6`; detail in `docs/memory.md`. Re-evaluated when closing F2 (2026-10-06): they **remain**, with no impact on F2 | No date; the user's decision whether they are repaired |
 | Minor debts of F2 | (a) AGENTS.md "unused parameters: `_` prefix" is imprecise with the real eslint (`after-used`, with no `argsIgnorePattern`: the `_` does not protect the last parameter) → amendment for the user to decide; (b) note #99: with Vitest's CSS-Modules proxy the fallback branch may never be exercised — the validity of the pattern lies in sharing the `styles` object between test and implementation; (c) pre-existing stderr `act(...)` in 2 tests of `ThemeProvider.test.tsx` (they pass) → decide whether to repair | (a) and (c): the user's decision; (b): next review of the sdd skill |
 
 ## Entries
 
-### §XXXV · 2026-11-15 — Closing of #121: code 100 % in English, "why-only" comments
-- What: full cleanup of comments in `src/` (139 files, tests included) and outside `src/` (`tokens.css`, `data/constants.ts`, descriptions of the schema + generated files, banners, `index.html`, configs, `.gitignore`, name of the workflow); error messages and test invariants in English; guard test `src/test/comments.test.ts` (Foundation T22). % of comment: `.ts`/`.tsx` 54 → 12, CSS 66 → 15, tests 44 → 3. Done by Claude Code at the user's request, with a reviewed pilot.
-- Checks: per commit, transpiled output without comments identical byte for byte; production bundle identical (class hashes normalized) after the comments-only stage; list of test names unchanged; lint · typecheck · test (**485/42**) · build · validate:content; pass in the browser on the local build (tabs, theme, language, dialog) with no console errors.
-- Decisions: #121 → `docs/README.md`. The comment of the anti-flash script was also changed in `foundations/theming.md` (a test compares them literally) and the header of generated files becomes "GENERATED" (line of the Foundation spec and prompt of `foundation` aligned).
-- Commits: `6405b72` (rules) · `98c6bfb`…`fc269d9` (one `chore(<Name>)` per piece) · `138f75b` `2cb90c9` (messages) · `ec45ee4` (outside `src/`) · `870aa69` (T22).
-- Opens: test titles with internal references and some Spanish (they were not touched); figures of the root README out of date; closes: debts of form of comments in tests.
+### §XXXVI · 2026-11-16 — Closing of #122: all the documentation in English
+- What: translation of the 117 kit documents (`AGENTS.md`, `docs/`, `foundations/`, `specs/`, `.opencode/`), faithful and in full, with the structural terms in English (`Status`, `Requirements (EARS)`, `Done when`, gate, `Open items`…); the agents now talk to the user in English; guard test extended to the documents (Foundation T23). Done by Claude Code at the user's request, in six stages with a reviewed pilot.
+- Checks: per document, mechanical comparison with its previous version (headings, tables, lists, checkboxes, code blocks, identifiers, hashes, links); no old terms left (`Estado:`, `Hecho cuando`, `CUANDO`…); lint · typecheck · test (**487/42**) · build.
+- Decisions: #122 → `docs/README.md` (it amends L1). Quoted Spanish interface strings and historical literals are kept as they were written.
+- Commits: `805666f` (pilot) · `2d10d4e` (rules and agents) · `ec50f75` (foundations and design) · `237a2c4`…`ac57747` (specs) · `0d6ffe8` `1bab476` `0c8bff3` (status, QA, proposal, register) · `2866724` (T23).
+- Opens: run the OpenCode agents once with the translated prompts (not executable from Claude Code); figures of the root README (485 tests, #1–#121) one step behind; closes: "Internal documentation in English" of `docs/BACKLOG.md`.
+
+### 2026-11-15 · §XXXV — Closing of #121: code 100 % in English, "why-only" comments · #121 · `git show 4b1a48f:docs/diagnostics.md`
 
 ### 2026-11-15 · §XXXIV — Decision #121: "why-only" comments in English (rules) · #121 · `git show 6405b72:docs/diagnostics.md`
 
