@@ -1,24 +1,24 @@
 # TestimonialCarousel
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Carrusel horizontal de testimonios con scroll-snap nativo, bullets de
-paginación y un único `TestimonialDialog` para ver el texto completo. Sin
-librerías (reemplaza Swiper) y **sin autoplay**.
+Horizontal carousel of testimonials with native scroll-snap, pagination
+bullets and a single `TestimonialDialog` to see the full text. With no
+libraries (it replaces Swiper) and **no autoplay**.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO `testimonials` contiene elementos, ENTONCES EL SISTEMA renderiza **la única `<section>` de la región** (decisión 20: el carrusel es dueño de la section; AboutPage **no** lo envuelve en otra) con `aria-roledescription="carousel"`, nombrada por `labelledBy` (si se pasa) o `aria-label=labels.carousel`, con un slide por testimonio; SI `testimonials` está vacío, ENTONCES no renderiza nada.
-- RF-2: EL SISTEMA desplaza el track con `overflow-x` y `scroll-snap-type` nativos (sin librerías), y no implementa autoplay, loop ni flechas prev/next. **Tampoco navegación por flechas de teclado** (decisión 21): Tab entre botones + scroll nativo/swipe.
-- RF-3: EL SISTEMA renderiza un bullet por cada posición alcanzable (`getScrollStops`), no uno por testimonio, recalculándolos al montar **y cada vez que cambia el tamaño del track (instancia un `ResizeObserver` sobre el track que re-mide los stops; cableado real, no solo teórico)**; SI hay un stop o menos, ENTONCES no renderiza bullets. El recálculo por resize **no tiene test unitario** (mock global `ResizeObserver` es no-op; decisión 21: la decisión elimina el test, no el comportamiento — su validación es QA F5). El bullet activo inicial, una vez calculados los stops (mount, `scrollLeft = 0`), es el del stop de `getActiveStop` → el primero.
-- RF-4: CUANDO el usuario pulsa un bullet, ENTONCES EL SISTEMA llama `track.scrollTo` con el `left` de ese stop, usando `behavior: "smooth"` solo si `prefers-reduced-motion` es `no-preference` (lectura por `window.matchMedia` en el click; no requiere reaccionar en vivo). Verificación: test de `scrollTo` con `behavior` según el mock de `matchMedia` (setup F1: `matches` configurable).
-- RF-5: EL SISTEMA marca `aria-current="true"` en el bullet activo según `getActiveStop(stops, scrollLeft)`, recalculado en el evento `scroll` con un cálculo por frame. **Sin región `aria-live`** (decisión 21): el cambio de slide no se anuncia; no hay autoplay.
-- RF-6: EL SISTEMA mantiene un único `TestimonialDialog`: `onOpen(id)` de la card fija el estado seleccionado y `onClose` lo limpia (con `testimonial` derivado del `selectedId`; nunca valor→valor sin `null` intermedio, ver ciclo en `TestimonialDialog.md`).
-- RF-7: EL SISTEMA reserva el espacio del avatar con `padding-block: var(--testimonial-headroom) 2rem` en el track (único lugar que lo hace: arriba, protrusión + sombra; abajo, `2rem` fijo fijado textualmente por la tabla — mismo criterio de medidas fijas de `breakpoints.md` — para no recortar la sombra de hover) y oculta la scrollbar.
-- RF-8: EL SISTEMA imprime los testimonios apilados con el texto completo y la paginación oculta, y escala el responsive solo con columnas y tokens (sin medidas literales en `@media`; `2rem` de RF-7 fuera de `@media`).
+- RF-1: WHEN `testimonials` contains elements, THEN THE SYSTEM renders **the only `<section>` of the region** (decision 20: the carousel owns the section; AboutPage does **not** wrap it in another one) with `aria-roledescription="carousel"`, named by `labelledBy` (if passed) or `aria-label=labels.carousel`, with one slide per testimonial; IF `testimonials` is empty, THEN it renders nothing.
+- RF-2: THE SYSTEM scrolls the track with native `overflow-x` and `scroll-snap-type` (no libraries), and implements no autoplay, loop or prev/next arrows. **Nor navigation with keyboard arrows** (decision 21): Tab between buttons + native scroll/swipe.
+- RF-3: THE SYSTEM renders one bullet per reachable position (`getScrollStops`), not one per testimonial, recalculating them on mount **and every time the size of the track changes (it instantiates a `ResizeObserver` on the track that re-measures the stops; real wiring, not only theoretical)**; IF there is one stop or fewer, THEN it renders no bullets. The recalculation on resize **has no unit test** (the global `ResizeObserver` mock is a no-op; decision 21: the decision removes the test, not the behavior — its validation is QA F5). The initial active bullet, once the stops are calculated (mount, `scrollLeft = 0`), is that of the stop from `getActiveStop` → the first one.
+- RF-4: WHEN the user presses a bullet, THEN THE SYSTEM calls `track.scrollTo` with the `left` of that stop, using `behavior: "smooth"` only if `prefers-reduced-motion` is `no-preference` (read through `window.matchMedia` on the click; it does not need to react live). Verification: `scrollTo` test with `behavior` according to the `matchMedia` mock (F1 setup: configurable `matches`).
+- RF-5: THE SYSTEM marks `aria-current="true"` on the active bullet according to `getActiveStop(stops, scrollLeft)`, recalculated on the `scroll` event with one calculation per frame. **No `aria-live` region** (decision 21): the slide change is not announced; there is no autoplay.
+- RF-6: THE SYSTEM keeps a single `TestimonialDialog`: the card's `onOpen(id)` sets the selected state and `onClose` clears it (with `testimonial` derived from `selectedId`; never value→value without an intermediate `null`, see the cycle in `TestimonialDialog.md`).
+- RF-7: THE SYSTEM reserves the avatar's space with `padding-block: var(--testimonial-headroom) 2rem` on the track (the only place that does it: at the top, protrusion + shadow; at the bottom, a fixed `2rem` set textually by the table — the same criterion of fixed measures of `breakpoints.md` — so as not to clip the hover shadow) and hides the scrollbar.
+- RF-8: THE SYSTEM prints the testimonials stacked with the full text and the pagination hidden, and scales the responsive behavior only with columns and tokens (no literal measures in `@media`; the `2rem` of RF-7 is outside `@media`).
 
-## Anatomía
+## Anatomy
 
 ```html
 <section aria-roledescription="carousel" aria-label="Testimonials">
@@ -37,21 +37,21 @@ librerías (reemplaza Swiper) y **sin autoplay**.
 </section>
 ```
 
-La `<section>` del carrusel **es** la región nombrada (decisión 20): AboutPage
-renderiza el `SectionTitle` y el carrusel hermanos en el tabpanel, sin envolver
-en otra `<section>`; cuando hay h2 visible encima se pasa `labelledBy` con el id
-del h2 (en lugar de `aria-label`).
+The carousel's `<section>` **is** the named region (decision 20): AboutPage
+renders the `SectionTitle` and the carousel as siblings in the tabpanel, without wrapping
+them in another `<section>`; when there is a visible h2 above, `labelledBy` is passed with the id
+of the h2 (instead of `aria-label`).
 
-**Cambio de accesibilidad (decisión del usuario 2026-10-07, opción A):** el track
-y los slides son `<div>`, no `<ul>/<li>`. `li[role="group"]` viola
-`aria-allowed-role` de axe (el rol `group` no está permitido en `li`) y arrastra
-la regla `list`; el patrón APG de carrusel usa contenedores `<div role="group">`.
-El Test 12 (`expectNoA11yViolations` sobre el track completo **cerrado**) es
-inviable con `ul/li`, así que la spec adopta divs para keep axe intacto (sin
-desactivar reglas). Consecuencia en tests de T2/T3 aprobados: sus aserciones
-estructurales `tagName "UL"/"LI"` se actualizan a `div`+`role="group"` **como
-parte de este mismo Cambio** (decisión explícita del usuario; no es debilitar —
-el contrato observable, "un `group` por testimonio con nombre n of N", no cambia).
+**Accessibility change (user's decision 2026-10-07, option A):** the track
+and the slides are `<div>`, not `<ul>/<li>`. `li[role="group"]` violates
+axe's `aria-allowed-role` (the `group` role is not allowed on `li`) and drags in
+the `list` rule; the APG carousel pattern uses `<div role="group">` containers.
+Test 12 (`expectNoA11yViolations` on the whole track **closed**) is
+unfeasible with `ul/li`, so the spec adopts divs to keep axe intact (without
+disabling rules). Consequence for the approved tests of T2/T3: their structural
+assertions `tagName "UL"/"LI"` are updated to `div`+`role="group"` **as
+part of this same Change** (explicit decision of the user; it is not weakening —
+the observable contract, "one `group` per testimonial with the name n of N", does not change).
 
 ## API
 
@@ -70,142 +70,142 @@ export interface TestimonialCarouselProps {
   testimonials: readonly Testimonial[];
   labels: TestimonialCarouselLabels;
   labelledBy?: string;
-  /** Se une a la clase base de la `<section>` raíz (G-B). */
+  /** Joined to the base class of the root `<section>` (G-B). */
   className?: string;
 }
 ```
 
-Interpola con la función `format` de i18n.
+It interpolates with the i18n `format` function.
 
-## Comportamiento
+## Behavior
 
-- **Slides por vista**: 1 (< md), 2 (≥ md). Lo resuelve CSS:
+- **Slides per view**: 1 (< md), 2 (≥ md). CSS resolves it:
   `grid-auto-columns: 100%` → `calc((100% - var(--layout-gap)) / 2)`.
-- **Scroll**: `overflow-x: auto; scroll-snap-type: x mandatory;` cada slide
-  `scroll-snap-align: start`. Swipe/trackpad nativos.
+- **Scroll**: `overflow-x: auto; scroll-snap-type: x mandatory;` each slide
+  `scroll-snap-align: start`. Native swipe/trackpad.
 
-### Bullets: uno por posición de scroll alcanzable
+### Bullets: one per reachable scroll position
 
-Con 2 slides por vista, no todos los testimonios pueden quedar primeros (el
-último nunca llega al borde izquierdo). Por eso los bullets **no** son uno
-por testimonio, sino uno por **posición a la que el track realmente puede
-desplazarse** (`stop`).
+With 2 slides per view, not every testimonial can end up first (the
+last one never reaches the left edge). That is why the bullets are **not** one
+per testimonial, but one per **position the track can really
+scroll to** (`stop`).
 
-Dos funciones puras en el módulo del componente, testeadas aparte:
+Two pure functions in the component's module, tested separately:
 
 ```ts
-/** Posiciones alcanzables: offset de cada slide limitado al scroll máximo, sin duplicados (tolerancia 1px), ordenadas. */
+/** Reachable positions: offset of each slide limited to the maximum scroll, with no duplicates (1px tolerance), sorted. */
 export function getScrollStops(slideOffsets: readonly number[], maxScroll: number): number[];
-/** Índice del stop más cercano a scrollLeft (empate → el menor). */
+/** Index of the stop closest to scrollLeft (tie → the lower one). */
 export function getActiveStop(stops: readonly number[], scrollLeft: number): number;
 ```
 
-- `slideOffsets` = `offsetLeft` de cada slide relativo al track;
+- `slideOffsets` = `offsetLeft` of each slide relative to the track;
   `maxScroll` = `track.scrollWidth - track.clientWidth`.
-- Ejemplo: 3 testimonios, 2 por vista → 2 stops (posición 0 y el final).
-  1 por vista → 3 stops. 2 testimonios con 2 por vista → 1 stop.
-- Los stops se recalculan al montar y cuando cambia el tamaño del track
+- Example: 3 testimonials, 2 per view → 2 stops (position 0 and the end).
+  1 per view → 3 stops. 2 testimonials with 2 per view → 1 stop.
+- The stops are recalculated on mount and when the size of the track changes
   (`ResizeObserver`).
-- **Click en un bullet** → `track.scrollTo({ left: stop, behavior })`, con
-  `behavior: "smooth"` solo si `prefers-reduced-motion: no-preference`.
-- **Bullet activo** = `getActiveStop(stops, track.scrollLeft)`, recalculado en el
-  evento `scroll` del track (limitado a un cálculo por frame con
-  `requestAnimationFrame`). Lleva `aria-current="true"`.
-- **Nombre del bullet**: `goToSlide` con `n` = número (1-based) del **primer
-  testimonio cuyo `offsetLeft ≥ stop − 1px`** (regla fija de la decisión 21 para
-  stops recortados a `maxScroll`; en el stop 0 es el testimonio 1).
-- **Nombre del slide** (`slideLabel`): `current` = índice 1-based del testimonio
-  en el array; `total` = `testimonials.length` (no de stops).
-- **Con 1 stop o menos**: no se renderizan bullets (cubre 1 testimonio, y 2
-  testimonios con 2 por vista). Con **0 testimonios**: no renderiza nada.
+- **Click on a bullet** → `track.scrollTo({ left: stop, behavior })`, with
+  `behavior: "smooth"` only if `prefers-reduced-motion: no-preference`.
+- **Active bullet** = `getActiveStop(stops, track.scrollLeft)`, recalculated on the
+  track's `scroll` event (limited to one calculation per frame with
+  `requestAnimationFrame`). It carries `aria-current="true"`.
+- **Name of the bullet**: `goToSlide` with `n` = number (1-based) of the **first
+  testimonial whose `offsetLeft ≥ stop − 1px`** (fixed rule of decision 21 for
+  stops clamped to `maxScroll`; at stop 0 it is testimonial 1).
+- **Name of the slide** (`slideLabel`): `current` = 1-based index of the testimonial
+  in the array; `total` = `testimonials.length` (not of stops).
+- **With 1 stop or fewer**: no bullets are rendered (it covers 1 testimonial, and 2
+  testimonials with 2 per view). With **0 testimonials**: it renders nothing.
 
 ### Dialog
 
-Estado `selectedId`; `onOpen(id)` de la card lo fija; `onClose` del dialog lo
-limpia (ver la máquina de estados en `TestimonialDialog.md`).
+State `selectedId`; the card's `onOpen(id)` sets it; the dialog's `onClose`
+clears it (see the state machine in `TestimonialDialog.md`).
 
-## Estilos y tokens
+## Styles and tokens
 
-| Parte | Valor |
+| Part | Value |
 |---|---|
-| Track | `position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: var(--layout-gap); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; padding-block: var(--testimonial-headroom) 2rem; margin: 0; scrollbar-width: none;` (≥ md: 2 columnas visibles). `position: relative` es **necesidad mecánica** del contrato "`slideOffsets` relativo al track": hace del track el `offsetParent` de las slides para que `offsetLeft` midan bien (criterio HexAvatar T2 / dialog-flex; no es un valor de diseño, va con comentario). Ya no hay `list-style` (el track es `div`, Cambio de accesibilidad) |
-| Slide | `div class="slide"` (hijo directo del track): `scroll-snap-align: start;` (Comportamiento → Scroll) + `min-width: 0` (mecánico: un item de grid sin él se hincha a `min-content` y rompe columna/medición; con comentario) |
-| Headroom del track | **Único lugar** que reserva espacio para el avatar de TestimonialCard: `padding-top: var(--testimonial-headroom)` (protrusión del avatar + 0.5rem de sombra; 32px < 580 → 38px). `padding-bottom: 2rem` (fijo) para que no se recorte la sombra de hover de la card. Motivo: `overflow-x: auto` también recorta el eje vertical. La card no lleva `margin-top` |
-| Scrollbar | Oculta (`scrollbar-width: none` + `::-webkit-scrollbar { display: none }`): la navegación visible son los bullets |
-| Paginación | `display: flex; justify-content: center; gap: 0.625rem; margin-top: var(--space-4);` |
-| Bullet | `width/height: var(--size-bullet); border-radius: var(--radius-round); background: var(--color-track); border: 0;` + área táctil 24×24px lograda con **pseudo-elemento transparente** (`::after` con inset negativo), no con padding: conserva el `gap: 0.625rem` visual de la paginación (elección fijada en la pasada de Clarificación sobre el "o" de la regla; rechazable en la puerta de Plan) |
-| Bullet activo | `width: var(--size-bullet-active); background: var(--gradient-accent);` transición de `width` `--duration-base` `--ease-emphasized` (el fondo cambia sin transición: un gradiente no se puede animar) |
+| Track | `position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 100%; gap: var(--layout-gap); overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; padding-block: var(--testimonial-headroom) 2rem; margin: 0; scrollbar-width: none;` (≥ md: 2 visible columns). `position: relative` is a **mechanical necessity** of the contract "`slideOffsets` relative to the track": it makes the track the `offsetParent` of the slides so that `offsetLeft` measures correctly (HexAvatar T2 / dialog-flex criterion; it is not a design value, it goes with a comment). There is no `list-style` any more (the track is a `div`, Accessibility change) |
+| Slide | `div class="slide"` (direct child of the track): `scroll-snap-align: start;` (Behavior → Scroll) + `min-width: 0` (mechanical: a grid item without it swells to `min-content` and breaks the column/measurement; with a comment) |
+| Track headroom | **The only place** that reserves space for the avatar of TestimonialCard: `padding-top: var(--testimonial-headroom)` (avatar protrusion + 0.5rem of shadow; 32px < 580 → 38px). `padding-bottom: 2rem` (fixed) so that the card's hover shadow is not clipped. Reason: `overflow-x: auto` also clips the vertical axis. The card has no `margin-top` |
+| Scrollbar | Hidden (`scrollbar-width: none` + `::-webkit-scrollbar { display: none }`): the visible navigation is the bullets |
+| Pagination | `display: flex; justify-content: center; gap: 0.625rem; margin-top: var(--space-4);` |
+| Bullet | `width/height: var(--size-bullet); border-radius: var(--radius-round); background: var(--color-track); border: 0;` + a 24×24px touch area achieved with a **transparent pseudo-element** (`::after` with a negative inset), not with padding: it keeps the pagination's visual `gap: 0.625rem` (a choice set in the Clarification pass on the rule's "or"; rejectable at the Plan gate) |
+| Active bullet | `width: var(--size-bullet-active); background: var(--gradient-accent);` `width` transition `--duration-base` `--ease-emphasized` (the background changes with no transition: a gradient cannot be animated) |
 
-El activo se distingue por **tamaño** (10 → 20px) además del color, porque
-`--color-track` es decorativo (regla 3 de `docs/tokens/contrast.md`).
+The active one is distinguished by **size** (10 → 20px) in addition to the color, because
+`--color-track` is decorative (rule 3 of `docs/tokens/contrast.md`).
 
-## Estados
+## States
 
-| Estado | Efecto |
+| State | Effect |
 |---|---|
-| Bullet hover | `background: var(--color-text-muted)` (solo inactivos) |
+| Bullet hover | `background: var(--color-text-muted)` (inactive ones only) |
 | Bullet focus-visible | `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);` |
-| Bullet activo | ver tabla de estilos |
-| Dialog abierto | ver `TestimonialDialog.md` |
+| Active bullet | see the styles table |
+| Dialog open | see `TestimonialDialog.md` |
 
 ## Responsive
 
-- < md: 1 testimonio por vista; ≥ md: 2 (cambio de columnas, sin medidas nuevas).
-- El headroom escala por token (`--testimonial-headroom`).
-- La cantidad de bullets cambia sola con el ancho (se recalculan los stops).
+- < md: 1 testimonial per view; ≥ md: 2 (a change of columns, with no new measures).
+- The headroom scales through a token (`--testimonial-headroom`).
+- The number of bullets changes by itself with the width (the stops are recalculated).
 
-## Impresión
+## Print
 
-Los testimonios se imprimen **todos, apilados, con el texto completo**:
+The testimonials are printed **all of them, stacked, with the full text**:
 
 - Track: `display: block; overflow: visible; padding: var(--testimonial-headroom) 0 0;`
-  cada slide `break-inside: avoid;` y, desde el segundo,
-  `margin-top: var(--testimonial-headroom)` (espacio para el avatar).
-- Paginación: `display: none`. El dialog no se imprime.
-- TestimonialCard, en su propio `@media print`, quita el recorte del extracto
-  (texto completo), oculta el botón estirado y la sombra (ver su spec).
+  each slide `break-inside: avoid;` and, from the second one on,
+  `margin-top: var(--testimonial-headroom)` (space for the avatar).
+- Pagination: `display: none`. The dialog is not printed.
+- TestimonialCard, in its own `@media print`, removes the clamp of the excerpt
+  (full text), hides the stretched button and the shadow (see its spec).
 
-## Accesibilidad
+## Accessibility
 
-- Patrón *carousel* de WAI-ARIA: `aria-roledescription="carousel"` en la sección
-  nombrada; cada slide `role="group"` + `aria-roledescription="slide"` + `aria-label` "n of N".
-- Sin autoplay → no hace falta botón de pausa. Sin región `aria-live`: el cambio
-  de slide no se anuncia (RF-5, decisión 21).
-- Sin navegación por flechas de teclado (RF-2, decisión 21): Tab entre controles + scroll nativo.
-- El foco por teclado recorre los botones de las cards (uno por slide) y luego
-  los bullets; al enfocar una card fuera de vista, el navegador la desplaza.
-- Los bullets son `<button type="button">` con nombre ("Go to slide n", regla de
-  mapeo stop→n en Comportamiento).
+- WAI-ARIA *carousel* pattern: `aria-roledescription="carousel"` on the named
+  section; each slide `role="group"` + `aria-roledescription="slide"` + `aria-label` "n of N".
+- No autoplay → no pause button is needed. No `aria-live` region: the slide
+  change is not announced (RF-5, decision 21).
+- No navigation with keyboard arrows (RF-2, decision 21): Tab between controls + native scroll.
+- Keyboard focus goes through the buttons of the cards (one per slide) and then
+  the bullets; when a card out of view is focused, the browser scrolls it in.
+- The bullets are `<button type="button">` with a name ("Go to slide n", stop→n
+  mapping rule in Behavior).
 
-## Tests esperados
+## Expected tests
 
-jsdom no tiene layout ni `ResizeObserver`, y no implementa `scrollTo`:
-mockearlos (en `src/test/setup.ts` o en el test) y fijar `offsetLeft`,
-`scrollWidth`, `clientWidth` y `scrollLeft` con `Object.defineProperty`.
-El recálculo de stops **por resize no se testea** (mock global no-op): QA F5
-(decisión 21). El `behavior` de `scrollTo` se fija con el mock de `matchMedia`
-(del `src/test/`, configurable; setup F1).
+jsdom has no layout or `ResizeObserver`, and does not implement `scrollTo`:
+mock them (in `src/test/setup.ts` or in the test) and set `offsetLeft`,
+`scrollWidth`, `clientWidth` and `scrollLeft` with `Object.defineProperty`.
+The recalculation of stops **on resize is not tested** (no-op global mock): QA F5
+(decision 21). The `behavior` of `scrollTo` is set with the `matchMedia` mock
+(from `src/test/`, configurable; F1 setup).
 
-Funciones puras:
+Pure functions:
 
-1. `getScrollStops([0, 300, 600], 300)` → `[0, 300]` (2 por vista).
-2. `getScrollStops([0, 300, 600], 600)` → `[0, 300, 600]` (1 por vista).
+1. `getScrollStops([0, 300, 600], 300)` → `[0, 300]` (2 per view).
+2. `getScrollStops([0, 300, 600], 600)` → `[0, 300, 600]` (1 per view).
 3. `getScrollStops([0, 300], 0)` → `[0]`.
-4. `getActiveStop([0, 300], 140)` → `0`; con `160` → `1`; con `150` → `0` (empate → el menor).
+4. `getActiveStop([0, 300], 140)` → `0`; with `160` → `1`; with `150` → `0` (tie → the lower one).
 
-Componente:
+Component:
 
-5. Sección con nombre (por `aria-label` o `aria-labelledby`).
-6. Un `group` por testimonio con `aria-roledescription="slide"` y nombre "n of N" (1-based, `total = testimonials.length`).
-7. Con layout mockeado de 3 testimonios y 2 por vista: 2 bullets; el primero con `aria-current="true"`; nombres según la regla stop→n (Go to slide 1 / Go to slide 2).
-8. Click en el bullet 2 → `track.scrollTo` con el `left` del stop 2 y `behavior` según `matchMedia.matches` (smooth / auto).
-9. Evento `scroll` con `scrollLeft` en el stop 2 → el bullet 2 pasa a `aria-current="true"` y el 1 no.
-10. Click en "Read full testimonial from X" → se abre el dialog con el nombre de X; cerrar → desaparece.
-11. 1 stop (p. ej. 1 testimonio) → sin bullets; 0 testimonios → no renderiza nada.
-12. `expectNoA11yViolations` sin violaciones (cerrado y con el dialog abierto).
+5. Section with a name (by `aria-label` or `aria-labelledby`).
+6. One `group` per testimonial with `aria-roledescription="slide"` and the name "n of N" (1-based, `total = testimonials.length`).
+7. With a mocked layout of 3 testimonials and 2 per view: 2 bullets; the first one with `aria-current="true"`; names according to the stop→n rule (Go to slide 1 / Go to slide 2).
+8. Click on bullet 2 → `track.scrollTo` with the `left` of stop 2 and `behavior` according to `matchMedia.matches` (smooth / auto).
+9. `scroll` event with `scrollLeft` at stop 2 → bullet 2 becomes `aria-current="true"` and bullet 1 does not.
+10. Click on "Read full testimonial from X" → the dialog opens with the name of X; closing → it disappears.
+11. 1 stop (e.g. 1 testimonial) → no bullets; 0 testimonials → it renders nothing.
+12. `expectNoA11yViolations` with no violations (closed and with the dialog open).
 
-## No hacer
+## Do not
 
-- No instalar Swiper, Embla ni similares.
-- No agregar autoplay ni loop infinito.
-- No agregar flechas prev/next (el diseño usa bullets; si se quisieran, es un cambio de spec).
+- Do not install Swiper, Embla or similar.
+- Do not add autoplay or an infinite loop.
+- Do not add prev/next arrows (the design uses bullets; if they were wanted, it is a spec change).

@@ -1,33 +1,33 @@
 # Plan — TestimonialCard
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/TestimonialCard/TestimonialCard.tsx` | `Box variant="inner" as="article">` + `.card`: header grid (HexAvatar + identity h3/p), excerpt, comilla gradient, botón estirado | RF-1, RF-2, RF-4, RF-7 |
-| `src/components/TestimonialCard/TestimonialCard.module.css` | ajustes de la card sobre el Box (relative/flex/`--radius-16`/`--testimonial-padding`/`height: 100%`), offset avatar, grid, clamp, comilla absolute, `::after` del botón, hover shadow + transición, `@media print` propio | RF-2, RF-5, RF-6 |
-| `src/components/TestimonialCard/TestimonialCard.test.tsx` | tests + cierre a11y | todas |
+| `src/components/TestimonialCard/TestimonialCard.tsx` | `Box variant="inner" as="article">` + `.card`: header grid (HexAvatar + identity h3/p), excerpt, gradient quote, stretched button | RF-1, RF-2, RF-4, RF-7 |
+| `src/components/TestimonialCard/TestimonialCard.module.css` | card adjustments on top of the Box (relative/flex/`--radius-16`/`--testimonial-padding`/`height: 100%`), avatar offset, grid, clamp, absolute quote, the button's `::after`, hover shadow + transition, its own `@media print` | RF-2, RF-5, RF-6 |
+| `src/components/TestimonialCard/TestimonialCard.test.tsx` | tests + a11y closing case | all |
 | `src/components/TestimonialCard/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno.
+None.
 
-## Interfaz
+## Interface
 
-`TestimonialCardProps { testimonial; openLabel; onOpen; className? }` (spec → API; `className` al Box raíz vía Box, G-B). El h3 id: `testimonial-${testimonial.id}-name` (fórmula fija RF-7).
+`TestimonialCardProps { testimonial; openLabel; onOpen; className? }` (spec → API; `className` to the root Box via Box, G-B). The h3 id: `testimonial-${testimonial.id}-name` (fixed formula RF-7).
 
-## Decisiones
+## Decisions
 
-- Superficie sobre `Box variant="inner" as="article">` + clase `.card` que ajusta (decisión 17): fondo del Box inner (`surface-muted`), radio/padding propios por tokens; la card no declara color literal.
-- Botón estirado (RF-1): `<button type="button" aria-label={openLabel}>` sin hijos; `::after { inset: 0 }` cubre la card; `onOpen(testimonial.id)`; único enfocable; siempre visible (decisión 17). Enter/Espacio nativos.
-- Avatar: `HexAvatar src=… className={styles.avatar}` (alt por defecto ""), `margin-top` negativo por token; headroom NO se reserva acá (RF-3: del track, carrusel).
-- Comilla: `Icon name="quote" tone="gradient" className={styles.quote}` (`--icon-size: 2rem`, absolute con insets de tokens) — decorativa.
-- Clamp 4 líneas (`-webkit-line-clamp`) + `@media print` propio (RF-2: quita clamp/oculta botón; sombra vía token en print, no se redeclara) — la única pieza de F3 con print propio junto con el dialog (G-D-1).
-- Hover sobre la card: regla `.card:hover { box-shadow: var(--shadow-control) }` con transición `box-shadow var(--duration-base) var(--ease-standard)` (G-E; el `::after` del botón no necesita estado hover aparte).
+- Surface on `Box variant="inner" as="article">` + a `.card` class that adjusts (decision 17): background of the inner Box (`surface-muted`), its own radius/padding through tokens; the card declares no literal color.
+- Stretched button (RF-1): `<button type="button" aria-label={openLabel}>` with no children; `::after { inset: 0 }` covers the card; `onOpen(testimonial.id)`; the only focusable; always visible (decision 17). Native Enter/Space.
+- Avatar: `HexAvatar src=… className={styles.avatar}` (default alt ""), negative `margin-top` by token; the headroom is NOT reserved here (RF-3: it belongs to the track, carousel).
+- Quote: `Icon name="quote" tone="gradient" className={styles.quote}` (`--icon-size: 2rem`, absolute with token insets) — decorative.
+- 4-line clamp (`-webkit-line-clamp`) + its own `@media print` (RF-2: it removes the clamp/hides the button; shadow via the token in print, not redeclared) — the only F3 piece with its own print together with the dialog (G-D-1).
+- Hover on the card: rule `.card:hover { box-shadow: var(--shadow-control) }` with transition `box-shadow var(--duration-base) var(--ease-standard)` (G-E; the button's `::after` needs no separate hover state).
 
-## Estrategia de tests
+## Test strategy
 
-Fixture `Testimonial` (id `t-maria`). Armazones: `HexAvatarDefs` + `AccentGradientDefs` (comilla y avatar gradient; criterio HexAvatar → Forma). Tests: `getByRole("article", { name: author })` con heading nivel 3 e id fórmula; rol y extracto visibles (`testimonial.text`); `getByRole("button", { name: openLabel })` único enfocable del article (`focus()` Tab-order: `queryAll...` de elements? asertar que el article no tiene tabIndex ni otro control — criterio NavTabs); click/Enter/Espacio → `onOpen("t-maria")` una vez (user-event); avatar `img` con `alt=""`; `expectNoA11yViolations`. P1 (clamp, hover, focus ring del ::after, print, offsets): inspección + QA F5 (#101). Rojo on-arrival probable en el caso "único enfocable" si T1 monta otro control — no: no debe existir.
+`Testimonial` fixture (id `t-maria`). Scaffolds: `HexAvatarDefs` + `AccentGradientDefs` (quote and gradient avatar; HexAvatar → Shape criterion). Tests: `getByRole("article", { name: author })` with a level 3 heading and formula id; role and excerpt visible (`testimonial.text`); `getByRole("button", { name: openLabel })` the only focusable of the article (`focus()` Tab-order: `queryAll...` of elements? assert that the article has no tabIndex or other control — NavTabs criterion); click/Enter/Space → `onOpen("t-maria")` once (user-event); avatar `img` with `alt=""`; `expectNoA11yViolations`. P1 (clamp, hover, focus ring of the ::after, print, offsets): inspection + QA F5 (#101). Red on-arrival likely in the "only focusable" case if T1 mounts another control — no: it must not exist.
 
-Cobertura: T1→RF-4,RF-7 · T2→RF-1 · T3→RF-2,RF-3(doc),RF-5,RF-6 + cierre.
+Coverage: T1→RF-4,RF-7 · T2→RF-1 · T3→RF-2,RF-3(doc),RF-5,RF-6 + closing.

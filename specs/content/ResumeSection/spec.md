@@ -1,20 +1,20 @@
 # ResumeSection
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Bloque "Experience", "Projects" o "Education" del panel Resume: título h2 con IconBox +
+"Experience", "Projects" or "Education" block of the Resume panel: h2 title with IconBox +
 Timeline.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO `entries` contiene elementos, ENTONCES EL SISTEMA renderiza una `<section>` nombrada por su título; SI `entries` está vacío, ENTONCES no renderiza nada.
-- RF-2: EL SISTEMA renderiza un `SectionTitle` `as="h2"` con `id` derivado e `icon` (que SectionTitle monta en su `IconBox` decorativo, RF-3 de SectionTitle), seguido de un `Timeline` con las entradas, el `locale` y el `presentLabel` recibidos, y el **`idPrefix` explícito recibido por prop** (decisión 14: no hay derivación interna "education"→"edu"; lo fija ResumePage).
-- RF-3: EL SISTEMA deriva **solo el id del `h2`** de la sección con la fórmula fija `resume-${id}-title` (`id` de la prop); la unicidad de los ids de los ítems del Timeline la garantiza su `idPrefix` (RF-5 de Timeline), no esta pieza.
-- RF-4: EL SISTEMA delega en ResumePage la disposición en columnas y no declara `@media` propios. Verificación: inspección del CSS de la pieza.
-- RF-5: EL SISTEMA expone la sección como región nombrada por su `h2` (`aria-labelledby`). El nivel h3 de los títulos del Timeline lo fija Timeline (RF-2 de su spec) y se comprueba en sus tests; aquí la región nombrada queda verificada por test 1.
+- RF-1: WHEN `entries` contains elements, THEN THE SYSTEM renders a `<section>` named by its title; IF `entries` is empty, THEN it renders nothing.
+- RF-2: THE SYSTEM renders a `SectionTitle` `as="h2"` with a derived `id` and `icon` (which SectionTitle mounts in its decorative `IconBox`, RF-3 of SectionTitle), followed by a `Timeline` with the entries, the `locale` and the `presentLabel` received, and the **explicit `idPrefix` received by prop** (decision 14: there is no internal "education"→"edu" derivation; ResumePage sets it).
+- RF-3: THE SYSTEM derives **only the id of the `h2`** of the section with the fixed formula `resume-${id}-title` (`id` from the prop); the uniqueness of the ids of the Timeline items is guaranteed by its `idPrefix` (RF-5 of Timeline), not by this piece.
+- RF-4: THE SYSTEM delegates the column arrangement to ResumePage and declares no `@media` of its own. Verification: inspection of the piece's CSS.
+- RF-5: THE SYSTEM exposes the section as a region named by its `h2` (`aria-labelledby`). The h3 level of the Timeline titles is set by Timeline (RF-2 of its spec) and checked in its tests; here the named region is verified by test 1.
 
-## Anatomía
+## Anatomy
 
 ```html
 <section aria-labelledby="resume-education-title">
@@ -30,51 +30,51 @@ import type { IconName } from "../Icon";
 import type { Locale, TimelineEntry } from "@data/cv.types.generated";
 
 export interface ResumeSectionProps {
-  /** Identificador estable de la sección: base del id del h2 (`resume-${id}-title`). */
+  /** Stable identifier of the section: base of the h2's id (`resume-${id}-title`). */
   id: string;
-  /** Prefijo explícito que se reenvía a Timeline para sus ids de ítem (ej. "edu", "exp"); decisión 14. */
+  /** Explicit prefix forwarded to Timeline for its item ids (e.g. "edu", "exp"); decision 14. */
   timelineIdPrefix: string;
   title: string;
   icon: IconName;
   entries: readonly TimelineEntry[];
   locale: Locale;
   presentLabel: string;
-  /** Se une a la clase base de la `<section>` raíz (G-B). */
+  /** Joined to the base class of the root `<section>` (G-B). */
   className?: string;
 }
 ```
 
-## Estilos y tokens
+## Styles and tokens
 
 - `display: flex; flex-direction: column;`
-- El h2 usa `margin-bottom` del SectionTitle; entre título y timeline no se agrega más.
-- La disposición de las secciones (una sola columna, apiladas; #114) la hace **ResumePage**, no este componente.
+- The h2 uses SectionTitle's `margin-bottom`; nothing more is added between title and timeline.
+- The arrangement of the sections (a single column, stacked; #114) is done by **ResumePage**, not by this component.
 
-## Estados
+## States
 
-No es interactivo. Con `entries` vacío no se renderiza.
+It is not interactive. With empty `entries` it is not rendered.
 
 ## Responsive
 
-Sin `@media` propios. La disposición en columnas la decide ResumePage.
+No `@media` of its own. The column arrangement is decided by ResumePage.
 
-## Accesibilidad
+## Accessibility
 
-- `<section>` nombrada por su h2 (`aria-labelledby`), así aparece como región.
-- Los títulos del Timeline son h3 (un nivel debajo).
+- `<section>` named by its h2 (`aria-labelledby`), so it shows up as a region.
+- The Timeline titles are h3 (one level below).
 
-## Tests esperados
+## Expected tests
 
 1. `getByRole("region", { name: title })`.
-2. Contiene un heading nivel 2 con `title` y un IconBox decorativo.
-3. Renderiza el Timeline con las entradas (`listitem` × n).
-4. `entries` vacío → no renderiza la sección (`null`).
-5. Dos ResumeSection con `id` distintos producen `resume-<id>-title` distintos (solo el id del h2; RF-3).
-6. `expectNoA11yViolations` sin violaciones.
+2. It contains a level 2 heading with `title` and a decorative IconBox.
+3. It renders the Timeline with the entries (`listitem` × n).
+4. Empty `entries` → it does not render the section (`null`).
+5. Two ResumeSection with different `id` produce different `resume-<id>-title` (only the h2's id; RF-3).
+6. `expectNoA11yViolations` with no violations.
 
-## No hacer
+## Do not
 
-- No renderizar la sección con `entries` vacío: devuelve `null`.
-- No decidir columnas ni declarar `@media`: la disposición la hace ResumePage.
-- No agregar espacio entre el título y el Timeline: alcanza el `margin-bottom` del SectionTitle.
-- No usar ids fijos: se derivan de `id` para que dos secciones no los dupliquen.
+- Do not render the section with empty `entries`: it returns `null`.
+- Do not decide columns or declare `@media`: the arrangement is done by ResumePage.
+- Do not add space between the title and the Timeline: SectionTitle's `margin-bottom` is enough.
+- Do not use fixed ids: they are derived from `id` so that two sections do not duplicate them.

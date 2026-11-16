@@ -1,21 +1,21 @@
 # ServiceCard
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Tarjeta de "What I'm Doing" en el panel About: ícono, título y descripción
-de un servicio o área de trabajo.
+"What I'm Doing" card in the About panel: icon, title and description
+of a service or area of work.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el componente recibe un `service`, ENTONCES EL SISTEMA renderiza un `<article>` nombrado por su `h3`, con el título (como `SectionTitle as="h3"`, decisión 16: tamaño y margen 0.5rem los aporta SectionTitle, la pieza no los duplica) y la descripción del servicio. El nivel es fijo h3, sin prop que lo cambie.
-- RF-2: EL SISTEMA renderiza el ícono con `name = service.icon` (campo `icon` del esquema) y `tone="gradient"`, decorativo; el tamaño se fija con `--icon-size` en la clase del propio ícono (`.glyph`). No hay wrapper `.icon`: el `Icon` ya trae `flex-shrink: 0` (la "caja" es el glifo mismo de 2.5rem, sin inset — decisión 16). **No usa `IconBox`** por contrato: IconBox RF-5 prohíbe ponerlo dentro de `Box variant="inner"` (la card es un Box inner) y su API no re-escala el glifo.
-- RF-3: EL SISTEMA genera el id del título con la fórmula fija `service-${service.id}-title` y el `<article>` se nombra con ese id (sin duplicados por `service.id` del esquema).
-- RF-4: EL SISTEMA organiza el layout **mobile-first**: la base (sin media) apila el ícono arriba y centra el texto; CUANDO el ancho es 580px o más (`@media (min-width: 580px)`), ENTONCES el ícono queda a la izquierda del texto. Verificación: inspección del CSS + QA F5 (jsdom no computa).
-- RF-5: EL SISTEMA deja la cantidad de columnas a AboutPage, iguala alturas con `height: 100%` y no declara `@media` con medidas literales. En impresión, el `break-inside: avoid` lo pone el estilo compartido (G-D; `foundations/layout.md` → Impresión): la pieza no declara `@media print`.
-- RF-6: EL SISTEMA renderiza ServiceCard sin estados interactivos propios (sin hover ni foco). Verificación: inspección del CSS + axe.
+- RF-1: WHEN the component receives a `service`, THEN THE SYSTEM renders an `<article>` named by its `h3`, with the title (as `SectionTitle as="h3"`, decision 16: size and 0.5rem margin are provided by SectionTitle, the piece does not duplicate them) and the description of the service. The level is fixed at h3, with no prop to change it.
+- RF-2: THE SYSTEM renders the icon with `name = service.icon` (`icon` field of the schema) and `tone="gradient"`, decorative; the size is set with `--icon-size` on the class of the icon itself (`.glyph`). There is no `.icon` wrapper: the `Icon` already brings `flex-shrink: 0` (the "box" is the 2.5rem glyph itself, with no inset — decision 16). **It does not use `IconBox`** by contract: IconBox RF-5 forbids putting it inside `Box variant="inner"` (the card is an inner Box) and its API does not rescale the glyph.
+- RF-3: THE SYSTEM generates the title's id with the fixed formula `service-${service.id}-title` and the `<article>` is named with that id (no duplicates thanks to the schema's `service.id`).
+- RF-4: THE SYSTEM organizes the layout **mobile-first**: the base (no media) stacks the icon on top and centers the text; WHEN the width is 580px or more (`@media (min-width: 580px)`), THEN the icon sits to the left of the text. Verification: CSS inspection + QA F5 (jsdom does not compute).
+- RF-5: THE SYSTEM leaves the number of columns to AboutPage, evens out heights with `height: 100%` and declares no `@media` with literal measures. In print, `break-inside: avoid` is set by the shared style (G-D; `foundations/layout.md` → Print): the piece declares no `@media print`.
+- RF-6: THE SYSTEM renders ServiceCard with no interactive states of its own (no hover or focus). Verification: CSS inspection + axe.
 
-## Anatomía
+## Anatomy
 
 ```
 ≥ 580px                                  < 580px
@@ -43,54 +43,54 @@ import type { Service } from "@data/cv.types.generated";
 
 export interface ServiceCardProps {
   service: Service;
-  /** Se une al raíz: se transmite al Box `as="article"` (Box aplica la unión en su raíz, G-B). */
+  /** Joined to the root: it is passed on to the `as="article"` Box (Box applies the join on its root, G-B). */
   className?: string;
 }
 ```
 
-## Estilos y tokens
+## Styles and tokens
 
-| Parte | Valor |
+| Part | Value |
 |---|---|
-| Contenedor (base) | `Box variant="inner"`; `display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-4); height: 100%;` |
-| ≥ 580px (solo layout) | `flex-direction: row; align-items: flex-start; text-align: start;` (el `gap` sigue siendo `--space-4`; sin medidas literales en el media) |
-| Ícono | `.glyph { --icon-size: var(--size-service-icon); }` sobre el propio `Icon` (2.5rem; la variable no se hereda, Icon RF-6; `flex-shrink: 0` ya lo trae Icon) |
-| Título | `SectionTitle as="h3"` (font-size `--font-size-h3` y `margin-bottom: 0.5rem` por RF-1/RF-5 de SectionTitle; la pieza no los declara) |
-| Descripción | cuerpo; `margin: 0` |
+| Container (base) | `Box variant="inner"`; `display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-4); height: 100%;` |
+| ≥ 580px (layout only) | `flex-direction: row; align-items: flex-start; text-align: start;` (the `gap` is still `--space-4`; no literal measures in the media) |
+| Icon | `.glyph { --icon-size: var(--size-service-icon); }` on the `Icon` itself (2.5rem; the variable is not inherited, Icon RF-6; `flex-shrink: 0` already comes with Icon) |
+| Title | `SectionTitle as="h3"` (font-size `--font-size-h3` and `margin-bottom: 0.5rem` by RF-1/RF-5 of SectionTitle; the piece does not declare them) |
+| Description | body; `margin: 0` |
 
-La grilla (1 columna; 2 columnas ≥ lg con `gap: var(--layout-gap)`) la arma
-AboutPage. `height: 100%` iguala alturas en la misma fila.
+The grid (1 column; 2 columns ≥ lg with `gap: var(--layout-gap)`) is built by
+AboutPage. `height: 100%` evens out heights in the same row.
 
-## Estados
+## States
 
-No es interactivo: sin hover ni foco.
+It is not interactive: no hover or focus.
 
 ## Responsive
 
-- Base (mobile-first): ícono arriba y texto centrado.
-- ≥ 580px: ícono a la izquierda (cambio de dirección, sin cambiar medidas).
-- La cantidad de columnas la decide AboutPage.
+- Base (mobile-first): icon on top and centered text.
+- ≥ 580px: icon on the left (a change of direction, without changing measures).
+- The number of columns is decided by AboutPage.
 
-## Accesibilidad
+## Accessibility
 
-- `<article>` nombrado por su h3 (SectionTitle con `id`).
-- Ícono decorativo; los tests con `tone="gradient"` montan `AccentGradientDefs` de armazón (contrato de Icon, criterio IconBox).
+- `<article>` named by its h3 (SectionTitle with `id`).
+- Decorative icon; the tests with `tone="gradient"` mount a scaffold `AccentGradientDefs` (Icon's contract, IconBox criterion).
 
-## Tests esperados
+## Expected tests
 
 1. `getByRole("article", { name: service.title })`.
-2. Heading nivel 3 con el título y párrafo con la descripción.
-3. Renderiza un svg decorativo con `stroke="url(#accent-gradient)"` y el glyph corresponde a `service.icon` (clase `lucide-*` propagada por Icon; armazón `AccentGradientDefs`).
-4. El id del título es `service-${service.id}-title` y el `<article>` lo referencia en `aria-labelledby`.
-5. `expectNoA11yViolations` sin violaciones.
+2. Level 3 heading with the title and a paragraph with the description.
+3. It renders a decorative svg with `stroke="url(#accent-gradient)"` and the glyph matches `service.icon` (`lucide-*` class propagated by Icon; `AccentGradientDefs` scaffold).
+4. The title's id is `service-${service.id}-title` and the `<article>` references it in `aria-labelledby`.
+5. `expectNoA11yViolations` with no violations.
 
-## No hacer
+## Do not
 
-- No agregar hover ni foco: no es interactiva.
-- No pasar `size` al `Icon` ni fijar `--icon-size` en un contenedor: va en la clase del propio ícono (`.glyph`).
-- No envolver el ícono en un `<span class="icon">`: la caja es el glifo (decisión 16).
-- No usar `IconBox` dentro de esta card (Box inner): prohibido por IconBox RF-5.
-- No declarar el título con h3 crudo + estilos propios: usa `SectionTitle as="h3"`.
-- No invertir el orden responsive: base = columna centrada; el `@media (min-width: 580px)` pasa a fila (mobile-first, `docs/tokens/breakpoints.md`).
-- No decidir la cantidad de columnas: la grilla la arma AboutPage.
-- No cambiar medidas en el `@media`: solo dirección, alineación y centrado.
+- Do not add hover or focus: it is not interactive.
+- Do not pass `size` to the `Icon` or set `--icon-size` on a container: it goes on the class of the icon itself (`.glyph`).
+- Do not wrap the icon in a `<span class="icon">`: the box is the glyph (decision 16).
+- Do not use `IconBox` inside this card (inner Box): forbidden by IconBox RF-5.
+- Do not declare the title with a raw h3 + styles of its own: it uses `SectionTitle as="h3"`.
+- Do not invert the responsive order: base = centered column; the `@media (min-width: 580px)` switches to a row (mobile-first, `docs/tokens/breakpoints.md`).
+- Do not decide the number of columns: the grid is built by AboutPage.
+- Do not change measures in the `@media`: only direction, alignment and centering.

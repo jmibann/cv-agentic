@@ -1,31 +1,31 @@
 # Timeline
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Lista cronológica vertical para Experience, Projects y Education: línea fina a la
-izquierda, un punto de acento por ítem, título, período y descripción.
+Vertical chronological list for Experience, Projects and Education: a thin line on the
+left, one accent dot per item, title, period and description.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO `entries` contiene ítems, ENTONCES EL SISTEMA renderiza un `<ol role="list">` (el `role` explícito protege la semántica ante el quirk de `list-style: none` en Safari/VoiceOver) con un `<li>` por entrada en el orden de los datos; SI `entries` está vacío, ENTONCES no renderiza nada.
-- RF-2: EL SISTEMA renderiza por ítem el título como `<h3>` (nivel fijo por `docs/DESIGN.md`, sin prop que lo cambie) y muestra `organization` y `description` si existen en la entrada.
-- RF-3: CUANDO `end` es `null`, ENTONCES EL SISTEMA termina el período en `presentLabel` ("Present" / "Actualidad").
-- RF-4: EL SISTEMA envuelve **cada fecha** en `<time dateTime>` con el valor de los datos y formatea cada extremo con el formador por extremo que exporta `src/i18n/formatPeriod.ts`, según el `locale`. Decisión 12=a: **extensión previa de Foundation** (tarea F3 delegada a `foundation`, sin romper `formatPeriod`: la función actual sigue con la misma firma y usos; se exporta un formador de extremo — nombre exacto lo fija esa tarea). Timeline no lo reimplementa ni parsea strings compuestas.
-- RF-5: EL SISTEMA genera los ids de título con la fórmula fija `${idPrefix}-${entry.id}-title` (el `entry.id` del esquema entra en la fórmula), de modo que dos Timelines en la misma página no colisionen.
-- RF-6: EL SISTEMA trata el punto y la línea como decorativos (pseudo-elementos) y le quita la línea al **último ítem por posición** (`:last-child` del `<ol>`), aunque un ítem con `end: null` quede en el medio. Verificación: inspección del CSS.
-- RF-7: EL SISTEMA escala la sangría con `--timeline-indent` y no declara `@media` propios (tampoco `@media print`: el `break-inside: avoid` del ítem lo fija el estilo compartido de impresión per `foundations/layout.md` → Impresión, G-D). Verificación: inspección del CSS.
+- RF-1: WHEN `entries` contains items, THEN THE SYSTEM renders an `<ol role="list">` (the explicit `role` protects the semantics against the `list-style: none` quirk in Safari/VoiceOver) with one `<li>` per entry in the order of the data; IF `entries` is empty, THEN it renders nothing.
+- RF-2: THE SYSTEM renders per item the title as `<h3>` (a level fixed by `docs/DESIGN.md`, with no prop to change it) and shows `organization` and `description` if they exist in the entry.
+- RF-3: WHEN `end` is `null`, THEN THE SYSTEM ends the period in `presentLabel` ("Present" / "Actualidad").
+- RF-4: THE SYSTEM wraps **each date** in `<time dateTime>` with the value from the data and formats each endpoint with the per-endpoint formatter exported by `src/i18n/formatPeriod.ts`, according to the `locale`. Decision 12=a: **a prior extension of Foundation** (F3 task delegated to `foundation`, without breaking `formatPeriod`: the current function keeps the same signature and uses; an endpoint formatter is exported — that task sets the exact name). Timeline does not reimplement it or parse composite strings.
+- RF-5: THE SYSTEM generates the title ids with the fixed formula `${idPrefix}-${entry.id}-title` (the schema's `entry.id` goes into the formula), so that two Timelines on the same page do not collide.
+- RF-6: THE SYSTEM treats the dot and the line as decorative (pseudo-elements) and removes the line from the **last item by position** (`:last-child` of the `<ol>`), even if an item with `end: null` ends up in the middle. Verification: CSS inspection.
+- RF-7: THE SYSTEM scales the indent with `--timeline-indent` and declares no `@media` of its own (nor `@media print`: the item's `break-inside: avoid` is set by the shared print style per `foundations/layout.md` → Print, G-D). Verification: CSS inspection.
 
-## Anatomía
+## Anatomy
 
 ```
-●  B.Sc. in Computer Science          ← h3 (estilo h4) — title
+●  B.Sc. in Computer Science          ← h3 (h4 style) — title
 │  University of Buenos Aires         ← organization
-│  2012 — 2017                        ← período (text-muted, <time>)
+│  2012 — 2017                        ← period (text-muted, <time>)
 │  Focus on software engineering…     ← description
 │
 ●  Web Accessibility Specialist
-   …                                  ← el último ítem no tiene línea
+   …                                  ← the last item has no line
 ```
 
 ```html
@@ -51,74 +51,74 @@ export interface TimelineProps {
   locale: Locale;
   /** "Present" / "Actualidad". */
   presentLabel: string;
-  /** Prefijo para ids únicos de títulos (ej. "edu", "exp"); fórmula: `${idPrefix}-${entry.id}-title`. */
+  /** Prefix for unique title ids (e.g. "edu", "exp"); formula: `${idPrefix}-${entry.id}-title`. */
   idPrefix: string;
-  /** Se une a la clase base del `<ol>` raíz (G-B). */
+  /** Joined to the base class of the root `<ol>` (G-B). */
   className?: string;
 }
 ```
 
-Usa `formatPeriod` de `src/i18n/formatPeriod.ts` (lo crea foundation en F1,
-con sus tests; spec en `foundations/i18n.md`). Timeline no lo reimplementa.
-Para los `<time>` por extremo usa además el **formador por extremo** que esa
-extensión exporta (RF-4; decisión 12=a — `formatPeriod` no se rompe).
-El orden de render es **el de los datos** (el contenido decide el orden).
+It uses `formatPeriod` from `src/i18n/formatPeriod.ts` (foundation creates it in F1,
+with its tests; spec in `foundations/i18n.md`). Timeline does not reimplement it.
+For the per-endpoint `<time>` elements it also uses the **per-endpoint formatter** that
+extension exports (RF-4; decision 12=a — `formatPeriod` is not broken).
+The render order is **that of the data** (the content decides the order).
 
-El título de cada ítem es **siempre `<h3>`** (con estilo de h4). No hay prop
-para cambiar el nivel: la jerarquía está fijada en `docs/DESIGN.md` y
-`foundations/typography.md` (h2 sección → h3 ítem).
+The title of each item is **always `<h3>`** (with h4 style). There is no prop
+to change the level: the hierarchy is fixed in `docs/DESIGN.md` and
+`foundations/typography.md` (h2 section → h3 item).
 
-## Estilos y tokens
+## Styles and tokens
 
-| Parte | Valor |
+| Part | Value |
 |---|---|
-| Lista | `list-style: none; margin: 0; padding: 0 0 0 calc(var(--size-timeline-dot) / 2 + var(--timeline-dot-ring));` (deja lugar para que el punto y su halo no se corten a la izquierda) |
-| Ítem | `position: relative; border-left: var(--timeline-line-width) solid var(--color-track); padding: 0 0 var(--space-6) var(--timeline-indent);` (sangría 30px < 580 → 40px) |
-| Último ítem | `border-left-color: transparent; padding-bottom: 0;` |
-| Punto (`::before`) | `width/height: var(--size-timeline-dot); border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 0 var(--timeline-dot-ring) var(--color-track); position: absolute; top: var(--timeline-dot-top); left: calc((var(--size-timeline-dot) + var(--timeline-line-width)) / -2);` (centrado sobre la línea: la mitad del punto más la mitad del grosor de la línea) |
-| Título | `font-size: var(--font-size-h4); font-weight: var(--font-weight-medium); margin: 0; position: relative; top: calc(var(--timeline-title-shift) * -1);` |
-| Organización | `color: var(--color-heading); font-weight: var(--font-weight-regular); margin: 0;` |
-| Período | `color: var(--color-text-muted); margin: 0;` |
-| Descripción | `margin: var(--space-1) 0 0;` |
+| List | `list-style: none; margin: 0; padding: 0 0 0 calc(var(--size-timeline-dot) / 2 + var(--timeline-dot-ring));` (it leaves room so that the dot and its halo are not cut off on the left) |
+| Item | `position: relative; border-left: var(--timeline-line-width) solid var(--color-track); padding: 0 0 var(--space-6) var(--timeline-indent);` (indent 30px < 580 → 40px) |
+| Last item | `border-left-color: transparent; padding-bottom: 0;` |
+| Dot (`::before`) | `width/height: var(--size-timeline-dot); border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 0 var(--timeline-dot-ring) var(--color-track); position: absolute; top: var(--timeline-dot-top); left: calc((var(--size-timeline-dot) + var(--timeline-line-width)) / -2);` (centered on the line: half the dot plus half the line's thickness) |
+| Title | `font-size: var(--font-size-h4); font-weight: var(--font-weight-medium); margin: 0; position: relative; top: calc(var(--timeline-title-shift) * -1);` |
+| Organization | `color: var(--color-heading); font-weight: var(--font-weight-regular); margin: 0;` |
+| Period | `color: var(--color-text-muted); margin: 0;` |
+| Description | `margin: var(--space-1) 0 0;` |
 
-**Token nuevo (decisión 13): `--timeline-title-shift: 0.3125rem`** en `tokens/tokens.css` (valor fijo, no escala por breakpoint; reemplaza el literal `-0.3125rem` del título y documenta el acople con `--timeline-dot-top` que hoy solo vive en comentario). **Lo agrega el usuario** en la sección de componentes, antes de Timeline T3 (misma mecánica aprobada en #99 para `--button-small-padding-*`; `tokens/` es kit y los agentes no lo escriben). La línea exacta se presenta en la puerta de Plan + Tareas de F3.
+**New token (decision 13): `--timeline-title-shift: 0.3125rem`** in `tokens/tokens.css` (a fixed value, it does not scale by breakpoint; it replaces the title's `-0.3125rem` literal and documents the coupling with `--timeline-dot-top` that today lives only in a comment). **The user adds it** in the components section, before Timeline T3 (the same mechanics approved in #99 for `--button-small-padding-*`; `tokens/` is kit and the agents do not write it). The exact line is presented at the Plan + Tasks gate of F3.
 
-La línea y el halo usan `--color-track` (en oscuro = `--color-border`, para
-que se vean: `grey-200` oscuro es más oscuro que la card).
+The line and the halo use `--color-track` (in dark = `--color-border`, so
+that they are visible: dark `grey-200` is darker than the card).
 
-`border-left-color: transparent` en el último ítem usa la palabra clave
-`transparent`, permitida por la regla dura 1 de `docs/DESIGN.md`.
+`border-left-color: transparent` on the last item uses the keyword
+`transparent`, allowed by hard rule 1 of `docs/DESIGN.md`.
 
-## Estados
+## States
 
-No es interactivo: sin hover ni foco. Variante única: el último ítem sin línea.
+It is not interactive: no hover or focus. A single variant: the last item with no line.
 
 ## Responsive
 
-Sin `@media` propios: la sangría escala por el token `--timeline-indent`.
+No `@media` of its own: the indent scales through the `--timeline-indent` token.
 
-## Accesibilidad
+## Accessibility
 
-- `<ol role="list">`: el orden importa (el `role` explícito es por el quirk de `list-style: none`; RF-1).
-- Cada ítem es un `<article>` nombrado por su título.
-- El punto y la línea son decorativos (pseudo-elementos).
-- Fechas con `<time dateTime>`; "Present" es texto.
+- `<ol role="list">`: the order matters (the explicit `role` is because of the `list-style: none` quirk; RF-1).
+- Each item is an `<article>` named by its title.
+- The dot and the line are decorative (pseudo-elements).
+- Dates with `<time dateTime>`; "Present" is text.
 
-## Tests esperados
+## Expected tests
 
-1. Renderiza un `list` (ol) con un `listitem` por entrada, en orden.
-2. Cada ítem tiene un heading **nivel 3** con el título.
-3. Muestra organización, período formateado y descripción.
-4. `end: null` → el período termina en `presentLabel`.
-5. Fechas `YYYY-MM` se formatean según `locale` (en vs es) con el formador por extremo (RF-4).
-6. Hay **dos `<time>`** por ítem con rango (inicio y fin), cada uno con `dateTime` igual al valor de los datos; `end: null` → un solo `<time>` + `presentLabel` como texto.
-7. Ids de títulos siguen la fórmula `${idPrefix}-${entry.id}-title` y dos Timelines en la misma página no colisionan.
-8. `entries` vacío → no renderiza nada (`null`).
-9. `expectNoA11yViolations` sin violaciones.
+1. It renders a `list` (ol) with one `listitem` per entry, in order.
+2. Each item has a **level 3** heading with the title.
+3. It shows organization, formatted period and description.
+4. `end: null` → the period ends in `presentLabel`.
+5. `YYYY-MM` dates are formatted according to `locale` (en vs es) with the per-endpoint formatter (RF-4).
+6. There are **two `<time>`** per item with a range (start and end), each with `dateTime` equal to the value from the data; `end: null` → a single `<time>` + `presentLabel` as text.
+7. Title ids follow the formula `${idPrefix}-${entry.id}-title` and two Timelines on the same page do not collide.
+8. Empty `entries` → it renders nothing (`null`).
+9. `expectNoA11yViolations` with no violations.
 
-Los tests de `formatPeriod` viven junto a la función (F1), no en Timeline.
+The tests of `formatPeriod` live next to the function (F1), not in Timeline.
 
-## No hacer
+## Do not
 
-- No usar `h5` (el tema original lo hacía; rompe la jerarquía).
-- No ordenar las entradas dentro del componente.
+- Do not use `h5` (the original theme did; it breaks the hierarchy).
+- Do not sort the entries inside the component.

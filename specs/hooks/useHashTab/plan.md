@@ -25,7 +25,7 @@ There is no `index.ts` for `src/lib` (it is imported by path, like `format.ts`).
   `location.pathname + location.search + "#" + id`, more surface for reading
   `location` outside the moment RF-6 allows).
 - Listener effect: it mounts `window.addEventListener("hashchange", handler)` and
-  cleans up with `removeEventListener` using **the same** handler **reference**
+  cleans up with `removeEventListener` using **the same reference** to the handler
   (the discriminator of test 8 with a spy; discarded alternative:
   `AbortController`, which does not make observable the `removeEventListener` the
   spec asks for). Deps `[ids]` — a constant of the consumer (API precondition).

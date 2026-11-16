@@ -1,33 +1,33 @@
 # Plan — ResumeSection
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/ResumeSection/ResumeSection.tsx` | `<section aria-labelledby="resume-${id}-title">` con `SectionTitle as="h2" icon` + `Timeline` (passthrough de `entries/locale/presentLabel/timelineIdPrefix`) | RF-1…RF-5 |
-| `src/components/ResumeSection/ResumeSection.module.css` | `display: flex; flex-direction: column;` sin gaps extra, cero `@media` | RF-4 |
-| `src/components/ResumeSection/ResumeSection.test.tsx` | tests + cierre a11y | todas |
+| `src/components/ResumeSection/ResumeSection.tsx` | `<section aria-labelledby="resume-${id}-title">` with `SectionTitle as="h2" icon` + `Timeline` (passthrough of `entries/locale/presentLabel/timelineIdPrefix`) | RF-1…RF-5 |
+| `src/components/ResumeSection/ResumeSection.module.css` | `display: flex; flex-direction: column;` with no extra gaps, zero `@media` | RF-4 |
+| `src/components/ResumeSection/ResumeSection.test.tsx` | tests + a11y closing case | all |
 | `src/components/ResumeSection/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno.
+None.
 
-## Interfaz
+## Interface
 
-`ResumeSectionProps { id; timelineIdPrefix; title; icon; entries; locale; presentLabel; className? }` (spec → API; G-B: `className` a la `<section>` raíz).
+`ResumeSectionProps { id; timelineIdPrefix; title; icon; entries; locale; presentLabel; className? }` (spec → API; G-B: `className` to the root `<section>`).
 
-## Decisiones
+## Decisions
 
-- Id del título: `resume-${id}-title` (fórmula fija, RF-3); `aria-labelledby` de la sección apunta ahí.
-- `timelineIdPrefix` llega **explícito por prop** (decisión 14) y se reenvía tal cual a `Timeline.idPrefix`; no hay mapa interno "education"→"edu".
-- Icono: se pasa como `icon` a `SectionTitle` (es SectionTitle quien monta el `IconBox` decorativo, RF-3 de su spec) — la pieza no lo importa.
-- Sin espaciado propio entre título y timeline (spec → Estilos/"No hacer"): el `margin-bottom` del h2 (1.25rem por SectionTitle RF-5) es el único.
+- Title id: `resume-${id}-title` (fixed formula, RF-3); the section's `aria-labelledby` points there.
+- `timelineIdPrefix` arrives **explicitly by prop** (decision 14) and is forwarded as is to `Timeline.idPrefix`; there is no internal "education"→"edu" map.
+- Icon: it is passed as `icon` to `SectionTitle` (it is SectionTitle that mounts the decorative `IconBox`, RF-3 of its spec) — the piece does not import it.
+- No spacing of its own between title and timeline (spec → Styles/"Do not"): the h2's `margin-bottom` (1.25rem by SectionTitle RF-5) is the only one.
 - `entries=[]` → `null` (RF-1).
-- Cero conocimiento de ResumePage/columnas (RF-4).
+- Zero knowledge of ResumePage/columns (RF-4).
 
-## Estrategia de tests
+## Test strategy
 
-Render aislado con fixture (2 entradas); como hijo usa `Timeline` real (pieza ya construida en la fase) — no hace falta mock. Tests: `getByRole("region", { name: title })` (el nombre sale del h2 vía labelledBy); heading nivel 2 con el título; `listitem` × n dentro de la región; sección ausente con `entries=[]`; dos secciones con ids distintos → ids de título distintos (test 5); el h3 del ítem queda nivel 3 dentro de la región (assert de jerarquía mínimo: `getAllByRole("heading")` por nivel, cubre la parte verificable de RF-5 sin duplicar los tests de Timeline). El `IconBox` decorativo con gradiente → armazón `AccentGradientDefs` en los renders. Cierre `expectNoA11yViolations`. P1: flex column, cero `@media`, cero gap extra → inspección.
+Isolated render with a fixture (2 entries); as a child it uses the real `Timeline` (a piece already built in the phase) — no mock is needed. Tests: `getByRole("region", { name: title })` (the name comes from the h2 via labelledBy); level 2 heading with the title; `listitem` × n inside the region; section absent with `entries=[]`; two sections with different ids → different title ids (test 5); the item's h3 stays level 3 inside the region (minimal hierarchy assert: `getAllByRole("heading")` by level, it covers the verifiable part of RF-5 without duplicating Timeline's tests). The decorative `IconBox` with a gradient → `AccentGradientDefs` scaffold in the renders. Closing with `expectNoA11yViolations`. P1: flex column, zero `@media`, zero extra gap → inspection.
 
-Cobertura: T1→RF-1,RF-2,RF-3,RF-5 · T2→RF-4 + cierre.
+Coverage: T1→RF-1,RF-2,RF-3,RF-5 · T2→RF-4 + closing.

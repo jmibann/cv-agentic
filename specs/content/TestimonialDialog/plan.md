@@ -1,64 +1,64 @@
 # Plan — TestimonialDialog
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/TestimonialDialog/TestimonialDialog.tsx` | montaje condicional del `<dialog>` + refs (`showModal`/`close`), ciclo `close`→`onClose` con guard de ref, backdrop/padding detection, contenido (h2 autor, rol, texto, HexAvatar, comilla) y botón Close | RF-1…RF-4 |
-| `src/components/TestimonialDialog/TestimonialDialog.module.css` | dialog/backdrop/layout (grid, `overflow-y: auto`)/close/comilla/2 columnas ≥580/entrada `@starting-style`/`@media print` propio | RF-5, RF-6 |
-| `src/components/TestimonialDialog/TestimonialDialog.test.tsx` | tests + cierre a11y | todas |
+| `src/components/TestimonialDialog/TestimonialDialog.tsx` | conditional mounting of the `<dialog>` + refs (`showModal`/`close`), `close`→`onClose` cycle with a ref guard, backdrop/padding detection, content (author h2, role, text, HexAvatar, quote) and Close button | RF-1…RF-4 |
+| `src/components/TestimonialDialog/TestimonialDialog.module.css` | dialog/backdrop/layout (grid, `overflow-y: auto`)/close/quote/2 columns ≥580/`@starting-style` entrance/its own `@media print` | RF-5, RF-6 |
+| `src/components/TestimonialDialog/TestimonialDialog.test.tsx` | tests + a11y closing case | all |
 | `src/components/TestimonialDialog/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-- Detección de backdrop real (decisión 19): `handleClick(e)`: cierra si `e.target === dialogEl` **y** el punto cae fuera de `dialogEl.getBoundingClientRect()` (click en ::backdrop); la franja de padding del dialog NO cierra. Lógica pequeña dentro del handler (evento con DOM: no extrae a pura; se cubre con tests de eventos sobre el mock).
+- Detection of the real backdrop (decision 19): `handleClick(e)`: it closes if `e.target === dialogEl` **and** the point falls outside `dialogEl.getBoundingClientRect()` (click on ::backdrop); the dialog's padding strip does NOT close. Small logic inside the handler (an event with DOM: it is not extracted to a pure function; it is covered with event tests on the mock).
 
-## Interfaz
+## Interface
 
-`TestimonialDialogProps { testimonial: Testimonial | null; onClose: () => void; closeLabel: string }` (spec → API; sin `className`). `useRef<HTMLDialogElement>`.
+`TestimonialDialogProps { testimonial: Testimonial | null; onClose: () => void; closeLabel: string }` (spec → API; no `className`). `useRef<HTMLDialogElement>`.
 
-## Decisiones
+## Decisions
 
-- **Montaje condicional (18=b):** `testimonial === null` → `return null`; al montar con valor, effect llama `showModal()`; cleanup del effect llama `dialog.close()` si `dialog.open` (cierre iniciado por el padre) — el guard del handler `close` (ref con último valor) evita `onClose` en ese camino (ciclo completo en spec → tabla).
-- **Sin doble llamada:** `onClose` solo desde el evento `close`; `idempotencia` pedida al padre (Carousel) se mantiene.
-- Entrada sola, `@starting-style` (19): `transition: opacity, transform` en abierto con `@starting-style` de cierre→apertura; sin estado de salida. `prefers-reduced-motion` ya colapsa la duración por tokens (sin media propio; lo declara el plan como criterio — el `@starting-style` es la única técnica fijada).
-- Foco inicial/retorno: nativo (`showModal`/`close`); sin autofocus, verificación F5 (RF-4).
-- Scroll interno: `max-height` del dialog + `.layout { overflow-y: auto }` (19).
-- Comilla del aside: `Icon quote tone="gradient" --icon-size: 2rem` (decisión 19: mismo contrato de la card, debajo del avatar en aside); Close `Icon name="x"` sin `--icon-size` (default).
-- Print: `@media print { display: none }` en el módulo de la pieza (G-D-1).
-- `closeLabel` como `aria-label` del botón (nombre del botón); el `<h2 id>` fija el nombre del dialog (`aria-labelledby`).
-- No toca `src/test/setup.ts`: los tests **usan** el mock existente (`showModal`→`open`; `close`→ quita `open` + dispara evento `close`) y verifican que alcanza (19).
+- **Conditional mounting (18=b):** `testimonial === null` → `return null`; on mounting with a value, an effect calls `showModal()`; the effect's cleanup calls `dialog.close()` if `dialog.open` (a closing started by the parent) — the guard of the `close` handler (a ref with the last value) avoids `onClose` on that path (full cycle in spec → table).
+- **No double call:** `onClose` only from the `close` event; the `idempotencia` asked of the parent (Carousel) is kept.
+- Entrance only, `@starting-style` (19): `transition: opacity, transform` when open with a closed→open `@starting-style`; no exit state. `prefers-reduced-motion` already collapses the duration through tokens (no media of its own; the plan declares it as a criterion — `@starting-style` is the only technique fixed).
+- Initial focus/return: native (`showModal`/`close`); no autofocus, F5 verification (RF-4).
+- Inner scroll: the dialog's `max-height` + `.layout { overflow-y: auto }` (19).
+- Quote of the aside: `Icon quote tone="gradient" --icon-size: 2rem` (decision 19: the same contract as the card, below the avatar in the aside); Close `Icon name="x"` with no `--icon-size` (default).
+- Print: `@media print { display: none }` in the piece's module (G-D-1).
+- `closeLabel` as the button's `aria-label` (the button's name); the `<h2 id>` sets the dialog's name (`aria-labelledby`).
+- It does not touch `src/test/setup.ts`: the tests **use** the existing mock (`showModal`→`open`; `close`→ removes `open` + fires the `close` event) and verify that it is enough (19).
 
-## Anexo — Cambio motion 4 (2026-11-13, #106/#116; puerta Spec+Plan+Tareas aprobada con ajuste de redacción del usuario)
+## Annex — Motion change 4 (2026-11-13, #106/#116; Spec+Plan+Tasks gate approved with a wording adjustment by the user)
 
-- **Historia del cambio (no va en la spec → fila "Entrada", por decisión del
-  usuario):** propuesta §4.4 e ítem 9 de la matriz §2.4 (#106): cambiar **solo
-  el easing** de la entrada (`--ease-standard`→`--ease-enter`); se mantienen
-  `--duration-base` 0.2 s y `@starting-style` como único mecanismo; sin salida.
-  El hover del botón close conserva `--ease-standard` (ítem 10: "se conserva").
-  C7 de la matriz de hallazgos. Menor heredado de §XXIV: el comentario
-  "0.3s ease-in-out" (módulo, bloque Entrada) está rancio doblemente (la
-  duración es 0.2 s desde T15 y el easing pasa a `enter`) — se reescribe acá.
-- **Alcance:** `TestimonialDialog.module.css` únicamente (2 valores +
-  comentario). Cero tsx, cero tests (régimen #101: jsdom no computa
-  transiciones; verificación = inspección + QA en navegador), cero cambios en
-  `@starting-style`, backdrop, print, close o layout.
-- **T4:** `feat(TestimonialDialog): T4` — commit único, **verde-only declarado
-  #101** (no hay rojo posible sin inventar alcance; el rojo artificial leyendo
-  CSS como texto queda descartado — precedente T3/T5 de esta pieza y decisión
-  #101). Hecho: `.dialog` sigue (0,1,0); entrada `--ease-enter`; close intacto;
-  suite sin regresiones.
-- **T5:** cierre — suite + `build` + QA del reviewer con app servida (#91):
-  apertura ~200 ms con deceleración marcada (`cubic-bezier(0.22,1,0.36,1)`, sin
-  rebote), **cierre sigue instantáneo (regresión clave)**, hover close sin
-  cambios, backdrop/print sin regresión; spec → `implementada`; docs #86
-  (§XXVII) y **propuesta `specs/motion/proposal.md` marcada 4/4 implementada**
-  (cabecera + cualquier "en espera" restante); regla #116 elevada a permanente
-  (viñeta en `foundations/motion.md` + regla corta en sitio a decidir:
-  `docs/DESIGN.md` o `AGENTS.md` → Convenciones — ambos en manos del usuario).
+- **History of the change (it does not go in the spec → "Entrance" row, by the
+  user's decision):** proposal §4.4 and item 9 of the matrix §2.4 (#106): change **only
+  the easing** of the entrance (`--ease-standard`→`--ease-enter`); `--duration-base`
+  0.2 s and `@starting-style` as the only mechanism are kept; no exit.
+  The hover of the close button keeps `--ease-standard` (item 10: "it is kept").
+  C7 of the findings matrix. Minor inherited from §XXIV: the comment
+  "0.3s ease-in-out" (module, Entrance block) is doubly stale (the
+  duration is 0.2 s since T15 and the easing becomes `enter`) — it is rewritten here.
+- **Scope:** `TestimonialDialog.module.css` only (2 values +
+  comment). Zero tsx, zero tests (regime #101: jsdom does not compute
+  transitions; verification = inspection + QA in the browser), zero changes in
+  `@starting-style`, backdrop, print, close or layout.
+- **T4:** `feat(TestimonialDialog): T4` — a single commit, **green-only declared
+  #101** (there is no possible red without inventing scope; the artificial red reading
+  CSS as text is discarded — precedent T3/T5 of this piece and decision
+  #101). Done: `.dialog` is still (0,1,0); entrance `--ease-enter`; close intact;
+  suite with no regressions.
+- **T5:** closing — suite + `build` + the reviewer's QA with the app served (#91):
+  opening ~200 ms with a marked deceleration (`cubic-bezier(0.22,1,0.36,1)`, no
+  bounce), **closing is still instant (key regression)**, close hover with no
+  changes, backdrop/print with no regression; spec → `implemented`; docs #86
+  (§XXVII) and **proposal `specs/motion/proposal.md` marked 4/4 implemented**
+  (header + any remaining "on hold"); rule #116 raised to permanent
+  (a bullet in `foundations/motion.md` + a short rule in a place to be decided:
+  `docs/DESIGN.md` or `AGENTS.md` → Conventions — both in the user's hands).
 
-Cobertura del anexo: T4→RF-5/RF-6 (fila Entrada; inspección) · T5→cierre + QA.
+Coverage of the annex: T4→RF-5/RF-6 (Entrance row; inspection) · T5→closing + QA.
 
-Harness con `HexAvatarDefs` + `AccentGradientDefs` (armazón). `renderWithDialog`: montar con `testimonial` o `null`; rerender para transiciones. Tests 1–8 de la spec; el 5 se desdobla en tres asserts: backdrop real (click en target=dialog con coords fuera del rect — `Object.defineProperty(el,"getBoundingClientRect")` o mock de rect), padding (coords dentro del rect → no cierra), contenido (no cierra). Evento `close` sintético (simula Esc) → `onClose` una vez; `null` desde el padre con abierto → cleanup cierra y **no** llama `onClose` (18=b). Cierre `expectNoA11yViolations` con dialog abierto. P1 (backdrop color, overflow, print, animación): inspección.
+Harness with `HexAvatarDefs` + `AccentGradientDefs` (scaffold). `renderWithDialog`: mount with `testimonial` or `null`; rerender for transitions. Tests 1–8 of the spec; test 5 is split into three asserts: real backdrop (click on target=dialog with coords outside the rect — `Object.defineProperty(el,"getBoundingClientRect")` or a rect mock), padding (coords inside the rect → it does not close), content (it does not close). Synthetic `close` event (simulates Esc) → `onClose` once; `null` from the parent while open → the cleanup closes and does **not** call `onClose` (18=b). Closing with `expectNoA11yViolations` with the dialog open. P1 (backdrop color, overflow, print, animation): inspection.
 
-Cobertura: T1→RF-1,RF-4 (contenido/nombre),RF-2 (Close→close→onClose) · T2→RF-2,RF-3 (ciclo completo) · T3→RF-5,RF-6 + cierre.
+Coverage: T1→RF-1,RF-4 (content/name),RF-2 (Close→close→onClose) · T2→RF-2,RF-3 (full cycle) · T3→RF-5,RF-6 + closing.

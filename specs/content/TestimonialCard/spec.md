@@ -1,38 +1,38 @@
 # TestimonialCard
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Tarjeta de testimonio en el carrusel: avatar hexagonal que sobresale arriba,
-nombre, rol, extracto del texto y un ícono de comilla. Es **operable en toda
-su superficie mediante el botón estirado** (patrón *stretched link*: el botón
-cubre la card con su `::after`; el `<article>` no es clickeable) y abre el
-texto completo en `TestimonialDialog`.
+Testimonial card in the carousel: a hexagonal avatar that sticks out at the top,
+name, role, an excerpt of the text and a quote icon. It is **operable over its whole
+surface through the stretched button** (*stretched link* pattern: the button
+covers the card with its `::after`; the `<article>` is not clickable) and it opens the
+full text in `TestimonialDialog`.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el usuario activa el botón estirado (click, Enter o Espacio), ENTONCES EL SISTEMA invoca `onOpen(testimonial.id)`; EL SISTEMA mantiene ese botón como único elemento enfocable de la tarjeta, con `aria-label` igual a `openLabel`, y el `<article>` no es clickeable. El botón se muestra **siempre** (aunque el texto entre completo en las 4 líneas).
-- RF-2: EL SISTEMA recorta el extracto a 4 líneas en pantalla (verificación: inspección del CSS; jsdom no computa clamp); en su `@media print` propio muestra el texto completo y oculta el botón estirado (la sombra ya la resuelve el token `--shadow-control: none` en impresión — la card no la redeclara).
-- RF-3: EL SISTEMA reserva el espacio del avatar que sobresale mediante `--testimonial-headroom` en el contenedor que aloja la tarjeta. (Verificación en el consumidor — carrusel RF-7 —; la pieza no lo testea.)
-- RF-4: EL SISTEMA usa `HexAvatar` con `alt=""` y trata la comilla como decorativa; no reimplementa el hexágono ni muestra fecha. El extracto se puebla con `testimonial.text` (el campo largo del esquema).
-- RF-5: EL SISTEMA aplica en hover la sombra `--shadow-control` (regla `.card:hover` sobre la raíz; transición `box-shadow var(--duration-base) var(--ease-standard)`, G-E) y en el foco visible el anillo de foco estándar sobre el `::after` del botón. **Cambio F5 2026-10-08 (hallazgo D3 de `docs/qa-report.md`): el `<button>` raíz suprime el anillo propio del navegador (`outline: none` en la base del botón): el único anillo visible es el del `::after`; el ring UA del botón estirado duplicaba un anillo de 2px ajeno al kit (regla dura 7 de `docs/DESIGN.md`).** Verificación: inspección del CSS + foco por test de anillo imposible en jsdom → QA F5.
-- RF-6: EL SISTEMA no declara `@media` propios de **breakpoints**: padding, subida del avatar y posición de la comilla escalan con tokens `--testimonial-*`. La única excepción es el bloque `@media print` propio de la card (RF-2 / decisión 17 y G-D-1). Verificación: inspección del CSS.
-- RF-7: EL SISTEMA renderiza el `author` en un `<h3>` con id fijo `testimonial-${testimonial.id}-name` (el `<article>` se nombra con ese id), el `role` y el extracto (RF-4). Nivel h3 fijo, sin prop.
+- RF-1: WHEN the user activates the stretched button (click, Enter or Space), THEN THE SYSTEM invokes `onOpen(testimonial.id)`; THE SYSTEM keeps that button as the only focusable element of the card, with `aria-label` equal to `openLabel`, and the `<article>` is not clickable. The button is **always** shown (even if the text fits entirely in the 4 lines).
+- RF-2: THE SYSTEM clamps the excerpt to 4 lines on screen (verification: CSS inspection; jsdom does not compute clamp); in its own `@media print` it shows the full text and hides the stretched button (the shadow is already resolved by the `--shadow-control: none` token in print — the card does not redeclare it).
+- RF-3: THE SYSTEM reserves the space of the protruding avatar through `--testimonial-headroom` on the container that hosts the card. (Verification in the consumer — carousel RF-7 —; the piece does not test it.)
+- RF-4: THE SYSTEM uses `HexAvatar` with `alt=""` and treats the quote as decorative; it does not reimplement the hexagon or show a date. The excerpt is filled with `testimonial.text` (the long field of the schema).
+- RF-5: THE SYSTEM applies on hover the shadow `--shadow-control` (rule `.card:hover` on the root; transition `box-shadow var(--duration-base) var(--ease-standard)`, G-E) and on visible focus the standard focus ring on the button's `::after`. **F5 Change 2026-10-08 (finding D3 of `docs/qa-report.md`): the root `<button>` suppresses the browser's own ring (`outline: none` on the button's base): the only visible ring is that of the `::after`; the UA ring of the stretched button duplicated a 2px ring foreign to the kit (hard rule 7 of `docs/DESIGN.md`).** Verification: CSS inspection + focus by ring test impossible in jsdom → QA F5.
+- RF-6: THE SYSTEM declares no **breakpoint** `@media` of its own: padding, avatar lift and quote position scale with `--testimonial-*` tokens. The only exception is the card's own `@media print` block (RF-2 / decision 17 and G-D-1). Verification: CSS inspection.
+- RF-7: THE SYSTEM renders the `author` in an `<h3>` with the fixed id `testimonial-${testimonial.id}-name` (the `<article>` is named with that id), the `role` and the excerpt (RF-4). Fixed h3 level, with no prop.
 
-## Anatomía
+## Anatomy
 
 ```
    ⬡⬡⬡
-  ⬡ av ⬡  María González              ❝   ← comilla con gradiente (arriba-derecha)
+  ⬡ av ⬡  María González              ❝   ← quote with gradient (top right)
    ⬡⬡⬡   Product Manager, Acme Corp
   Alex consistently delivered high-quality work and made
-  complex features feel simple for our users…             ← recortado a 4 líneas
+  complex features feel simple for our users…             ← clamped to 4 lines
 ```
 
 ```html
 <Box variant="inner" as="article" className="card" aria-labelledby="testimonial-t-maria-name">
-  <div class="header">                                                 <!-- grilla auto | 1fr -->
-    <HexAvatar src={testimonial.avatar.src} className="avatar" />     <!-- alt="" por defecto -->
+  <div class="header">                                                 <!-- grid auto | 1fr -->
+    <HexAvatar src={testimonial.avatar.src} className="avatar" />     <!-- alt="" by default -->
     <div class="identity">
       <h3 id="testimonial-t-maria-name" class="name">María González</h3>
       <p class="role">Product Manager, Acme Corp</p>
@@ -44,9 +44,9 @@ texto completo en `TestimonialDialog`.
 </Box>
 ```
 
-El `<button>` cubre toda la tarjeta con `::after` (patrón *stretched link*):
-un `<button>` no puede contener headings, así que el heading queda fuera y el
-botón se estira por encima.
+The `<button>` covers the whole card with `::after` (*stretched link* pattern):
+a `<button>` cannot contain headings, so the heading stays outside and the
+button stretches over it.
 
 ## API
 
@@ -55,78 +55,78 @@ import type { Testimonial } from "@data/cv.types.generated";
 
 export interface TestimonialCardProps {
   testimonial: Testimonial;
-  /** "Read full testimonial from {author}", ya interpolado. */
+  /** "Read full testimonial from {author}", already interpolated. */
   openLabel: string;
   onOpen: (id: string) => void;
   className?: string;
 }
 ```
 
-## Estilos y tokens
+## Styles and tokens
 
-| Parte | Valor |
+| Part | Value |
 |---|---|
-| Card | `Box variant="inner" as="article"` (fondo `surface-muted` del Box) con clase propia `.card` que ajusta: `position: relative; display: flex; flex-direction: column; border-radius: var(--radius-16); padding: var(--testimonial-padding); height: 100%;` (16px < 580 → 30/30/24px). **Sin `margin-top`**. Decisión 17: la superficie es Box inner, no una card a mano. |
-| Avatar | `HexAvatar` con `margin-top: calc(var(--testimonial-avatar-offset) * -1);` (sube 40px < 580 → 60px) |
-| Encabezado | `display: grid; grid-template-columns: auto 1fr; column-gap: 0.9375rem; align-items: start; margin-bottom: 0.75rem;` (avatar en la columna 1, nombre y rol en la 2; sin márgenes negativos). `align-items: start` (Cambio 2026-11-12, decisión #113; antes `end`): el avatar queda anclado arriba y sobresale siempre `--testimonial-avatar-offset − --testimonial-padding-top`, con cualquier cantidad de líneas de nombre y rol; con `end` bajaba con cada línea y quedaba desalineado entre cards |
-| Identidad | bloque con nombre y rol: `padding-inline-end: var(--testimonial-quote-reserve);` — reserva exactamente lo que la comilla invade del área de contenido: ancho de la comilla (2rem) + `--testimonial-quote-inset-inline` − padding derecho de la card (2.2rem < 580 → 2rem ≥ 580), para que nombre y rol nunca queden debajo de ella (Cambios 2026-11-12: #112 la introdujo, #113 la ajusta al valor exacto) |
-| Nombre | h3: `--font-size-h3`; `margin: 0;` |
-| Rol | `color: var(--color-text-muted); margin: 0;` |
-| Extracto | `display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0;` |
-| Comilla | `Icon name="quote" tone="gradient" className={styles.quote}` con `.quote { --icon-size: 2rem; }` (en la clase del propio ícono; Icon RF-6); `position: absolute; top: var(--testimonial-quote-inset-block); right: var(--testimonial-quote-inset-inline);` |
-| Botón estirado | `position: static; background: none; border: 0;` `::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }`; `cursor: pointer` |
+| Card | `Box variant="inner" as="article"` (the Box's `surface-muted` background) with its own class `.card` that adjusts: `position: relative; display: flex; flex-direction: column; border-radius: var(--radius-16); padding: var(--testimonial-padding); height: 100%;` (16px < 580 → 30/30/24px). **No `margin-top`**. Decision 17: the surface is an inner Box, not a hand-made card. |
+| Avatar | `HexAvatar` with `margin-top: calc(var(--testimonial-avatar-offset) * -1);` (it rises 40px < 580 → 60px) |
+| Header | `display: grid; grid-template-columns: auto 1fr; column-gap: 0.9375rem; align-items: start; margin-bottom: 0.75rem;` (avatar in column 1, name and role in column 2; no negative margins). `align-items: start` (Change 2026-11-12, decision #113; previously `end`): the avatar stays anchored at the top and always protrudes `--testimonial-avatar-offset − --testimonial-padding-top`, with any number of lines of name and role; with `end` it went down with each line and ended up misaligned between cards |
+| Identity | block with name and role: `padding-inline-end: var(--testimonial-quote-reserve);` — it reserves exactly what the quote invades of the content area: width of the quote (2rem) + `--testimonial-quote-inset-inline` − right padding of the card (2.2rem < 580 → 2rem ≥ 580), so that name and role never end up under it (Changes 2026-11-12: #112 introduced it, #113 adjusts it to the exact value) |
+| Name | h3: `--font-size-h3`; `margin: 0;` |
+| Role | `color: var(--color-text-muted); margin: 0;` |
+| Excerpt | `display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; margin: 0;` |
+| Quote | `Icon name="quote" tone="gradient" className={styles.quote}` with `.quote { --icon-size: 2rem; }` (on the class of the icon itself; Icon RF-6); `position: absolute; top: var(--testimonial-quote-inset-block); right: var(--testimonial-quote-inset-inline);` |
+| Stretched button | `position: static; background: none; border: 0;` `::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }`; `cursor: pointer` |
 
-### Espacio para el avatar (headroom)
+### Space for the avatar (headroom)
 
-El avatar sobresale por encima del borde superior de la card
+The avatar protrudes above the top edge of the card by
 `--testimonial-avatar-offset − --testimonial-padding-top` (30px ≥ 580,
-24px < 580). La card **no reserva ese espacio**: lo reserva el contenedor que
-la aloja, usando el token `--testimonial-headroom` (= esa protrusión + 0.5rem
-para la sombra). En el carrusel es el `padding-top` del track (ver
-`TestimonialCarousel.md`). Si la card se usa fuera del carrusel, el padre
-debe aplicar ese mismo token.
+24px < 580). The card **does not reserve that space**: the container that
+hosts it does, using the `--testimonial-headroom` token (= that protrusion + 0.5rem
+for the shadow). In the carousel it is the track's `padding-top` (see
+`TestimonialCarousel.md`). If the card is used outside the carousel, the parent
+must apply that same token.
 
-La forma hexagonal la resuelve la primitiva `HexAvatar`
-(`specs/primitives/HexAvatar/spec.md`): no se reimplementa acá.
+The hexagonal shape is resolved by the `HexAvatar` primitive
+(`specs/primitives/HexAvatar/spec.md`): it is not reimplemented here.
 
-## Estados
+## States
 
-| Estado | Efecto |
+| State | Effect |
 |---|---|
-| Hover (sobre la card) | `box-shadow: var(--shadow-control)` con transición de `box-shadow` `--duration-base` |
-| Focus-visible (botón) | en el `::after` del botón: `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);` |
-| Active | sin efecto propio |
+| Hover (on the card) | `box-shadow: var(--shadow-control)` with a `box-shadow` transition of `--duration-base` |
+| Focus-visible (button) | on the button's `::after`: `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);` |
+| Active | no effect of its own |
 
 ## Responsive
 
-Sin `@media` propios: padding, subida del avatar y posición de la comilla
-escalan por tokens (`--testimonial-*`).
+No `@media` of its own: padding, avatar lift and quote position
+scale through tokens (`--testimonial-*`).
 
-## Impresión
+## Print
 
-En `@media print` (lo usa el carrusel al imprimir los testimonios apilados):
-el extracto muestra el **texto completo** (`display: block; -webkit-line-clamp: unset; overflow: visible;`),
-el botón estirado se oculta (`display: none`) y la card no lleva sombra.
+In `@media print` (the carousel uses it when printing the stacked testimonials):
+the excerpt shows the **full text** (`display: block; -webkit-line-clamp: unset; overflow: visible;`),
+the stretched button is hidden (`display: none`) and the card has no shadow.
 
-## Accesibilidad
+## Accessibility
 
-- `<article>` nombrado por el h3.
-- Avatar con `alt=""`: el nombre está al lado, anunciarlo dos veces es ruido.
-- El botón tiene nombre explícito (`openLabel`) y es lo único enfocable de la tarjeta.
-- La comilla es decorativa.
+- `<article>` named by the h3.
+- Avatar with `alt=""`: the name is next to it, announcing it twice is noise.
+- The button has an explicit name (`openLabel`) and is the only focusable thing in the card.
+- The quote is decorative.
 
-## Tests esperados
+## Expected tests
 
-1. `getByRole("article", { name: author })` con heading nivel 3 e id `testimonial-${testimonial.id}-name` (RF-7).
-2. Muestra `role` y el extracto (`testimonial.text`).
+1. `getByRole("article", { name: author })` with a level 3 heading and id `testimonial-${testimonial.id}-name` (RF-7).
+2. It shows `role` and the excerpt (`testimonial.text`).
 3. `getByRole("button", { name: openLabel })`; click → `onOpen(testimonial.id)`.
-4. Enter y Espacio sobre el botón llaman `onOpen`.
-5. La imagen del avatar tiene `alt=""` (decorativa) y se renderiza con `HexAvatar` (el test monta `HexAvatarDefs` y `AccentGradientDefs`).
-6. `expectNoA11yViolations` sin violaciones.
+4. Enter and Space on the button call `onOpen`.
+5. The avatar image has `alt=""` (decorative) and is rendered with `HexAvatar` (the test mounts `HexAvatarDefs` and `AccentGradientDefs`).
+6. `expectNoA11yViolations` with no violations.
 
-## No hacer
+## Do not
 
-- No envolver la tarjeta completa en `<button>` ni poner `onClick` en el `<article>`.
-- No mostrar fecha (decisión: los testimonios no llevan fecha).
-- No reimplementar el hexágono: usar `HexAvatar`.
-- No agregar `@media` de breakpoints propios (RF-6); el único permitido es el bloque `@media print` propio (RF-2).
+- Do not wrap the whole card in a `<button>` or put `onClick` on the `<article>`.
+- Do not show a date (decision: testimonials carry no date).
+- Do not reimplement the hexagon: use `HexAvatar`.
+- Do not add breakpoint `@media` of its own (RF-6); the only one allowed is its own `@media print` block (RF-2).

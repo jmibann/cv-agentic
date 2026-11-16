@@ -1,33 +1,33 @@
 # Plan — ServiceCard
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/ServiceCard/ServiceCard.tsx` | `Box variant="inner" as="article">` nombrado: `Icon name=service.icon tone="gradient"` con `.glyph`, y `<div>` con `SectionTitle as="h3" id` + `<p>` descripción | RF-1…RF-3, RF-6 |
-| `src/components/ServiceCard/ServiceCard.module.css` | contenedor flex **columna centrada (base)**; `@media (min-width: 580px)` → fila flex-start (solo layout); `.glyph { --icon-size: var(--size-service-icon); }`; `height: 100%` | RF-4, RF-5 |
-| `src/components/ServiceCard/ServiceCard.test.tsx` | tests + cierre a11y | todas |
+| `src/components/ServiceCard/ServiceCard.tsx` | named `Box variant="inner" as="article">`: `Icon name=service.icon tone="gradient"` with `.glyph`, and a `<div>` with `SectionTitle as="h3" id` + description `<p>` | RF-1…RF-3, RF-6 |
+| `src/components/ServiceCard/ServiceCard.module.css` | flex container, **centered column (base)**; `@media (min-width: 580px)` → flex-start row (layout only); `.glyph { --icon-size: var(--size-service-icon); }`; `height: 100%` | RF-4, RF-5 |
+| `src/components/ServiceCard/ServiceCard.test.tsx` | tests + a11y closing case | all |
 | `src/components/ServiceCard/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno.
+None.
 
-## Interfaz
+## Interface
 
-`ServiceCardProps { service: Service; className?: string }` (spec → API; G-B: `className` se transmite al `Box` raíz y la unión la aplica Box).
+`ServiceCardProps { service: Service; className?: string }` (spec → API; G-B: `className` is passed on to the root `Box` and Box applies the join).
 
-## Decisiones
+## Decisions
 
-- Título por `SectionTitle as="h3" id=service-${service.id}-title` (decisión 16): tamaño y margen los fija SectionTitle (RF-1/RF-5 suyos); el `<article aria-labelledby>` apunta a ese id. *Descartado:* h3 crudo con estilos duplicados (choca con la regla de excepciones de márgenes).
-- Ícono **sin wrapper** (decisión 16): `<Icon className={styles.glyph}>` directo como hijo del flex; Icon ya trae `flex-shrink: 0`; el gradiente exige armazón `AccentGradientDefs` en los tests.
-- Mobile-first (decisión 16): la base del módulo es columna centrada con `text-align: center`; el `@media (min-width: 580px)` cambia `flex-direction: row; align-items: flex-start; text-align: start;` — solo layout, sin medidas (criterio `breakpoints.md`).
-- `height: 100%` para igualar filas; columnas las arma AboutPage (RF-5).
-- Sin interactividad: cero pseudo-estados (RF-6). Impresión: `break-inside` del estilo compartido (G-D); cero `@media print` propio.
-- Sin IconBox (RF-5 suyo prohíbe Box inner; constancia en spec).
+- Title by `SectionTitle as="h3" id=service-${service.id}-title` (decision 16): size and margin are set by SectionTitle (its RF-1/RF-5); the `<article aria-labelledby>` points to that id. *Discarded:* a raw h3 with duplicated styles (it clashes with the rule on margin exceptions).
+- Icon **with no wrapper** (decision 16): `<Icon className={styles.glyph}>` directly as a child of the flex; Icon already brings `flex-shrink: 0`; the gradient requires an `AccentGradientDefs` scaffold in the tests.
+- Mobile-first (decision 16): the module's base is a centered column with `text-align: center`; the `@media (min-width: 580px)` changes `flex-direction: row; align-items: flex-start; text-align: start;` — layout only, no measures (`breakpoints.md` criterion).
+- `height: 100%` to even out rows; the columns are built by AboutPage (RF-5).
+- No interactivity: zero pseudo-states (RF-6). Print: `break-inside` from the shared style (G-D); zero `@media print` of its own.
+- No IconBox (its RF-5 forbids inner Box; recorded in the spec).
 
-## Estrategia de tests
+## Test strategy
 
-Fixture `Service` (id `web-apps`, icon `code` — ServiceIcon válido). Tests: `getByRole("article", { name: service.title })` con `heading` nivel 3; párrafo con la descripción; svg `stroke="url(#accent-gradient)"` dentro del article y clase `lucide-code` propagada (decisión 16/RF-2); id del título `service-web-apps-title` y `aria-labelledby` del article apuntándolo (test 4); `expectNoA11yViolations`. P1: base columna + media 580 fila, sin otras propiedades en el media → inspección; `--icon-size` fijo en `.glyph` no en el contenedor → inspección.
+`Service` fixture (id `web-apps`, icon `code` — a valid ServiceIcon). Tests: `getByRole("article", { name: service.title })` with a level 3 `heading`; paragraph with the description; svg `stroke="url(#accent-gradient)"` inside the article and the `lucide-code` class propagated (decision 16/RF-2); title id `service-web-apps-title` and the article's `aria-labelledby` pointing to it (test 4); `expectNoA11yViolations`. P1: base column + 580 media row, with no other properties in the media → inspection; `--icon-size` set on `.glyph`, not on the container → inspection.
 
-Cobertura: T1→RF-1,RF-2,RF-3 · T2→RF-4,RF-5,RF-6 + cierre.
+Coverage: T1→RF-1,RF-2,RF-3 · T2→RF-4,RF-5,RF-6 + closing.
