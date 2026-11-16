@@ -90,6 +90,11 @@ in `tasks.md`: the orchestrator does it after the reviewer's OK.
 
 ## Rules
 
+- **Run each shell command on its own** (decision #123): no `&&`, `;`, `|` or
+  redirections such as `2>&1`. Permissions are matched per command and anything not
+  listed is denied, so a chained line fails as a whole (`Permission denied: shell`).
+  That message is the permission rule, not the user: do not retry the same line;
+  split it, or report the command you could not run.
 - Do not modify components in `src/components/`: if something is missing in a
   component, report it to the orchestrator (it goes back to `component-builder`).
 - Do not add dependencies.

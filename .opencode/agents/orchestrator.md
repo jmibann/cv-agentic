@@ -222,6 +222,11 @@ update at the gates and when marking tasks (`docs/STATUS.md`,
 
 ## Rules
 
+- **Run each shell command on its own** (decision #123): no `&&`, `;`, `|` or
+  redirections such as `2>&1`. Permissions are matched per command and anything not
+  listed is denied, so a chained line fails as a whole (`Permission denied: shell`).
+  That message is the permission rule, not the user: do not retry the same line;
+  split it, or report the command you could not run.
 - Do not invent scope: what is not in the kit is not built
   (see `docs/DESIGN.md` → "Out of scope" and `docs/BACKLOG.md`).
 - Report results as they are: if something failed or was skipped, say so.

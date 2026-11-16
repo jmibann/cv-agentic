@@ -2,11 +2,11 @@
 
 Minimal log of the project (decisions **#86** and **#98**): one entry for each
 closing of an F gate and for each rules decision, with the relevant hashes.
-Last update: **2026-11-16** (closing of #122, documentation in English §XXXVI; closing of #121, code in English §XXXV; rules §XXXIV; general audit and cleanup §XXXIII; README in English and `docs/STATUS.md` §XXXII, #120; Change #119, avatar in WebP §XXXI; docs cleanup §XXX; Change #118, `projects` collection §XXIX; Change #117, SEO metadata §XXVIII; motion system complete §XXVII; changes 3 §XXVI and 2 §XXV; stage 1 gate §XXIII).
+Last update: **2026-11-16** (#123, one shell command per call §XXXVII; closing of #122, documentation in English §XXXVI; closing of #121, code in English §XXXV; rules §XXXIV; general audit and cleanup §XXXIII; README in English and `docs/STATUS.md` §XXXII, #120; Change #119, avatar in WebP §XXXI; docs cleanup §XXX; Change #118, `projects` collection §XXIX; Change #117, SEO metadata §XXVIII; motion system complete §XXVII; changes 3 §XXVI and 2 §XXV; stage 1 gate §XXIII).
 The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
 
 What is live does not live here: status → `docs/STATUS.md` ("Current status") · memory →
-`docs/memory.md` · decisions #1–#122 → `docs/README.md` · QA of F5 →
+`docs/memory.md` · decisions #1–#123 → `docs/README.md` · QA of F5 →
 `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Owner: orchestrator (`edit` by path). The piece gates do not touch this
@@ -47,12 +47,13 @@ of the entry); the detail stays in git.
 
 ## Entries
 
-### §XXXVI · 2026-11-16 — Closing of #122: all the documentation in English
-- What: translation of the 117 kit documents (`AGENTS.md`, `docs/`, `foundations/`, `specs/`, `.opencode/`), faithful and in full, with the structural terms in English (`Status`, `Requirements (EARS)`, `Done when`, gate, `Open items`…); the agents now talk to the user in English; guard test extended to the documents (Foundation T23). Done by Claude Code at the user's request, in six stages with a reviewed pilot.
-- Checks: per document, mechanical comparison with its previous version (headings, tables, lists, checkboxes, code blocks, identifiers, hashes, links); no old terms left (`Estado:`, `Hecho cuando`, `CUANDO`…); lint · typecheck · test (**487/42**) · build.
-- Decisions: #122 → `docs/README.md` (it amends L1). Quoted Spanish interface strings and historical literals are kept as they were written.
-- Commits: `805666f` (pilot) · `2d10d4e` (rules and agents) · `ec50f75` (foundations and design) · `237a2c4`…`ac57747` (specs) · `0d6ffe8` `1bab476` `0c8bff3` (status, QA, proposal, register) · `2866724` (T23).
-- Opens: run the OpenCode agents once with the translated prompts (not executable from Claude Code); figures of the root README (485 tests, #1–#121) one step behind; closes: "Internal documentation in English" of `docs/BACKLOG.md`.
+### §XXXVII · 2026-11-16 — Decision #123: one shell command per call
+- What: the five agent prompts say to run each shell command on its own (no `&&`, `;`, pipes or redirections) and that `Permission denied: shell` comes from the permission rule, not the user; the bash permissions do not change.
+- Checks: lint · typecheck · test (487/42); agent permission blocks byte-identical.
+- Decisions: #123 → `docs/README.md`.
+- Opens: confirm in an OpenCode session that the orchestrator runs the checks without denials; closes: —.
+
+### 2026-11-16 · §XXXVI — Closing of #122: all the documentation in English · #122 · `git show 0904234:docs/diagnostics.md`
 
 ### 2026-11-15 · §XXXV — Closing of #121: code 100 % in English, "why-only" comments · #121 · `git show 4b1a48f:docs/diagnostics.md`
 

@@ -213,6 +213,11 @@ run `npm run dev`.
 
 ## Limits
 
+- **Run each shell command on its own** (decision #123): no `&&`, `;`, `|` or
+  redirections such as `2>&1`. Permissions are matched per command and anything not
+  listed is denied, so a chained line fails as a whole (`Permission denied: shell`).
+  That message is the permission rule, not the user: do not retry the same line;
+  split it, or report the command you could not run.
 - Do not build visual components (they belong to F2/F3).
 - Do not add dependencies outside the approved list.
 - Do not modify the kit (see point 2 of the scope) or `.opencode/`.

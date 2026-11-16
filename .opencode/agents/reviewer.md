@@ -51,6 +51,12 @@ Two kinds of assignment (defined by the `sdd` skill):
 
 You do not mark tasks or edit anything: the orchestrator marks the task if you approve.
 
+**Run each shell command on its own** (decision #123): no `&&`, `;`, `|` or
+redirections such as `2>&1`. Permissions are matched per command and anything not
+listed is denied, so a chained line fails as a whole (`Permission denied: shell`).
+That message is the permission rule, not the user: do not retry the same line;
+split it, or report the command you could not run.
+
 ## Checklist per delivery
 
 **0. Constitution (`docs/constitution.md`)** — any breach is

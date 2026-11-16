@@ -84,6 +84,11 @@ and everything you write to the repo is in English (decision #122).
 
 ## Rules
 
+- **Run each shell command on its own** (decision #123): no `&&`, `;`, `|` or
+  redirections such as `2>&1`. Permissions are matched per command and anything not
+  listed is denied, so a chained line fails as a whole (`Permission denied: shell`).
+  That message is the permission rule, not the user: do not retry the same line;
+  split it, or report the command you could not run.
 - You write **only** in `src/components/<Name>/` (never in `specs/`). If you need something
   outside it (a global mock, a function in `lib/`), ask the orchestrator.
 - The props API is the one in the spec. Do not add props "just in case".
