@@ -1,38 +1,38 @@
 # Plan — Separator
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/Separator/Separator.tsx` | `<div>` decorativo `aria-hidden="true"` | RF-1, RF-2 |
-| `src/components/Separator/Separator.module.css` | línea 1px `--color-track`, full-bleed con `calc()` de `--box-padding`, `margin-block: var(--separator-gap)` | RF-3, RF-4, RF-5 |
-| `src/components/Separator/Separator.test.tsx` | tests + cierre a11y | todas |
+| `src/components/Separator/Separator.tsx` | decorative `<div>` with `aria-hidden="true"` | RF-1, RF-2 |
+| `src/components/Separator/Separator.module.css` | 1px line `--color-track`, full-bleed with `calc()` of `--box-padding`, `margin-block: var(--separator-gap)` | RF-3, RF-4, RF-5 |
+| `src/components/Separator/Separator.test.tsx` | tests + a11y closing case | all |
 | `src/components/Separator/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno.
+None.
 
-## Interfaz
+## Interface
 
-`SeparatorProps { className?: string }`. `className` unida al raíz (P3).
+`SeparatorProps { className?: string }`. `className` joined to the root (P3).
 
-## Decisiones
+## Decisions
 
-- `<div>` con `aria-hidden`, nunca `<hr>` ni `role="separator"`: es decoración
-  (un `hr` anunciaría cambio de tema de sección).
-- `margin-block` en **ambos lados** (resolución P-2): el contenedor del
-  separador no debe sumar `gap` en ese tramo; el espacio bloque-línea-bloque lo
-  aporta todo el Separator. *Descartado:* `margin-block-end` solo (la línea
-  quedaría pegada al bloque anterior).
-- Full-bleed con márgenes negativos + ancho calcados desde `--box-padding`
-  (excepción #54 a "sin margen externo"; depende del Box outer).
+- `<div>` with `aria-hidden`, never `<hr>` or `role="separator"`: it is decoration
+  (an `hr` would announce a thematic break of the section).
+- `margin-block` on **both sides** (resolution P-2): the separator's container
+  must not add `gap` in that stretch; the block-line-block space is
+  provided entirely by the Separator. *Discarded:* `margin-block-end` only (the line
+  would stick to the previous block).
+- Full-bleed with negative margins + width derived from `--box-padding`
+  (exception #54 to "no outer margin"; it depends on the outer Box).
 
-## Estrategia de tests
+## Test strategy
 
-Test: raíz con `aria-hidden="true"`, `tagName` `div`, sin rol separator
-(`queryByRole("separator")` null), `className` unida (P2), cierre
-`expectNoA11yViolations`. P1: grosor, color, full-bleed y márgenes (RF-1/3/4/5)
-se verifican por inspección del CSS (jsdom no computa). `npm test`.
+Test: root with `aria-hidden="true"`, `tagName` `div`, no separator role
+(`queryByRole("separator")` null), `className` joined (P2), closing
+`expectNoA11yViolations`. P1: thickness, color, full-bleed and margins (RF-1/3/4/5)
+are verified by CSS inspection (jsdom does not compute). `npm test`.
 
-Cobertura: T1→RF-1,RF-2 · T2→RF-3,RF-4,RF-5 · T3→RF-3 (className) + a11y.
+Coverage: T1→RF-1,RF-2 · T2→RF-3,RF-4,RF-5 · T3→RF-3 (className) + a11y.

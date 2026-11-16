@@ -1,25 +1,25 @@
 # Icon
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Único punto de entrada a `lucide-react`. Centraliza tamaño, color, el
-tratamiento con gradiente y la accesibilidad de los íconos de interfaz.
+The only entry point to `lucide-react`. It centralizes size, color, the
+gradient treatment and the accessibility of interface icons.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el componente recibe un `name` válido de `IconName`, ENTONCES EL SISTEMA renderiza el `<svg>` de lucide correspondiente al mapa explícito nombre → componente.
-- RF-2: MIENTRAS un `Icon` no reciba `label`, EL SISTEMA lo marca decorativo (`aria-hidden="true"`).
-- RF-3: CUANDO el componente recibe `label`, ENTONCES EL SISTEMA expone `role="img"` con `aria-label` igual al label recibido.
-- RF-4: CUANDO `tone` es `gradient`, ENTONCES EL SISTEMA aplica `stroke="url(#accent-gradient)"` resolviendo las definiciones compartidas de `AccentGradientDefs`; el montaje único en la app lo garantiza AppLayout (RF-6 de su spec).
-- RF-5: SI un nombre del `enum` `ServiceIcon` de `data/cv.schema.json` no tiene entrada en el mapa del componente, ENTONCES la compilación falla (el eslabón es `data/cv.types.generated.ts`: requiere `gen:types`, que corre en `prebuild`; sin regenerar, nada falla en runtime). Verificación: build/prebuild (no testeable en unit test).
-- RF-6: EL SISTEMA dimensiona el ícono solo por CSS (`--icon-size`, con `--size-icon` por defecto): sin prop `size` y sin `@media` propios.
-- RF-7: EL SISTEMA fija `focusable="false"` en el `<svg>` en todos los casos (con y sin `label`).
+- RF-1: WHEN the component receives a valid `name` of `IconName`, THEN THE SYSTEM renders the lucide `<svg>` that matches the explicit name → component map.
+- RF-2: WHILE an `Icon` receives no `label`, THE SYSTEM marks it decorative (`aria-hidden="true"`).
+- RF-3: WHEN the component receives `label`, THEN THE SYSTEM exposes `role="img"` with `aria-label` equal to the received label.
+- RF-4: WHEN `tone` is `gradient`, THEN THE SYSTEM applies `stroke="url(#accent-gradient)"`, resolving the shared definitions of `AccentGradientDefs`; AppLayout guarantees the single mount in the app (RF-6 of its spec).
+- RF-5: IF a name of the `ServiceIcon` `enum` of `data/cv.schema.json` has no entry in the component's map, THEN compilation fails (the link is `data/cv.types.generated.ts`: it requires `gen:types`, which runs in `prebuild`; without regenerating, nothing fails at runtime). Verification: build/prebuild (not testable in a unit test).
+- RF-6: THE SYSTEM sizes the icon through CSS only (`--icon-size`, with `--size-icon` by default): no `size` prop and no `@media` of its own.
+- RF-7: THE SYSTEM sets `focusable="false"` on the `<svg>` in every case (with and without `label`).
 
-## Anatomía
+## Anatomy
 
-`<svg>` de lucide con `stroke` configurado. Opcionalmente, el trazo usa el
-gradiente de acento compartido (`<AccentGradientDefs />`).
+A lucide `<svg>` with `stroke` configured. Optionally, the stroke uses the
+shared accent gradient (`<AccentGradientDefs />`).
 
 ## API
 
@@ -35,69 +35,69 @@ export type IconName = UiIconName | ServiceIcon;
 
 export interface IconProps {
   name: IconName;
-  /** current = hereda color; accent = --color-accent; gradient = trazo con gradiente. Default: "current". */
+  /** current = inherits color; accent = --color-accent; gradient = stroke with gradient. Default: "current". */
   tone?: "current" | "accent" | "gradient";
-  /** Si se pasa, el ícono es informativo: role="img" + aria-label. Si no, aria-hidden. */
+  /** If passed, the icon is informative: role="img" + aria-label. If not, aria-hidden. */
   label?: string;
-  /** Se UNE a la clase base `.icon` sobre el `<svg>` raíz (no la reemplaza); el padre fija `--icon-size` exactamente aquí. */
+  /** JOINED to the base class `.icon` on the root `<svg>` (it does not replace it); the parent sets `--icon-size` exactly here. */
   className?: string;
 }
 ```
 
-Mapa explícito nombre → componente (sin `import * as`, para tree-shaking):
+Explicit name → component map (no `import * as`, for tree-shaking):
 
-| name | lucide | Uso |
+| name | lucide | Use |
 |---|---|---|
-| mail | `Mail` | contacto email |
-| phone | `Phone` | contacto teléfono |
-| message-circle | `MessageCircle` | contacto WhatsApp (lucide no tiene logo) |
-| map-pin | `MapPin` | contacto ubicación |
-| download | `Download` | botón Download CV |
-| chevron-down | `ChevronDown` | botón Show Contacts |
+| mail | `Mail` | email contact |
+| phone | `Phone` | phone contact |
+| message-circle | `MessageCircle` | WhatsApp contact (lucide has no logo) |
+| map-pin | `MapPin` | location contact |
+| download | `Download` | Download CV button |
+| chevron-down | `ChevronDown` | Show Contacts button |
 | sun / moon | `Sun` / `Moon` | ThemeToggle |
 | book-open | `BookOpen` | ResumeSection Education |
 | briefcase | `Briefcase` | ResumeSection Experience |
 | quote | `Quote` | TestimonialCard / Dialog |
-| x | `X` | cerrar TestimonialDialog |
+| x | `X` | close TestimonialDialog |
 | code, layout, palette, smartphone, server, database, cloud, pen-tool, camera, megaphone, gauge, shield | `Code`, `LayoutTemplate`, `Palette`, `Smartphone`, `Server`, `Database`, `Cloud`, `PenTool`, `Camera`, `Megaphone`, `Gauge`, `Shield` | ServiceCard |
 
-El mapa se tipa como `Record<IconName, LucideIcon>`: si se agrega un nombre al
-`enum` `ServiceIcon` de `data/cv.schema.json` (y a `SERVICE_ICONS` de `@data/constants`)
-sin agregarlo acá, **falla la compilación** (el tipo generado es una unión de literales).
+The map is typed as `Record<IconName, LucideIcon>`: if a name is added to the
+`ServiceIcon` `enum` of `data/cv.schema.json` (and to `SERVICE_ICONS` of `@data/constants`)
+without adding it here, **compilation fails** (the generated type is a union of literals).
 
-## Gradiente
+## Gradient
 
-Lucide dibuja con `stroke`; `background-clip: text` (lo que usaba el tema)
-no aplica a SVG. En su lugar:
+Lucide draws with `stroke`; `background-clip: text` (what the theme used)
+does not apply to SVG. Instead:
 
-- `AccentGradientDefs` (exportado desde el mismo módulo) renderiza **una vez**,
-  en `AppLayout`, un `<svg width="0" height="0" aria-hidden="true" focusable="false">`
-  con `<linearGradient id="accent-gradient" gradientUnits="userSpaceOnUse" x1="0.62" y1="-0.56" x2="23.38" y2="24.56">`
-  y dos `<stop>` cuyo color sale de tokens **por CSS Module** (sin estilos inline):
+- `AccentGradientDefs` (exported from the same module) renders **once**,
+  in `AppLayout`, an `<svg width="0" height="0" aria-hidden="true" focusable="false">`
+  with `<linearGradient id="accent-gradient" gradientUnits="userSpaceOnUse" x1="0.62" y1="-0.56" x2="23.38" y2="24.56">`
+  and two `<stop>` elements whose color comes from tokens **through the CSS Module** (no inline styles):
   `<stop offset="0.2631" className={styles.stopStart} />` / `<stop offset="0.9375" className={styles.stopEnd} />`
-  con `.stopStart { stop-color: var(--gradient-accent-start); }` y
+  with `.stopStart { stop-color: var(--gradient-accent-start); }` and
   `.stopEnd { stop-color: var(--gradient-accent-end); }`.
 - `tone="gradient"` → `stroke="url(#accent-gradient)"`.
-- **`gradientUnits="userSpaceOnUse"` es obligatorio.** Con el valor por
-  defecto (`objectBoundingBox`) cada trazo del ícono toma su propia caja: el
-  gradiente cambia de un trazo a otro y las líneas rectas (caja de ancho o
-  alto 0) **no se dibujan**. Con `userSpaceOnUse` el gradiente se mapea al
-  espacio 0–24 del `viewBox` de lucide, igual para todo el ícono. Los
-  extremos `x1/y1/x2/y2` reproducen el ángulo de 137.84° y los `offset` las
-  posiciones 26.31 % / 93.75 % de `--gradient-accent`.
-- El `<svg>` de `AccentGradientDefs` es invisible por tamaño
-  (`width="0" height="0"`, `position: absolute`), **nunca con
-  `display: none`**: algunos navegadores no resuelven referencias `url(#…)` a
-  definiciones dentro de un SVG no renderizado.
-- Como los stops usan custom properties, el gradiente **cambia solo con el tema**.
-- Si `AccentGradientDefs` no está montado, el trazo no se ve: por eso los tests
-  de componentes que usan `tone="gradient"` montan también `AccentGradientDefs`,
-  y AppLayout tiene un test que verifica que existe una sola vez.
+- **`gradientUnits="userSpaceOnUse"` is mandatory.** With the default
+  value (`objectBoundingBox`) each stroke of the icon takes its own box: the
+  gradient changes from one stroke to another and straight lines (a box of zero
+  width or height) **are not drawn**. With `userSpaceOnUse` the gradient is mapped to the
+  0–24 space of lucide's `viewBox`, the same for the whole icon. The
+  end points `x1/y1/x2/y2` reproduce the 137.84° angle and the `offset` values the
+  26.31 % / 93.75 % positions of `--gradient-accent`.
+- The `<svg>` of `AccentGradientDefs` is invisible by size
+  (`width="0" height="0"`, `position: absolute`), **never with
+  `display: none`**: some browsers do not resolve `url(#…)` references to
+  definitions inside an SVG that is not rendered.
+- Since the stops use custom properties, the gradient **changes on its own with the theme**.
+- If `AccentGradientDefs` is not mounted, the stroke is not visible: that is why the tests
+  of components that use `tone="gradient"` also mount `AccentGradientDefs`,
+  and AppLayout has a test that verifies it exists only once.
 
-## Estilos y tokens
+## Styles and tokens
 
-**Tamaño: solo por CSS.** Los atributos `width`/`height` de un SVG no aceptan
-`var()`, así que el tamaño **no** es una prop:
+**Size: through CSS only.** The `width`/`height` attributes of an SVG do not accept
+`var()`, so the size is **not** a prop:
 
 ```css
 .icon {
@@ -107,51 +107,51 @@ no aplica a SVG. En su lugar:
 }
 ```
 
-- Por defecto mide `--size-icon` (1.125rem).
-- Para otro tamaño, **el padre le pasa una `className` al `Icon`** y en esa
-  clase fija `--icon-size` (se aplica sobre el propio `<svg>`). Ej. en
+- By default it measures `--size-icon` (1.125rem).
+- For another size, **the parent passes a `className` to the `Icon`** and sets
+  `--icon-size` in that class (it applies on the `<svg>` itself). E.g. in
   ServiceCard: `<Icon name="code" tone="gradient" className={styles.glyph} />`
-  con `.glyph { --icon-size: var(--size-service-icon); }`.
-- `--icon-size` está registrada con `@property … { inherits: false }` en
-  `tokens/tokens.css`: fijarla en un contenedor **no tiene efecto** sobre los
-  íconos de adentro (así no se filtra a íconos anidados).
-  El CSS gana sobre los atributos `width`/`height` que lucide pone por defecto.
-- `stroke-width` 2 (default de lucide).
-- `tone` se aplica por **clases del CSS Module** (p. ej. `.toneAccent { color: var(--color-accent); }`; `current` no agrega clase), sin estilos inline. `gradient` no es un color: usa el atributo `stroke` con la url del gradiente.
+  with `.glyph { --icon-size: var(--size-service-icon); }`.
+- `--icon-size` is registered with `@property … { inherits: false }` in
+  `tokens/tokens.css`: setting it on a container **has no effect** on the
+  icons inside (so it does not leak into nested icons).
+  The CSS wins over the `width`/`height` attributes lucide sets by default.
+- `stroke-width` 2 (lucide's default).
+- `tone` is applied through **classes of the CSS Module** (e.g. `.toneAccent { color: var(--color-accent); }`; `current` adds no class), with no inline styles. `gradient` is not a color: it uses the `stroke` attribute with the gradient's url.
 
-## Estados
+## States
 
-Sin estados propios (no es interactivo). El color en hover/foco lo hereda del
-control que lo contiene (`tone="current"`).
+No states of its own (it is not interactive). The color on hover/focus is inherited from
+the control that contains it (`tone="current"`).
 
 ## Responsive
 
-Sin `@media` propios. Si un tamaño debe cambiar por breakpoint, el token que
-se asigna a `--icon-size` es el que escala (sus `@media` viven en
-`tokens/tokens.css`, según la regla general de `docs/tokens/breakpoints.md`).
+No `@media` of its own. If a size must change by breakpoint, the token
+assigned to `--icon-size` is the one that scales (its `@media` blocks live in
+`tokens/tokens.css`, following the general rule of `docs/tokens/breakpoints.md`).
 
-## Accesibilidad
+## Accessibility
 
-- Sin `label`: `aria-hidden="true"`; con `label`: `role="img"` y `aria-label={label}`.
-- Un `label` de string vacío se trata como **decorativo** (equivale a no pasarlo: `aria-label=""` no produce nombre accesible).
-- `focusable="false"` siempre (RF-7).
-- `tone="gradient"` con `label` es una combinación válida: el gradiente decora
-  el trazo (exento de par de contraste, ver `docs/tokens/contrast.md`) y el
-  nombre accesible lo da `aria-label`.
+- Without `label`: `aria-hidden="true"`; with `label`: `role="img"` and `aria-label={label}`.
+- An empty-string `label` is treated as **decorative** (the same as not passing it: `aria-label=""` produces no accessible name).
+- `focusable="false"` always (RF-7).
+- `tone="gradient"` with `label` is a valid combination: the gradient decorates
+  the stroke (exempt from a contrast pair, see `docs/tokens/contrast.md`) and the
+  accessible name comes from `aria-label`.
 
-## Tests esperados
+## Expected tests
 
-- Renderiza un svg para cada `IconName` (test parametrizado sobre la lista completa).
-- El `<svg>` lleva `focusable="false"` (con y sin `label`; RF-7).
-- Sin `label`: `aria-hidden="true"`; no aparece en `getByRole("img")`.
-- Con `label`: `getByRole("img", { name: label })`.
-- `tone="gradient"` → atributo `stroke="url(#accent-gradient)"`.
-- El `className` recibido queda unido a la clase base `.icon` sobre el propio `<svg>` (aserción de clases con el criterio de CSS Modules de la fase). El tamaño visual lo controla `--icon-size`: jsdom no calcula estilos, se verifica en QA visual.
-- `AccentGradientDefs` renderiza un `linearGradient` con id `accent-gradient`, `gradientUnits="userSpaceOnUse"` y 2 stops (`offset` 0.2631 y 0.9375) **sin atributo `style`** (el color va por clase).
-- `expectNoA11yViolations` sin violaciones (con y sin label).
+- Renders an svg for each `IconName` (a parametrized test over the full list).
+- The `<svg>` carries `focusable="false"` (with and without `label`; RF-7).
+- Without `label`: `aria-hidden="true"`; it does not show up in `getByRole("img")`.
+- With `label`: `getByRole("img", { name: label })`.
+- `tone="gradient"` → attribute `stroke="url(#accent-gradient)"`.
+- The received `className` is joined to the base class `.icon` on the `<svg>` itself (class assertion with the phase's CSS Modules criterion). The visual size is controlled by `--icon-size`: jsdom computes no styles, it is verified in visual QA.
+- `AccentGradientDefs` renders a `linearGradient` with id `accent-gradient`, `gradientUnits="userSpaceOnUse"` and 2 stops (`offset` 0.2631 and 0.9375) **with no `style` attribute** (the color goes through a class).
+- `expectNoA11yViolations` with no violations (with and without label).
 
-## No hacer
+## Do not
 
-- No importar lucide en otros componentes: siempre a través de `Icon`.
-- No usar íconos de marca de lucide (fueron retirados); para redes, `BrandIcon`.
-- No hardcodear colores en los `<stop>`.
+- Do not import lucide in other components: always through `Icon`.
+- Do not use lucide's brand icons (they were removed); for social networks, `BrandIcon`.
+- Do not hardcode colors in the `<stop>` elements.

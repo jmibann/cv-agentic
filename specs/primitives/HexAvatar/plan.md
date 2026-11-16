@@ -1,43 +1,43 @@
 # Plan — HexAvatar
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/HexAvatar/HexAvatar.tsx` | estructura `wrap > border > img` + `HexAvatarDefs` (export del módulo) | RF-1…RF-3 |
-| `src/components/HexAvatar/HexAvatar.module.css` | clip-paths `url(#hex-avatar-outer/inner)`, offsets, `--color-track`, `filter: drop-shadow` del wrap | RF-1, RF-4, RF-5 |
-| `src/components/HexAvatar/HexAvatar.test.tsx` | tests + cierre a11y | todas |
+| `src/components/HexAvatar/HexAvatar.tsx` | structure `wrap > border > img` + `HexAvatarDefs` (export of the module) | RF-1…RF-3 |
+| `src/components/HexAvatar/HexAvatar.module.css` | clip-paths `url(#hex-avatar-outer/inner)`, offsets, `--color-track`, `filter: drop-shadow` of the wrap | RF-1, RF-4, RF-5 |
+| `src/components/HexAvatar/HexAvatar.test.tsx` | tests + a11y closing case | all |
 | `src/components/HexAvatar/index.ts` | re-export `HexAvatar`, `HexAvatarDefs` | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno. El path SVG **no se deriva en runtime**: sale de las coordenadas fijas
-de la spec ("Forma") y queda escrito en `HexAvatarDefs` con comentario.
+None. The SVG path is **not derived at runtime**: it comes from the fixed coordinates
+of the spec ("Shape") and is written in `HexAvatarDefs` with a comment.
 
-## Interfaz
+## Interface
 
 `HexAvatarProps { src: string; alt?: string; className?: string }` +
-`HexAvatarDefs(): JSX` (según spec; `className` se une al `wrap`, P3).
+`HexAvatarDefs(): JSX` (as in the spec; `className` is joined to the `wrap`, P3).
 
-## Decisiones
+## Decisions
 
-- Geometría **fijada en la spec** (vértices px + normalizados, radios 6/2 px;
-  resolución H-1=A): el builder transcribe, no inventa. *Descartado:* criterio
-  ±1px a ojo en QA (divergiría entre card y dialog).
-- `hex-avatar-inner` por inset geométrico real de 4 px, no escalado (RF-4
-  original pasó a prosa de "Forma"; RF renumeradas).
-- Sin `-webkit-clip-path` por ahora; Safari se chequea en F5 (resolución H-8).
-- Sin estado de error: `--color-track` del `<img>` como placeholder natural
-  (H-4). *Descartado:* `onError` con fallback (nada que testear en jsdom y sin
-  requisito).
-- El montaje único de `HexAvatarDefs` es responsabilidad de AppLayout (P4).
+- Geometry **pinned in the spec** (px + normalized vertices, radii 6/2 px;
+  resolution H-1=A): the builder transcribes, it does not invent. *Discarded:* a
+  ±1px by-eye criterion in QA (it would diverge between card and dialog).
+- `hex-avatar-inner` by a true 4 px geometric inset, not scaled (the original
+  RF-4 became prose in "Shape"; RFs renumbered).
+- No `-webkit-clip-path` for now; Safari is checked in F5 (resolution H-8).
+- No error state: `--color-track` of the `<img>` as a natural placeholder
+  (H-4). *Discarded:* `onError` with a fallback (nothing to test in jsdom and no
+  requirement).
+- The single mount of `HexAvatarDefs` is AppLayout's responsibility (P4).
 
-## Estrategia de tests
+## Test strategy
 
-Tests: ids de los dos `clipPath` con `clipPathUnits="objectBoundingBox"` (defs);
-estructura y clases de contorno/imagen (P2; el `url(#…)` por inspección del
-módulo); `alt` ""/nombre vía `getByRole("img")`; `className` unida al wrap. P1:
-`drop-shadow` sin `box-shadow`, tamaño fijo sin `@media`, cero interactividad →
-inspección + axe. Cierre `expectNoA11yViolations`. `npm test`.
+Tests: ids of the two `clipPath`s with `clipPathUnits="objectBoundingBox"` (defs);
+structure and classes of outline/image (P2; the `url(#…)` by inspection of the
+module); `alt` ""/name through `getByRole("img")`; `className` joined to the wrap. P1:
+`drop-shadow` with no `box-shadow`, fixed size with no `@media`, zero interactivity →
+inspection + axe. Closing `expectNoA11yViolations`. `npm test`.
 
-Cobertura: T1→RF-3 · T2→RF-1 · T3→RF-2 · T4→RF-4,RF-5.
+Coverage: T1→RF-3 · T2→RF-1 · T3→RF-2 · T4→RF-4,RF-5.

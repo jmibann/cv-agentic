@@ -1,48 +1,48 @@
 # Plan — BrandIcon
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/BrandIcon/BrandIcon.tsx` | componente `<svg>` desde `paths.ts` + `BRAND_NAMES` | RF-1…RF-3, RF-5 |
-| `src/components/BrandIcon/paths.ts` | dato por red: `{ viewBox: string; d: string \| string[] }` (imports nombrados de `simple-icons`; constantes oficiales donde haga falta) | RF-1, RF-4 |
-| `src/components/BrandIcon/BrandIcon.module.css` | tamaño `var(--icon-size, var(--size-social-icon))` | RF-5, RF-6 |
-| `src/components/BrandIcon/BrandIcon.test.tsx` | tests parametrizados por red + cierre a11y | todas |
-| `src/components/BrandIcon/index.ts` | re-export `BrandIcon`, `BRAND_NAMES`, tipos | — |
+| `src/components/BrandIcon/BrandIcon.tsx` | `<svg>` component from `paths.ts` + `BRAND_NAMES` | RF-1…RF-3, RF-5 |
+| `src/components/BrandIcon/paths.ts` | data per network: `{ viewBox: string; d: string \| string[] }` (named imports from `simple-icons`; official constants where needed) | RF-1, RF-4 |
+| `src/components/BrandIcon/BrandIcon.module.css` | size `var(--icon-size, var(--size-social-icon))` | RF-5, RF-6 |
+| `src/components/BrandIcon/BrandIcon.test.tsx` | tests parametrized per network + a11y closing case | all |
+| `src/components/BrandIcon/index.ts` | re-export `BrandIcon`, `BRAND_NAMES`, types | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno: lookup directo `network → paths.ts`. Sin lógica de fecha.
+None: a direct lookup `network → paths.ts`. No date logic.
 
-## Interfaz
+## Interface
 
-`BrandIconProps { network: SocialNetwork; className?: string }` y
-`BRAND_NAMES: Record<SocialNetwork, string>` según la spec. `className` se une
-a la clase base del `<svg>` (P3).
+`BrandIconProps { network: SocialNetwork; className?: string }` and
+`BRAND_NAMES: Record<SocialNetwork, string>` as in the spec. `className` is joined
+to the base class of the `<svg>` (P3).
 
-## Decisiones
+## Decisions
 
-- Estructura `paths.ts` con `viewBox` por entrada y `d` simple o array
-  (resolución B-1): el SVG oficial que no sea 24×24 conserva su viewBox sin
-  deformarse. *Descartado:* forzar normalización a 24×24 (deforma el logo o
-  recorta; viola "respetar guías de marca").
-- `BRAND_NAMES` literales definidos en el componente, no derivados de
-  `si.title` (B-3): el fallback (LinkedIn) no tiene `si.title` y el nombre
-  visible lo elige el diseño.
-- Coberturas RF-4: verificar al construir T1 contra `SOCIAL_NETWORKS`
-  (`@data/constants`). Caso conocido: **LinkedIn no está en simple-icons
-  16.33** → `paths.ts` nace con el SVG oficial + comentario de origen; el
-  builder lo **reporta** y el orchestrator lo registra en `docs/BACKLOG.md`
-  (los subagentes no escriben en `docs/`). *Descartado:* ícono genérico
-  sustituto (No hacer de la spec).
-- Tamaño solo por CSS con fallback a `--size-social-icon` (mismo mecanismo que
-  Icon; los atributos SVG no aceptan `var()`).
+- `paths.ts` structure with a `viewBox` per entry and `d` as a single value or an array
+  (resolution B-1): an official SVG that is not 24×24 keeps its viewBox without
+  being distorted. *Discarded:* forcing normalization to 24×24 (it distorts the logo or
+  crops it; it breaks "respect the brand guidelines").
+- `BRAND_NAMES` literals defined in the component, not derived from
+  `si.title` (B-3): the fallback (LinkedIn) has no `si.title` and the display
+  name is chosen by the design.
+- RF-4 coverage: verify when building T1 against `SOCIAL_NETWORKS`
+  (`@data/constants`). Known case: **LinkedIn is not in simple-icons
+  16.33** → `paths.ts` is born with the official SVG + a provenance comment; the
+  builder **reports** it and the orchestrator records it in `docs/BACKLOG.md`
+  (subagents do not write in `docs/`). *Discarded:* a generic substitute
+  icon (the spec's Do not).
+- Size through CSS only with a fallback to `--size-social-icon` (same mechanism as
+  Icon; SVG attributes do not accept `var()`).
 
-## Estrategia de tests
+## Test strategy
 
-Test parametrizado sobre **todos** los valores de `SOCIAL_NETWORKS` (RF-1).
-Queries por atributos del svg + `expectNoA11yViolations` al cierre. P1: RF-4
-(chequeo de coberturas, inspección del reviewer sobre `paths.ts`), RF-5/RF-6
-por inspección del CSS. P2/P3 como en Icon. `npm test`.
+A parametrized test over **all** the values of `SOCIAL_NETWORKS` (RF-1).
+Queries by svg attributes + `expectNoA11yViolations` at the end. P1: RF-4
+(coverage check, the reviewer's inspection of `paths.ts`), RF-5/RF-6
+by CSS inspection. P2/P3 as in Icon. `npm test`.
 
-Cobertura: T1→RF-1(paths) · T2→RF-1(render) · T3→RF-2,RF-3 · T4→RF-5,RF-6.
+Coverage: T1→RF-1(paths) · T2→RF-1(render) · T3→RF-2,RF-3 · T4→RF-5,RF-6.

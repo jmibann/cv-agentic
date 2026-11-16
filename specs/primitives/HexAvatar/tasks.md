@@ -1,30 +1,30 @@
-# Tareas — HexAvatar
+# Tasks — HexAvatar
 
-- [x] **T1. `HexAvatarDefs` con los dos `clipPath` de la geometría fija.** RF-3 — 09c9e03
-  - Hecho cuando: el test renderiza `HexAvatarDefs` y encuentra dos `clipPath`
-    con ids `hex-avatar-outer` e `hex-avatar-inner`, `clipPathUnits="objectBoundingBox"`;
-    los `d` transcriben los vértices/radios de "Forma" (spec) con comentario de
-    origen; el `<svg>` es 0×0 `position: absolute`, nunca `display: none`
-    (inspección); verde tras `feat(HexAvatar): T1`.
+- [x] **T1. `HexAvatarDefs` with the two `clipPath`s of the fixed geometry.** RF-3 — 09c9e03
+  - Done when: the test renders `HexAvatarDefs` and finds two `clipPath`s
+    with ids `hex-avatar-outer` and `hex-avatar-inner`, `clipPathUnits="objectBoundingBox"`;
+    the `d` values transcribe the vertices/radii of "Shape" (spec) with a provenance
+    comment; the `<svg>` is 0×0 `position: absolute`, never `display: none`
+    (inspection); green after `feat(HexAvatar): T1`.
 
-- [x] **T2. Estructura `wrap > border > img` con `src`.** RF-1 — 9137a67
-  - Hecho cuando: el `<img>` recibe el `src`; contorno e imagen llevan sus
-    clases del módulo (P2); los offsets 4px y tamaños `calc()` respecto de
-    `--size-testimonial-avatar-w/h` (inspección); el `url(#hex-avatar-*)` de
-    cada clase se verifica leyendo el `.module.css` (jsdom no aplica
-    `clip-path`); verde tras `feat(HexAvatar): T2`.
+- [x] **T2. Structure `wrap > border > img` with `src`.** RF-1 — 9137a67
+  - Done when: the `<img>` receives the `src`; outline and image carry their
+    module classes (P2); the 4px offsets and `calc()` sizes relative to
+    `--size-testimonial-avatar-w/h` (inspection); the `url(#hex-avatar-*)` of
+    each class is verified by reading the `.module.css` (jsdom does not apply
+    `clip-path`); green after `feat(HexAvatar): T2`.
 
-- [x] **T3. `alt`: decorativo por defecto.** RF-2 — bcfe9ec
-  - Hecho cuando: sin `alt` → `alt=""` y no aparece en `getByRole("img")`;
-    con `alt="Foto de X"` → `getByRole("img", { name: "Foto de X" })`; verde
-    tras `feat(HexAvatar): T3`.
+- [x] **T3. `alt`: decorative by default.** RF-2 — bcfe9ec
+  - Done when: without `alt` → `alt=""` and it does not show up in `getByRole("img")`;
+    with `alt="Foto de X"` → `getByRole("img", { name: "Foto de X" })`; green
+    after `feat(HexAvatar): T3`.
 
-- [x] **T4. Sombra, tamaño fijo, `className` y cierre a11y.** RF-4, RF-5 — b0b2b2c
-  - Hecho cuando: el wrap declara `filter: var(--filter-avatar-drop)` sin
-    ningún `box-shadow` (inspección); ningún `@media` ni regla
-    `:hover`/`:focus`/transición; `className` unida al `wrap` (P2); archivo
-    termina con `expectNoA11yViolations` (con `HexAvatarDefs` montado); lint +
-    typecheck + test verdes tras `feat(HexAvatar): T4`.
-  - Nota para el cierre de pieza: `index.ts` re-exporta `HexAvatar`,
-    `HexAvatarDefs` y tipos (el plan lo lista y las tareas no lo cubrían; gap
-    detectado en el review de Icon T1).
+- [x] **T4. Shadow, fixed size, `className` and a11y closing case.** RF-4, RF-5 — b0b2b2c
+  - Done when: the wrap declares `filter: var(--filter-avatar-drop)` with
+    no `box-shadow` (inspection); no `@media` and no
+    `:hover`/`:focus`/transition rule; `className` joined to the `wrap` (P2); the file
+    ends with `expectNoA11yViolations` (with `HexAvatarDefs` mounted); lint +
+    typecheck + test green after `feat(HexAvatar): T4`.
+  - Note for closing the piece: `index.ts` re-exports `HexAvatar`,
+    `HexAvatarDefs` and types (the plan lists it and the tasks did not cover it; gap
+    found in the review of Icon T1).

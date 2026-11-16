@@ -1,22 +1,22 @@
-# Tareas — IconBox
+# Tasks — IconBox
 
-- [x] **T1. Estructura: `<span>` con `Icon tone="gradient"` centrado.** RF-1 — 53c0a21
-  - Hecho cuando: el test (con `AccentGradientDefs` de armazón) encuentra un
-    `svg` con `stroke="url(#accent-gradient)"`; el IconBox no renderiza defs
-    propias (un solo `#accent-gradient` en el DOM del test); verde tras
+- [x] **T1. Structure: `<span>` with a centered `Icon tone="gradient"`.** RF-1 — 53c0a21
+  - Done when: the test (with scaffold `AccentGradientDefs`) finds an
+    `svg` with `stroke="url(#accent-gradient)"`; the IconBox renders no defs
+    of its own (a single `#accent-gradient` in the test's DOM); green after
     `feat(IconBox): T1`.
 
-- [x] **T2. Raíz decorativa + `className`.** RF-2 — b0abecc
-  - Hecho cuando: el `<span>` raíz tiene `aria-hidden="true"`; la `className`
-    externa queda unida a la clase base del raíz (P2); verde tras
+- [x] **T2. Decorative root + `className`.** RF-2 — b0abecc
+  - Done when: the root `<span>` has `aria-hidden="true"`; the external
+    `className` is joined to the root's base class (P2); green after
     `feat(IconBox): T2`.
 
-- [x] **T3. Estilos por tokens y cierre a11y.** RF-3, RF-4, RF-5 — bc78ac8
-  - Hecho cuando: el módulo fija cuadrado `--size-icon-box`, fondo
-    `--color-surface-muted`, `--radius-12`, `inline-flex` centrado y
-    `flex-shrink: 0`, sin margen propio, sin `@media`, sin
-    `:hover`/`:focus`/transiciones (inspección); archivo termina con
-    `expectNoA11yViolations`; lint + typecheck + test verdes tras
+- [x] **T3. Token-based styles and a11y closing case.** RF-3, RF-4, RF-5 — bc78ac8
+  - Done when: the module sets a `--size-icon-box` square, background
+    `--color-surface-muted`, `--radius-12`, centered `inline-flex` and
+    `flex-shrink: 0`, with no margin of its own, no `@media`, no
+    `:hover`/`:focus`/transitions (inspection); the file ends with
+    `expectNoA11yViolations`; lint + typecheck + test green after
     `feat(IconBox): T3`.
-  - Nota para el cierre de pieza: `index.ts` re-exporta `IconBox` y tipos (el
-    plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
+  - Note for closing the piece: `index.ts` re-exports `IconBox` and types (the
+    plan lists it and the tasks did not cover it; gap found in the review of Icon T1).

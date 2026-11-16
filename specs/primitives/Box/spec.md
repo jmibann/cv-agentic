@@ -1,23 +1,23 @@
 # Box
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Superficie base del diseño. Dos variantes: la card flotante (`outer`) y el
-bloque interno tintado (`inner`).
+Base surface of the design. Two variants: the floating card (`outer`) and the
+tinted inner block (`inner`).
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el componente se renderiza sin `variant`, ENTONCES EL SISTEMA aplica la variante `outer` (superficie flotante con borde inferior y sombra).
-- RF-2: CUANDO recibe `variant="inner"`, ENTONCES EL SISTEMA aplica la variante `inner` (fondo tintado, sin borde ni sombra).
-- RF-3: CUANDO recibe `as`, ENTONCES EL SISTEMA renderiza ese elemento (`div` por defecto) y solo le transmite `children`, `id`, `aria-label`, `aria-labelledby` y `className`.
-- RF-4: SI se le pasa un atributo fuera de la API cerrada (p. ej. `role` o `tabIndex`), ENTONCES EL SISTEMA no lo transmite al elemento. Verificación: inspección (el tipo cerrado de props lo garantiza; no hay unit test posible para un consumo no tipado).
-- RF-5: EL SISTEMA resuelve fondo, radio, padding y cambios de breakpoint solo con tokens; Box no declara `@media` propios (verificación: inspección del CSS).
-- RF-6: EL SISTEMA mantiene `overflow: visible` en `outer` para que el avatar del Sidebar y la CornerTab no se recorten.
+- RF-1: WHEN the component is rendered without `variant`, THEN THE SYSTEM applies the `outer` variant (floating surface with a bottom border and a shadow).
+- RF-2: WHEN it receives `variant="inner"`, THEN THE SYSTEM applies the `inner` variant (tinted background, no border or shadow).
+- RF-3: WHEN it receives `as`, THEN THE SYSTEM renders that element (`div` by default) and only passes it `children`, `id`, `aria-label`, `aria-labelledby` and `className`.
+- RF-4: IF it is passed an attribute outside the closed API (e.g. `role` or `tabIndex`), THEN THE SYSTEM does not pass it to the element. Verification: inspection (the closed props type guarantees it; no unit test is possible for an untyped use).
+- RF-5: THE SYSTEM resolves background, radius, padding and breakpoint changes with tokens only; Box declares no `@media` of its own (verification: CSS inspection).
+- RF-6: THE SYSTEM keeps `overflow: visible` on `outer` so that the Sidebar's avatar and the CornerTab are not clipped.
 
-## Anatomía
+## Anatomy
 
-Un único elemento contenedor (tag configurable) con `children`.
+A single container element (configurable tag) with `children`.
 
 ## API
 
@@ -35,59 +35,59 @@ export interface BoxProps {
 }
 ```
 
-API cerrada: solo esos atributos llegan al elemento (sin pass-through
-genérico de `role`, `tabIndex` ni `...rest`). `aria-label` y
-`aria-labelledby` los usan Sidebar (`as="aside" aria-label`) y ServiceCard
+Closed API: only those attributes reach the element (no generic
+pass-through of `role`, `tabIndex` or `...rest`). `aria-label` and
+`aria-labelledby` are used by Sidebar (`as="aside" aria-label`) and ServiceCard
 (`as="article" aria-labelledby`).
 
-El tabpanel de NavTabs **no** es un Box: es un `<div role="tabpanel">` dentro
-del Box de contenido (ver `specs/layout/AppLayout/spec.md`).
+The tabpanel of NavTabs is **not** a Box: it is a `<div role="tabpanel">` inside
+the content Box (see `specs/layout/AppLayout/spec.md`).
 
-`className` se **une** a la clase de la variante sobre el elemento raíz (no la
-reemplaza). El orden en el atributo `class` no resuelve conflictos de
-especificidad: rige el orden en la hoja de estilos.
+`className` is **joined** to the variant's class on the root element (it does not
+replace it). The order in the `class` attribute does not resolve specificity
+conflicts: the order in the style sheet rules.
 
-## Estilos y tokens
+## Styles and tokens
 
 | | outer | inner |
 |---|---|---|
-| Fondo | `--color-surface` | `--color-surface-muted` |
-| Radio | `--radius-20` | `--radius-box-inner` (14px < 580 → 16px) |
+| Background | `--color-surface` | `--color-surface-muted` |
+| Radius | `--radius-20` | `--radius-box-inner` (14px < 580 → 16px) |
 | Padding | `--box-padding` | `--box-inner-padding` |
-| Borde | `border-bottom: var(--size-box-edge) solid var(--color-box-edge)` | — |
-| Sombra | `--shadow-box` | — |
-| Posición | `position: relative` (ancla de CornerTab) | — |
+| Border | `border-bottom: var(--size-box-edge) solid var(--color-box-edge)` | — |
+| Shadow | `--shadow-box` | — |
+| Position | `position: relative` (CornerTab's anchor) | — |
 
-- `outer` usa `overflow: visible` (el avatar del sidebar y la CornerTab
-  dependen de eso). La CornerTab resuelve su esquina con su propio radio.
-- `inner` **no declara** `overflow` (queda `visible` por defecto).
+- `outer` uses `overflow: visible` (the sidebar's avatar and the CornerTab
+  depend on that). The CornerTab resolves its corner with its own radius.
+- `inner` **does not declare** `overflow` (it stays `visible` by default).
 
-## Estados
+## States
 
-Sin estados interactivos.
+No interactive states.
 
 ## Responsive
 
-Resuelto íntegramente por tokens (`--box-padding`, `--box-inner-padding`,
-`--radius-box-inner`). El componente no tiene `@media` propios.
+Resolved entirely by tokens (`--box-padding`, `--box-inner-padding`,
+`--radius-box-inner`). The component has no `@media` of its own.
 
-## Accesibilidad
+## Accessibility
 
-Neutral. La semántica sale del elemento elegido con `as` (`section`,
-`article`, `aside`) más su nombre (`aria-label` / `aria-labelledby`). Box no
-acepta `role`.
+Neutral. The semantics come from the element chosen with `as` (`section`,
+`article`, `aside`) plus its name (`aria-label` / `aria-labelledby`). Box does not
+accept `role`.
 
-## Tests esperados
+## Expected tests
 
-- Renderiza `children`.
-- Default: `div` con la clase de `outer`.
-- `variant="inner"` aplica la clase de inner y no la de outer.
-- `as="section"` renderiza un `<section>`.
-- Pasa `id`, `aria-label` y `aria-labelledby` al elemento (p. ej. `as="aside" aria-label="Profile"` → `getByRole("complementary", { name: "Profile" })`).
-- Concatena `className`.
-- `expectNoA11yViolations` sin violaciones.
+- Renders `children`.
+- Default: `div` with the `outer` class.
+- `variant="inner"` applies the inner class and not the outer one.
+- `as="section"` renders a `<section>`.
+- Passes `id`, `aria-label` and `aria-labelledby` to the element (e.g. `as="aside" aria-label="Profile"` → `getByRole("complementary", { name: "Profile" })`).
+- Concatenates `className`.
+- `expectNoA11yViolations` with no violations.
 
-## No hacer
+## Do not
 
-- No agregar margen externo.
-- No crear variantes nuevas (p. ej. "outlined") sin actualizar esta spec.
+- Do not add an outer margin.
+- Do not create new variants (e.g. "outlined") without updating this spec.

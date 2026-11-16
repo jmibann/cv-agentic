@@ -1,32 +1,32 @@
-# Tareas — SectionTitle
+# Tasks — SectionTitle
 
-- [x] **T1. Headings por nivel con `id`.** RF-1, RF-4 — ec409cf
-  - Hecho cuando: `as="h1| h2| h3"` renderiza `getByRole("heading", { level,
-    name })` y `id` llega al heading; verde tras `feat(SectionTitle): T1`.
+- [x] **T1. Headings per level with `id`.** RF-1, RF-4 — ec409cf
+  - Done when: `as="h1| h2| h3"` renders `getByRole("heading", { level,
+    name })` and `id` reaches the heading; green after `feat(SectionTitle): T1`.
 
-- [x] **T2. Tamaño por nivel desde el módulo.** RF-1 — 4b6c08a
-  - Hecho cuando: cada nivel aplica su clase `.h1/.h2/.h3` (P2) con
-    `font-size: var(--font-size-h1/2/3)` (inspección: sin literales de px);
-    verde tras `feat(SectionTitle): T2`.
+- [x] **T2. Size per level from the module.** RF-1 — 4b6c08a
+  - Done when: each level applies its class `.h1/.h2/.h3` (P2) with
+    `font-size: var(--font-size-h1/2/3)` (inspection: no px literals);
+    green after `feat(SectionTitle): T2`.
 
-- [x] **T3. `decorated`: barra `::after`.** RF-2 — 05a3339
-  - Hecho cuando: la clase `decorated` aplica `position: relative` + `::after`
-    con `--gradient-accent`, `--size-title-bar-*`, `bottom:
-    calc(var(--title-bar-offset) * -1)` y **sin contenido textual**
-    (`content: ""`; inspección); el nombre accesible no cambia (test); verde tras
+- [x] **T3. `decorated`: `::after` bar.** RF-2 — 05a3339
+  - Done when: the `decorated` class applies `position: relative` + `::after`
+    with `--gradient-accent`, `--size-title-bar-*`, `bottom:
+    calc(var(--title-bar-offset) * -1)` and **no text content**
+    (`content: ""`; inspection); the accessible name does not change (test); green after
     `feat(SectionTitle): T3`.
 
-- [x] **T4. `icon` (IconBox en el heading) y combinación decorated+icon.** RF-3 — 9dc375a
-  - Hecho cuando: con `icon` el heading renderiza `IconBox` y su nombre
-    accesible sigue siendo solo el texto; `decorated` + `icon` juntos conserva
-    ambos tratamientos (clase decorated **y** IconBox presentes); el flex va en
-    el propio heading sin wrapper (inspección); verde tras `feat(SectionTitle): T4`.
+- [x] **T4. `icon` (IconBox in the heading) and decorated+icon combination.** RF-3 — 9dc375a
+  - Done when: with `icon` the heading renders `IconBox` and its accessible
+    name is still only the text; `decorated` + `icon` together keeps
+    both treatments (decorated class **and** IconBox present); the flex goes on
+    the heading itself with no wrapper (inspection); green after `feat(SectionTitle): T4`.
 
-- [x] **T5. `className`, márgenes y cierre a11y.** RF-5, RF-6 — 734b06c
-  - Hecho cuando: `className` unida al heading raíz (P2); `margin-bottom` según
-    RF-5 — h1 solo con `decorated` usa `--title-decorated-gap`, h2 `1.25rem`,
-    h3 `0.5rem`, h1 sin decorar no declara margen propio (inspección); cero
-    `@media` propios; archivo termina con `expectNoA11yViolations`; lint +
-    typecheck + test verdes tras `feat(SectionTitle): T5`.
-  - Nota para el cierre de pieza: `index.ts` re-exporta `SectionTitle` y tipos
-    (el plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
+- [x] **T5. `className`, margins and a11y closing case.** RF-5, RF-6 — 734b06c
+  - Done when: `className` joined to the root heading (P2); `margin-bottom` as in
+    RF-5 — h1 only with `decorated` uses `--title-decorated-gap`, h2 `1.25rem`,
+    h3 `0.5rem`, an undecorated h1 declares no margin of its own (inspection); zero
+    `@media` of its own; the file ends with `expectNoA11yViolations`; lint +
+    typecheck + test green after `feat(SectionTitle): T5`.
+  - Note for closing the piece: `index.ts` re-exports `SectionTitle` and types
+    (the plan lists it and the tasks did not cover it; gap found in the review of Icon T1).

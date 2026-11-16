@@ -1,44 +1,44 @@
 # Plan — Box
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/Box/Box.tsx` | contenedor con `variant`/`as`, API cerrada (sin `...rest`) | RF-1…RF-4 |
-| `src/components/Box/Box.module.css` | `.outer`/`.inner` solo con tokens; `overflow: visible` en outer | RF-5, RF-6 |
-| `src/components/Box/Box.test.tsx` | tests + cierre a11y | todas |
+| `src/components/Box/Box.tsx` | container with `variant`/`as`, closed API (no `...rest`) | RF-1…RF-4 |
+| `src/components/Box/Box.module.css` | `.outer`/`.inner` with tokens only; `overflow: visible` on outer | RF-5, RF-6 |
+| `src/components/Box/Box.test.tsx` | tests + a11y closing case | all |
 | `src/components/Box/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno: `const El = as ?? "div"` con clases elegidas por `variant`.
+None: `const El = as ?? "div"` with classes chosen by `variant`.
 
-## Interfaz
+## Interface
 
-`BoxProps` de la spec: `variant`, `as`, `children`, `id`, `aria-label`,
-`aria-labelledby`, `className`. Nada más llega al DOM (RF-3/RF-4). `className`
-se une a la clase de variante sobre el único elemento raíz (P3).
+`BoxProps` of the spec: `variant`, `as`, `children`, `id`, `aria-label`,
+`aria-labelledby`, `className`. Nothing else reaches the DOM (RF-3/RF-4). `className`
+is joined to the variant's class on the single root element (P3).
 
-## Decisiones
+## Decisions
 
-- API cerrada sin pass-through de `role`/`tabIndex`/`...rest` (resolución A3 de
-  la auditoría: el tabpanel **no** es un Box). *Descartado:* mantener
-  pass-through genérico (muerto y peligroso para a11y).
-- `outer` declara `overflow: visible` explícito (la CornerTab y el avatar del
-  Sidebar dependen de esto); `inner` **no declara** `overflow` (resolución X-3,
-  visible por defecto). *Descartado:* `hidden` en inner (recorta el radio
-  tintado).
-- RF-4 (no transmisión) no tiene unit test: el tipo cerrado de props lo
-  garantiza en compilación y un consumo no tipado no existe en el proyecto
-  (P1: inspección).
-- Cero `@media`: todo el responsive sale de `--box-padding`,
-  `--box-inner-padding` y `--radius-box-inner` (RF-5).
+- Closed API with no pass-through of `role`/`tabIndex`/`...rest` (resolution A3 of
+  the audit: the tabpanel is **not** a Box). *Discarded:* keeping a generic
+  pass-through (dead and dangerous for a11y).
+- `outer` declares an explicit `overflow: visible` (the CornerTab and the Sidebar's
+  avatar depend on it); `inner` **does not declare** `overflow` (resolution X-3,
+  visible by default). *Discarded:* `hidden` on inner (it clips the tinted
+  radius).
+- RF-4 (non-transmission) has no unit test: the closed props type
+  guarantees it at compile time and an untyped use does not exist in the project
+  (P1: inspection).
+- Zero `@media`: all the responsive behavior comes from `--box-padding`,
+  `--box-inner-padding` and `--radius-box-inner` (RF-5).
 
-## Estrategia de tests
+## Test strategy
 
-RTL con queries por rol (`complementary`/`region` vía `aria-label`) y
-aserción de clase P2 (`styles["outer"]` etc.). P1: RF-4/RF-5/RF-6 por
-inspección del CSS/DOM en la revisión. Cierre con `expectNoA11yViolations`
-(outer y inner). `npm test`.
+RTL with queries by role (`complementary`/`region` through `aria-label`) and
+P2 class assertion (`styles["outer"]` etc.). P1: RF-4/RF-5/RF-6 by
+inspection of the CSS/DOM in the review. Closing with `expectNoA11yViolations`
+(outer and inner). `npm test`.
 
-Cobertura: T1→RF-1,RF-3 · T2→RF-2 · T3→RF-3 · T4→RF-4,RF-5,RF-6.
+Coverage: T1→RF-1,RF-3 · T2→RF-2 · T3→RF-3 · T4→RF-4,RF-5,RF-6.

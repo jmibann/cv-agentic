@@ -1,37 +1,37 @@
 # Plan — Overhead
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/Overhead/Overhead.tsx` | raíz `span`/`dt` en bloque con el texto tal cual | RF-1, RF-2 |
-| `src/components/Overhead/Overhead.module.css` | `uppercase`, `--color-text-muted`, `--font-size-overhead`, elipsis (`hidden/ellipsis/nowrap`), `block` | RF-1, RF-3, RF-5 |
-| `src/components/Overhead/Overhead.test.tsx` | tests + cierre a11y | todas |
+| `src/components/Overhead/Overhead.tsx` | block-level `span`/`dt` root with the text as is | RF-1, RF-2 |
+| `src/components/Overhead/Overhead.module.css` | `uppercase`, `--color-text-muted`, `--font-size-overhead`, ellipsis (`hidden/ellipsis/nowrap`), `block` | RF-1, RF-3, RF-5 |
+| `src/components/Overhead/Overhead.test.tsx` | tests + a11y closing case | all |
 | `src/components/Overhead/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno.
+None.
 
-## Interfaz
+## Interface
 
 `OverheadProps { children: React.ReactNode; as?: "span" | "dt"; className?: string }`
-(O-2: `"p"` fuera del tipo). `className` unida al raíz (P3).
+(O-2: `"p"` left out of the type). `className` joined to the root (P3).
 
-## Decisiones
+## Decisions
 
-- Mayúsculas **solo por CSS** (`text-transform`): el DOM conserva "Email".
-  *Descartado:* transformar el string (rompería lectores de pantalla).
-- Elipsis sin `max-width` propio (O-1): la restricción de ancho es del
-  contenedor (Sidebar); en jsdom no se computa → inspección (P1).
-- RF-4 (contraste sobre `bg`) es restricción de uso: la verifica el reviewer en
-  F3 (P1). `as` restringido a `span | dt` (O-2; descartado mantener `"p"` sin
-  consumidor documentado).
+- Uppercase **through CSS only** (`text-transform`): the DOM keeps "Email".
+  *Discarded:* transforming the string (it would break screen readers).
+- Ellipsis with no `max-width` of its own (O-1): the width restriction belongs to the
+  container (Sidebar); in jsdom it is not computed → inspection (P1).
+- RF-4 (contrast on `bg`) is a usage restriction: the reviewer verifies it in
+  F3 (P1). `as` restricted to `span | dt` (O-2; discarded keeping `"p"` with no
+  documented consumer).
 
-## Estrategia de tests
+## Test strategy
 
-`getByText` con el texto original (no transformado); `tagName` por `as` (con
-`<dl>` de armazón); clases P2 para la elipsis; cierre `expectNoA11yViolations`.
-P1: uppercase/elipsis/tamaño/`@media` por inspección del CSS. `npm test`.
+`getByText` with the original text (untransformed); `tagName` by `as` (with a
+scaffold `<dl>`); P2 classes for the ellipsis; `expectNoA11yViolations` closing case.
+P1: uppercase/ellipsis/size/`@media` by CSS inspection. `npm test`.
 
-Cobertura: T1→RF-1 · T2→RF-2 · T3→RF-3,RF-4,RF-5,RF-6.
+Coverage: T1→RF-1 · T2→RF-2 · T3→RF-3,RF-4,RF-5,RF-6.

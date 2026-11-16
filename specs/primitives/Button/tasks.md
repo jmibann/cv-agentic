@@ -1,41 +1,41 @@
-# Tareas — Button
+# Tasks — Button
 
-- [x] **T1. `<button>` con `type` de la prop.** RF-1 — 6b87744
-  - Hecho cuando: sin `href` renderiza `getByRole("button", { name })` con
-    `type="button"` por defecto y `type="submit"` llega al DOM; verde tras
+- [x] **T1. `<button>` with the prop's `type`.** RF-1 — 6b87744
+  - Done when: without `href` it renders `getByRole("button", { name })` with
+    `type="button"` by default and `type="submit"` reaches the DOM; green after
     `feat(Button): T1`.
 
-- [x] **T2. `onClick` y `disabled`.** RF-3 — 754288e
-  - Hecho cuando: user-event invoca el handler; con `disabled` no se invoca y
-    el `<button>` queda deshabilitado; verde tras `feat(Button): T2`.
+- [x] **T2. `onClick` and `disabled`.** RF-3 — 754288e
+  - Done when: user-event invokes the handler; with `disabled` it is not invoked and
+    the `<button>` is disabled; green after `feat(Button): T2`.
 
-- [x] **T3. Link: `href`, `rel` y `download`.** RF-2, RF-8, RF-9 — c037d1c
-  - Hecho cuando: con `href` renderiza `getByRole("link")` con ese `href`;
-    `target="_blank"` sin `rel` agrega `noopener noreferrer`; un `rel`
-    explícito llega tal cual sin fusionar; `download` se transmite con su
-    valor; verde tras `feat(Button): T3`.
+- [x] **T3. Link: `href`, `rel` and `download`.** RF-2, RF-8, RF-9 — c037d1c
+  - Done when: with `href` it renders `getByRole("link")` with that `href`;
+    `target="_blank"` with no `rel` adds `noopener noreferrer`; an explicit
+    `rel` arrives as is, unmerged; `download` is passed with its
+    value; green after `feat(Button): T3`.
 
-- [x] **T4. Ícono decorativo y `iconPosition`.** RF-4, RF-7 — cc7a5ed
-  - Hecho cuando: `icon` renderiza `<svg>` con `aria-hidden` y el nombre
-    accesible sigue siendo solo el texto; con `iconPosition="end"` el svg está
-    **después** del label en el DOM (default: antes); verde tras `feat(Button): T4`.
+- [x] **T4. Decorative icon and `iconPosition`.** RF-4, RF-7 — cc7a5ed
+  - Done when: `icon` renders an `<svg>` with `aria-hidden` and the accessible
+    name is still only the text; with `iconPosition="end"` the svg is
+    **after** the label in the DOM (default: before); green after `feat(Button): T4`.
 
-- [x] **T5. `size="small"` y `fullWidth` (clases).** RF-6 — 1d69f14
-  - Hecho cuando: ambas aplican su clase del módulo (P2) sobre el raíz junto a
-    la `className` externa; el módulo resuelve small con
-    `var(--button-small-padding-block/inline)` (existen en `tokens.css` —
-    bloqueado hasta que el usuario las agregue) y `::before { content: none }`;
-    `fullWidth` → `width: 100%` por clase; verde tras `feat(Button): T5`.
+- [x] **T5. `size="small"` and `fullWidth` (classes).** RF-6 — 1d69f14
+  - Done when: both apply their module class (P2) on the root next to
+    the external `className`; the module resolves small with
+    `var(--button-small-padding-block/inline)` (they exist in `tokens.css` —
+    blocked until the user adds them) and `::before { content: none }`;
+    `fullWidth` → `width: 100%` through a class; green after `feat(Button): T5`.
 
-- [x] **T6. Estilos base, pseudo-estados y cierre a11y.** RF-5, RF-6 — bc2f4c2
-  - Hecho cuando: el módulo resuelve fondo `--gradient-accent`, texto
-    `--color-on-accent`, radio, sombra y `::before` (`bottom: 0`,
-    `z-index: var(--z-below)`, botón con `position: relative;
-    z-index: var(--z-base)`), focus-visible con `--focus-ring-*` +
+- [x] **T6. Base styles, pseudo-states and a11y closing case.** RF-5, RF-6 — bc2f4c2
+  - Done when: the module resolves background `--gradient-accent`, text
+    `--color-on-accent`, radius, shadow and `::before` (`bottom: 0`,
+    `z-index: var(--z-below)`, button with `position: relative;
+    z-index: var(--z-base)`), focus-visible with `--focus-ring-*` +
     `--shadow-accent-focus`, disabled `opacity: 0.5` + `cursor: not-allowed`
-    sin hover (todo por inspección: cero literales, cero `@media`); archivo
-    termina con `expectNoA11yViolations` (button y link); lint + typecheck +
-    test verdes tras `feat(Button): T6` (el `build` de cierre de pieza lo
-    corren orchestrator/reviewer, decisión #80).
-  - Nota para el cierre de pieza: `index.ts` re-exporta `Button` y tipos (el plan
-    lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
+    with no hover (all by inspection: zero literals, zero `@media`); the file
+    ends with `expectNoA11yViolations` (button and link); lint + typecheck +
+    test green after `feat(Button): T6` (the `build` for closing the piece is
+    run by orchestrator/reviewer, decision #80).
+  - Note for closing the piece: `index.ts` re-exports `Button` and types (the plan
+    lists it and the tasks did not cover it; gap found in the review of Icon T1).

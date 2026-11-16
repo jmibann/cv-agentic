@@ -1,73 +1,73 @@
 # Overhead
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Etiqueta pequeña en mayúsculas que precede a un valor ("EMAIL" sobre
+A small uppercase label that precedes a value ("EMAIL" above
 "alex@example.com").
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el componente recibe texto, ENTONCES EL SISTEMA lo muestra en mayúsculas por CSS (`text-transform: uppercase`) sin transformar el texto del DOM.
-- RF-2: CUANDO recibe `as="dt"`, ENTONCES EL SISTEMA renderiza un `<dt>`; la validez del contexto de la `<dl>` es del consumidor (el test usa `<dl>` de armazón).
-- RF-3: EL SISTEMA trunca el texto largo con elipsis (`overflow: hidden`, `text-overflow: ellipsis`, `white-space: nowrap`) **cuando el contenedor restringe el ancho**: Overhead no declara `max-width` propio. Verificación: inspección del CSS (jsdom no computa el truncamiento).
-- RF-4: SI el Overhead se sitúa sobre `--color-bg` en claro, ENTONCES el contraste queda en 4.32:1 y es insuficiente; por eso su uso se restringe a `surface`, `surface-muted` y `surface-raised`. Restricción de uso: la verifica el reviewer en el consumidor (el componente no conoce el fondo).
-- RF-5: EL SISTEMA escala el tamaño con `--font-size-overhead` y no declara `@media` propios (verificación: inspección del CSS).
-- RF-6: EL SISTEMA lo renderiza no interactivo y sin roles añadidos (inspección + axe).
+- RF-1: WHEN the component receives text, THEN THE SYSTEM shows it in uppercase through CSS (`text-transform: uppercase`) without transforming the text in the DOM.
+- RF-2: WHEN it receives `as="dt"`, THEN THE SYSTEM renders a `<dt>`; the validity of the `<dl>` context belongs to the consumer (the test uses a scaffold `<dl>`).
+- RF-3: THE SYSTEM truncates long text with an ellipsis (`overflow: hidden`, `text-overflow: ellipsis`, `white-space: nowrap`) **when the container restricts the width**: Overhead declares no `max-width` of its own. Verification: CSS inspection (jsdom does not compute the truncation).
+- RF-4: IF the Overhead sits on `--color-bg` in light, THEN the contrast is 4.32:1 and is insufficient; that is why its use is restricted to `surface`, `surface-muted` and `surface-raised`. Usage restriction: the reviewer verifies it in the consumer (the component does not know the background).
+- RF-5: THE SYSTEM scales the size with `--font-size-overhead` and declares no `@media` of its own (verification: CSS inspection).
+- RF-6: THE SYSTEM renders it non-interactive and with no added roles (inspection + axe).
 
-## Anatomía
+## Anatomy
 
-`<span>` en bloque (o `<dt>` según `as`).
+A block-level `<span>` (or `<dt>` depending on `as`).
 
 ## API
 
 ```ts
 export interface OverheadProps {
   children: React.ReactNode;
-  as?: "span" | "dt";  // default "span"; "dt" cuando va en una <dl>
-  /** Se une a la clase base del elemento raíz. */
+  as?: "span" | "dt";  // default "span"; "dt" when it goes in a <dl>
+  /** Joined to the base class of the root element. */
   className?: string;
 }
 ```
 
-## Estilos y tokens
+## Styles and tokens
 
-| Propiedad | Valor |
+| Property | Value |
 |---|---|
 | Color | `--color-text-muted` |
-| Tamaño | `--font-size-overhead` |
-| Peso | `--font-weight-regular` |
-| Transformación | `text-transform: uppercase` |
+| Size | `--font-size-overhead` |
+| Weight | `--font-weight-regular` |
+| Transform | `text-transform: uppercase` |
 | Display | `block`; `overflow: hidden; text-overflow: ellipsis; white-space: nowrap;` |
 
-## Estados
+## States
 
-No es interactivo.
+Not interactive.
 
 ## Responsive
 
-Sin `@media` propios: el tamaño escala por `--font-size-overhead` (11px < 580 → 12px).
+No `@media` of its own: the size scales through `--font-size-overhead` (11px < 580 → 12px).
 
-## Accesibilidad
+## Accessibility
 
-`text-transform` no altera lo que leen los lectores de pantalla: el texto en el
-DOM va en capitalización normal ("Email"), no en mayúsculas.
+`text-transform` does not alter what screen readers read: the text in the
+DOM is in normal capitalization ("Email"), not in uppercase.
 
-## Reglas de contraste
+## Contrast rules
 
-Nunca sobre `--color-bg` en claro (4.32:1). Sí sobre `surface`,
-`surface-muted` y `surface-raised` (ver `docs/tokens/contrast.md`).
+Never on `--color-bg` in light (4.32:1). Allowed on `surface`,
+`surface-muted` and `surface-raised` (see `docs/tokens/contrast.md`).
 
-## Tests esperados
+## Expected tests
 
-- Renderiza el texto tal cual (sin transformar en el DOM).
-- `as="dt"` renderiza `<dt>` (dentro de `<dl>` en el test).
-- Concatena `className` (criterio de CSS Modules de la fase).
-- `expectNoA11yViolations` sin violaciones.
+- Renders the text as is (untransformed in the DOM).
+- `as="dt"` renders a `<dt>` (inside a `<dl>` in the test).
+- Concatenates `className` (the phase's CSS Modules criterion).
+- `expectNoA11yViolations` with no violations.
 
-## No hacer
+## Do not
 
-- No escribir el texto en mayúsculas en el DOM: la capitalización la pone `text-transform` (Accesibilidad).
-- No usarlo sobre `--color-bg` en tema claro (4.32:1): solo sobre `surface`, `surface-muted` o `surface-raised`.
-- No agregar `@media` propios: el tamaño escala por `--font-size-overhead`.
-- No hacerlo interactivo ni agregarle roles.
+- Do not write the text in uppercase in the DOM: the capitalization comes from `text-transform` (Accessibility).
+- Do not use it on `--color-bg` in the light theme (4.32:1): only on `surface`, `surface-muted` or `surface-raised`.
+- Do not add `@media` of its own: the size scales through `--font-size-overhead`.
+- Do not make it interactive or add roles to it.

@@ -1,22 +1,22 @@
 # IconBox
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Contenedor cuadrado tintado con un ícono en gradiente. Se usa en la lista
-de contactos del Sidebar y junto a los h2 de las ResumeSection.
+A tinted square container with an icon in gradient. It is used in the Sidebar's
+contact list and next to the h2 headings of the ResumeSections.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el componente recibe `icon`, ENTONCES EL SISTEMA renderiza un `Icon tone="gradient"` centrado en un contenedor cuadrado tintado. IconBox **no monta** las defs del gradiente: la unicidad del montaje la garantiza AppLayout (RF-6 de su spec).
-- RF-2: EL SISTEMA marca el contenedor decorativo (`aria-hidden="true"`): el significado lo da el texto que lo acompaña.
-- RF-3: EL SISTEMA mantiene el tamaño con `--size-icon-box` y no declara `@media` propios (verificación: inspección del CSS).
-- RF-4: EL SISTEMA renderiza IconBox sin roles interactivos ni reglas `:hover`/`:focus`/transiciones propias (verificación: inspección + axe).
-- RF-5: SI IconBox se coloca dentro de un `Box variant="inner"`, ENTONCES comparte fondo con el contenedor y pierde visibilidad, por lo que ese uso queda prohibido. Restricción de uso: la verifica el reviewer en F3/F4 (el primitivo no detecta superficies).
+- RF-1: WHEN the component receives `icon`, THEN THE SYSTEM renders an `Icon tone="gradient"` centered in a tinted square container. IconBox **does not mount** the gradient's defs: AppLayout guarantees the single mount (RF-6 of its spec).
+- RF-2: THE SYSTEM marks the container decorative (`aria-hidden="true"`): the meaning comes from the text next to it.
+- RF-3: THE SYSTEM keeps the size with `--size-icon-box` and declares no `@media` of its own (verification: CSS inspection).
+- RF-4: THE SYSTEM renders IconBox with no interactive roles and no `:hover`/`:focus`/transition rules of its own (verification: inspection + axe).
+- RF-5: IF IconBox is placed inside a `Box variant="inner"`, THEN it shares its background with the container and loses visibility, so that use is forbidden. Usage restriction: the reviewer verifies it in F3/F4 (the primitive does not detect surfaces).
 
-## Anatomía
+## Anatomy
 
-`<span>` cuadrado con un `Icon tone="gradient"` centrado.
+A square `<span>` with a centered `Icon tone="gradient"`.
 
 ## API
 
@@ -25,42 +25,42 @@ import type { IconName } from "../Icon";
 
 export interface IconBoxProps {
   icon: IconName;
-  /** Se une a la clase base del `<span>` raíz. Nota: `--icon-size` fijada aquí NO llega al ícono (no hereda). */
+  /** Joined to the base class of the root `<span>`. Note: `--icon-size` set here does NOT reach the icon (it does not inherit). */
   className?: string;
 }
 ```
 
-## Estilos y tokens
+## Styles and tokens
 
-| Propiedad | Valor |
+| Property | Value |
 |---|---|
-| Tamaño | `--size-icon-box` (3rem) cuadrado |
-| Fondo | `--color-surface-muted` |
-| Radio | `--radius-12` |
-| Ícono | `Icon tone="gradient"`: IconBox **no** pasa `--icon-size`, aplica el fallback default de Icon (`--size-icon`) |
+| Size | `--size-icon-box` (3rem) square |
+| Background | `--color-surface-muted` |
+| Radius | `--radius-12` |
+| Icon | `Icon tone="gradient"`: IconBox does **not** pass `--icon-size`, it applies Icon's default fallback (`--size-icon`) |
 | Display | `inline-flex; align-items: center; justify-content: center; flex-shrink: 0;` |
 
-## Estados
+## States
 
-No es interactivo.
+Not interactive.
 
 ## Responsive
 
-Tamaño fijo (`--size-icon-box`); sin `@media` propios.
+Fixed size (`--size-icon-box`); no `@media` of its own.
 
-## Accesibilidad
+## Accessibility
 
-Siempre decorativo (`aria-hidden="true"` en el span). El significado lo da el
-texto que lo acompaña (Overhead o título).
+Always decorative (`aria-hidden="true"` on the span). The meaning comes from the
+text next to it (Overhead or a title).
 
-## Tests esperados
+## Expected tests
 
-- Renderiza un svg con `stroke="url(#accent-gradient)"` (el test monta `AccentGradientDefs` como armazón, según Icon).
-- El contenedor tiene `aria-hidden="true"`.
-- `expectNoA11yViolations` sin violaciones.
+- Renders an svg with `stroke="url(#accent-gradient)"` (the test mounts `AccentGradientDefs` as scaffold, as in Icon).
+- The container has `aria-hidden="true"`.
+- `expectNoA11yViolations` with no violations.
 
-## No hacer
+## Do not
 
-- No ponerlo dentro de un `Box variant="inner"` (mismo fondo).
-- No usarlo como botón.
-- No declarar margen propio: el espaciado con el texto acompañante lo pone el consumidor (gap de Sidebar/ResumeSection).
+- Do not put it inside a `Box variant="inner"` (same background).
+- Do not use it as a button.
+- Do not declare a margin of its own: the spacing with the accompanying text is set by the consumer (the gap of Sidebar/ResumeSection).

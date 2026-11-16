@@ -1,21 +1,21 @@
-# Tareas — Overhead
+# Tasks — Overhead
 
-- [x] **T1. Render con mayúsculas solo por CSS.** RF-1 — 6a18005
-  - Hecho cuando: `getByText("Email")` encuentra el texto **sin transformar**
-    en el DOM y el módulo declara `text-transform: uppercase` (inspección);
-    verde tras `feat(Overhead): T1`.
+- [x] **T1. Render with uppercase through CSS only.** RF-1 — 6a18005
+  - Done when: `getByText("Email")` finds the text **untransformed**
+    in the DOM and the module declares `text-transform: uppercase` (inspection);
+    green after `feat(Overhead): T1`.
 
-- [x] **T2. `as="dt"` con armazón `<dl>`.** RF-2 — 62aedbf
-  - Hecho cuando: default `span`; `as="dt"` renderiza `<dt>` (el test lo envuelve
-    en `<dl>`); `className` queda unida al raíz (P2); verde tras
+- [x] **T2. `as="dt"` with a scaffold `<dl>`.** RF-2 — 62aedbf
+  - Done when: default `span`; `as="dt"` renders a `<dt>` (the test wraps it
+    in a `<dl>`); `className` is joined to the root (P2); green after
     `feat(Overhead): T2`.
 
-- [x] **T3. Estilos (elipsis/muted/tamaño) y cierre a11y.** RF-3, RF-4, RF-5, RF-6 — 0a3cc07
-  - Hecho cuando: el módulo declara `display: block` +
-    `overflow: hidden; text-overflow: ellipsis; white-space: nowrap` sin
-    `max-width` propio, color `--color-text-muted`, tamaño
-    `--font-size-overhead`, peso regular, cero `@media`, cero roles/interactividad
-    (inspección); archivo termina con `expectNoA11yViolations`; lint +
-    typecheck + test verdes tras `feat(Overhead): T3`.
-  - Nota para el cierre de pieza: `index.ts` re-exporta `Overhead` y tipos (el
-    plan lo lista y las tareas no lo cubrían; gap detectado en el review de Icon T1).
+- [x] **T3. Styles (ellipsis/muted/size) and a11y closing case.** RF-3, RF-4, RF-5, RF-6 — 0a3cc07
+  - Done when: the module declares `display: block` +
+    `overflow: hidden; text-overflow: ellipsis; white-space: nowrap` with no
+    `max-width` of its own, color `--color-text-muted`, size
+    `--font-size-overhead`, regular weight, zero `@media`, zero roles/interactivity
+    (inspection); the file ends with `expectNoA11yViolations`; lint +
+    typecheck + test green after `feat(Overhead): T3`.
+  - Note for closing the piece: `index.ts` re-exports `Overhead` and types (the
+    plan lists it and the tasks did not cover it; gap found in the review of Icon T1).
