@@ -1,37 +1,37 @@
 # AboutPage
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Contenido del panel **About**: presentación, servicios ("What I'm Doing") y
-testimonios. Se renderiza dentro del tabpanel de AppLayout.
+Content of the **About** panel: introduction, services ("What I'm Doing") and
+testimonials. It is rendered inside AppLayout's tabpanel.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: EL SISTEMA renderiza siempre el `h1` con `t.about.title`.
-- RF-2: CUANDO `profile.about` tiene párrafos, ENTONCES EL SISTEMA renderiza `.intro` con un `<p>` por elemento; SI `services` está vacío, ENTONCES no renderiza su `<section>`; SI `testimonials` está vacío, ENTONCES no renderiza ni el `h2` ni el carrusel (decisión 20 de la Clarificación F3: el testimonio ya no vive en una `<section>` de la página — la región es la `<section>` propia del `TestimonialCarousel`, nombrada con `labelledBy`).
-- RF-3: EL SISTEMA obtiene los datos con `useCv()` y los textos con `useLocale().t`, y pasa las plantillas crudas de `t.testimonials` en los labels del carrusel (quien interpola con `format` es el carrusel).
-- RF-4: EL SISTEMA mantiene `.page` en flujo de bloque normal (sin flex ni grid ni `overflow` distinto de `visible`) para que el `h1` fluya junto a la solapa flotante de NavTabs. Verificación: inspección del CSS (jsdom no computa) + QA F5.
-- RF-5: EL SISTEMA expone un único `h1`, nombra cada región con su `h2` (la de servicios, su `<section aria-labelledby>`; la de testimonios, la `<section>` del propio carrusel vía `labelledBy` — RF-1 de TestimonialCarousel) y renderiza los servicios como `<ul>`.
-- RF-6: EL SISTEMA aplica solo layout: sin estilos visuales, con servicios en 1 columna que pasan a 2 a partir de lg. Verificación: inspección del CSS + QA F5.
+- RF-1: THE SYSTEM always renders the `h1` with `t.about.title`.
+- RF-2: WHEN `profile.about` has paragraphs, THEN THE SYSTEM renders `.intro` with one `<p>` per element; IF `services` is empty, THEN it does not render its `<section>`; IF `testimonials` is empty, THEN it renders neither the `h2` nor the carousel (decision 20 of the F3 Clarification: the testimonial no longer lives in a `<section>` of the page — the region is the `TestimonialCarousel`'s own `<section>`, named with `labelledBy`).
+- RF-3: THE SYSTEM gets the data with `useCv()` and the texts with `useLocale().t`, and passes the raw templates of `t.testimonials` in the carousel's labels (the one that interpolates with `format` is the carousel).
+- RF-4: THE SYSTEM keeps `.page` in normal block flow (no flex or grid or `overflow` other than `visible`) so that the `h1` flows next to the floating tab of NavTabs. Verification: CSS inspection (jsdom does not compute) + QA F5.
+- RF-5: THE SYSTEM exposes a single `h1`, names each region with its `h2` (the services one, its `<section aria-labelledby>`; the testimonials one, the carousel's own `<section>` via `labelledBy` — RF-1 of TestimonialCarousel) and renders the services as a `<ul>`.
+- RF-6: THE SYSTEM applies layout only: no visual styles, with services in 1 column that become 2 from lg on. Verification: CSS inspection + QA F5.
 
-## Anatomía
+## Anatomy
 
 ```html
 <div class="page">
   <SectionTitle as="h1" decorated>About Me</SectionTitle>            <!-- t.about.title -->
   <div class="intro">
-    <p>…</p>                                                        <!-- uno por profile.about -->
+    <p>…</p>                                                        <!-- one per profile.about -->
   </div>
 
-  <section aria-labelledby="about-services-title">                   <!-- si hay services -->
+  <section aria-labelledby="about-services-title">                   <!-- if there are services -->
     <SectionTitle as="h2" id="about-services-title">What I'm Doing</SectionTitle>
     <ul class="services">                                           <!-- grid -->
       <li><ServiceCard service={…} /></li>
     </ul>
   </section>
 
-  <!-- si hay testimonials: hermanos directos en .page; la región es la <section> del carrusel (decisión 20) -->
+  <!-- if there are testimonials: direct siblings in .page; the region is the carousel's <section> (decision 20) -->
   <SectionTitle as="h2" id="about-testimonials-title">Testimonials</SectionTitle>
   <TestimonialCarousel testimonials={cv.testimonials} labels={carouselLabels} labelledBy="about-testimonials-title" className={styles.testimonials} />
 </div>
@@ -45,18 +45,18 @@ export interface AboutPageProps {
 }
 ```
 
-`className` se une a la clase `.page` del raíz (G-B). Que AppLayout no la pase
-hoy no la elimina: es la superficie común de las piezas y tiene su test de
-unión (test 8).
+`className` is joined to the root's `.page` class (G-B). That AppLayout does not pass it
+today does not remove it: it is the common surface of the pieces and it has its join
+test (test 8).
 
-Datos con `useCv()` (`profile.about`, `services`, `testimonials`) y textos con
-`useLocale().t` (`t.about.*`, `t.testimonials.*`). Es un componente de página:
-**sí** puede usar esos hooks (excepción documentada en `specs/README.md`).
+Data with `useCv()` (`profile.about`, `services`, `testimonials`) and texts with
+`useLocale().t` (`t.about.*`, `t.testimonials.*`). It is a page component:
+it **can** use those hooks (exception documented in `specs/README.md`).
 
-Los labels del carrusel son las plantillas crudas de `t.testimonials`:
-`readMore` recibe `{author}`, `slide` recibe `{current}`/`{total}`, `goToSlide`
-recibe `{n}` — **quien interpola con `format` es el carrusel, nunca la página**
-(RF-3). Mapeo explícito:
+The carousel's labels are the raw templates of `t.testimonials`:
+`readMore` receives `{author}`, `slide` receives `{current}`/`{total}`, `goToSlide`
+receives `{n}` — **the one that interpolates with `format` is the carousel, never the page**
+(RF-3). Explicit mapping:
 
 ```ts
 const carouselLabels: TestimonialCarouselLabels = {
@@ -68,67 +68,67 @@ const carouselLabels: TestimonialCarouselLabels = {
 };
 ```
 
-## Estilos y tokens
+## Styles and tokens
 
-Solo layout (el aspecto es de los componentes):
+Layout only (the look belongs to the components):
 
-| Parte | Valor |
+| Part | Value |
 |---|---|
-| `.page` | **Flujo de bloque normal** (no flex ni grid): `.page > * + * { margin-top: var(--stack-gap); }`. El `h1` es el primer hijo. |
-| `.intro` | `display: flex; flex-direction: column; gap: var(--space-4);` párrafos con `margin: 0` |
+| `.page` | **Normal block flow** (not flex or grid): `.page > * + * { margin-top: var(--stack-gap); }`. The `h1` is the first child. |
+| `.intro` | `display: flex; flex-direction: column; gap: var(--space-4);` paragraphs with `margin: 0` |
 | `.services` | `display: grid; gap: var(--layout-gap); list-style: none; margin: 0; padding: 0;` → ≥ lg: `grid-template-columns: repeat(2, minmax(0, 1fr));` |
-| `.testimonials` (se pasa como `className` al raíz del carrusel) | `margin-top: 0`: el `h2` "Testimonials" y el carrusel son hermanos directos de `.page` (decisión 20) y el par título→contenido lo resuelve el `margin-bottom` del `h2` (1.25rem, `foundations/layout.md` → "Espaciado vertical"), el mismo valor que h2→`ul` en servicios; sin este `0`, `* + *` lo inflaría a `--stack-gap` |
+| `.testimonials` (passed as `className` to the carousel's root) | `margin-top: 0`: the `h2` "Testimonials" and the carousel are direct siblings of `.page` (decision 20) and the title→content pair is resolved by the `margin-bottom` of the `h2` (1.25rem, `foundations/layout.md` → "Vertical spacing"), the same value as h2→`ul` in services; without this `0`, `* + *` would inflate it to `--stack-gap` |
 
-**Por qué bloque y no flex:** en ≥ lg la solapa de navegación flota a la
-derecha (`CornerTab placement="float"`) y el `h1` tiene que fluir a su lado.
-Un contenedor flex/grid (o con `overflow` ≠ `visible`) crea un contexto de
-formato propio y se angostaría entero junto a la solapa en vez de fluir.
-Los bloques internos que vienen después del `h1` (listas, grids, secciones)
-sí pueden ser flex/grid: para cuando empiezan, la solapa ya terminó.
+**Why block and not flex:** at ≥ lg the navigation tab floats on the
+right (`CornerTab placement="float"`) and the `h1` has to flow beside it.
+A flex/grid container (or one with `overflow` ≠ `visible`) creates its own
+formatting context and would narrow as a whole next to the tab instead of flowing.
+The inner blocks that come after the `h1` (lists, grids, sections)
+can be flex/grid: by the time they start, the tab has already ended.
 
-## Estados
+## States
 
-- Sin `profile.about` (array vacío) → no renderiza `.intro`. (Sin test
-  propio: no se inventa cobertura; verificación por inspección del código.)
-- Sin `services` → no renderiza esa `<section>`.
-- Sin `testimonials` → no renderiza esa `<section>`.
-- El `h1` se renderiza siempre.
+- No `profile.about` (empty array) → it does not render `.intro`. (No test
+  of its own: coverage is not invented; verification by code inspection.)
+- No `services` → it does not render that `<section>`.
+- No `testimonials` → it does not render that `<section>`.
+- The `h1` is always rendered.
 
 ## Responsive
 
-Servicios en 1 columna; 2 columnas ≥ lg (992). El carrusel resuelve su propio
-responsive (1 / 2 por vista).
+Services in 1 column; 2 columns ≥ lg (992). The carousel resolves its own
+responsive behavior (1 / 2 per view).
 
-## Accesibilidad
+## Accessibility
 
-- Un único `h1` (el del panel).
-- Cada región nombrada por su `h2`: la de servicios, `<section>` de la página; la de testimonios, la `<section>` propia del carrusel (decisión 20) → ambas aparecen como región.
-- La lista de servicios es `<ul>`: se anuncia la cantidad.
-- `.services` lleva `list-style: none` sin `role="list"`, igual que SkillList:
-  el quirk Safari/VoiceOver se resuelve de forma unificada en QA F5 (decisión
-  de Clarificación F4); la página no lo decide acá.
+- A single `h1` (the panel's).
+- Each region named by its `h2`: the services one, a `<section>` of the page; the testimonials one, the carousel's own `<section>` (decision 20) → both show up as a region.
+- The list of services is a `<ul>`: the count is announced.
+- `.services` carries `list-style: none` with no `role="list"`, the same as SkillList:
+  the Safari/VoiceOver quirk is resolved in a unified way in QA F5 (decision
+  of the F4 Clarification); the page does not decide it here.
 
-## Tests esperados
+## Expected tests
 
-(Envolviendo con `LocaleProvider` y el contenido de ejemplo del kit; las
-variantes con colecciones vacías se obtienen mockeando el módulo de contenido
-(`vi.mock` con delegación, precedente `LanguageSwitcher.test.tsx`); los tests
-montan `AccentGradientDefs` y `HexAvatarDefs` de armazón por sus hijos con
+(Wrapping with `LocaleProvider` and the kit's example content; the
+variants with empty collections are obtained by mocking the content module
+(`vi.mock` with delegation, precedent `LanguageSwitcher.test.tsx`); the tests
+mount scaffold `AccentGradientDefs` and `HexAvatarDefs` because of their children with
 `tone="gradient"`.)
 
-El mapeo de `carouselLabels` se verifica en los tests del carrusel y en
-AppLayout; la página no agrega test propio de labels.
+The mapping of `carouselLabels` is verified in the carousel's tests and in
+AppLayout; the page adds no labels test of its own.
 
-1. Heading nivel 1 con `t.about.title`, único: `getAllByRole("heading", { level: 1 })` de longitud 1.
-2. Un párrafo por cada elemento de `profile.about`.
-3. Región con nombre `t.about.services` que contiene un `article` por servicio.
-4. Región con nombre `t.about.testimonials` que contiene el carrusel (es la `<section>` del carrusel, no un wrapper de la página).
-5. Con `services` vacío (mock del módulo de contenido) no existe la región de servicios; con `testimonials` vacío (mock) no existen ni el `h2` "Testimonials" ni la región (RF-2). En ambos escenarios el `h1` sigue siendo el único (longitud 1).
-6. Con `locale = "es"` muestra los textos de `ui.es` y el contenido de `cv.es`.
-7. `expectNoA11yViolations` sin violaciones.
-8. Concatena `className` en el raíz `.page` (G-B).
+1. Level 1 heading with `t.about.title`, unique: `getAllByRole("heading", { level: 1 })` of length 1.
+2. One paragraph per element of `profile.about`.
+3. Region with the name `t.about.services` that contains one `article` per service.
+4. Region with the name `t.about.testimonials` that contains the carousel (it is the carousel's `<section>`, not a wrapper of the page).
+5. With empty `services` (mock of the content module) the services region does not exist; with empty `testimonials` (mock) neither the `h2` "Testimonials" nor the region exist (RF-2). In both scenarios the `h1` is still the only one (length 1).
+6. With `locale = "es"` it shows the texts of `ui.es` and the content of `cv.es`.
+7. `expectNoA11yViolations` with no violations.
+8. It concatenates `className` on the root `.page` (G-B).
 
-## No hacer
+## Do not
 
-- No agregar estilos visuales (colores, fondos, bordes): solo layout.
-- No importar el contenido directamente: siempre `useCv()`.
+- Do not add visual styles (colors, backgrounds, borders): layout only.
+- Do not import the content directly: always `useCv()`.

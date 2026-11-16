@@ -1,52 +1,52 @@
 # Plan — AboutPage
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/pages/AboutPage/AboutPage.tsx` | página: `.page` con `h1` siempre, `.intro`, `<section aria-labelledby>` de servicios con `<ul>`, h2 "Testimonials" + `TestimonialCarousel` (hermanos directos, decisión 20); `carouselLabels` = plantillas crudas de `t.testimonials`; datos `useCv()`, textos `useLocale().t` | RF-1..RF-3, RF-5 |
-| `src/pages/AboutPage/AboutPage.module.css` | solo layout: `.page` flujo de bloque con `* + * { margin-top: var(--stack-gap) }`, `.intro` flex col gap `--space-4` + `p { margin: 0 }`, `.services` grid `--layout-gap` + `list-style: none` 1 col → ≥ lg (992) 2 cols, `.testimonials { margin-top: 0 }` (pasa como className al raíz del carrusel) | RF-4, RF-6 |
-| `src/pages/AboutPage/AboutPage.test.tsx` | tests 1–8 de la spec; variante vacía con `vi.mock` del provider (precedente `LanguageSwitcher.test.tsx`: `vi.mock` + `importOriginal` overriding `useCv` con el cv del kit con `services: []` / `testimonials: []`); wrapper `LocaleProvider` real + armazones `AccentGradientDefs` y `HexAvatarDefs` | todas |
+| `src/pages/AboutPage/AboutPage.tsx` | page: `.page` with the `h1` always, `.intro`, services `<section aria-labelledby>` with a `<ul>`, h2 "Testimonials" + `TestimonialCarousel` (direct siblings, decision 20); `carouselLabels` = raw templates of `t.testimonials`; data `useCv()`, texts `useLocale().t` | RF-1..RF-3, RF-5 |
+| `src/pages/AboutPage/AboutPage.module.css` | layout only: `.page` block flow with `* + * { margin-top: var(--stack-gap) }`, `.intro` flex col gap `--space-4` + `p { margin: 0 }`, `.services` grid `--layout-gap` + `list-style: none` 1 col → ≥ lg (992) 2 cols, `.testimonials { margin-top: 0 }` (passed as className to the carousel's root) | RF-4, RF-6 |
+| `src/pages/AboutPage/AboutPage.test.tsx` | tests 1–8 of the spec; empty variant with `vi.mock` of the provider (precedent `LanguageSwitcher.test.tsx`: `vi.mock` + `importOriginal` overriding `useCv` with the kit's cv with `services: []` / `testimonials: []`); real `LocaleProvider` wrapper + `AccentGradientDefs` and `HexAvatarDefs` scaffolds | all |
 | `src/pages/AboutPage/index.ts` | re-export `AboutPage` + `AboutPageProps` | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguna: la página es presentación pura; el único "mapeo" es el objeto literal
-`carouselLabels` (5 claves, spec → API). Sin ordenamiento ni derivación de datos.
+None: the page is pure presentation; the only "mapping" is the object literal
+`carouselLabels` (5 keys, spec → API). No sorting or derivation of data.
 
-## Interfaz
+## Interface
 
-`AboutPageProps { className?: string }` → unida a `.page` (G-B, canon #99:
+`AboutPageProps { className?: string }` → joined to `.page` (G-B, canon #99:
 `const rootClassName = [styles.page, className].filter(Boolean).join(" ")`,
-estilo de las piezas F2/F3, sin `clsx`).
+the style of the F2/F3 pieces, with no `clsx`).
 
-## Decisiones
+## Decisions
 
-- **`vi.mock` del módulo de providers para vaciar colecciones** (P1 de la
-  Clarificación): alternativa descartada — prop de override en `LocaleProvider`
-  (tocaría `src/providers/`, archivo cerrado desde F1). El precedente de
-  mocking con `importOriginal` ya existe en `LanguageSwitcher.test.tsx`.
-- **La página no llama a `format`** (P8): pasa plantillas crudas; el carrusel
-  interpola. Si un test de la página pidiera "1 of 3", está mal ubicado: los
-  nombres del carrusel se verifican en su pieza y en AppLayout.
-- **`className` al raíz del carrusel para el espaciado** (`.testimonials` =
-  `margin-top: 0`): alternativa descartada — envolver el carrusel en un div de
-  layout (rompería la decisión 20: el carrusel es hermano directo del `h2`).
-- **`.services` sin `role="list"`** (P4): el quirk se unifica en QA F5; la
-  página no lo decide.
-- **`profile.about` vacío no tiene test** (Estados → inspección): no se inventa
-  cobertura (regla sdd).
+- **`vi.mock` of the providers module to empty collections** (P1 of the
+  Clarification): discarded alternative — an override prop in `LocaleProvider`
+  (it would touch `src/providers/`, a file closed since F1). The precedent of
+  mocking with `importOriginal` already exists in `LanguageSwitcher.test.tsx`.
+- **The page does not call `format`** (P8): it passes raw templates; the carousel
+  interpolates. If a test of the page asked for "1 of 3", it is misplaced: the
+  carousel's names are verified in its piece and in AppLayout.
+- **`className` to the carousel's root for the spacing** (`.testimonials` =
+  `margin-top: 0`): discarded alternative — wrapping the carousel in a layout
+  div (it would break decision 20: the carousel is a direct sibling of the `h2`).
+- **`.services` with no `role="list"`** (P4): the quirk is unified in QA F5; the
+  page does not decide it.
+- **Empty `profile.about` has no test** (States → inspection): coverage is not
+  invented (sdd rule).
 
-## Estrategia de tests
+## Test strategy
 
-Render con `LocaleProvider` real (contenido del kit, locale `en`) + armazones
-defs. Queries por rol: `heading level 1` con `getAllByRole` longitud 1 (RF-1/RF-5),
-`region` por nombre `t.about.services`/`t.about.testimonials` (la del carrusel
-resuelve a su `<section>` vía `labelledBy`), `article` por servicio, párrafos
-por `profile.about`. Variantes vacías con el mock. Test 6 (`es`): montar con
-locale `es` (patrón de `LanguageSwitcher.test.tsx` / providers F1) y pedir un
-texto de `ui.es` y uno de `cv.es`. Cierre `expectNoA11yViolations` en cada
-escenario completo. Tareas en orden markup→estilos: `test` rojo → `feat`.
+Render with the real `LocaleProvider` (kit content, locale `en`) + defs
+scaffolds. Queries by role: `heading level 1` with `getAllByRole` length 1 (RF-1/RF-5),
+`region` by name `t.about.services`/`t.about.testimonials` (the carousel's
+resolves to its `<section>` via `labelledBy`), `article` per service, paragraphs
+per `profile.about`. Empty variants with the mock. Test 6 (`es`): mount with
+locale `es` (pattern of `LanguageSwitcher.test.tsx` / F1 providers) and ask for one
+text from `ui.es` and one from `cv.es`. Closing `expectNoA11yViolations` in each
+full scenario. Tasks in markup→styles order: red `test` → `feat`.
 
-Cobertura: T1→RF-1,RF-2(intro) · T2→RF-2(servicios),RF-5 · T3→RF-2(testimonios),RF-3
-(incl. test 6 es) · T4→RF-4,RF-6 (inspección) + unión `className` + cierre a11y.
+Coverage: T1→RF-1,RF-2(intro) · T2→RF-2(services),RF-5 · T3→RF-2(testimonials),RF-3
+(incl. test 6 es) · T4→RF-4,RF-6 (inspection) + `className` join + a11y closing case.
