@@ -1,32 +1,32 @@
 # NavTabs
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Navegación principal entre los paneles **About** y **Resume**, con semántica
-de **tablist**. Reemplaza al menú hamburguesa del tema: siempre visible, sin
-drawer, en todos los breakpoints. Visualmente es una solapa (`CornerTab`) en la
-esquina superior derecha de la card de contenido.
+Main navigation between the **About** and **Resume** panels, with **tablist**
+semantics. It replaces the theme's hamburger menu: always visible, with no
+drawer, at all breakpoints. Visually it is a corner tab (`CornerTab`) in the
+top right corner of the content card.
 
-Referencia visual: tab con fondo `surface-raised`, borde fino, ítem activo en
-color de acento, inactivos en color de texto.
+Visual reference: tab with a `surface-raised` background, thin border, active item in
+the accent color, inactive ones in the text color.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el componente recibe `items`, ENTONCES EL SISTEMA renderiza un `role="tablist"` nombrado con un `role="tab"` por item en ese orden, aplicando roving tabindex (solo el tab activo con `tabIndex=0`).
-- RF-2: EL SISTEMA hace que **todos los tabs apunten con `aria-controls` al mismo `panelId`** (un único tabpanel); la existencia y el contenido de ese panel son responsabilidad de AppLayout, no verificables en esta pieza.
-- RF-3: CUANDO el usuario hace click en un tab inactivo, ENTONCES EL SISTEMA invoca `onChange(id)` una vez; SI hace click en el tab activo, ENTONCES no lo invoca.
-- RF-4: CUANDO el foco está en un tab y se pulsa `keydown` de Flecha ←/→, Home o End, ENTONCES EL SISTEMA mueve el foco al tab resultante (vuelta circular en los extremos) **y emite `onChange` de ese tab** (activación automática: lo visual depende del re-render del padre, que es controlado); SI el tab resultante es el mismo (un solo item), ENTONCES no emite `onChange`; SI se pulsa Espacio, ENTONCES EL SISTEMA hace `preventDefault` (no scrollea la página) y activa por click nativo; Enter y las demás teclas quedan al comportamiento nativo sin efecto adicional. ↑/↓ no mueven el foco (tablist horizontal).
-- RF-5: EL SISTEMA distingue el tab activo con `--color-accent-text` y `aria-selected="true"`; los inactivos van al 80% de opacidad y al 100% con subrayado de 2px en hover. Verificación: `aria-selected` por test; el resto por inspección del CSS + QA F5.
-- RF-6: EL SISTEMA mantiene la navegación visible en todos los breakpoints, sin hamburguesa, drawer ni overlay. En impresión la ocultan los estilos compartidos (G-D: ningún `@media print` propio).
-- RF-7: SI `items` viene vacío, ENTONCES EL SISTEMA no renderiza nada (un tablist sin tabs es inválido para axe).
+- RF-1: WHEN the component receives `items`, THEN THE SYSTEM renders a named `role="tablist"` with one `role="tab"` per item in that order, applying roving tabindex (only the active tab with `tabIndex=0`).
+- RF-2: THE SYSTEM makes **all the tabs point with `aria-controls` to the same `panelId`** (a single tabpanel); the existence and the content of that panel are AppLayout's responsibility, not verifiable in this piece.
+- RF-3: WHEN the user clicks an inactive tab, THEN THE SYSTEM invokes `onChange(id)` once; IF they click the active tab, THEN it does not invoke it.
+- RF-4: WHEN focus is on a tab and a `keydown` of Arrow ←/→, Home or End is pressed, THEN THE SYSTEM moves focus to the resulting tab (wrapping around at the ends) **and emits `onChange` of that tab** (automatic activation: the visual part depends on the re-render of the parent, which is controlled); IF the resulting tab is the same one (a single item), THEN it does not emit `onChange`; IF Space is pressed, THEN THE SYSTEM does `preventDefault` (it does not scroll the page) and activates by native click; Enter and the other keys are left to the native behavior with no additional effect. ↑/↓ do not move focus (horizontal tablist).
+- RF-5: THE SYSTEM distinguishes the active tab with `--color-accent-text` and `aria-selected="true"`; the inactive ones go at 80% opacity and at 100% with a 2px underline on hover. Verification: `aria-selected` by test; the rest by CSS inspection + QA F5.
+- RF-6: THE SYSTEM keeps the navigation visible at all breakpoints, with no hamburger, drawer or overlay. In print the shared styles hide it (G-D: no `@media print` of its own).
+- RF-7: IF `items` comes empty, THEN THE SYSTEM renders nothing (a tablist with no tabs is invalid for axe).
 
-**Invariantes del consumidor (AppLayout):** `activeId` debe coincidir siempre con un `item.id` (useHashTab garantiza id válido o default); NavTabs **no** valida ni hace fallback. Los `item.id` se usan tal cual en `getTabId`: sin espacios ni caracteres problemáticos (invariante de AppLayout/`useHashTab`).
+**Invariants of the consumer (AppLayout):** `activeId` must always match an `item.id` (useHashTab guarantees a valid id or the default); NavTabs does **not** validate or fall back. The `item.id` values are used as is in `getTabId`: no spaces or problematic characters (invariant of AppLayout/`useHashTab`).
 
-## Anatomía
+## Anatomy
 
 ```html
-<Box variant="outer" as="section">                 ← card de contenido (AppLayout)
+<Box variant="outer" as="section">                 ← content card (AppLayout)
   <CornerTab size="md" placement="float">
     <div role="tablist" aria-label="Sections" aria-orientation="horizontal">
       <button role="tab" id="tab-about"  aria-selected="true"  aria-controls="main-panel" tabindex="0">About</button>
@@ -37,142 +37,142 @@ color de acento, inactivos en color de texto.
 </Box>
 ```
 
-NavTabs renderiza **solo** la CornerTab con el tablist. El tabpanel lo
-renderiza AppLayout, usando `panelId` y el id del tab activo (`getTabId`).
+NavTabs renders **only** the CornerTab with the tablist. The tabpanel is
+rendered by AppLayout, using `panelId` and the id of the active tab (`getTabId`).
 
-Hay **un único tabpanel** cuyo contenido cambia; todos los tabs lo controlan
-(`aria-controls` apunta al mismo id). Es válido para el patrón y evita montar
-paneles ocultos.
+There is **a single tabpanel** whose content changes; all the tabs control it
+(`aria-controls` points to the same id). It is valid for the pattern and avoids mounting
+hidden panels.
 
 ## API
 
 ```ts
 export interface NavTabItem {
   id: string;      // "about" | "resume"
-  label: string;   // ya traducido
+  label: string;   // already translated
 }
 
 export interface NavTabsProps {
   items: readonly NavTabItem[];
-  activeId: string;                 // controlado
+  activeId: string;                 // controlled
   onChange: (id: string) => void;
-  panelId: string;                  // id del tabpanel
-  label: string;                    // aria-label del tablist, traducido
-  /** Se une al raíz de la pieza — se transmite a la clase base de `CornerTab` (G-B). */
+  panelId: string;                  // id of the tabpanel
+  label: string;                    // aria-label of the tablist, translated
+  /** Joined to the root of the piece — it is passed on to the base class of `CornerTab` (G-B). */
   className?: string;
 }
 
-/** Id del elemento tab para un item. Lo usa AppLayout para aria-labelledby. */
+/** Id of the tab element for an item. AppLayout uses it for aria-labelledby. */
 export const getTabId = (id: string) => `tab-${id}`;
 ```
 
-## Comportamiento
+## Behavior
 
-| Interacción | Resultado |
+| Interaction | Result |
 |---|---|
-| Click en un tab | `onChange(id)`; el foco queda en el tab pulsado (nativo del `<button>`, NavTabs no re-gestiona el foco tras click) |
-| Flecha → / ← (foco en un tab) | Mueve el foco al siguiente/anterior **y emite `onChange`** (activación automática; lo visual depende del padre), con vuelta circular |
-| Home / End | Foco y `onChange` del primero / último |
-| Tab | Sale del tablist hacia el tabpanel (solo el tab activo es tabulable) |
-| Enter | Activa el tab con foco (click nativo del `<button>`) |
-| Espacio | `preventDefault` (no scrollea la página) + activa por click nativo |
-| Click en el tab ya activo | No llama `onChange` |
+| Click on a tab | `onChange(id)`; focus stays on the pressed tab (native to the `<button>`, NavTabs does not re-manage focus after a click) |
+| Arrow → / ← (focus on a tab) | It moves focus to the next/previous one **and emits `onChange`** (automatic activation; the visual part depends on the parent), wrapping around |
+| Home / End | Focus and `onChange` of the first / last |
+| Tab | It leaves the tablist toward the tabpanel (only the active tab is tabbable) |
+| Enter | It activates the focused tab (native click of the `<button>`) |
+| Space | `preventDefault` (it does not scroll the page) + activates by native click |
+| Click on the already active tab | It does not call `onChange` |
 
-**Roving tabindex:** el tab activo tiene `tabIndex=0`; el resto, `-1`.
+**Roving tabindex:** the active tab has `tabIndex=0`; the rest, `-1`.
 
-## Sincronización con la URL
+## Sync with the URL
 
-La hace el hook `useHashTab` en AppLayout, no NavTabs (NavTabs es controlado).
-Spec, comportamiento y tests: [specs/hooks/useHashTab/spec.md](../../hooks/useHashTab/spec.md).
+It is done by the `useHashTab` hook in AppLayout, not by NavTabs (NavTabs is controlled).
+Spec, behavior and tests: [specs/hooks/useHashTab/spec.md](../../hooks/useHashTab/spec.md).
 
-Restricción que afecta a este componente: **ningún elemento del DOM puede
-tener `id="about"` ni `id="resume"`**. Los tabs usan `getTabId` (`tab-about`,
-`tab-resume`) y el panel es `main-panel`.
+Restriction that affects this component: **no DOM element may
+have `id="about"` or `id="resume"`**. The tabs use `getTabId` (`tab-about`,
+`tab-resume`) and the panel is `main-panel`.
 
-## Estilos y tokens
+## Styles and tokens
 
-| Parte | Valor |
+| Part | Value |
 |---|---|
-| Contenedor | `CornerTab size="md" placement="float"` (absoluta < lg, flotante ≥ lg) |
+| Container | `CornerTab size="md" placement="float"` (absolute < lg, floating ≥ lg) |
 | tablist | `display: flex; align-items: stretch; align-self: stretch; gap: var(--nav-tab-gap);` (24px < 992 → 40px) |
-| tab | Sin fondo ni borde; `display: flex; align-items: center; font-size: var(--font-size-nav); font-weight: var(--font-weight-medium); color: var(--color-text); padding-block: var(--space-2); white-space: nowrap; cursor: pointer;` |
-| tab primero/último | `padding-inline` de `--corner-tab-padding-inline` en el borde exterior + margen negativo equivalente: el padding exterior queda dentro del `<button>` sin mover el texto |
-| tab inactivo | `opacity: 0.8` (4.92:1 claro / 7.96:1 oscuro sobre `surface-raised`, registrado en `docs/tokens/contrast.md`); `text-decoration: underline 2px transparent; text-underline-offset: 0.375rem;` |
-| tab inactivo hover | `opacity: 1;` `text-decoration-color: currentColor` (aparece el subrayado) |
-| tab activo (`[aria-selected="true"]`) | `opacity: 1; color: var(--color-accent-text);` sin subrayado, sin cambio en hover |
+| tab | No background or border; `display: flex; align-items: center; font-size: var(--font-size-nav); font-weight: var(--font-weight-medium); color: var(--color-text); padding-block: var(--space-2); white-space: nowrap; cursor: pointer;` |
+| first/last tab | `padding-inline` of `--corner-tab-padding-inline` on the outer edge + an equivalent negative margin: the outer padding stays inside the `<button>` without moving the text |
+| inactive tab | `opacity: 0.8` (4.92:1 light / 7.96:1 dark on `surface-raised`, recorded in `docs/tokens/contrast.md`); `text-decoration: underline 2px transparent; text-underline-offset: 0.375rem;` |
+| inactive tab hover | `opacity: 1;` `text-decoration-color: currentColor` (the underline appears) |
+| active tab (`[aria-selected="true"]`) | `opacity: 1; color: var(--color-accent-text);` no underline, no change on hover |
 | Focus-visible | `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset); border-radius: var(--radius-8);` |
-| Transición | `opacity` y `text-decoration-color` en `var(--duration-base) var(--ease-standard)`; el `color` cambia al instante (sin arrastrar el acento del tema anterior) |
+| Transition | `opacity` and `text-decoration-color` in `var(--duration-base) var(--ease-standard)`; the `color` changes instantly (without dragging the accent of the previous theme) |
 
-El hover no usa `--color-heading`: en claro es igual a `--color-text` y el
-cambio no se vería. Usa opacidad + subrayado, que funcionan igual en ambos temas.
+The hover does not use `--color-heading`: in light it is equal to `--color-text` and the
+change would not be seen. It uses opacity + underline, which work the same in both themes.
 
-El `<button>` ocupa toda el área visual de la solapa, incluido el padding
-exterior: el tablist y los botones se estiran a la altura de la `CornerTab`
-(60px ≥ 992 / 48px < 992) y el padding de `:first-child`/`:last-child` se
-compensa con margen negativo para no mover el texto. El gap entre tabs
-(40px/24px) no es clickeable. El subrayado del hover es `text-decoration` (no
-un pseudo-elemento), así que no intercepta clicks.
+The `<button>` takes up the whole visual area of the corner tab, including the outer
+padding: the tablist and the buttons stretch to the height of the `CornerTab`
+(60px ≥ 992 / 48px < 992) and the padding of `:first-child`/`:last-child` is
+compensated with a negative margin so as not to move the text. The gap between tabs
+(40px/24px) is not clickable. The hover underline is `text-decoration` (not
+a pseudo-element), so it does not intercept clicks.
 
-Medidas de referencia (tamaño completo, ≥ lg): alto 60px, padding horizontal
-32px, separación entre ítems 40px, texto 16px/500. En < lg: alto 48px, padding
-20px, separación 24px, texto 14px/500. Todo resuelto por tokens. El padding
-horizontal exterior es parte del hit area del botón; el gap queda fuera.
+Reference measures (full size, ≥ lg): height 60px, horizontal padding
+32px, separation between items 40px, text 16px/500. At < lg: height 48px, padding
+20px, separation 24px, text 14px/500. All resolved through tokens. The outer horizontal
+padding is part of the button's hit area; the gap stays outside.
 
-El activo se distingue **por color** (acento vs texto) con contrastes
-≥ 5.47:1 en ambos temas; además `aria-selected` lo expone a tecnologías de asistencia.
+The active one is distinguished **by color** (accent vs text) with contrasts
+≥ 5.47:1 in both themes; in addition `aria-selected` exposes it to assistive technologies.
 
-## Estados
+## States
 
-| Estado | Efecto |
+| State | Effect |
 |---|---|
-| Inactivo | texto `--color-text` al 80% |
-| Inactivo hover | 100% + subrayado 2px |
-| Activo | `--color-accent-text`, 100%, sin subrayado |
-| Focus-visible | anillo estándar (`--focus-ring-*`) |
+| Inactive | text `--color-text` at 80% |
+| Inactive hover | 100% + 2px underline |
+| Active | `--color-accent-text`, 100%, no underline |
+| Focus-visible | standard ring (`--focus-ring-*`) |
 
 ## Responsive
 
-| Viewport | Comportamiento |
+| Viewport | Behavior |
 |---|---|
-| ≥ lg (992) | Tab tamaño completo y **flotante** (`placement="float"`): el `h1` del panel fluye a su izquierda usando el ancho real de la tab, sin reservas fijas. **Dependencia de contrato (CornerTab → float):** el contenido que sigue al tab en el tramo que convive con ella **no** puede crear contexto de formato propio (flex/grid/`overflow`≠visible/`flow-root`); lo garantiza AppLayout y lo verifica el reviewer en F4/F5. La solapa flotante debe quedar por encima del `h1` posicionado: `CornerTab .float` usa `z-index: var(--z-raised)`; con `auto`, el `h1` intercepta los clicks de la mitad inferior. |
-| < lg | Tab compacta, **siempre visible**, anclada a la derecha. El `h1` del panel va debajo (AppLayout agrega el espacio). |
+| ≥ lg (992) | Full-size and **floating** tab (`placement="float"`): the panel's `h1` flows to its left using the real width of the tab, with no fixed reserves. **Contract dependency (CornerTab → float):** the content that follows the tab in the stretch that coexists with it **cannot** create its own formatting context (flex/grid/`overflow`≠visible/`flow-root`); AppLayout guarantees it and the reviewer verifies it in F4/F5. The floating corner tab must stay above the positioned `h1`: `CornerTab .float` uses `z-index: var(--z-raised)`; with `auto`, the `h1` intercepts the clicks of the lower half. |
+| < lg | Compact tab, **always visible**, anchored on the right. The panel's `h1` goes below (AppLayout adds the space). |
 
-No hay hamburguesa, drawer ni overlay en ningún tamaño. "Con 2 ítems entra en 320px" es verificación de **QA F5** (no de test ni inspección).
+There is no hamburger, drawer or overlay at any size. "With 2 items it fits in 320px" is a **QA F5** verification (not a test or inspection one).
 
-## Accesibilidad
+## Accessibility
 
-- `role="tablist"` con `aria-label` y `aria-orientation="horizontal"`.
-- `role="tab"` en `<button type="button">`, con `id`, `aria-selected`, `aria-controls`.
-- El `<button role="tab">` ocupa toda el área visual de la solapa (incluido el
-  padding exterior); el gap entre tabs no es clickeable.
-- Tabpanel con `aria-labelledby` = id del tab activo y `tabIndex=0`
-  (el panel empieza con texto, no con un control).
+- `role="tablist"` with `aria-label` and `aria-orientation="horizontal"`.
+- `role="tab"` on `<button type="button">`, with `id`, `aria-selected`, `aria-controls`.
+- The `<button role="tab">` takes up the whole visual area of the corner tab (including the
+  outer padding); the gap between tabs is not clickable.
+- Tabpanel with `aria-labelledby` = id of the active tab and `tabIndex=0`
+  (the panel starts with text, not with a control).
 
-## Tests esperados
+## Expected tests
 
-1. Renderiza un `tablist` con el nombre recibido y un `tab` por item, en orden.
-2. Solo el tab activo tiene `aria-selected="true"` y `tabIndex=0`; el resto `false` / `-1`.
-3. Cada tab tiene `id = getTabId(item.id)` y `aria-controls = panelId`.
-4. Click en un tab inactivo llama `onChange(id)` una vez.
-5. Click en el tab activo no llama `onChange`.
-6. Flecha derecha desde el último vuelve al primero: foco + `onChange`.
-7. Flecha izquierda desde el primero va al último.
-8. Home / End enfocan y activan primero / último.
-9. Con `items` de un solo elemento, las flechas no fallan ni llaman `onChange`.
-10. Con `items` vacío **no renderiza nada** (`container` vacío): un tablist sin tabs es inválido para axe.
-11. **No existe** ningún botón de menú (`queryByRole("button", { name: /menu|menú/i })` es null).
-12. `expectNoA11yViolations` sin violaciones (renderizado junto a un tabpanel con el id correcto).
+1. It renders a `tablist` with the name received and one `tab` per item, in order.
+2. Only the active tab has `aria-selected="true"` and `tabIndex=0`; the rest `false` / `-1`.
+3. Each tab has `id = getTabId(item.id)` and `aria-controls = panelId`.
+4. A click on an inactive tab calls `onChange(id)` once.
+5. A click on the active tab does not call `onChange`.
+6. Right arrow from the last one goes back to the first: focus + `onChange`.
+7. Left arrow from the first one goes to the last.
+8. Home / End focus and activate the first / last.
+9. With `items` of a single element, the arrows do not fail or call `onChange`.
+10. With empty `items` it **renders nothing** (empty `container`): a tablist with no tabs is invalid for axe.
+11. There is **no** menu button (`queryByRole("button", { name: /menu|menú/i })` is null).
+12. `expectNoA11yViolations` with no violations (rendered together with a tabpanel with the correct id).
 
-La superficie clickeable completa y el apilamiento sobre el `h1` se verifican
-por inspección del CSS + QA visual (jsdom no computa layout ni hit-testing,
+The full clickable surface and the stacking over the `h1` are verified
+by CSS inspection + visual QA (jsdom does not compute layout or hit-testing,
 #101).
 
-## No hacer
+## Do not
 
-- No usar `<a href="#about">` para los tabs (la semántica elegida es tablist).
-- No renderizar ambos paneles ocultos con `hidden` salvo en `@media print`
-  (lo resuelve AppLayout).
-- No reintroducir el botón hamburguesa ni el estado abierto/cerrado.
-- No resolver el solapamiento con el `h1` usando `pointer-events: none` en el
-  `h1` (rompe la selección de texto); se resuelve con `z-index` en
+- Do not use `<a href="#about">` for the tabs (the chosen semantics is tablist).
+- Do not render both panels hidden with `hidden` except in `@media print`
+  (AppLayout resolves it).
+- Do not reintroduce the hamburger button or the open/closed state.
+- Do not resolve the overlap with the `h1` using `pointer-events: none` on the
+  `h1` (it breaks text selection); it is resolved with `z-index` on
   `CornerTab .float`.

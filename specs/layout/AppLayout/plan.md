@@ -1,135 +1,135 @@
 # Plan — AppLayout
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/AppLayout/AppLayout.tsx` | composición completa (spec → Anatomía, literal): defs ×1, skip link con `data-print-hide`, `div.container` (recibe `className`), ControlsBar, `div.grid`, Sidebar (sticky vía `.aside`), `main`, `Box variant="outer" as="section"`, NavTabs con guard `isTabId`, `div[data-print-stack]` con tabpanel (`data-print-page={active}`) + bloque inactivo (`data-print-only`, `data-print-page={inactiva}`, `hidden`); `TAB_IDS`/`TabId`/`isTabId` de módulo (`isTabId` **no** exportada) | RF-1..RF-8 |
-| `src/components/AppLayout/AppLayout.module.css` | layout de página según `foundations/layout.md`: contenedor/gutter, grilla `<lg` 1 col / `≥1200` 3+9, sidebar sticky solo `@media (min-width: 1200px) and (min-height: 900px)` (`--z-sticky`), `.panel` `padding-top: calc(var(--size-nav-tab-height) - var(--box-padding) + var(--space-4))` < lg y `0` en `@media (min-width: 992px)`, `.panel` no flex/grid/`overflow` visible, skip link oculto → con foco (arriba-izquierda, `--color-surface`/`--color-accent-text`/`--radius-8`/`--shadow-control`/`--z-skip`), foco tabpanel `:focus-visible` anillo estándar | RF-1 (no-BFC), estilos spec |
-| `src/styles/global.css` | **trabajo del integrator sin spec propia**: bloque `@media print` nuevo con el contrato de la spec → "Impresión": `[data-print-stack] { display: flex; flex-direction: column }`, `order` por `[data-print-page]` (`about: 0`, `resume: 1`), `[data-print-only] { display: block }`, ocultar `header`, `[role="tablist"]`, `[data-print-hide]`, `aside button`; `break-inside: avoid` en `article` y `li`; expansión de contactos del Sidebar con selector sobre su markup real (inspeccionar `Sidebar.tsx`; si no hay hook estable, queda anotado para QA F5) | RF-8, contract foundations |
-|  | ⚠️ **Actualizado por el Cambio F5 #104 (T7)**: los selectores nativos de la fila anterior perdieron por especificidad (qa-report B-2/B-3/M-1); T7 los reemplaza por los hooks compuestos `header/div/button[data-print-hide]` + `aside [download]` — ver spec → "Impresión" y tasks T7 | — |
-| `src/App.tsx` | reemplazo del provisorio F1 (la spec Foundation lo autoriza): `App` renderiza `<AppLayout />`; `src/App.test.tsx` se **adapta** a ese contrato (ver Decisiones) | integración |
-| `src/components/AppLayout/AppLayout.test.tsx` | tests 1–12 de la spec; wrappers con `ThemeProvider` + `LocaleProvider` reales; hash por `window.history.replaceState(null, "", "#resume")` antes de montar; `spy` de `replaceState`; `HashChangeEvent` manual para `hashchange` | todas |
+| `src/components/AppLayout/AppLayout.tsx` | full composition (spec → Anatomy, literal): defs ×1, skip link with `data-print-hide`, `div.container` (it receives `className`), ControlsBar, `div.grid`, Sidebar (sticky via `.aside`), `main`, `Box variant="outer" as="section"`, NavTabs with the `isTabId` guard, `div[data-print-stack]` with the tabpanel (`data-print-page={active}`) + inactive block (`data-print-only`, `data-print-page={inactiva}`, `hidden`); module-level `TAB_IDS`/`TabId`/`isTabId` (`isTabId` **not** exported) | RF-1..RF-8 |
+| `src/components/AppLayout/AppLayout.module.css` | page layout according to `foundations/layout.md`: container/gutter, grid `<lg` 1 col / `≥1200` 3+9, sidebar sticky only `@media (min-width: 1200px) and (min-height: 900px)` (`--z-sticky`), `.panel` `padding-top: calc(var(--size-nav-tab-height) - var(--box-padding) + var(--space-4))` < lg and `0` in `@media (min-width: 992px)`, `.panel` not flex/grid/`overflow` visible, skip link hidden → with focus (top left, `--color-surface`/`--color-accent-text`/`--radius-8`/`--shadow-control`/`--z-skip`), tabpanel focus `:focus-visible` standard ring | RF-1 (no-BFC), spec styles |
+| `src/styles/global.css` | **work of the integrator with no spec of its own**: new `@media print` block with the contract of spec → "Print": `[data-print-stack] { display: flex; flex-direction: column }`, `order` by `[data-print-page]` (`about: 0`, `resume: 1`), `[data-print-only] { display: block }`, hide `header`, `[role="tablist"]`, `[data-print-hide]`, `aside button`; `break-inside: avoid` on `article` and `li`; expansion of the Sidebar's contacts with a selector on its real markup (inspect `Sidebar.tsx`; if there is no stable hook, it is noted for QA F5) | RF-8, contract foundations |
+|  | ⚠️ **Updated by the F5 Change #104 (T7)**: the native selectors of the previous row lost on specificity (qa-report B-2/B-3/M-1); T7 replaces them with the compound hooks `header/div/button[data-print-hide]` + `aside [download]` — see spec → "Print" and tasks T7 | — |
+| `src/App.tsx` | replacement of the provisional F1 one (the Foundation spec authorizes it): `App` renders `<AppLayout />`; `src/App.test.tsx` is **adapted** to that contract (see Decisions) | integration |
+| `src/components/AppLayout/AppLayout.test.tsx` | tests 1–12 of the spec; wrappers with the real `ThemeProvider` + `LocaleProvider`; hash by `window.history.replaceState(null, "", "#resume")` before mounting; `spy` on `replaceState`; manual `HashChangeEvent` for `hashchange` | all |
 | `src/components/AppLayout/index.ts` | re-export `AppLayout` + `AppLayoutProps` | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-- `isTabId(id): id is TabId` — único algoritmo propio (guard de estrechamiento,
-  spec → Anatomía). `focusPanel`: `preventDefault` + `panelRef.current?.focus()`.
-- Nada de fecha/lógica dependiente del tiempo → sin "hoy" como parámetro.
+- `isTabId(id): id is TabId` — the only algorithm of its own (narrowing guard,
+  spec → Anatomy). `focusPanel`: `preventDefault` + `panelRef.current?.focus()`.
+- No date/time-dependent logic → no "today" as a parameter.
 
-## Interfaz
+## Interface
 
-`AppLayoutProps { className?: string }` unida al `div.container` (la raíz es
-fragment; decisión A7 de la Clarificación). Conecta `useHashTab(TAB_IDS,
-"about")`, `useCv`, `useLocale`, `getTabId` (NavTabs), labels de Sidebar
-mapeados de `t.sidebar.*` + `t.contact` (spec → Anatomía).
+`AppLayoutProps { className?: string }` joined to the `div.container` (the root is
+a fragment; decision A7 of the Clarification). It connects `useHashTab(TAB_IDS,
+"about")`, `useCv`, `useLocale`, `getTabId` (NavTabs), Sidebar labels
+mapped from `t.sidebar.*` + `t.contact` (spec → Anatomy).
 
-## Decisiones
+## Decisions
 
-- **Guard `isTabId` en el `onChange`** (A1): alternativa descartada — Cambio de
-  NavTabs a genérico (pieza ya `implementada`, lo rechaza la puerta). Sin casts.
-- **Stack de impresión por atributos, una sola copia de cada página** (A3/A4,
-  decisión del usuario): alternativa descartada — `.printOnly` con la inactiva
-  (orden impreso dependía del tab) y dos copias fijas About+Resume (duplicaba
-  ids y disparaba `duplicate-id-aria` en axe). El contrato habla en `data-*`;
-  los selectores nativos (`header`, `[role="tablist"]`, `aside button`) son
-  deliberados (salvaguarda aprobada por el usuario).
-- **Print transversal en `global.css`** (regla dura 3): alternativa descartada —
-  `:global(...)` dentro del módulo de AppLayout (acopla el contrato transversal
-  a una pieza). El token de paleta de print ya existe (`tokens.css`).
-- **`--z-skip: 30` en `tokens.css`** (A10): token nuevo del kit; **lo agrega el
-  usuario a mano** (ni el orchestrator ni el integrator tienen permiso de
-  edición ahí). Pendiente antes de T5; la T5 no puede commitear sin él.
-- **Reemplazo de `App.tsx` y adaptación de `App.test.tsx`** (T6): la spec de
-  Foundation declara el App "provisorio, lo reemplaza el integrator en F4";
-  borrar las aserciones del placeholder **no** es debilitar un test vigente —
-  es el reemplazo autorizado. Queda documentado acá y en el `test(AppLayout): T6`
-  (precedente F3/TestimonialCarousel T5: update dentro de tarea, aprobado en la
-  puerta). El test adaptado hace smoke: `render(<App/>)` → `banner` + `h1` +
-  tablist existen.
-- **Contenido en/es**: no es tarea nueva — el contenido bilingüe existe desde
-  F1; F4 lo verifica con los tests 5 (AboutPage) / 7 (ResumePage) y el test 10
-  de AppLayout en ambos idiomas.
-- **Alt del avatar derivado (Cambio 2026-11-10):** `avatarAlt` se compone en
-  AppLayout con `format(t.sidebar.avatarAlt, { name: cv.profile.name })` y viaja
-  en `sidebarLabels`; el Sidebar no compone textos (RF-8 de su spec). *Descartado:*
-  guardar `alt` en el JSON (se desincroniza al cambiar el nombre) y
-  `alt={profile.name}` (pierde "Portrait of"/"Retrato de").
+- **`isTabId` guard in the `onChange`** (A1): discarded alternative — a Change of
+  NavTabs to generic (a piece already `implemented`, the gate rejects it). No casts.
+- **Print stack by attributes, a single copy of each page** (A3/A4,
+  the user's decision): discarded alternative — `.printOnly` with the inactive one
+  (the printed order depended on the tab) and two fixed copies About+Resume (it duplicated
+  ids and triggered `duplicate-id-aria` in axe). The contract speaks in `data-*`;
+  the native selectors (`header`, `[role="tablist"]`, `aside button`) are
+  deliberate (safeguard approved by the user).
+- **Cross-cutting print in `global.css`** (hard rule 3): discarded alternative —
+  `:global(...)` inside AppLayout's module (it couples the cross-cutting contract
+  to one piece). The print palette token already exists (`tokens.css`).
+- **`--z-skip: 30` in `tokens.css`** (A10): a new token of the kit; **the
+  user adds it by hand** (neither the orchestrator nor the integrator has edit
+  permission there). Pending before T5; T5 cannot commit without it.
+- **Replacement of `App.tsx` and adaptation of `App.test.tsx`** (T6): the Foundation
+  spec declares the App "provisional, the integrator replaces it in F4";
+  deleting the placeholder's assertions is **not** weakening a current test —
+  it is the authorized replacement. It is documented here and in the `test(AppLayout): T6`
+  (precedent F3/TestimonialCarousel T5: update within a task, approved at the
+  gate). The adapted test does a smoke check: `render(<App/>)` → `banner` + `h1` +
+  tablist exist.
+- **Content en/es**: it is not a new task — the bilingual content exists since
+  F1; F4 verifies it with tests 5 (AboutPage) / 7 (ResumePage) and test 10
+  of AppLayout in both languages.
+- **Derived avatar alt (Change 2026-11-10):** `avatarAlt` is composed in
+  AppLayout with `format(t.sidebar.avatarAlt, { name: cv.profile.name })` and travels
+  in `sidebarLabels`; the Sidebar composes no texts (RF-8 of its spec). *Discarded:*
+  storing `alt` in the JSON (it goes out of sync when the name changes) and
+  `alt={profile.name}` (it loses "Portrait of"/"Retrato de").
 
-## Estrategia de tests
+## Test strategy
 
-Render del árbol completo con providers reales (el setup F1 ya mockea
-`matchMedia`, dialog, `scrollTo`, `ResizeObserver`). Tests 1–12 literales de la
-spec; el 9 (`document.getElementById("about") === null`) protege la
-precondición de `useHashTab` RF-5; el 11 asserts del tablist (2 tabs, orden,
-`aria-labelledby` activo antes/después); el 12 asserts del stack (inactiva con
-`hidden` fuera del tabpanel + `getAllByRole h1` longitud 1, simétrico). Cierre
-`expectNoA11yViolations` en About y Resume × en/es (test 10). Todo lo de
-`@media print` y del CSS de layout: inspección + QA F5 (jsdom no computa).
-`build` y `validate:content` al cerrar la pieza (decisión #80).
+Render of the whole tree with real providers (the F1 setup already mocks
+`matchMedia`, dialog, `scrollTo`, `ResizeObserver`). Tests 1–12 literal from the
+spec; test 9 (`document.getElementById("about") === null`) protects the
+precondition of `useHashTab` RF-5; test 11 asserts on the tablist (2 tabs, order,
+active `aria-labelledby` before/after); test 12 asserts on the stack (inactive one with
+`hidden` outside the tabpanel + `getAllByRole h1` length 1, symmetric). Closing
+`expectNoA11yViolations` on About and Resume × en/es (test 10). Everything about
+`@media print` and the layout CSS: inspection + QA F5 (jsdom does not compute).
+`build` and `validate:content` when closing the piece (decision #80).
 
-Cobertura: T1→RF-1,RF-6 · T2→RF-2,RF-3,RF-5 (+guard A1) · T3→RF-4 ·
-T4→RF-7,RF-8 (capa DOM) · T5→RF-8 (print, inspección) + estilos/`--z-skip` +
-cierre a11y · T6→integración (`App.tsx`) · T9→alt del avatar derivado (en/es).
+Coverage: T1→RF-1,RF-6 · T2→RF-2,RF-3,RF-5 (+guard A1) · T3→RF-4 ·
+T4→RF-7,RF-8 (DOM layer) · T5→RF-8 (print, inspection) + styles/`--z-skip` +
+a11y closing case · T6→integration (`App.tsx`) · T9→derived avatar alt (en/es).
 
-## Anexo — Cambio motion 2 (2026-11-13, #106/#116; puerta Plan+Tareas aprobada con ajuste en T12)
+## Annex — Motion change 2 (2026-11-13, #106/#116; Plan+Tasks gate approved with an adjustment in T12)
 
-**Archivos nuevos/tocados:** `src/lib/tabDirection.ts` (nuevo),
-`src/lib/tabDirection.test.ts` (nuevo), `src/components/AppLayout/AppLayout.tsx`,
-`AppLayout.module.css`, `AppLayout.test.tsx`. **No se tocan:** `global.css`
-(P6), NavTabs, providers, `src/test/**`. Dueño de todo: `integrator`.
+**New/touched files:** `src/lib/tabDirection.ts` (new),
+`src/lib/tabDirection.test.ts` (new), `src/components/AppLayout/AppLayout.tsx`,
+`AppLayout.module.css`, `AppLayout.test.tsx`. **Not touched:** `global.css`
+(P6), NavTabs, providers, `src/test/**`. Owner of everything: `integrator`.
 
-**Decisiones:**
+**Decisions:**
 
-- **P1 — Dirección estable con el patrón oficial de React "ajuste de estado al
-  cambiar"** (`useState` + `setState` condicional en render del propio
-  componente; spec → Anatomía). *Descartado:* leer/escribir refs durante el
-  render (lo prohíbe `react-hooks/refs` con recommended-latest, bloqueante de
-  lint) y mudar `{active, direction}` al estado de `useHashTab` (más invasiva:
-  sería Cambio de spec del hook). **Checklist de T11:** `npm run lint` debe
-  aceptar el `setState` condicionado bajo `react-hooks/set-state-in-render`;
-  si lo rechaza, **escalar al usuario antes de commitear el `feat`** (sin
+- **P1 — Stable direction with React's official pattern "adjusting state when
+  it changes"** (`useState` + conditional `setState` in the render of the component
+  itself; spec → Anatomy). *Discarded:* reading/writing refs during the
+  render (`react-hooks/refs` with recommended-latest forbids it, blocking for
+  lint) and moving `{active, direction}` to the state of `useHashTab` (more invasive:
+  it would be a spec Change of the hook). **T11 checklist:** `npm run lint` must
+  accept the conditional `setState` under `react-hooks/set-state-in-render`;
+  if it rejects it, **escalate to the user before committing the `feat`** (no
   `eslint-disable`).
-- **P2 — `animation-fill-mode: backwards`.** *Descartado:* `both` (deja
-  `transform` aplicado permanentemente → contexto de apilamiento y referencia
-  de `position: fixed` alterada).
-- **P3 — Un único `@keyframes panel-enter` con `var(--panel-enter-x)`; las
-  variables en `.motionPanel[data-motion-direction="from-left|from-right"]`
-  (0,2,0, acotadas por la clase).** *Descartado:* dos `@keyframes` elegidos por
-  atributo (duplica frames sin beneficio) y selector de atributo suelto (en un
-  CSS Module es global; precedente `.contacts p`). Una variable no es una
-  `transition`: #116 se cumple.
-- **P4 — `key={active}` solo en el wrapper.** *Descartado:* key en el tabpanel
-  o en las páginas (rompería foco/ARIA del panel).
-- **P5 — `animation` declarada solo en `.motionPanel[data-motion-direction]`.**
-  *Descartado:* animación incondicional en `.motionPanel` (animaría el render
-  inicial contra RF-9).
-- **P6 — Regla de impresión dentro del módulo, ubicada tras la de `animation`**
-  (empate (0,2,0) se resuelve por orden). *Descartado:* `global.css` (se
-  importa antes que los módulos en `main.tsx`: el empate lo ganaría el módulo y
-  la anulación de print no haría efecto — mismo patrón que `.social a` en la
-  etapa 1).
-- **P7 — `getTabDirection` + `MotionDirection` en `src/lib/tabDirection.ts`.**
-  *Descartado:* exportar desde `AppLayout.tsx` (obligaría a ampliar
-  `allowExportNames` de react-refresh, #96/#100: nombres nuevos = aprobación
-  del usuario; con `.ts` no se toca la lista).
-- **P8 — El test 14 es de NO REGRESIÓN, verde on-arrival declarado (#101):**
-  el reset entre tabs ocurre desde F4 por el intercambio de tipos
-  `AboutPage`↔`ResumePage`; *descartado:* presentarlo como prueba del `key`
-  (esa es la segunda parte del test 13).
+- **P2 — `animation-fill-mode: backwards`.** *Discarded:* `both` (it leaves
+  `transform` applied permanently → stacking context and an altered reference
+  for `position: fixed`).
+- **P3 — A single `@keyframes panel-enter` with `var(--panel-enter-x)`; the
+  variables in `.motionPanel[data-motion-direction="from-left|from-right"]`
+  (0,2,0, scoped by the class).** *Discarded:* two `@keyframes` chosen by
+  attribute (it duplicates frames with no benefit) and a bare attribute selector (in a
+  CSS Module it is global; precedent `.contacts p`). A variable is not a
+  `transition`: #116 is fulfilled.
+- **P4 — `key={active}` only on the wrapper.** *Discarded:* a key on the tabpanel
+  or on the pages (it would break the panel's focus/ARIA).
+- **P5 — `animation` declared only in `.motionPanel[data-motion-direction]`.**
+  *Discarded:* an unconditional animation on `.motionPanel` (it would animate the initial
+  render against RF-9).
+- **P6 — Print rule inside the module, placed after the `animation` one**
+  (the (0,2,0) tie is resolved by order). *Discarded:* `global.css` (it is
+  imported before the modules in `main.tsx`: the module would win the tie and
+  the print cancellation would have no effect — the same pattern as `.social a` in
+  stage 1).
+- **P7 — `getTabDirection` + `MotionDirection` in `src/lib/tabDirection.ts`.**
+  *Discarded:* exporting from `AppLayout.tsx` (it would force extending
+  react-refresh's `allowExportNames`, #96/#100: new names = the user's
+  approval; with `.ts` the list is not touched).
+- **P8 — Test 14 is a NO REGRESSION one, green on-arrival declared (#101):**
+  the reset between tabs happens since F4 because of the swap of the types
+  `AboutPage`↔`ResumePage`; *discarded:* presenting it as proof of the `key`
+  (that is the second part of test 13).
 
-**Commits de T12 (ajuste de la puerta):** `test(AppLayout): T12` = solo el test
-14 (verde de llegada declarado, #101); `feat(AppLayout): T12` = solo el CSS.
-No se mezclan (regla de `git log -p` del reviewer).
+**Commits of T12 (adjustment of the gate):** `test(AppLayout): T12` = only test
+14 (green on arrival declared, #101); `feat(AppLayout): T12` = only the CSS.
+They are not mixed (the reviewer's `git log -p` rule).
 
-**Estrategia de tests del anexo:** RF-9 → tests 13–16 jsdom + test 15 puro en su
-archivo; CSS/animación por inspección y QA del reviewer con app servida (#91):
-animación en ambos sentidos, sin animación en la carga inicial, reduced motion
-instantáneo, impresión sin animación y **flujo del `h1` junto a la solapa
-flotante ≥ 992px** (el wrapper es div de bloque, sin flex/grid/overflow — RF-6
-de las páginas). `build` en T13 (cierre de pieza/Cambio, #80).
+**Test strategy of the annex:** RF-9 → jsdom tests 13–16 + pure test 15 in its
+file; CSS/animation by inspection and the reviewer's QA with the app served (#91):
+animation in both directions, no animation on the initial load, instant reduced
+motion, print with no animation and **flow of the `h1` next to the floating corner
+tab ≥ 992px** (the wrapper is a block div, with no flex/grid/overflow — RF-6
+of the pages). `build` in T13 (closing of the piece/Change, #80).
 
-Cobertura del anexo: T10→RF-9 (función pura) · T11→RF-9 (wrapper/atributos,
-tests 13/16) · T12→RF-9 (CSS entrada + print, inspección; test 14 no
-regresión) · T13→cierre (build + QA + docs).
+Coverage of the annex: T10→RF-9 (pure function) · T11→RF-9 (wrapper/attributes,
+tests 13/16) · T12→RF-9 (entrance CSS + print, inspection; test 14 no
+regression) · T13→closing (build + QA + docs).
