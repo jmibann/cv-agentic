@@ -1,32 +1,32 @@
 # Plan — ControlsBar
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/ControlsBar/ControlsBar.tsx` | `<header class="controlsBar">` > `div role="group">` con `ThemeToggle` + `LanguageSwitcher`; consume `useLocale().t.controls` | RF-1…RF-3 |
-| `src/components/ControlsBar/ControlsBar.module.css` | flex right-aligned, alto `--size-control`, `z-index: var(--z-controls)`, `gap: var(--controls-gap)` | RF-1, RF-6 |
-| `src/components/ControlsBar/ControlsBar.test.tsx` | tests + cierre a11y | todas |
+| `src/components/ControlsBar/ControlsBar.tsx` | `<header class="controlsBar">` > `div role="group">` with `ThemeToggle` + `LanguageSwitcher`; consumes `useLocale().t.controls` | RF-1…RF-3 |
+| `src/components/ControlsBar/ControlsBar.module.css` | right-aligned flex, height `--size-control`, `z-index: var(--z-controls)`, `gap: var(--controls-gap)` | RF-1, RF-6 |
+| `src/components/ControlsBar/ControlsBar.test.tsx` | tests + a11y closing case | all |
 | `src/components/ControlsBar/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno.
+None.
 
-## Interfaz
+## Interface
 
-`ControlsBarProps { className?: string }` (al `<header>` raíz, G-B). No recibe hijos: compone los dos controles él mismo (spec → Anatomía).
+`ControlsBarProps { className?: string }` (on the root `<header>`, G-B). It receives no children: it composes the two controls itself (spec → Anatomy).
 
-## Decisiones
+## Decisions
 
-- Pasa a sus hijos los labels de `t.controls` (`label`, `language`, y en ThemeToggle `darkModeLabel=t.controls.darkMode` + `lightModeLabel=t.controls.lightMode` — depende de **Foundation T12**).
-- RF-4 y la unicidad del banner quedan como invariantes de **AppLayout/F4** (decisión 4): en esta pieza no hay tarea ni test; el plan lo declara y el reviewer lo verifica en F4/F5.
-- RF-5: el módulo **no declara texto** (la pieza no pinta texto propio; sus hijos traen el suyo) — verificación por inspección.
-- `useLocale()` en la barra: excepción C2 análoga a los controles (no hay RF 6 propio en la spec; la API lo documenta) — si el reviewer lo pide, se formaliza con una RF en la próxima revisión de spec, no se agrega alcance nuevo ahora.
-- Impresión: ningún `@media print` propio (G-D-1); lo ocultan los estilos compartidos (F4).
+- It passes its children the labels of `t.controls` (`label`, `language`, and in ThemeToggle `darkModeLabel=t.controls.darkMode` + `lightModeLabel=t.controls.lightMode` — it depends on **Foundation T12**).
+- RF-4 and the uniqueness of the banner remain as invariants of **AppLayout/F4** (decision 4): in this piece there is no task or test; the plan declares it and the reviewer verifies it in F4/F5.
+- RF-5: the module **declares no text** (the piece paints no text of its own; its children bring theirs) — verification by inspection.
+- `useLocale()` in the bar: a C2 exception analogous to the controls (there is no RF 6 of its own in the spec; the API documents it) — if the reviewer asks for it, it is formalized with an RF in the next spec review; no new scope is added now.
+- Print: no `@media print` of its own (G-D-1); the shared styles hide it (F4).
 
-## Estrategia de tests
+## Test strategy
 
-Harness: `ThemeProvider` + `LocaleProvider` reales (los hijos consumen ambos), reset de `data-theme`/`lang`/storage en `afterEach`. Tests: `banner` contiene `group` con nombre (en) y los dos controles por rol+nombre; click en "Español" → `group` pasa a "Ajustes de visualización" y el toggle a labels en español (RF-3); `expectNoA11yViolations`. RF-1/RF-6/RF-5 por inspección del CSS (#101).
+Harness: real `ThemeProvider` + `LocaleProvider` (the children consume both), reset of `data-theme`/`lang`/storage in `afterEach`. Tests: `banner` contains a `group` with a name (en) and the two controls by role+name; click on "Español" → `group` becomes "Ajustes de visualización" and the toggle gets labels in Spanish (RF-3); `expectNoA11yViolations`. RF-1/RF-6/RF-5 by CSS inspection (#101).
 
-Cobertura: T1→RF-2,RF-3 · T2→RF-1,RF-5,RF-6 + cierre. (RF-4: AppLayout, sin tarea acá.)
+Coverage: T1→RF-2,RF-3 · T2→RF-1,RF-5,RF-6 + closing. (RF-4: AppLayout, no task here.)

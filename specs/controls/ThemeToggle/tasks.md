@@ -1,10 +1,10 @@
-# Tareas — ThemeToggle
+# Tasks — ThemeToggle
 
-- [x] **T1. Render conectado a `useTheme()` (requiere Foundation T12).** RF-1, RF-2, RF-3, RF-6 — 79ffa1f
-  - Hecho cuando: `<button>` con `aria-pressed` según `theme`, label `darkModeLabel` en claro / `lightModeLabel` en oscuro, ícono `lucide-moon` en claro y `lucide-sun` en oscuro, y click → `toggleTheme()` (integration: `dataset.theme` + storage cambian); el componente no referencia `localStorage` ni `document.documentElement` (inspección); verde tras `feat(ThemeToggle): T1`.
+- [x] **T1. Render wired to `useTheme()` (requires Foundation T12).** RF-1, RF-2, RF-3, RF-6 — 79ffa1f
+  - Done when: `<button>` with `aria-pressed` according to `theme`, label `darkModeLabel` in light / `lightModeLabel` in dark, icon `lucide-moon` in light and `lucide-sun` in dark, and click → `toggleTheme()` (integration: `dataset.theme` + storage change); the component does not reference `localStorage` or `document.documentElement` (inspection); green after `feat(ThemeToggle): T1`.
 
-- [x] **T2. Teclado nativo.** RF-4 — 2a094ed (commit único `test`, verde on-arrival declarado #101; sin `feat` por no haber comportamiento nuevo que implementar)
-  - Hecho cuando: foco con Tab + Espacio alterna (test con `user-event`); sin handlers propios `onKeyDown` (inspección: Enter/Espacio nativos del `<button>`); verde on-arrival donde el alcance no discrimina, declarado per #101; verde tras el commit correspondiente.
+- [x] **T2. Native keyboard.** RF-4 — 2a094ed (a single `test` commit, green on arrival declared #101; no `feat` because there is no new behavior to implement)
+  - Done when: focus with Tab + Space toggles (test with `user-event`); no `onKeyDown` handlers of its own (inspection: Enter/Space native to the `<button>`); green on arrival where the scope does not discriminate, declared per #101; green after the corresponding commit.
 
-- [x] **T3. Estilos por tokens y cierre a11y.** RF-4 (anillo), RF-5 — bb623b5
-  - Hecho cuando: el módulo fija `--size-control` cuadrado, `--color-surface-raised`, borde `1px solid var(--color-border)`, `--radius-12`, `--shadow-control`, color `--color-text` → hover `--color-accent-text`, anillo `focus-visible` estándar, `transform: translateY(1px)` en active con `transition: transform var(--duration-fast) var(--ease-standard)`, cero `@media`, cero gradiente en fondo (inspección); archivo termina con `expectNoA11yViolations` (claro y oscuro); `index.ts` re-exporta `ThemeToggle` y tipos; lint + typecheck + test verdes tras `feat(ThemeToggle): T3`.
+- [x] **T3. Token-based styles and a11y closing case.** RF-4 (ring), RF-5 — bb623b5
+  - Done when: the module sets a `--size-control` square, `--color-surface-raised`, border `1px solid var(--color-border)`, `--radius-12`, `--shadow-control`, color `--color-text` → hover `--color-accent-text`, the standard `focus-visible` ring, `transform: translateY(1px)` on active with `transition: transform var(--duration-fast) var(--ease-standard)`, zero `@media`, zero gradient on the background (inspection); the file ends with `expectNoA11yViolations` (light and dark); `index.ts` re-exports `ThemeToggle` and types; lint + typecheck + test green after `feat(ThemeToggle): T3`.

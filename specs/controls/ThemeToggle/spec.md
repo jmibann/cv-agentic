@@ -1,93 +1,93 @@
 # ThemeToggle
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Alternar entre tema claro y oscuro. Vive en la ControlsBar.
+Switch between the light and the dark theme. It lives in the ControlsBar.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el usuario activa el botón, ENTONCES EL SISTEMA invoca `toggleTheme()` del contexto; el alternado del tema, la aplicación de `data-theme` y la persistencia en `localStorage["cv:theme"]` con `try/catch` son responsabilidad del `ThemeProvider` (G-A: el componente no toca storage ni DOM global). Verificación: integración componente+provider (los tests de la pieza envuelven `ThemeProvider`).
-- RF-2: EL SISTEMA refleja el tema actual en `aria-pressed` del botón (`false` en claro, `true` en oscuro); el reflejo en `data-theme` del `<html>` lo aporta el provider (ya verificado en `ThemeProvider.test.tsx`; se comprueba aquí solo de forma indirecta por integración).
-- RF-3: EL SISTEMA muestra la luna en tema claro y el sol en oscuro, con `aria-label` traducido que **nombra el modo al que se va** (decisión 1=a): en claro → `darkModeLabel` ("Dark mode"), en oscuro → `lightModeLabel` ("Light mode"); el label nombra un modo, nunca una acción ("Activar/Desactivar").
-- RF-4: EL SISTEMA opera con Enter y Espacio (nativo del `<button>`) y aplica el anillo de foco estándar en `focus-visible`. (Verificación: test de teclado + inspección del CSS.)
-- RF-5: EL SISTEMA mantiene el tamaño fijo con `--size-control` y no declara `@media` propios. (Verificación: inspección del CSS.)
-- RF-6: EL SISTEMA consume `useTheme()` directamente (excepción documentada a la regla "props en, eventos fuera").
+- RF-1: WHEN the user activates the button, THEN THE SYSTEM invokes `toggleTheme()` from the context; switching the theme, applying `data-theme` and persisting in `localStorage["cv:theme"]` with `try/catch` are the `ThemeProvider`'s responsibility (G-A: the component does not touch storage or the global DOM). Verification: component+provider integration (the piece's tests wrap `ThemeProvider`).
+- RF-2: THE SYSTEM reflects the current theme in the button's `aria-pressed` (`false` in light, `true` in dark); the reflection in `data-theme` of `<html>` is provided by the provider (already verified in `ThemeProvider.test.tsx`; here it is checked only indirectly, through integration).
+- RF-3: THE SYSTEM shows the moon in the light theme and the sun in dark, with a translated `aria-label` that **names the mode you go to** (decision 1=a): in light → `darkModeLabel` ("Dark mode"), in dark → `lightModeLabel` ("Light mode"); the label names a mode, never an action ("Activar/Desactivar").
+- RF-4: THE SYSTEM operates with Enter and Space (native to the `<button>`) and applies the standard focus ring on `focus-visible`. (Verification: keyboard test + CSS inspection.)
+- RF-5: THE SYSTEM keeps the size fixed with `--size-control` and declares no `@media` of its own. (Verification: CSS inspection.)
+- RF-6: THE SYSTEM consumes `useTheme()` directly (a documented exception to the rule "props in, events out").
 
-## Anatomía
+## Anatomy
 
-Un único `<button>` cuadrado de solo ícono: luna en claro (pasar a oscuro),
-sol en oscuro (pasar a claro).
+A single square, icon-only `<button>`: moon in light (go to dark),
+sun in dark (go to light).
 
 ## API
 
 ```ts
 export interface ThemeToggleProps {
-  /** aria-label en tema claro: nombra el modo al que se va. Ej: "Dark mode" / "Modo oscuro". */
+  /** aria-label in the light theme: names the mode you go to. E.g. "Dark mode" / "Modo oscuro". */
   darkModeLabel: string;
-  /** aria-label en tema oscuro: nombra el modo al que se va. Ej: "Light mode" / "Modo claro". */
+  /** aria-label in the dark theme: names the mode you go to. E.g. "Light mode" / "Modo claro". */
   lightModeLabel: string;
-  /** Se une a la clase base del `<button>` raíz (G-B). */
+  /** Joined to the base class of the root `<button>` (G-B). */
   className?: string;
 }
 ```
 
-Consume `useTheme()` (excepción documentada a "props en, eventos fuera"). El label activo es `theme === "light" ? darkModeLabel : lightModeLabel`.
-Requiere la clave i18n nueva `controls.lightMode` ("Light mode" / "Modo claro") en `src/i18n/ui.{en,es}.ts`
-(decisión del usuario 1=a; la agrega una tarea previa de F3 delegada a `foundation`, dueña de i18n/providers post-F1; `ControlsBar` pasa ambos labels).
+It consumes `useTheme()` (a documented exception to "props in, events out"). The active label is `theme === "light" ? darkModeLabel : lightModeLabel`.
+It requires the new i18n key `controls.lightMode` ("Light mode" / "Modo claro") in `src/i18n/ui.{en,es}.ts`
+(user decision 1=a; a previous F3 task delegated to `foundation`, owner of i18n/providers after F1, adds it; `ControlsBar` passes both labels).
 
-## Estilos y tokens
+## Styles and tokens
 
-| Propiedad | Valor |
+| Property | Value |
 |---|---|
-| Tamaño | `--size-control` cuadrado (2.5rem) |
-| Fondo | `--color-surface-raised` |
-| Borde | `1px solid var(--color-border)` |
-| Radio | `--radius-12` |
-| Sombra | `--shadow-control` |
-| Ícono | `Icon name="moon" \| "sun"`, `tone="current"`, tamaño `--size-icon` |
+| Size | `--size-control` square (2.5rem) |
+| Background | `--color-surface-raised` |
+| Border | `1px solid var(--color-border)` |
+| Radius | `--radius-12` |
+| Shadow | `--shadow-control` |
+| Icon | `Icon name="moon" \| "sun"`, `tone="current"`, size `--size-icon` |
 | Color | `--color-text`; hover → `--color-accent-text` |
 | Focus-visible | `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);` |
 
-## Estados
+## States
 
-| Estado | Efecto |
+| State | Effect |
 |---|---|
-| Claro (`aria-pressed="false"`) | ícono luna |
-| Oscuro (`aria-pressed="true"`) | ícono sol |
+| Light (`aria-pressed="false"`) | moon icon |
+| Dark (`aria-pressed="true"`) | sun icon |
 | Hover | color `--color-accent-text` |
 | Focus-visible | `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);` |
-| Active (press) | `transform: translateY(1px)` con `transition: transform var(--duration-fast) var(--ease-standard)` (G-E; DESIGN prohíbe `transition: all`) |
+| Active (press) | `transform: translateY(1px)` with `transition: transform var(--duration-fast) var(--ease-standard)` (G-E; DESIGN forbids `transition: all`) |
 
 ## Responsive
 
-Tamaño fijo en todos los breakpoints (`--size-control`); sin `@media` propios.
+Fixed size at every breakpoint (`--size-control`); no `@media` of its own.
 
-## Accesibilidad
+## Accessibility
 
-Patrón **toggle button**:
+**Toggle button** pattern:
 
-- `aria-label` que nombra el modo al que se va (RF-3) + `aria-pressed={theme === "dark"}`.
-- El ícono es decorativo.
-- Opera con Enter/Espacio (nativo del `<button>`).
+- `aria-label` that names the mode you go to (RF-3) + `aria-pressed={theme === "dark"}`.
+- The icon is decorative.
+- It operates with Enter/Space (native to the `<button>`).
 
-## Tests esperados
+## Expected tests
 
-- `getByRole("button", { name: darkModeLabel })` con `aria-pressed="false"` en claro.
-- Click → `aria-pressed="true"`, **`aria-label` pasa a `lightModeLabel`**, `document.documentElement.dataset.theme === "dark"`,
-  `localStorage["cv:theme"] === "dark"` (integración con el provider).
-- Segundo click vuelve a claro: `aria-pressed="false"`, label otra vez `darkModeLabel`.
-- Muestra el ícono de luna en claro y el de sol en oscuro (verificar por el
-  atributo/clase del svg de lucide, p. ej. `lucide-moon`; criterio del contrato de `Icon`, que propaga esas clases).
-- Teclado: foco con Tab y Espacio alterna.
-- `expectNoA11yViolations` sin violaciones.
+- `getByRole("button", { name: darkModeLabel })` with `aria-pressed="false"` in light.
+- Click → `aria-pressed="true"`, **`aria-label` becomes `lightModeLabel`**, `document.documentElement.dataset.theme === "dark"`,
+  `localStorage["cv:theme"] === "dark"` (integration with the provider).
+- A second click goes back to light: `aria-pressed="false"`, label `darkModeLabel` again.
+- It shows the moon icon in light and the sun one in dark (verify through the
+  attribute/class of lucide's svg, e.g. `lucide-moon`; criterion of `Icon`'s contract, which propagates those classes).
+- Keyboard: focus with Tab, and Space toggles.
+- `expectNoA11yViolations` with no violations.
 
-(Los tests envuelven con `ThemeProvider` y resetean `data-theme` y
-`localStorage` en `afterEach`.)
+(The tests wrap with `ThemeProvider` and reset `data-theme` and
+`localStorage` in `afterEach`.)
 
-## No hacer
+## Do not
 
-- No mostrar una acción en el `aria-label` ("Activar/Desactivar…"): nombra el **modo** al que se va (RF-3). El estado lo da `aria-pressed`.
-- No hardcodear los labels: llegan traducidos por las props.
-- No leer ni escribir `localStorage` ni tocar `data-theme` desde el componente: la persistencia es del `ThemeProvider` (G-A); el `try/catch` y la clave `cv:theme` aplican ahí.
-- No cambiar el tamaño por breakpoint ni agregar `@media` propios (`--size-control`).
+- Do not show an action in the `aria-label` ("Activar/Desactivar…"): it names the **mode** you go to (RF-3). The state comes from `aria-pressed`.
+- Do not hardcode the labels: they arrive translated through the props.
+- Do not read or write `localStorage` or touch `data-theme` from the component: persistence belongs to the `ThemeProvider` (G-A); the `try/catch` and the key `cv:theme` apply there.
+- Do not change the size by breakpoint or add `@media` of its own (`--size-control`).

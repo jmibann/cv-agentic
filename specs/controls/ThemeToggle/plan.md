@@ -1,34 +1,34 @@
 # Plan — ThemeToggle
 
-## Archivos y responsabilidades
+## Files and responsibilities
 
-| Archivo | Responsabilidad | RF |
+| File | Responsibility | RF |
 |---|---|---|
-| `src/components/ThemeToggle/ThemeToggle.tsx` | `<button>` único; consume `useTheme()`; label por tema; `aria-pressed` | RF-1…RF-4, RF-6 |
-| `src/components/ThemeToggle/ThemeToggle.module.css` | tamaño/fondo/borde/radio/sombra/color, hover, focus-visible, press + transición | RF-4, RF-5 |
-| `src/components/ThemeToggle/ThemeToggle.test.tsx` | tests + cierre a11y | todas |
+| `src/components/ThemeToggle/ThemeToggle.tsx` | a single `<button>`; consumes `useTheme()`; label by theme; `aria-pressed` | RF-1…RF-4, RF-6 |
+| `src/components/ThemeToggle/ThemeToggle.module.css` | size/background/border/radius/shadow/color, hover, focus-visible, press + transition | RF-4, RF-5 |
+| `src/components/ThemeToggle/ThemeToggle.test.tsx` | tests + a11y closing case | all |
 | `src/components/ThemeToggle/index.ts` | re-export | — |
 
-## Funciones puras y algoritmo
+## Pure functions and algorithm
 
-Ninguno. El label activo es una rama trivial: `theme === "light" ? darkModeLabel : lightModeLabel`.
+None. The active label is a trivial branch: `theme === "light" ? darkModeLabel : lightModeLabel`.
 
-## Interfaz
+## Interface
 
 `ThemeToggleProps { darkModeLabel: string; lightModeLabel: string; className?: string }`
-(spec → API, decisión 1=a). Consume `useTheme()` (`{ theme, toggleTheme }`; excepción C2 documentada, RF-6).
+(spec → API, decision 1=a). It consumes `useTheme()` (`{ theme, toggleTheme }`; documented C2 exception, RF-6).
 
-## Decisiones
+## Decisions
 
-- El click llama **`toggleTheme()`** del contexto: ni `localStorage` ni `data-theme` tocan al componente (G-A). *Descartado:* duplicar la persistencia acá.
-- Depende del **Cambio T12 de Foundation** (`controls.lightMode` en `ui.{en,es}.ts`): sin esa clave, `t.controls.lightMode` no compila. T12 es tarea previa de la fase, delegada a `foundation`.
-- El ícono es decorativo: `<Icon name={theme === "light" ? "moon" : "sun"} />` (`tone="current"` default; ninguno de los dos lleva `label`).
-- `className` unida al `<button>` raíz (G-B, patrón #99 de aserción).
-- Transición de press: `transition: transform var(--duration-fast) var(--ease-standard)` (G-E; `transition: all` prohibido).
-- Arreglo anti-`react-refresh` no esperado: el `.tsx` solo exporta `ThemeToggle` + `ThemeToggleProps` (nada spiable; #96/#100 no aplican).
+- The click calls **`toggleTheme()`** from the context: neither `localStorage` nor `data-theme` is the component's business (G-A). *Discarded:* duplicating the persistence here.
+- It depends on **Foundation's Change T12** (`controls.lightMode` in `ui.{en,es}.ts`): without that key, `t.controls.lightMode` does not compile. T12 is a previous task of the phase, delegated to `foundation`.
+- The icon is decorative: `<Icon name={theme === "light" ? "moon" : "sun"} />` (`tone="current"` default; neither carries `label`).
+- `className` joined to the root `<button>` (G-B, assertion pattern #99).
+- Press transition: `transition: transform var(--duration-fast) var(--ease-standard)` (G-E; `transition: all` forbidden).
+- No anti-`react-refresh` fix expected: the `.tsx` only exports `ThemeToggle` + `ThemeToggleProps` (nothing to spy on; #96/#100 do not apply).
 
-## Estrategia de tests
+## Test strategy
 
-Harness: `ThemeProvider` real + reset de `data-theme` y `localStorage["cv:theme"]` en `afterEach` (spec → nota de Tests; el provider ya expone la semilla por `data-theme`, como sus propios tests de F1). Queries por rol `button` + nombre. RF-1/2 se verifican **en integración** (tras click cambian `aria-pressed`, label y `dataset.theme`/storage — los comprueba el assertion de provider+componente, sin duplicar lo que ya cubre `ThemeProvider.test.tsx`). Ícono por clase `lucide-moon`/`lucide-sun` propagada por Icon (criterio de la spec). Teclado: Tab + Espacio. Cierre `expectNoA11yViolations` en las dos ramas de tema.
+Harness: real `ThemeProvider` + reset of `data-theme` and `localStorage["cv:theme"]` in `afterEach` (spec → Tests note; the provider already exposes the seed through `data-theme`, like its own F1 tests). Queries by role `button` + name. RF-1/2 are verified **in integration** (after a click `aria-pressed`, the label and `dataset.theme`/storage change — the provider+component assertion checks them, without duplicating what `ThemeProvider.test.tsx` already covers). Icon by the class `lucide-moon`/`lucide-sun` propagated by Icon (the spec's criterion). Keyboard: Tab + Space. Closing `expectNoA11yViolations` on both theme branches.
 
-Cobertura: T1→RF-1,RF-2,RF-3,RF-6 · T2→RF-4 · T3→RF-4(anillo por inspección),RF-5 + cierre.
+Coverage: T1→RF-1,RF-2,RF-3,RF-6 · T2→RF-4 · T3→RF-4(ring by inspection),RF-5 + closing.

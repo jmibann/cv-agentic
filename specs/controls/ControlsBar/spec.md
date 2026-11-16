@@ -1,22 +1,22 @@
 # ControlsBar
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Barra chica **arriba de las cards, alineada a la derecha y fuera de ellas**,
-con los controles de visualización: ThemeToggle y LanguageSwitcher. Ocupa la
-parte inferior del espacio `--gutter-top` y se ve igual en todos los breakpoints.
+A small bar **above the cards, aligned to the right and outside them**,
+with the display controls: ThemeToggle and LanguageSwitcher. It takes the
+lower part of the `--gutter-top` space and looks the same at every breakpoint.
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: EL SISTEMA renderiza la barra con `justify-content: flex-end`, alto `--size-control` y los controles alineados a la derecha, **fuera de las cards**; la posición vertical dentro del espacio `--gutter-top` y el ancho del `<header>` (full-width) los define AppLayout (tabla → Posición vertical). Verificación: inspección del CSS de la pieza; layout de página en F4/F5.
-- RF-2: EL SISTEMA expone un landmark `<header>` (banner) con un grupo nombrado dentro; la **unicidad de página** del banner es responsabilidad de AppLayout (ningún otro `<header>`) y la verifica el reviewer en F4/F5.
-- RF-3: CUANDO cambia el idioma de la interfaz, ENTONCES EL SISTEMA actualiza los labels traducidos de ThemeToggle y LanguageSwitcher.
-- RF-4: ControlsBar debe quedar entre lo primero del orden de tabulación, inmediatamente después del skip link: **restricción de uso a nivel de página** — el DOM order lo garantiza AppLayout (su spec); no es verificable en la unidad de ControlsBar (la pieza no conoce el skip link). La verifica el reviewer en F4.
-- RF-5: EL SISTEMA no declara en su módulo ningún color de texto sobre `--color-bg` ni usa `--color-text-muted` (la pieza no renderiza texto propio; el texto que muestra viene de sus hijos, que traen sus tokens). Verificación: inspección del CSS.
-- RF-6: EL SISTEMA se muestra igual en todos los breakpoints: solo el `gap` escala, con token y sin `@media` propios. Verificación: inspección del CSS. En **impresión** la oculta el contrato `data-*` (G-D; Cambio F5 2026-10-08): el `<header>` raíz renderiza **`data-print-hide`** — `global.css` lo oculta con `[data-print-hide]` porque el selector nativo `header` perdía por especificidad contra la clase del módulo (hallazgo B-2 de `docs/qa-report.md`). La pieza no declara `@media print`.
+- RF-1: THE SYSTEM renders the bar with `justify-content: flex-end`, height `--size-control` and the controls aligned to the right, **outside the cards**; the vertical position within the `--gutter-top` space and the width of the `<header>` (full-width) are defined by AppLayout (table → Vertical position). Verification: inspection of the piece's CSS; page layout in F4/F5.
+- RF-2: THE SYSTEM exposes a `<header>` landmark (banner) with a named group inside; the **page uniqueness** of the banner is AppLayout's responsibility (no other `<header>`) and the reviewer verifies it in F4/F5.
+- RF-3: WHEN the interface language changes, THEN THE SYSTEM updates the translated labels of ThemeToggle and LanguageSwitcher.
+- RF-4: ControlsBar must be among the first things in the tab order, right after the skip link: a **page-level usage restriction** — AppLayout (its spec) guarantees the DOM order; it is not verifiable in ControlsBar's unit (the piece does not know the skip link). The reviewer verifies it in F4.
+- RF-5: THE SYSTEM declares in its module no text color on `--color-bg` and does not use `--color-text-muted` (the piece renders no text of its own; the text it shows comes from its children, which bring their own tokens). Verification: CSS inspection.
+- RF-6: THE SYSTEM looks the same at every breakpoint: only the `gap` scales, with a token and no `@media` of its own. Verification: CSS inspection. In **print** it is hidden by the `data-*` contract (G-D; F5 Change 2026-10-08): the root `<header>` renders **`data-print-hide`** — `global.css` hides it with `[data-print-hide]` because the native `header` selector lost on specificity against the module's class (finding B-2 of `docs/qa-report.md`). The piece declares no `@media print`.
 
-## Anatomía
+## Anatomy
 
 ```
                                               [☾]  [EN|ES]
@@ -36,60 +36,60 @@ parte inferior del espacio `--gutter-top` y se ve igual en todos los breakpoints
 
 ```ts
 export interface ControlsBarProps {
-  /** Se une a la clase base del `<header>` raíz (G-B). */
+  /** Joined to the base class of the root `<header>` (G-B). */
   className?: string;
 }
 ```
 
-Consume `useLocale()` para pasar los labels traducidos a sus hijos
-(`t.controls.label`, `t.controls.language`, y a ThemeToggle
+It consumes `useLocale()` to pass the translated labels to its children
+(`t.controls.label`, `t.controls.language`, and to ThemeToggle
 `darkModeLabel={t.controls.darkMode}` + `lightModeLabel={t.controls.lightMode}`
-— la clave `controls.lightMode` se agrega como tarea previa de F3, ver spec de
+— the key `controls.lightMode` is added as a previous F3 task, see the spec of
 ThemeToggle).
 
-## Estilos y tokens
+## Styles and tokens
 
-| Propiedad | Valor |
+| Property | Value |
 |---|---|
 | Layout | `display: flex; justify-content: flex-end; align-items: center; gap: var(--controls-gap);` (8px < 580 → 12px) |
-| Alto | `var(--size-control)` |
-| Capa | `position: relative; z-index: var(--z-controls);` |
-| Posición vertical | La define AppLayout (ver `foundations/layout.md`) |
+| Height | `var(--size-control)` |
+| Layer | `position: relative; z-index: var(--z-controls);` |
+| Vertical position | Defined by AppLayout (see `foundations/layout.md`) |
 
-- Está sobre `--color-bg`: cualquier texto usa `--color-text` (nunca
-  `--color-text-muted`; ver `docs/tokens/contrast.md`). Los controles llevan su
-  propio fondo `surface-raised`, así que el contraste interno no depende del fondo.
+- It sits on `--color-bg`: any text uses `--color-text` (never
+  `--color-text-muted`; see `docs/tokens/contrast.md`). The controls carry their
+  own `surface-raised` background, so the inner contrast does not depend on the background.
 
-## Estados
+## States
 
-Sin estados propios: los de ThemeToggle y LanguageSwitcher.
+No states of its own: those of ThemeToggle and LanguageSwitcher.
 
 ## Responsive
 
-Igual en todos los tamaños; solo el `gap` escala, por token (`--controls-gap`). Sin `@media` propios.
+The same at every size; only the `gap` scales, through a token (`--controls-gap`). No `@media` of its own.
 
-## Accesibilidad
+## Accessibility
 
-- Landmark `<header>` a nivel de página (banner); la unicidad la garantiza AppLayout (RF-2).
-- Grupo con nombre ("Display settings" / "Ajustes de visualización").
-- Orden de tabulación: inmediatamente después del skip link — lo fija AppLayout (RF-4).
-- Impresión: la barra la ocultan los estilos compartidos; ningún `@media print` propio (G-D).
+- Page-level `<header>` landmark (banner); AppLayout guarantees its uniqueness (RF-2).
+- A named group ("Display settings" / "Ajustes de visualización").
+- Tab order: right after the skip link — AppLayout sets it (RF-4).
+- Print: the bar is hidden by the shared styles; no `@media print` of its own (G-D).
 
-## Tests esperados
+## Expected tests
 
-- Renderiza un `banner` que contiene un `group` con nombre traducido.
-- Contiene el ThemeToggle y el LanguageSwitcher (por rol y nombre).
-- Al cambiar el idioma a `es`, los labels de los controles cambian al español.
-- El `<header>` raíz renderiza `data-print-hide` (Cambio F5: hook del contrato de impresión; test estructural simple).
-- `expectNoA11yViolations` sin violaciones.
+- Renders a `banner` that contains a `group` with a translated name.
+- It contains the ThemeToggle and the LanguageSwitcher (by role and name).
+- When the language changes to `es`, the labels of the controls change to Spanish.
+- The root `<header>` renders `data-print-hide` (F5 Change: hook of the print contract; a simple structural test).
+- `expectNoA11yViolations` with no violations.
 
-(Los tests envuelven con `ThemeProvider` **y** `LocaleProvider` — los hijos
-consumen ambos contextos — y resetean `data-theme`, `lang` y `localStorage` en
-`afterEach`, como en las specs hermanas.)
+(The tests wrap with `ThemeProvider` **and** `LocaleProvider` — the children
+consume both contexts — and reset `data-theme`, `lang` and `localStorage` in
+`afterEach`, as in the sibling specs.)
 
-## No hacer
+## Do not
 
-- No ubicarla dentro de las cards: va arriba, a la derecha y fuera de ellas.
-- No usar `--color-text-muted` para texto: está sobre `--color-bg` (`docs/tokens/contrast.md`).
-- No agregar otro landmark `<header>`: el banner es único en la página (AppLayout).
-- No agregar `@media` propios: solo el `gap` escala, por `--controls-gap`; ni `@media print` (lo ocultan los estilos compartidos).
+- Do not place it inside the cards: it goes above, to the right and outside them.
+- Do not use `--color-text-muted` for text: it sits on `--color-bg` (`docs/tokens/contrast.md`).
+- Do not add another `<header>` landmark: the banner is unique on the page (AppLayout).
+- Do not add `@media` of its own: only the `gap` scales, through `--controls-gap`; nor `@media print` (the shared styles hide it).
