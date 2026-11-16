@@ -2,8 +2,7 @@
 
 Minimal log of the project (decisions **#86** and **#98**): one entry for each
 closing of an F gate and for each rules decision, with the relevant hashes.
-Last update: **2026-11-16** (#123, one shell command per call §XXXVII; closing of #122, documentation in English §XXXVI; closing of #121, code in English §XXXV; rules §XXXIV; general audit and cleanup §XXXIII; README in English and `docs/STATUS.md` §XXXII, #120; Change #119, avatar in WebP §XXXI; docs cleanup §XXX; Change #118, `projects` collection §XXIX; Change #117, SEO metadata §XXVIII; motion system complete §XXVII; changes 3 §XXVI and 2 §XXV; stage 1 gate §XXIII).
-The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
+Last update: **2026-11-16** (#123, one shell command per call §XXXVII; #122, documentation in English §XXXVI; #121, code in English §XXXV). The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
 
 What is live does not live here: status → `docs/STATUS.md` ("Current status") · memory →
 `docs/memory.md` · decisions #1–#123 → `docs/README.md` · QA of F5 →
