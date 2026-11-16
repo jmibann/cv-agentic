@@ -1,21 +1,21 @@
 # useHashTab
-Estado: implementada
+Status: implemented
 
-## Propósito
+## Purpose
 
-Sincroniza el tab activo de `NavTabs` con el hash de la URL (`#about`,
-`#resume`), para que se pueda compartir un link directo a un panel. Vive en la
-app (`src/lib/useHashTab.ts`) y lo usa **AppLayout**; NavTabs no lo conoce
-(NavTabs es controlado: recibe `activeId` y emite `onChange`).
+It syncs the active tab of `NavTabs` with the URL hash (`#about`,
+`#resume`), so that a direct link to a panel can be shared. It lives in the
+app (`src/lib/useHashTab.ts`) and **AppLayout** uses it; NavTabs does not know it
+(NavTabs is controlled: it receives `activeId` and emits `onChange`).
 
-## Requisitos (EARS)
+## Requirements (EARS)
 
-- RF-1: CUANDO el hash de la URL es uno de `ids`, ENTONCES EL SISTEMA devuelve ese id como tab activo; SI no hay hash o el hash es inválido, devuelve `defaultId` sin reescribir la URL.
-- RF-2: CUANDO el consumidor llama `setActiveId(id)`, ENTONCES EL SISTEMA actualiza el estado y llama `history.replaceState` (nunca `pushState`) con el hash nuevo, conservando `pathname` y `search`; SI `id` ya es el activo, no hace nada.
-- RF-3: CUANDO ocurre `hashchange` con un hash válido, ENTONCES EL SISTEMA actualiza el tab activo; SI el hash es inválido, lo ignora y mantiene el tab actual.
-- RF-4: CUANDO el hook se desmonta, ENTONCES EL SISTEMA quita el listener de `hashchange`.
-- RF-5: EL SISTEMA toma como precondición del consumidor que ningún elemento del DOM tenga un `id` igual a un valor de `ids`: el hook no la comprueba ni la reescribe en runtime. La verifica el test 9 de AppLayout y la inspección del reviewer.
-- RF-6: EL SISTEMA no usa router, no mueve scroll ni foco, y solo lee `location.hash` al montar y en `hashchange`. Verificación: inspección del código (el reviewer); no hay test de jsdom para estas cláusulas.
+- RF-1: WHEN the URL hash is one of `ids`, THEN THE SYSTEM returns that id as the active tab; IF there is no hash or the hash is invalid, it returns `defaultId` without rewriting the URL.
+- RF-2: WHEN the consumer calls `setActiveId(id)`, THEN THE SYSTEM updates the state and calls `history.replaceState` (never `pushState`) with the new hash, preserving `pathname` and `search`; IF `id` is already the active one, it does nothing.
+- RF-3: WHEN `hashchange` happens with a valid hash, THEN THE SYSTEM updates the active tab; IF the hash is invalid, it ignores it and keeps the current tab.
+- RF-4: WHEN the hook unmounts, THEN THE SYSTEM removes the `hashchange` listener.
+- RF-5: THE SYSTEM takes as a precondition of the consumer that no DOM element has an `id` equal to a value of `ids`: the hook does not check it or rewrite it at runtime. AppLayout's test 9 and the reviewer's inspection verify it.
+- RF-6: THE SYSTEM uses no router, does not move scroll or focus, and only reads `location.hash` on mount and on `hashchange`. Verification: code inspection (the reviewer); there is no jsdom test for these clauses.
 
 ## API
 
@@ -26,79 +26,79 @@ export function useHashTab<T extends string>(
 ): [activeId: T, setActiveId: (id: T) => void];
 ```
 
-- `ids`: tabs válidos (`["about", "resume"]`).
-- `defaultId`: tab si el hash no es válido o no existe (`"about"`).
-- Precondiciones del llamador, sin chequeo de runtime: `defaultId ∈ ids`; los
-  valores de `ids` no contienen espacios ni caracteres que requieran encoding
-  en la URL (el hook no codifica ni normaliza; es la invariante de formato que
-  NavTabs le atribuye en su spec).
+- `ids`: valid tabs (`["about", "resume"]`).
+- `defaultId`: the tab if the hash is invalid or missing (`"about"`).
+- Caller's preconditions, with no runtime check: `defaultId ∈ ids`; the
+  values of `ids` contain no spaces or characters that need encoding
+  in the URL (the hook does not encode or normalize; it is the format invariant
+  NavTabs attributes to it in its spec).
 
-## Comportamiento
+## Behavior
 
-| Situación | Resultado |
+| Situation | Result |
 |---|---|
-| Montaje con `location.hash` = `#resume` (y `resume` ∈ `ids`) | `activeId = "resume"` |
-| Montaje sin hash o con hash inválido (`#foo`) | `activeId = defaultId`; **no** reescribe la URL |
-| `setActiveId(id)` | Actualiza el estado y llama `history.replaceState(null, "", "#" + id)` |
-| `setActiveId(id)` con el id ya activo | No hace nada (ni estado ni `replaceState`) |
-| Evento `hashchange` con hash válido | Actualiza `activeId` |
-| Evento `hashchange` con hash inválido | Se ignora; queda el tab actual |
-| Desmontaje | Quita el listener de `hashchange` |
+| Mount with `location.hash` = `#resume` (and `resume` ∈ `ids`) | `activeId = "resume"` |
+| Mount with no hash or with an invalid hash (`#foo`) | `activeId = defaultId`; it does **not** rewrite the URL |
+| `setActiveId(id)` | Updates the state and calls `history.replaceState(null, "", "#" + id)` |
+| `setActiveId(id)` with the id already active | Does nothing (neither state nor `replaceState`) |
+| `hashchange` event with a valid hash | Updates `activeId` |
+| `hashchange` event with an invalid hash | Ignored; the current tab stays |
+| Unmount | Removes the `hashchange` listener |
 
-Decisiones:
+Decisions:
 
-- **`replaceState`, no `pushState`**: el botón atrás no cambia de tab (lo
-  esperable en un tablist) y no se acumulan entradas de historial.
-  `replaceState` no dispara `hashchange`, así que no hay bucles.
-- Cambiar de tab **no** mueve el scroll ni el foco (eso es de NavTabs/AppLayout).
-- `setActiveId` conserva `pathname` y `search` de la URL; solo cambia el hash.
+- **`replaceState`, not `pushState`**: the back button does not change tabs (what
+  is expected of a tablist) and no history entries pile up.
+  `replaceState` does not fire `hashchange`, so there are no loops.
+- Changing tabs does **not** move scroll or focus (that belongs to NavTabs/AppLayout).
+- `setActiveId` preserves the URL's `pathname` and `search`; it only changes the hash.
 
-## Restricción sobre el DOM
+## DOM restriction
 
-**Ningún elemento puede tener `id="about"` ni `id="resume"`** (ni ningún id
-que coincida con un valor de `ids`): el navegador saltaría a él al cargar con
-ese hash. Es precondición del consumidor (RF-5); el hook no la comprueba en
-runtime. El panel es `main-panel`; los tabs, `tab-about` / `tab-resume`
-(ver `specs/layout/NavTabs/spec.md`). AppLayout lo verifica en su test 9.
+**No element may have `id="about"` or `id="resume"`** (or any id
+that matches a value of `ids`): the browser would jump to it when loading with
+that hash. It is a precondition of the consumer (RF-5); the hook does not check it at
+runtime. The panel is `main-panel`; the tabs, `tab-about` / `tab-resume`
+(see `specs/layout/NavTabs/spec.md`). AppLayout verifies it in its test 9.
 
-## Anatomía
+## Anatomy
 
-No aplica: es un hook sin UI.
+Not applicable: it is a hook with no UI.
 
-## Estilos y tokens
+## Styles and tokens
 
-No aplica.
+Not applicable.
 
 ## Responsive
 
-No aplica.
+Not applicable.
 
-## Estados
+## States
 
-Ver la tabla de "Comportamiento" (estado = tab activo; transiciones por
-`setActiveId` y `hashchange`).
+See the "Behavior" table (state = active tab; transitions through
+`setActiveId` and `hashchange`).
 
-## Accesibilidad
+## Accessibility
 
-No aplica directamente. Impone la restricción de ids descripta arriba; la
-semántica del tablist es de `NavTabs`.
+Not directly applicable. It imposes the id restriction described above; the
+tablist semantics belong to `NavTabs`.
 
-## Tests esperados
+## Expected tests
 
-(Con `window.location.hash` y `history.replaceState` controlados en el test;
-`renderHook` de Testing Library.)
+(With `window.location.hash` and `history.replaceState` controlled in the test;
+`renderHook` from Testing Library.)
 
-1. Sin hash → devuelve `defaultId`.
-2. Con `#resume` antes de montar → devuelve `"resume"`.
-3. Con `#foo` → devuelve `defaultId` y no llama `replaceState`.
-4. `setActiveId("resume")` → devuelve `"resume"` y llama `replaceState` con una URL que termina en `#resume` (spy: **no** se llama `pushState`).
-5. `setActiveId` con el id activo → no llama `replaceState`.
-6. Disparar `hashchange` tras cambiar `location.hash` a `#resume` → devuelve `"resume"`.
-7. `hashchange` con hash inválido → mantiene el valor anterior.
-8. Al desmontar se quita el listener: con spy de `addEventListener`/`removeEventListener` sobre `window`, al montar se registra `hashchange` y al desmontar se quita el mismo handler; un `hashchange` posterior no provoca actualizaciones.
-9. `setActiveId` conserva `pathname` y `search`.
+1. No hash → returns `defaultId`.
+2. With `#resume` before mounting → returns `"resume"`.
+3. With `#foo` → returns `defaultId` and does not call `replaceState`.
+4. `setActiveId("resume")` → returns `"resume"` and calls `replaceState` with a URL that ends in `#resume` (spy: `pushState` is **not** called).
+5. `setActiveId` with the active id → does not call `replaceState`.
+6. Firing `hashchange` after changing `location.hash` to `#resume` → returns `"resume"`.
+7. `hashchange` with an invalid hash → keeps the previous value.
+8. On unmount the listener is removed: with a spy on `addEventListener`/`removeEventListener` of `window`, on mount `hashchange` is registered and on unmount the same handler is removed; a later `hashchange` causes no updates.
+9. `setActiveId` preserves `pathname` and `search`.
 
-## No hacer
+## Do not
 
-- No usar `pushState` ni un router.
-- No leer `location.hash` en cada render: solo al montar y en `hashchange`.
+- Do not use `pushState` or a router.
+- Do not read `location.hash` on every render: only on mount and on `hashchange`.
