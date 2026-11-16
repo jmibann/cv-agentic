@@ -1,10 +1,10 @@
-# Tipografía
+# Typography
 
-## Fuente
+## Font
 
-- **Poppins**, servida desde el propio sitio (sin Google Fonts en runtime).
-- Implementación recomendada: paquete `@fontsource/poppins`, importando solo
-  los pesos usados en el entry de la app:
+- **Poppins**, served from the site itself (no Google Fonts at runtime).
+- Recommended implementation: the `@fontsource/poppins` package, importing only
+  the weights used, in the app's entry:
 
   ```ts
   import "@fontsource/poppins/300.css";
@@ -13,12 +13,12 @@
   import "@fontsource/poppins/600.css";
   ```
 
-  Alternativa sin dependencia: `.woff2` en `public/fonts/` con `@font-face`
-  propio (`font-display: swap`, subset latin, que cubre á é í ó ú ñ ¿ ¡).
-- Sin itálicas: el diseño no las usa.
-- Stack de respaldo: `--font-family` (system-ui…).
+  Alternative with no dependency: `.woff2` in `public/fonts/` with its own
+  `@font-face` (`font-display: swap`, latin subset, which covers á é í ó ú ñ ¿ ¡).
+- No italics: the design does not use them.
+- Fallback stack: `--font-family` (system-ui…).
 
-## Estilos base (globales, en el CSS global de la app)
+## Base styles (global, in the app's global CSS)
 
 ```css
 body {
@@ -40,49 +40,49 @@ h4 { font-weight: var(--font-weight-medium); }
 strong, b { font-weight: var(--font-weight-semibold); color: var(--color-heading); }
 ```
 
-El cuerpo en **peso 300** es parte de la identidad visual (texto liviano,
-títulos firmes). No subirlo "para que se lea mejor" sin consultarlo.
+The body at **weight 300** is part of the visual identity (light text,
+firm headings). Do not raise it "so it reads better" without asking.
 
-## Escala
+## Scale
 
-| Token | < 580px | ≥ 580px | Peso | Uso |
+| Token | < 580px | ≥ 580px | Weight | Use |
 |---|---|---|---|---|
-| `--font-size-h1` | 24px | 32px | 600 | Título de página ("About Me", "Resume") |
-| `--font-size-h2` | 18px | 24px | 600 | Títulos de sección (Education, Testimonials, dialog) |
-| `--font-size-h3` | 16px | 18px | 600 | ServiceCard, nombre en TestimonialCard |
-| `--font-size-h4` | 14px | 16px | 500 | Título de TimelineItem |
-| `--font-size-h5` | 12px | 14px | 600 | Reservado |
-| `--font-size-h6` | 10px | 12px | 600 | Reservado |
-| `--font-size-body` | 14px | 15px | 300 | Párrafos |
-| `--font-size-name` | 17px | 27px (≥768) | 500 | Nombre en el sidebar |
+| `--font-size-h1` | 24px | 32px | 600 | Page title ("About Me", "Resume") |
+| `--font-size-h2` | 18px | 24px | 600 | Section titles (Education, Testimonials, dialog) |
+| `--font-size-h3` | 16px | 18px | 600 | ServiceCard, name in TestimonialCard |
+| `--font-size-h4` | 14px | 16px | 500 | TimelineItem title |
+| `--font-size-h5` | 12px | 14px | 600 | Reserved |
+| `--font-size-h6` | 10px | 12px | 600 | Reserved |
+| `--font-size-body` | 14px | 15px | 300 | Paragraphs |
+| `--font-size-name` | 17px | 27px (≥768) | 500 | Name in the sidebar |
 | `--font-size-button` | 14px | 16px | 400 | Button |
 | `--font-size-small` | 12px | 12px | 400 | Button `size="small"` |
-| `--font-size-badge` | 11px | 13px (≥768) | 400 | Badge del rol, chips de skills |
-| `--font-size-overhead` | 11px | 12px | 400, MAYÚSCULAS | Etiquetas de contacto |
+| `--font-size-badge` | 11px | 13px (≥768) | 400 | Role badge, skill chips |
+| `--font-size-overhead` | 11px | 12px | 400, UPPERCASE | Contact labels |
 | `--font-size-nav` | 14px | 16px (≥992) | 500 | NavTabs |
 
-## Nivel visual vs. nivel semántico
+## Visual level vs. semantic level
 
-El **tamaño visual no define el nivel del heading**. La jerarquía del
-documento es:
+**Visual size does not define the heading level**. The document's
+hierarchy is:
 
 ```
-h1  título de página (uno por tabpanel)
-└─ h2  sección (Services, Testimonials, Experience, Projects, Education, Skills)
-   └─ h3  ítem (ServiceCard, TimelineItem, TestimonialCard)
+h1  page title (one per tabpanel)
+└─ h2  section (Services, Testimonials, Experience, Projects, Education, Skills)
+   └─ h3  item (ServiceCard, TimelineItem, TestimonialCard)
 ```
 
-El título de un TimelineItem es `<h3>` con estilo de h4 (clase del módulo,
-no el tag). El tema original usaba `<h5>`; eso rompe la jerarquía y **no** se
-replica. El nombre del sidebar no es heading: es un `<p>` con estilo propio
-(decisión fijada en `specs/layout/Sidebar/spec.md`; el único `h1` es el del
-panel activo).
+The title of a TimelineItem is an `<h3>` styled as h4 (the module's class,
+not the tag). The original theme used `<h5>`; that breaks the hierarchy and is **not**
+replicated. The sidebar name is not a heading: it is a `<p>` with its own style
+(decision pinned in `specs/layout/Sidebar/spec.md`; the only `h1` is the one of the
+active panel).
 
-## Márgenes de títulos
+## Heading margins
 
-| Elemento | Margin-bottom |
+| Element | Margin-bottom |
 |---|---|
-| h1 con barra (SectionTitle `decorated`) | `var(--title-decorated-gap)` (24px < 580 → 37px) — incluye la barra; la distancia texto→barra es `--title-bar-offset` |
+| h1 with bar (SectionTitle `decorated`) | `var(--title-decorated-gap)` (24px < 580 → 37px) — includes the bar; the text→bar distance is `--title-bar-offset` |
 | h2 | 1.25rem |
 | h3 | 0.5rem |
-| h4 (TimelineItem) | 0 (el período va inmediatamente debajo) |
+| h4 (TimelineItem) | 0 (the period goes right below) |

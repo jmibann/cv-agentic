@@ -1,16 +1,16 @@
 # Layout
 
-## Estructura del documento
+## Document structure
 
 ```html
 <body>
   <a class="skip-link" href="#main-panel">Skip to content</a>
   <div class="container">                     <!-- AppLayout -->
-    <ControlsBar />                       <!-- renderiza su propio <header> (banner) -->
+    <ControlsBar />                       <!-- renders its own <header> (banner) -->
     <div class="grid">
-      <Sidebar />                         <!-- renderiza su propio <aside aria-label> -->
+      <Sidebar />                         <!-- renders its own <aside aria-label> -->
       <main>
-        <Box variant="outer">                 <!-- card de contenido -->
+        <Box variant="outer">                 <!-- content card -->
           CornerTab > NavTabs (role="tablist")
           <div role="tabpanel" id="main-panel">  AboutPage | ResumePage  </div>
         </Box>
@@ -20,12 +20,12 @@
 </body>
 ```
 
-## Contenedor
+## Container
 
-- `max-width: var(--container-max)` (1290px), centrado, `padding-inline: var(--container-padding-inline)`.
+- `max-width: var(--container-max)` (1290px), centered, `padding-inline: var(--container-padding-inline)`.
 - `padding-bottom: var(--gutter-bottom)`.
-- Arriba: el espacio `--gutter-top` (5rem; 10rem en xl) aloja la **ControlsBar**.
-  La barra ocupa la parte inferior de ese espacio, alineada a la derecha:
+- On top: the `--gutter-top` space (5rem; 10rem at xl) holds the **ControlsBar**.
+  The bar takes the lower part of that space, aligned to the right:
 
   ```
   padding-top: calc(var(--gutter-top) - var(--size-control) - var(--space-4));
@@ -33,22 +33,22 @@
   margin-bottom: var(--space-4)
   ```
 
-  En xl el avatar del sidebar sobresale hacia arriba dentro de ese espacio,
-  pero solo en la columna izquierda; la ControlsBar está en la derecha, no chocan.
+  At xl the sidebar avatar sticks out upwards into that space,
+  but only in the left column; the ControlsBar is on the right, they do not collide.
 
-## Grilla por breakpoint
+## Grid per breakpoint
 
-### base → lg (< 1200px): una columna
+### base → lg (< 1200px): one column
 
 ```
 ┌──────────────────────────────────── ControlsBar ─ [☀] [EN|ES] ┐
 ┌───────────────────────────────────────────────────╭──────────────┐
-│ ┌──────┐  Nombre                                        ⌄         │  ← botón (chevron, Cambio F5 #104b)
-│ │avatar│  [Rol]                                             ╰─────┤
-│ └──────┘  (redes centradas)                                        │
-│ ─────────────────────── (colapsable) ─────────────────────────── │
-│ ✉ EMAIL        ☎ PHONE          ← 2 columnas ≥768, 1 columna <768 │
-│ [ Download CV ] (solo si existe downloadCvUrl)                   │
+│ ┌──────┐  Name                                          ⌄         │  ← button (chevron, F5 Change #104b)
+│ │avatar│  [Role]                                            ╰─────┤
+│ └──────┘  (social links, centered)                                 │
+│ ─────────────────────── (collapsible) ────────────────────────── │
+│ ✉ EMAIL        ☎ PHONE          ← 2 columns ≥768, 1 column <768   │
+│ [ Download CV ] (only if downloadCvUrl exists)                   │
 └──────────────────────────────────────────────────────────────────┘
   gap: var(--stack-gap)
 ┌──────────────────────────────────────────╭───────────────────────┐
@@ -58,26 +58,26 @@
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-- **< lg**: el `h1` del panel va **debajo** de la CornerTab para no
-  superponerse. Fórmula única (definida en `specs/layout/AppLayout/spec.md`),
-  aplicada en el tabpanel (`.panel`):
+- **< lg**: the panel's `h1` goes **below** the CornerTab so they do not
+  overlap. A single formula (defined in `specs/layout/AppLayout/spec.md`),
+  applied on the tabpanel (`.panel`):
   `padding-top: calc(var(--size-nav-tab-height) - var(--box-padding) + var(--space-4))`.
-  Descuenta el `--box-padding` del Box porque la tab está posicionada desde el
-  borde de la card, no desde su contenido.
-- **≥ lg**: la tab **flota** a la derecha (`CornerTab placement="float"`) y
-  el `h1` fluye a su izquierda en la misma franja, usando el ancho real de la
-  tab (sin reservas fijas). `.panel` vuelve a `padding-top: 0`. Detalle en
-  `specs/layout/AppLayout/spec.md` y `specs/primitives/CornerTab/spec.md`.
+  It subtracts the Box's `--box-padding` because the tab is positioned from the
+  card's edge, not from its content.
+- **≥ lg**: the tab **floats** to the right (`CornerTab placement="float"`) and
+  the `h1` flows to its left on the same strip, using the tab's real width
+  (no fixed reserves). `.panel` goes back to `padding-top: 0`. Detail in
+  `specs/layout/AppLayout/spec.md` and `specs/primitives/CornerTab/spec.md`.
 
-### xl (≥ 1200px): sidebar + contenido
+### xl (≥ 1200px): sidebar + content
 
 ```
                 ┌──────┐                    ControlsBar ─ [☀] [EN|ES]
 ┌───────────────│avatar│┐  ┌─────────────────────────╭──────────────────┐
 │               └──────┘│  │ About Me                │  About   Resume  │
-│        Nombre         │  │ ▬▬▬                     ╰──────────────────┤
-│        [Rol]          │  │                                            │
-│      (redes)          │  │ …tabpanel…                                 │
+│         Name          │  │ ▬▬▬                     ╰──────────────────┤
+│        [Role]         │  │                                            │
+│    (social links)     │  │ …tabpanel…                                 │
 │ ───────────────────── │  │                                            │
 │ ✉ EMAIL               │  │                                            │
 │ ☎ PHONE               │  │                                            │
@@ -97,80 +97,80 @@
   }
 }
 
-/* Sticky solo si el Sidebar entra entero en la pantalla mientras está fijo.
-   Sidebar ≈ 665px + top ≈ 158px ≈ 823px; 900px deja margen para contenido
-   variable (cada contacto extra suma ≈ 72px). Única media query de altura
-   permitida (ver docs/tokens/breakpoints.md). */
+/* Sticky only if the Sidebar fits entirely on screen while it is fixed.
+   Sidebar ≈ 665px + top ≈ 158px ≈ 823px; 900px leaves room for variable
+   content (each extra contact adds ≈ 72px). The only height media query
+   allowed (see docs/tokens/breakpoints.md). */
 @media (min-width: 1200px) and (min-height: 900px) {
   .aside {
     position: sticky;
-    /* el avatar sobresale ≈ 0.71 × su tamaño por encima de la card: el top lo
-       incluye para que no quede cortado al fijarse */
+    /* the avatar sticks out ≈ 0.71 × its size above the card: the top
+       includes it so it is not cut off when it becomes fixed */
     top: calc(var(--size-avatar-sidebar) * 0.71 + var(--space-7));
     z-index: var(--z-sticky);
   }
 }
 ```
 
-- Sidebar **sticky** con CSS (`position: sticky`), sin librerías. El `top`
-  suma la protrusión del avatar (≈ 128px) y `--space-7`: con `top: 30px` el
-  avatar quedaría cortado contra el borde superior al hacer scroll.
-  Además, el sticky se activa **solo con `min-height: 900px`**: en pantallas
-  más bajas el Sidebar fijo (≈ 823px con el `top`) no entraría entero y el
-  botón Download CV quedaría fuera de vista. Debajo de ese alto, el Sidebar
-  scrollea con la página.
-- El avatar sobresale: `margin-top: calc(var(--size-avatar-sidebar) * -0.71)` (≈ −8rem
-  con 11.25rem), centrado. Por eso el `aside` necesita `padding-top` equivalente
-  dentro de `--gutter-top`; está contemplado en los 10rem.
+- **Sticky** Sidebar with CSS (`position: sticky`), no libraries. The `top`
+  adds the avatar's protrusion (≈ 128px) and `--space-7`: with `top: 30px` the
+  avatar would be cut off against the top edge when scrolling.
+  Also, the sticky is enabled **only with `min-height: 900px`**: on shorter
+  screens the fixed Sidebar (≈ 823px with the `top`) would not fit entirely and the
+  Download CV button would be out of view. Below that height, the Sidebar
+  scrolls with the page.
+- The avatar sticks out: `margin-top: calc(var(--size-avatar-sidebar) * -0.71)` (≈ −8rem
+  with 11.25rem), centered. That is why the `aside` needs an equivalent `padding-top`
+  within `--gutter-top`; it is accounted for in the 10rem.
 
-## Contenido de los paneles
+## Content of the panels
 
-Resumen visual. **La spec normativa de cada panel está en
-[specs/pages/AboutPage/spec.md](../specs/pages/AboutPage/spec.md) y
-[specs/pages/ResumePage/spec.md](../specs/pages/ResumePage/spec.md)**; si este
-resumen y esas specs difieren, ganan las specs.
+Visual summary. **The normative spec of each panel is in
+[specs/pages/AboutPage/spec.md](../specs/pages/AboutPage/spec.md) and
+[specs/pages/ResumePage/spec.md](../specs/pages/ResumePage/spec.md)**; if this
+summary and those specs differ, the specs win.
 
 ### AboutPage
 
 ```
 h1 About Me (SectionTitle decorated)
-párrafos (profile.about)
-h2 Services  → grid ServiceCard: 1 col; 2 cols ≥ lg
-h2 Testimonials → TestimonialCarousel (1 por vista; 2 ≥ md)
+paragraphs (profile.about)
+h2 Services  → ServiceCard grid: 1 col; 2 cols ≥ lg
+h2 Testimonials → TestimonialCarousel (1 per view; 2 ≥ md)
 ```
 
 ### ResumePage
 
 ```
 h1 Resume (SectionTitle decorated)
-┌ ResumeSection Experience ────────────────────────────┐   una sola columna en
-└──────────────────────────────────────────────────────┘   todos los anchos (#114)
+┌ ResumeSection Experience ────────────────────────────┐   a single column at
+└──────────────────────────────────────────────────────┘   every width (#114)
 ┌ ResumeSection Education ─────────────────────────────┐   gap --stack-gap
 └──────────────────────────────────────────────────────┘
-h2 Skills → SkillList (chips) a ancho completo
+h2 Skills → SkillList (chips) at full width
 ```
 
-## Espaciado vertical
+## Vertical spacing
 
-- Entre bloques de un panel: `var(--stack-gap)` (1rem → 1.875rem).
-- Entre h2 de sección y su contenido: margin del h2 (1.25rem).
-- Sin márgenes "sueltos" en componentes: el componente no se da margen
-  externo; lo posiciona el padre (flex/grid con `gap`).
+- Between blocks of a panel: `var(--stack-gap)` (1rem → 1.875rem).
+- Between a section h2 and its content: the h2's margin (1.25rem).
+- No "loose" margins on components: a component gives itself no outer
+  margin; the parent positions it (flex/grid with `gap`).
 
-## Impresión (`@media print`)
+## Print (`@media print`)
 
-El CV debe imprimirse limpio en A4/Letter:
+The CV must print cleanly on A4/Letter:
 
-- Ocultar: ControlsBar, CornerTab/NavTabs, el chevron de contactos del Sidebar, Download CV,
-  skip link, bullets del carrusel y el dialog.
-- Testimonios: **todos apilados, con el texto completo** (detalle en
-  `specs/content/TestimonialCarousel/spec.md` → "Impresión").
-- **Imprimir ambos paneles** (About y Resume) uno detrás del otro, sin importar
-  el tab activo: los tabpanels ocultos se muestran en print.
-- Sidebar arriba en una columna, contactos siempre expandidos.
-- Paleta clara siempre (también si el tema activo es oscuro), fondo blanco y
-  sin sombras: lo resuelve **`tokens/tokens.css`** en su bloque `@media print`,
-  que reasigna los tokens semánticos. Los componentes no hacen nada especial
-  de color para imprimir.
-- `break-inside: avoid` en TimelineItem y ServiceCard.
-- Links de contacto: mostrar el valor en texto (ya lo es), no la URL.
+- Hide: ControlsBar, CornerTab/NavTabs, the Sidebar's contacts chevron, Download CV,
+  skip link, carousel bullets and the dialog.
+- Testimonials: **all stacked, with the full text** (detail in
+  `specs/content/TestimonialCarousel/spec.md` → "Print").
+- **Print both panels** (About and Resume) one after the other, regardless of
+  the active tab: hidden tabpanels are shown in print.
+- Sidebar on top in one column, contacts always expanded.
+- Always the light palette (also if the active theme is dark), white background and
+  no shadows: **`tokens/tokens.css`** resolves it in its `@media print` block,
+  which reassigns the semantic tokens. Components do nothing special
+  about color for printing.
+- `break-inside: avoid` on TimelineItem and ServiceCard.
+- Contact links: show the value as text (it already is), not the URL.

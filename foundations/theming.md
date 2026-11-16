@@ -1,28 +1,28 @@
-# Theming (claro / oscuro)
+# Theming (light / dark)
 
-## Modelo
+## Model
 
-- Dos temas: `light` y `dark`. El tema se aplica con `data-theme` en `<html>`.
-- `tokens.css` define el claro en `:root` y el oscuro en `:root[data-theme="dark"]`.
-- Los componentes **no saben** en qué tema están: solo consumen tokens
-  semánticos. Ningún componente lee el tema salvo `ThemeToggle`.
+- Two themes: `light` and `dark`. The theme is applied with `data-theme` on `<html>`.
+- `tokens.css` defines the light one on `:root` and the dark one on `:root[data-theme="dark"]`.
+- Components **do not know** which theme they are in: they only consume semantic
+  tokens. No component reads the theme except `ThemeToggle`.
 
-## Resolución del tema inicial
+## Resolving the initial theme
 
-Orden de prioridad:
+Order of priority:
 
-1. Preferencia guardada: `localStorage["cv:theme"]` (`"light"` | `"dark"`).
-2. Preferencia del sistema: `matchMedia("(prefers-color-scheme: dark)")`.
+1. Stored preference: `localStorage["cv:theme"]` (`"light"` | `"dark"`).
+2. System preference: `matchMedia("(prefers-color-scheme: dark)")`.
 3. Default: `light`.
 
-Mientras el usuario no elija explícitamente, el sitio **sigue los cambios del
-sistema** en vivo (listener de `matchMedia`). Una vez que elige con el toggle,
-se guarda y deja de seguir al sistema.
+As long as the user has not chosen explicitly, the site **follows system
+changes** live (a `matchMedia` listener). Once they choose with the toggle,
+it is stored and the site stops following the system.
 
-## Script anti-flash (obligatorio)
+## Anti-flash script (mandatory)
 
-Inline en `<head>` de `index.html`, **antes** de cualquier CSS/JS del bundle,
-para que el primer frame ya tenga el tema y el idioma correctos:
+Inline in the `<head>` of `index.html`, **before** any CSS/JS of the bundle,
+so that the first frame already has the right theme and language:
 
 ```html
 <script>
@@ -53,12 +53,12 @@ para que el primer frame ya tenga el tema y el idioma correctos:
 </script>
 ```
 
-- Todo `localStorage` va en `try/catch`: en modo privado o con storage
-  bloqueado puede lanzar.
-- Si se agrega una CSP, este script necesita hash o nonce.
-- `index.html` incluye `<meta name="theme-color" content="#eceef4">`; el
-  script lo ajusta antes del primer frame y después el provider lo mantiene
-  sincronizado leyendo `--color-bg`.
+- Every `localStorage` access goes inside `try/catch`: in private mode or with
+  storage blocked it can throw.
+- If a CSP is added, this script needs a hash or a nonce.
+- `index.html` includes `<meta name="theme-color" content="#eceef4">`; the
+  script adjusts it before the first frame and afterwards the provider keeps it
+  in sync by reading `--color-bg`.
 
 ## `ThemeProvider`
 
@@ -67,41 +67,41 @@ type Theme = "light" | "dark";
 
 interface ThemeContextValue {
   theme: Theme;
-  setTheme: (theme: Theme) => void;   // guarda en storage; el efecto aplica data-theme y theme-color
+  setTheme: (theme: Theme) => void;   // stores it; the effect applies data-theme and theme-color
   toggleTheme: () => void;
 }
 ```
 
-- Estado inicial: leer `document.documentElement.dataset.theme` (ya resuelto
-  por el script), no volver a calcular.
-- `setTheme`: actualiza el estado y guarda en `localStorage` (try/catch).
-- **Un único efecto aplica el tema resuelto**, venga del toggle o de un cambio
-  de `prefers-color-scheme` sin preferencia guardada: fija `data-theme` en
-  `<html>` y actualiza `<meta name="theme-color">` con el valor de `--color-bg`
-  (leído con `getComputedStyle` después de aplicar `data-theme`). Así el meta
-  nunca queda desincronizado.
-- Hook `useTheme()` que lanza error si se usa fuera del provider.
+- Initial state: read `document.documentElement.dataset.theme` (already resolved
+  by the script), do not compute it again.
+- `setTheme`: updates the state and stores it in `localStorage` (try/catch).
+- **A single effect applies the resolved theme**, whether it comes from the toggle or from a
+  `prefers-color-scheme` change with no stored preference: it sets `data-theme` on
+  `<html>` and updates `<meta name="theme-color">` with the value of `--color-bg`
+  (read with `getComputedStyle` after applying `data-theme`). That way the meta
+  never drifts out of sync.
+- A `useTheme()` hook that throws if used outside the provider.
 
 ## `color-scheme`
 
-`tokens.css` fija `color-scheme: light | dark` según el tema, para que
-scrollbars, `<dialog>` y controles nativos acompañen.
+`tokens.css` sets `color-scheme: light | dark` according to the theme, so that
+scrollbars, `<dialog>` and native controls follow along.
 
-## Tests esperados (ThemeProvider)
+## Expected tests (ThemeProvider)
 
-- Toma el tema inicial de `data-theme`.
-- `toggleTheme` alterna `data-theme` y persiste en `localStorage`.
-- Si `localStorage` lanza, no rompe (el tema cambia igual en memoria).
-- Sin preferencia guardada, reacciona al cambio de `prefers-color-scheme`
-  (mock de `matchMedia`); con preferencia guardada, lo ignora.
-- `<meta name="theme-color">` se actualiza **tanto** con `toggleTheme` **como**
-  con un cambio de `prefers-color-scheme` sin preferencia guardada.
-- `useTheme` fuera del provider lanza un error descriptivo.
+- Takes the initial theme from `data-theme`.
+- `toggleTheme` switches `data-theme` and persists in `localStorage`.
+- If `localStorage` throws, it does not break (the theme still changes in memory).
+- With no stored preference, it reacts to a `prefers-color-scheme` change
+  (`matchMedia` mock); with a stored preference, it ignores it.
+- `<meta name="theme-color">` is updated **both** with `toggleTheme` **and**
+  with a `prefers-color-scheme` change with no stored preference.
+- `useTheme` outside the provider throws a descriptive error.
 
 ## QA
 
-Cada componente se revisa visualmente en **claro y oscuro**. Ojo: axe
-corre en jsdom, que no calcula estilos, así que **no verifica contraste de
-color** (solo roles, nombres, ARIA, estructura). El contraste queda cubierto
-por la tabla de `docs/tokens/contrast.md` + la regla de "solo tokens semánticos" +
-la revisión visual (o axe en navegador real, si el reviewer tiene uno).
+Each component is reviewed visually in **light and dark**. Note: axe
+runs in jsdom, which computes no styles, so it **does not verify color
+contrast** (only roles, names, ARIA, structure). Contrast is covered
+by the table in `docs/tokens/contrast.md` + the "semantic tokens only" rule +
+the visual review (or axe in a real browser, if the reviewer has one).

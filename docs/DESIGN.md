@@ -1,96 +1,96 @@
-# Design — principios y reglas
+# Design — principles and rules
 
-## Lenguaje visual
+## Visual language
 
-- **Cards flotando sobre un fondo tintado.** Todo el contenido vive en cards
-  blancas (claro) o grafito (oscuro) con radio generoso (20px), un borde
-  inferior grueso y sutil (5px `box-edge`) y una sombra larga y difusa.
-- **Acento escaso y con intención.** Nunca en fondos grandes. Se usa de
-  dos formas, y cada uso tiene **una sola** forma permitida:
-  - **Gradiente** (`--gradient-accent`, o `url(#accent-gradient)` en SVG):
-    barra bajo el `h1`, Button, íconos de IconBox y ServiceCard, comilla de
-    testimonios, bullet activo del carrusel, idioma activo del LanguageSwitcher.
-  - **Sólido** (`--color-accent` / `--color-accent-text`): punto del
-    Timeline, tab activo de NavTabs, texto y links de acento, hover de
-    controles y redes, anillo de foco.
-  - Claro: azul `#304cfd → #2640eb` (sólido `#304cfd`).
-  - Oscuro: dorado `#fadd7f → #f6c16f` (sólido `#fadd7f`).
-- **Tipografía liviana con títulos firmes.** Poppins 300 en el cuerpo,
-  600 en títulos, 500 en tabs, nombre e ítems de Timeline.
-- **Solapas en las esquinas.** La navegación es una pestaña (`CornerTab`)
-  pegada a la esquina superior derecha de su card: fondo apenas elevado,
-  borde fino y radio asimétrico (0 / 20 / 0 / 32). El "Show Contacts" del
-  Sidebar **no** es solapa: es un chevron dorado (`--color-accent-text`)
-  sin fondo, pegado a la esquina (Cambio F5 #104b — la solapa con fondo
-  solapaba el nombre a 375px; la identidad y la jerarquía tipográfica
-  quedan intactas).
-- **Tintes, no líneas.** Los bloques internos se separan por fondo
-  (`surface-muted`) antes que por bordes. Las líneas (Timeline, Separator)
-  son de 1px y decorativas.
+- **Cards floating on a tinted background.** All the content lives in cards,
+  white (light) or graphite (dark), with a generous radius (20px), a thick
+  and subtle bottom border (5px `box-edge`) and a long, diffuse shadow.
+- **Accent used sparingly and with intent.** Never on large backgrounds. It is used in
+  two ways, and each use has **a single** allowed form:
+  - **Gradient** (`--gradient-accent`, or `url(#accent-gradient)` in SVG):
+    bar under the `h1`, Button, icons of IconBox and ServiceCard, testimonial
+    quote, active bullet of the carousel, active language of the LanguageSwitcher.
+  - **Solid** (`--color-accent` / `--color-accent-text`): Timeline
+    dot, active tab of NavTabs, accent text and links, hover of
+    controls and social links, focus ring.
+  - Light: blue `#304cfd → #2640eb` (solid `#304cfd`).
+  - Dark: gold `#fadd7f → #f6c16f` (solid `#fadd7f`).
+- **Light typography with firm headings.** Poppins 300 in the body,
+  600 in headings, 500 in tabs, name and Timeline items.
+- **Tabs on the corners.** The navigation is a tab (`CornerTab`)
+  attached to the top right corner of its card: a barely raised background,
+  a thin border and an asymmetric radius (0 / 20 / 0 / 32). The Sidebar's "Show
+  Contacts" is **not** a tab: it is a gold chevron (`--color-accent-text`)
+  with no background, attached to the corner (F5 Change #104b — the tab with a
+  background overlapped the name at 375px; the identity and the typographic
+  hierarchy stay intact).
+- **Tints, not lines.** Inner blocks are separated by background
+  (`surface-muted`) rather than by borders. Lines (Timeline, Separator)
+  are 1px and decorative.
 
-## Reglas duras (el reviewer las verifica)
+## Hard rules (the reviewer verifies them)
 
-1. **Cero colores literales fuera de `tokens/tokens.css`.** Ni `#hex`, ni
-   `rgb()`, ni `hsl()`, ni nombres (`white`, `black`), ni en CSS ni en TSX.
-   Excepciones: las palabras clave `transparent` y `currentColor` (no son
-   colores de marca); los dos valores iniciales de `theme-color` en el script
-   anti-flash de `index.html` (corre antes de que cargue `tokens.css`; un test
-   verifica que sean iguales a `--palette-light-bg` / `--palette-dark-bg`); y
-   las imágenes de contenido en `public/` (placeholders), que no son estilos. La paleta clara para imprimir la fuerza `tokens.css`
-   en su bloque `@media print`; los componentes no la tocan.
-2. **Solo tokens semánticos en componentes** (`--color-*`, `--gradient-*`,
+1. **Zero color literals outside `tokens/tokens.css`.** No `#hex`, no
+   `rgb()`, no `hsl()`, no names (`white`, `black`), neither in CSS nor in TSX.
+   Exceptions: the keywords `transparent` and `currentColor` (they are not
+   brand colors); the two initial `theme-color` values in the anti-flash
+   script of `index.html` (it runs before `tokens.css` loads; a test
+   verifies they equal `--palette-light-bg` / `--palette-dark-bg`); and
+   the content images in `public/` (placeholders), which are not styles. The light palette for printing is forced by `tokens.css`
+   in its `@media print` block; components do not touch it.
+2. **Only semantic tokens in components** (`--color-*`, `--gradient-*`,
    `--shadow-*`, `--filter-*`, `--space-*`, `--radius-*`, `--size-*`,
-   `--font-*`, `--duration-*`, `--ease-*`, `--z-*`, `--focus-*` y las medidas
-   internas de componentes). Las `--palette-*` no se usan fuera de
-   `tokens.css`. `z-index` siempre con un token `--z-*` (también el negativo:
+   `--font-*`, `--duration-*`, `--ease-*`, `--z-*`, `--focus-*` and the
+   components' internal measures). `--palette-*` tokens are not used outside
+   `tokens.css`. `z-index` always with a `--z-*` token (the negative one too:
    `--z-below`).
-3. **Solo CSS Modules.** Nada de styled-components, CSS-in-JS, Tailwind,
-   `style={{…}}` para estilos estáticos (sí para valores dinámicos
-   imposibles en CSS, justificado en un comentario). El único CSS global
-   permitido es `src/styles/global.css`, con exactamente: reset,
-   base tipográfica (`foundations/typography.md`), estilos de impresión
-   compartidos y el bloqueo de scroll del dialog
+3. **CSS Modules only.** No styled-components, CSS-in-JS, Tailwind, or
+   `style={{…}}` for static styles (allowed for dynamic values that are
+   impossible in CSS, justified in a comment). The only global CSS
+   allowed is `src/styles/global.css`, with exactly: reset,
+   typographic base (`foundations/typography.md`), shared print
+   styles and the dialog's scroll lock
    (`html:has(dialog[open]) { overflow: hidden; }`).
-4. **Mobile-first** con los 4 breakpoints de `docs/tokens/breakpoints.md`.
-5. **Contraste AA** en ambos temas: solo pares de `docs/tokens/contrast.md`.
-   Texto sobre acento → `--color-on-accent`.
-6. **Contenido como datos.** Ningún texto de CV en componentes: el
-   contenido vive en `src/content/cv.{en,es}.json` (formato definido por
-   `data/cv.schema.json`). Ningún texto de interfaz hardcodeado (todo por
+4. **Mobile-first** with the 4 breakpoints of `docs/tokens/breakpoints.md`.
+5. **AA contrast** in both themes: only pairs from `docs/tokens/contrast.md`.
+   Text on accent → `--color-on-accent`.
+6. **Content as data.** No CV text in components: the
+   content lives in `src/content/cv.{en,es}.json` (format defined by
+   `data/cv.schema.json`). No hardcoded interface text (everything through
    `ui.{en,es}.ts`).
-7. **Accesibilidad no negociable**: roles y nombres correctos, teclado
-   completo, foco visible, sin violaciones de axe (`expectNoA11yViolations`) en cada componente.
-   El anillo de foco es siempre el mismo:
+7. **Accessibility is non-negotiable**: correct roles and names, full
+   keyboard, visible focus, no axe violations (`expectNoA11yViolations`) in every component.
+   The focus ring is always the same:
    `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);`
-   (solo `:focus-visible`).
-8. **Sin dependencias nuevas** fuera de las aprobadas (ver README).
+   (`:focus-visible` only).
+8. **No new dependencies** outside the approved ones (see README).
 
 ## Do / Don't
 
-| ✅ Hacer | ❌ No hacer |
+| ✅ Do | ❌ Don't |
 |---|---|
-| `color: var(--color-accent-text)` para texto de acento | `color: var(--color-accent)` para texto (en el futuro pueden diferir) |
-| `color: var(--color-on-accent)` sobre el gradiente | `color: #fff` sobre el gradiente (en oscuro no se lee) |
-| Chips sobre `surface` | Chips dentro de `Box variant="inner"` (mismo fondo) |
-| `CornerTab` con borde 1px | CornerTab sin borde o con sombra |
-| `h3` con estilo de h4 en Timeline | `h5` en Timeline (rompe la jerarquía) |
-| `<dialog>` nativo | Librerías de modal |
+| `color: var(--color-accent-text)` for accent text | `color: var(--color-accent)` for text (they may differ in the future) |
+| `color: var(--color-on-accent)` on the gradient | `color: #fff` on the gradient (unreadable in dark) |
+| Chips on `surface` | Chips inside `Box variant="inner"` (same background) |
+| `CornerTab` with a 1px border | CornerTab with no border or with a shadow |
+| `h3` styled as h4 in Timeline | `h5` in Timeline (breaks the hierarchy) |
+| Native `<dialog>` | Modal libraries |
 | scroll-snap + bullets | Swiper / autoplay |
-| Transiciones de propiedades concretas | `transition: all` |
-| Ícono informativo con `label` | Ícono como único contenido de un botón sin `aria-label` |
-| `gap` del padre para espaciar | `margin` externo en componentes |
+| Transitions on concrete properties | `transition: all` |
+| Informative icon with `label` | Icon as the only content of a button with no `aria-label` |
+| `gap` on the parent for spacing | outer `margin` on components |
 
-## Procedencia
+## Provenance
 
-Tokens, medidas y patrones de layout se extrajeron del tema comercial
-"vCard 2" (claro y oscuro) y de capturas de referencia para la navegación.
-**No se copió código ni assets del tema**: todo el CSS y los SVG se escriben
-desde cero a partir de estas specs. No incluir imágenes, logos ni avatares de
-la demo del tema.
+Tokens, measures and layout patterns were extracted from the commercial theme
+"vCard 2" (light and dark) and from reference captures for the navigation.
+**No code or assets were copied from the theme**: all the CSS and the SVGs are written
+from scratch from these specs. Do not include images, logos or avatars from
+the theme's demo.
 
-## Fuera de alcance (decisiones cerradas)
+## Out of scope (closed decisions)
 
-Portfolio, Blog, página Contact (formulario), skills con porcentaje/barras,
-agrupación de skills, carrusel de clientes, preloader, fondo de triángulos,
-fecha en testimonios, menú hamburguesa/drawer. Reabrir cualquiera es un
-cambio de alcance que decide el usuario.
+Portfolio, Blog, Contact page (form), skills with percentage/bars,
+skill grouping, clients carousel, preloader, triangles background,
+date in testimonials, hamburger menu/drawer. Reopening any of them is a
+scope change the user decides.

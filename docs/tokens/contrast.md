@@ -1,85 +1,85 @@
-# Contraste (WCAG 2.2)
+# Contrast (WCAG 2.2)
 
-Umbrales: **AA texto normal ≥ 4.5:1**, AA texto grande (≥ 24px, o ≥ 18.66px en negrita) ≥ 3:1,
-componentes de UI y gráficos que transmiten información ≥ 3:1.
+Thresholds: **AA normal text ≥ 4.5:1**, AA large text (≥ 24px, or ≥ 18.66px in bold) ≥ 3:1,
+UI components and graphics that convey information ≥ 3:1.
 
-Valores calculados con la fórmula de luminancia relativa de WCAG sobre los
-tokens de `tokens.css`.
+Values computed with WCAG's relative luminance formula on the
+tokens of `tokens.css`.
 
-## Texto sobre superficies
+## Text on surfaces
 
-| Texto → / Fondo ↓ | `bg` | `surface` | `surface-muted` | `surface-raised` |
+| Text → / Background ↓ | `bg` | `surface` | `surface-muted` | `surface-raised` |
 |---|---|---|---|---|
-| **Claro** `heading` / `text` `#3b4b5e` | 7.69 ✅ | 8.92 ✅ | 8.31 ✅ | 8.31 ✅ |
-| **Claro** `text-muted` `#637085` | **4.32 ⚠️** | 5.02 ✅ | 4.67 ✅ | 4.67 ✅ |
-| **Claro** `accent-text` `#304cfd` | 5.06 ✅ | 5.87 ✅ | 5.47 ✅ | 5.47 ✅ |
-| **Oscuro** `heading` `#ffffff` | 18.24 ✅ | 16.11 ✅ | 17.38 ✅ | 14.17 ✅ |
-| **Oscuro** `text` `#e8e8e8` | 14.88 ✅ | 13.15 ✅ | 14.18 ✅ | 11.57 ✅ |
-| **Oscuro** `text-muted` `#9e9e9e` | 6.81 ✅ | 6.01 ✅ | 6.49 ✅ | 5.29 ✅ |
-| **Oscuro** `accent-text` `#fadd7f` | 13.65 ✅ | 12.06 ✅ | 13.00 ✅ | 10.60 ✅ |
+| **Light** `heading` / `text` `#3b4b5e` | 7.69 ✅ | 8.92 ✅ | 8.31 ✅ | 8.31 ✅ |
+| **Light** `text-muted` `#637085` | **4.32 ⚠️** | 5.02 ✅ | 4.67 ✅ | 4.67 ✅ |
+| **Light** `accent-text` `#304cfd` | 5.06 ✅ | 5.87 ✅ | 5.47 ✅ | 5.47 ✅ |
+| **Dark** `heading` `#ffffff` | 18.24 ✅ | 16.11 ✅ | 17.38 ✅ | 14.17 ✅ |
+| **Dark** `text` `#e8e8e8` | 14.88 ✅ | 13.15 ✅ | 14.18 ✅ | 11.57 ✅ |
+| **Dark** `text-muted` `#9e9e9e` | 6.81 ✅ | 6.01 ✅ | 6.49 ✅ | 5.29 ✅ |
+| **Dark** `accent-text` `#fadd7f` | 13.65 ✅ | 12.06 ✅ | 13.00 ✅ | 10.60 ✅ |
 
-### Pares derivados (opacidad)
+### Derived pairs (opacity)
 
-| Uso | Par | Contraste |
+| Use | Pair | Contrast |
 |---|---|---|
-| Tab inactivo de NavTabs (`--color-text` al 80% de opacidad) | claro sobre `surface-raised` | 4.92 ✅ |
-| Tab inactivo de NavTabs (`--color-text` al 80% de opacidad) | oscuro sobre `surface-raised` | 7.96 ✅ |
-| Button en hover (elemento completo al 90%, sobre `surface`) | claro: `on-accent` sobre inicio / fin del gradiente | 4.92 ✅ / 5.75 ✅ |
-| Button en hover (elemento completo al 90%, sobre `surface`) | oscuro: `on-accent` sobre inicio / fin del gradiente | 11.19 ✅ / 9.20 ✅ |
-| Button deshabilitado (50%) | ambos temas | **Exento**: WCAG 1.4.3 no exige contraste a componentes inactivos. El estado deshabilitado debe comunicarse también por `disabled` (nativo) y `cursor: not-allowed` |
+| Inactive NavTabs tab (`--color-text` at 80% opacity) | light on `surface-raised` | 4.92 ✅ |
+| Inactive NavTabs tab (`--color-text` at 80% opacity) | dark on `surface-raised` | 7.96 ✅ |
+| Button on hover (whole element at 90%, on `surface`) | light: `on-accent` on the start / end of the gradient | 4.92 ✅ / 5.75 ✅ |
+| Button on hover (whole element at 90%, on `surface`) | dark: `on-accent` on the start / end of the gradient | 11.19 ✅ / 9.20 ✅ |
+| Disabled Button (50%) | both themes | **Exempt**: WCAG 1.4.3 does not require contrast for inactive components. The disabled state must also be conveyed by `disabled` (native) and `cursor: not-allowed` |
 
-Cualquier otro uso de `opacity` sobre texto o íconos informativos debe
-agregar su fila acá con el valor calculado.
+Any other use of `opacity` on informative text or icons must
+add its row here with the computed value.
 
-### Íconos informativos (WCAG 1.4.11, mínimo 3:1)
+### Informative icons (WCAG 1.4.11, minimum 3:1)
 
-| Uso | Claro | Oscuro |
+| Use | Light | Dark |
 |---|---|---|
-| Íconos de redes sociales del Sidebar (`--color-text-muted` sobre `surface`) | 5.02 ✅ | 6.01 ✅ |
-| Íconos de redes en hover/foco (`--color-accent-text` sobre `surface`) | 5.87 ✅ | 12.06 ✅ |
+| Sidebar social icons (`--color-text-muted` on `surface`) | 5.02 ✅ | 6.01 ✅ |
+| Social icons on hover/focus (`--color-accent-text` on `surface`) | 5.87 ✅ | 12.06 ✅ |
 
-## Texto sobre acento
+## Text on accent
 
-| Par | Contraste |
+| Pair | Contrast |
 |---|---|
-| Claro: `on-accent` `#fff` sobre `#304cfd` (inicio del gradiente) | 5.87 ✅ |
-| Claro: `on-accent` `#fff` sobre `#2640eb` (fin del gradiente) | 6.96 ✅ |
-| Oscuro: `on-accent` `#151517` sobre `#fadd7f` | 13.65 ✅ |
-| Oscuro: `on-accent` `#151517` sobre `#f6c16f` | 11.09 ✅ |
-| Oscuro: **blanco** sobre `#fadd7f` (prohibido) | 1.34 ❌ |
+| Light: `on-accent` `#fff` on `#304cfd` (start of the gradient) | 5.87 ✅ |
+| Light: `on-accent` `#fff` on `#2640eb` (end of the gradient) | 6.96 ✅ |
+| Dark: `on-accent` `#151517` on `#fadd7f` | 13.65 ✅ |
+| Dark: `on-accent` `#151517` on `#f6c16f` | 11.09 ✅ |
+| Dark: **white** on `#fadd7f` (forbidden) | 1.34 ❌ |
 
-## Líneas y decoración
+## Lines and decoration
 
-| Par | Contraste | Uso permitido |
+| Pair | Contrast | Allowed use |
 |---|---|---|
-| Claro: `track`/`border` `#e3e5e8` sobre `surface` | 1.26 | Solo decorativo |
-| Oscuro: `track`/`border` `#2f2f30` sobre `surface` | 1.20 | Solo decorativo |
-| Oscuro: `surface-raised` sobre `surface` | 1.14 | Solo con borde de 1px `--color-border` |
-| Punto del Timeline (`accent`) sobre `surface` | 5.87 claro / 12.06 oscuro | ✅ |
+| Light: `track`/`border` `#e3e5e8` on `surface` | 1.26 | Decorative only |
+| Dark: `track`/`border` `#2f2f30` on `surface` | 1.20 | Decorative only |
+| Dark: `surface-raised` on `surface` | 1.14 | Only with a 1px `--color-border` border |
+| Timeline dot (`accent`) on `surface` | 5.87 light / 12.06 dark | ✅ |
 
-## Reglas que se derivan
+## Rules that follow
 
-1. **`--color-text-muted` nunca va directo sobre `--color-bg`** en claro (4.32:1).
-   Todo lo que está sobre el fondo de página (ControlsBar) usa `--color-text`.
-2. **Texto sobre `--gradient-accent` o `--color-accent` siempre usa `--color-on-accent`**,
-   nunca blanco fijo: en oscuro el acento es dorado y el blanco no se lee.
-3. **`--color-track` y `--color-border` son decorativos.** Ningún estado
-   (activo, seleccionado, error) puede comunicarse solo con ellos. Los bullets
-   del carrusel indican el activo por **tamaño** (10px → 20px) además del color.
-4. **`--color-surface-raised` siempre lleva borde de 1px** (`--color-border`);
-   sin él la CornerTab no se distingue de la card en oscuro.
-5. Anillo de foco: siempre
+1. **`--color-text-muted` never goes directly on `--color-bg`** in light (4.32:1).
+   Everything that sits on the page background (ControlsBar) uses `--color-text`.
+2. **Text on `--gradient-accent` or `--color-accent` always uses `--color-on-accent`**,
+   never a fixed white: in dark the accent is gold and white is unreadable.
+3. **`--color-track` and `--color-border` are decorative.** No state
+   (active, selected, error) may be conveyed with them alone. The carousel
+   bullets mark the active one by **size** (10px → 20px) as well as color.
+4. **`--color-surface-raised` always carries a 1px border** (`--color-border`);
+   without it the CornerTab cannot be told apart from the card in dark.
+5. Focus ring: always
    `outline: var(--focus-ring-width) solid var(--color-focus-ring); outline-offset: var(--focus-ring-offset);`
-   (2px / 2px). El color es el acento sólido: contra `surface` da 5.87:1 en claro y
-   12.06:1 en oscuro (mínimo exigido para indicadores de foco: 3:1).
-6. Íconos con gradiente (`IconBox`, comilla de testimonio) son decorativos y
-   siempre van acompañados de texto; si un ícono es el único contenido de un
-   control, el control lleva `aria-label`.
+   (2px / 2px). The color is the solid accent: against `surface` it gives 5.87:1 in light and
+   12.06:1 in dark (minimum required for focus indicators: 3:1).
+6. Icons with a gradient (`IconBox`, testimonial quote) are decorative and
+   always come with text; if an icon is the only content of a
+   control, the control carries `aria-label`.
 
-## Verificación
+## Verification
 
-axe (`expectNoA11yViolations`) corre en jsdom y **no mide contraste** (jsdom no calcula
-estilos). El contraste se garantiza por diseño: los componentes solo usan
-los pares de esta tabla. En QA visual el reviewer revisa esos pares en ambos
-temas (y corre axe en un navegador real si lo tiene disponible). Si se agrega un
-token de color nuevo, **se agrega su fila acá** con el valor calculado.
+axe (`expectNoA11yViolations`) runs in jsdom and **does not measure contrast** (jsdom computes no
+styles). Contrast is guaranteed by design: components only use
+the pairs of this table. In visual QA the reviewer checks those pairs in both
+themes (and runs axe in a real browser if one is available). If a new color
+token is added, **its row is added here** with the computed value.

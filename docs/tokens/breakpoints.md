@@ -1,25 +1,25 @@
 # Breakpoints
 
-Mobile-first. Los estilos base son para el viewport más chico y cada `@media`
-**agrega** hacia arriba con `min-width`. No se usa `max-width` salvo en
-`@media print` o para casos documentados en la spec de un componente.
+Mobile-first. Base styles are for the smallest viewport and each `@media`
+**adds** upwards with `min-width`. `max-width` is not used except in
+`@media print` or for cases documented in a component's spec.
 
-| Nombre | Query | Viewport típico | Qué cambia (resumen) |
+| Name | Query | Typical viewport | What changes (summary) |
 |---|---|---|---|
-| base | — | < 580px (teléfonos) | Una columna, tipografía mobile, `--box-padding` 0.9375rem |
-| `sm` | `(min-width: 580px)` | teléfonos grandes | Tipografía desktop, `--box-padding` 1.5rem |
-| `md` | `(min-width: 768px)` | tablet vertical | `--box-padding` 1.875rem, 2 testimonios por vista, contactos del sidebar en 2 columnas |
-| `lg` | `(min-width: 992px)` | tablet horizontal / laptop chica | NavTabs tamaño completo con el `h1` en la misma franja, ServiceCards en 2 columnas |
-| `xl` | `(min-width: 1200px)` | desktop | Sidebar vertical fijo a la izquierda (3/12), contenido 9/12, avatar sobresale, contactos siempre visibles, `--gutter-top` 10rem |
+| base | — | < 580px (phones) | One column, mobile typography, `--box-padding` 0.9375rem |
+| `sm` | `(min-width: 580px)` | large phones | Desktop typography, `--box-padding` 1.5rem |
+| `md` | `(min-width: 768px)` | portrait tablet | `--box-padding` 1.875rem, 2 testimonials per view, sidebar contacts in 2 columns |
+| `lg` | `(min-width: 992px)` | landscape tablet / small laptop | Full-size NavTabs with the `h1` on the same strip, ServiceCards in 2 columns |
+| `xl` | `(min-width: 1200px)` | desktop | Vertical Sidebar fixed on the left (3/12), content 9/12, avatar sticks out, contacts always visible, `--gutter-top` 10rem |
 
-## Reglas
+## Rules
 
-- **Excepción única de altura:** `(min-height: 900px)`, combinada con
-  `(min-width: 1200px)`, y solo para activar el sticky del Sidebar en
-  AppLayout (ver `foundations/layout.md`). Ningún otro componente usa media
-  queries de altura.
-- **Solo estos cuatro valores** de ancho pueden aparecer en `@media`. Los `@media` no
-  aceptan custom properties, así que se escriben literales:
+- **The only height exception:** `(min-height: 900px)`, combined with
+  `(min-width: 1200px)`, and only to enable the Sidebar's sticky in
+  AppLayout (see `foundations/layout.md`). No other component uses height
+  media queries.
+- **Only these four width values** may appear in `@media`. Media queries do
+  not accept custom properties, so they are written as literals:
 
   ```css
   .grid { display: grid; gap: var(--stack-gap); }
@@ -29,31 +29,31 @@ Mobile-first. Los estilos base son para el viewport más chico y cada `@media`
   }
   ```
 
-- **Toda medida que cambia por breakpoint es un token.** Tipografía,
-  paddings, alturas, gaps, radios y offsets que varían con el viewport viven
-  en `tokens.css` (sección "Medidas internas de componentes"), con su escala
-  en los `@media` de ese archivo.
-- Un componente **solo** agrega `@media` para cambios de *layout*
-  (dirección, columnas, orden, visibilidad, `position`/`float`). Dentro de
-  ese `@media`, cualquier medida que acompañe al cambio de layout solo puede
-  ser un **token**, un **`calc()` de tokens** o **`0`** (p. ej. los márgenes
-  negativos de `CornerTab placement="float"` o el `padding-top: 0` del panel).
-  **Nunca** un literal nuevo: si hace falta, se agrega un token (y se
-  documenta en la spec).
-- Las medidas **fijas** (que no cambian por breakpoint) pueden ser literales
-  en el CSS del componente si su spec las define; si se repiten en más de un
-  componente, pasan a token.
-- `prefers-reduced-motion` y `print` también son `@media` válidos.
-- En tests (jsdom) no hay layout real: el comportamiento responsive se
-  verifica en la fase de QA visual (375 / 768 / 1024 / 1440), no en unit tests.
-  Los componentes **no** deben ramificar lógica en JS según el ancho, salvo
-  que la spec lo pida explícitamente.
+- **Every measure that changes by breakpoint is a token.** Typography,
+  paddings, heights, gaps, radii and offsets that vary with the viewport live
+  in `tokens.css` (section "Component internal measures"), with their scale
+  in that file's `@media` blocks.
+- A component **only** adds `@media` for *layout* changes
+  (direction, columns, order, visibility, `position`/`float`). Inside
+  that `@media`, any measure that goes with the layout change may only
+  be a **token**, a **`calc()` of tokens** or **`0`** (e.g. the negative
+  margins of `CornerTab placement="float"` or the panel's `padding-top: 0`).
+  **Never** a new literal: if one is needed, a token is added (and
+  documented in the spec).
+- **Fixed** measures (that do not change by breakpoint) may be literals
+  in the component's CSS if its spec defines them; if they repeat in more than one
+  component, they become a token.
+- `prefers-reduced-motion` and `print` are valid `@media` too.
+- In tests (jsdom) there is no real layout: responsive behavior is
+  verified in the visual QA phase (375 / 768 / 1024 / 1440), not in unit tests.
+  Components must **not** branch logic in JS by width, unless
+  the spec explicitly asks for it.
 
-## Correspondencia con el tema de referencia
+## Mapping to the reference theme
 
-El tema original es desktop-first (`max-width`). La traducción es:
+The original theme is desktop-first (`max-width`). The translation is:
 
-| Tema (max-width) | Kit (min-width) |
+| Theme (max-width) | Kit (min-width) |
 |---|---|
 | `≤ 580px` | base (< 580) |
 | `≤ 767/768px` | < `md` |
