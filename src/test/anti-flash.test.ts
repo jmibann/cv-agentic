@@ -157,7 +157,7 @@ describe("index.html anti-flash (RF-1)", () => {
       "<head>…</head>",
     );
     expect(head).toMatch(
-      /<title>Juan Manuel Ibáñez · Frontend Engineer<\/title>/,
+      /<title>Juan Manuel Ibañez · Frontend Engineer<\/title>/,
     );
     expect(head).toMatch(
       /<link rel="apple-touch-icon" href="\/apple-touch-icon\.png" \/>/,
@@ -257,7 +257,7 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
   const SHARING_TAGS: ReadonlyArray<string> = [
     '<meta name="description" content="Frontend Engineer with 7+ years in React and TypeScript: design systems, accessibility and AI-assisted development." />',
     '<meta property="og:type" content="profile" />',
-    '<meta property="og:title" content="Juan Manuel Ibáñez · Frontend Engineer" />',
+    '<meta property="og:title" content="Juan Manuel Ibañez · Frontend Engineer" />',
     '<meta property="og:description" content="React · TypeScript · Design Systems · Accessibility" />',
     '<meta property="og:url" content="https://jmibann.github.io/cv-agentic/" />',
     '<meta property="og:image" content="https://jmibann.github.io/cv-agentic/og-image.png" />',
@@ -319,7 +319,7 @@ describe("index.html sharing metadata (RF-11…RF-14, #117)", () => {
     expect(jsonLd).toEqual({
       "@context": "https://schema.org",
       "@type": "Person",
-      name: "Juan Manuel Ibáñez",
+      name: "Juan Manuel Ibañez",
       jobTitle: "Frontend Engineer",
       url: "https://jmibann.github.io/cv-agentic/",
       sameAs: [
