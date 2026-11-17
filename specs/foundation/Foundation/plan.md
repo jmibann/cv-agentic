@@ -308,3 +308,58 @@ Historical records and the root `README.md` are not touched.
   `npm run validate:content`, `npm run build` (closing of the piece, #80) and the
   visual check of the image (reads `public/og-image.png` and compares it with the
   pre-Change version in git).
+
+# Plan of Change 2026-11-17-2 — English policy beyond `src/` comments
+
+Audit finding F1 (approved by the user): the #121 rule was not fully enforced outside
+`src/`. Three verified leaks: Spanish comments with internal references in
+`tsconfig.json`; the Spanish `message` of the `no-restricted-syntax` rule in
+`eslint.config.js` (L53); the Spanish comments inside the `DECLARATIONS` template of
+`src/scripts/build-validator.ts` (L59–60, L67–68), which are emitted into
+`data/validate-cv.generated.d.ts` (L2–3, L10–11). The guard missed them because it
+scans only comments, only in its `ROOTS`, and `tsconfig.json` is not in `ROOTS`.
+
+## Files of the Change (grouped by task)
+
+| Task | Files | Responsibility | Owner |
+|---|---|---|---|
+| T25 | `src/test/comments.test.ts` · `tsconfig.json` · `eslint.config.js` · `src/scripts/build-validator.ts` · `data/validate-cv.generated.d.ts` | L1/L2 (#121): the guard extended (tsconfig in `ROOTS`; string-literal check for the two tooling files) — red; the three translations + regeneration of the `d.ts` by the script — green | `foundation` |
+
+## Decisions of the Change (with the discarded alternative)
+
+1. **String check via the TS AST, scoped to the two named files** (`StringLiteral`,
+   `NoSubstitutionTemplateLiteral` and template literal spans): it catches exactly the
+   ESLint `message` and the emitted `DECLARATIONS` text. *Discarded:* a whole-file
+   regex (false positives on the selector regex and import paths); repo-wide string
+   scanning (would flag the sanctioned Spanish of `src/i18n/ui.es.ts` and the guard's
+   own patterns); adding the generated `d.ts` to `ROOTS` (generated files are
+   regenerated, not policed — the fix belongs in the emitting template).
+2. **`tsconfig.json` enters `ROOTS` as a file path** (like `data/constants.ts`,
+   bypassing the extension filter); parsed with the TS parser as JSONC-tolerant
+   trivia. Its red-listing is a **stop condition** (Done when check 1): if the parser
+   does not surface the comments, the guard does not cover the file and the user
+   decides the alternative (JSONC-aware extraction) instead of a fake-green guard.
+3. **Both Spanish tests must list tsconfig in the red output**: the Spanish test
+   (the comments) and the internal-references test (`(decisión #63)` matches
+   `decisi[oó]n\s+#?\d+`).
+4. **Regeneration, not hand-edit** (`npm run build:validator`): byte-identity of
+   `data/validate-cv.generated.js` is a **stop-and-report condition** (Done when
+   check 2) — only the `d.ts` may change.
+5. **Translations keep the why and lose the references**: the tsconfig comments
+   (single-config rationale, TS-6 default-change note, `skipLibCheck` reason), the
+   ESLint message (pointer to `docs/DESIGN.md` hard rule 1 stays, in English) and the
+   emitted `DECLARATIONS` comments. The L142 whitelist is not touched.
+
+## Execution and coverage
+
+- Order: a single task **T25**; no other task depends on it.
+- Coverage: L1/L2 of the constitution as enforced by the guard (T22/T23 lineage);
+  no RF changes (the guard cites the rules, not the RFs).
+- Code commits: `test(Foundation): T25` (red; explicit `git add` of the test file) →
+  `feat(Foundation): T25` (`tsconfig.json` + `eslint.config.js` +
+  `src/scripts/build-validator.ts` + the regenerated `data/validate-cv.generated.d.ts`
+  — the `feat` does not touch tests).
+- The reviewer: per task — the red output lists all expected offenders and nothing
+  else; after the `feat`, the guard is green, `git diff` of the `d.ts` shows only the
+  comment lines, `data/validate-cv.generated.js` unchanged, and lint/typecheck/test/
+  `validate:content` green; `npm run build` at closing.
