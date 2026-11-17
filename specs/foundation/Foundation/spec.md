@@ -1,5 +1,5 @@
 # Foundation
-Status: implemented
+Status: approved
 
 *Note on Change #117 (2026-11-14): SEO and sharing metadata in
 `index.html` (RF-11…RF-14) — **closed**: T19 approved by the reviewer and by
@@ -20,6 +20,19 @@ records keep `Ibáñez`; in documents the new spelling goes **only inside
 backticks, quotes or a code block** (its `ñ` trips the documentation guard).
 Reviewer APPROVED (task + full review: 487/42, build ✓, `dist/` inspected); the
 user closed the gate 2026-11-17 and the `Status` returned to `implemented`.*
+
+*Note on Change 2026-11-17-2 (open): audit finding F1 — the #121 English policy was
+incompletely enforced outside `src/`: `tsconfig.json` carries Spanish comments with
+internal references, the `no-restricted-syntax` message in `eslint.config.js` is in
+Spanish, and the `DECLARATIONS` template of `src/scripts/build-validator.ts` emits
+Spanish comments into `data/validate-cv.generated.d.ts`. The guard missed them because
+it scans only comments and only its `ROOTS` list. One task closes it: **T25** —
+`test(Foundation): T25` extends the guard (adds `tsconfig.json` to `ROOTS`; checks the
+**string literals** of `eslint.config.js` and `src/scripts/build-validator.ts` against
+the Spanish pattern; the L142 name whitelist is not touched) — red;
+`feat(Foundation): T25` translates the three spots (why-only, no internal references)
+and regenerates the `d.ts` with `npm run build:validator` (never by hand). The `Status`
+returns to `implemented` when T25 closes.*
 
 Piece of F1 (decision #84): it leaves the app ready for F2–F4 to build
 components with TDD. The scope is derived **only** from
@@ -151,10 +164,12 @@ vite.config.ts              ← react plugin + resolve.alias @data/*
 tsconfig.json               ← a single one; strict, noUnusedLocals, noUnusedParameters,
                               noUncheckedIndexedAccess, moduleResolution "bundler",
                               resolveJsonModule, paths @data/*, types ["vite/client","node"];
-                              includes src/, data/ and vite.config.ts; no baseUrl
+                              includes src/, data/ and vite.config.ts; no baseUrl;
+                              its comments in English (#121; scanned by the guard from T25)
 eslint.config.js            ← flat: typescript-eslint (strict), react-hooks,
                               react-refresh; --max-warnings 0; no-restricted-syntax
-                              that forbids #[0-9a-fA-F]{3,8}\b|rgb(|hsl( in .tsx
+                              that forbids #[0-9a-fA-F]{3,8}\b|rgb(|hsl( in .tsx;
+                              its `message` in English (#121, T25)
 public/images/              ← avatar.webp (the site's real photo; WebP 512×512 with alpha, #119), testimonials/{magrael,
                               jptigani,dharari}.jpg (real photos of the testimonials, #112) and
                               testimonials/{maria,john,lena}.svg (neutral silhouette, no text
@@ -208,6 +223,7 @@ src/test/a11y.ts            ← expectNoA11yViolations on top of axe-core
                               (disables color-contrast and region; see foundation.md 5b)
 data/cv.types.generated.ts       ← gen:types   ┐ GENERATED — do not edit,
 data/validate-cv.generated.{js,d.ts} ← build:validator ┘ committed, "GENERATED" header (#121)
+                              ; the comments the d.ts emits are in English (#121, T25)
 ```
 
 ## API
@@ -445,6 +461,16 @@ Source: `foundations/theming.md`, `foundations/i18n.md`,
   `typecheck` covers `src/`, `data/` and `vite.config.ts`. The ESLint
   anti-color rule in `.tsx` stays in the config (Anatomy) and the
   reviewer verifies it with grep, with no test of its own.
+
+**English-policy guard (`src/test/comments.test.ts`, L1/L2 #121; extended by T25):**
+- comments in `ROOTS` (`src`, `tokens`, `data/constants.ts`, `vite.config.ts`,
+  `eslint.config.js`, `index.html` and, from T25, `tsconfig.json`) fail if Spanish or
+  with internal references;
+- from T25, the **string literals** (including template-literal text) of
+  `eslint.config.js` and `src/scripts/build-validator.ts` fail if Spanish — the ESLint
+  rule `message` and the comments emitted into the generated `d.ts` are user/tool
+  facing text, not prose, and are code by #121;
+- the names whitelist (L142) and the documentation-prose policy are unchanged.
 
 **When closing the piece (not per task, decision #80):** a green `npm run build`.
 **Visual verification (done by the reviewer with the app served by the user,
