@@ -2,7 +2,7 @@
   "$schema": "../../data/cv.schema.json",
   "locale": "en",
   "profile": {
-    "name": "Juan Manuel Ibáñez",
+    "name": "Juan Manuel Ibañez",
     "headline": "Frontend Engineer",
     "avatar": {
       "src": "/images/avatar.webp"
@@ -224,7 +224,7 @@
       "avatar": {
         "src": "/images/testimonials/jptigani.jpg"
       },
-      "text": "Ibáñez was an outstanding MBA student. His ability to absorb knowledge and his mental flexibility make him a potential executive at the highest levels of the organizational pyramid. He is young, and his adaptability and training set him on a very promising path."
+      "text": "Ibañez was an outstanding MBA student. His ability to absorb knowledge and his mental flexibility make him a potential executive at the highest levels of the organizational pyramid. He is young, and his adaptability and training set him on a very promising path."
     },
     {
       "id": "t-diego-harari",

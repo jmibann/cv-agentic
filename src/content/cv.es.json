@@ -2,7 +2,7 @@
   "$schema": "../../data/cv.schema.json",
   "locale": "es",
   "profile": {
-    "name": "Juan Manuel Ibáñez",
+    "name": "Juan Manuel Ibañez",
     "headline": "Frontend Engineer",
     "avatar": {
       "src": "/images/avatar.webp"
