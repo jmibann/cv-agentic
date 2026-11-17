@@ -1,10 +1,23 @@
 # Foundation
-Status: implemented
+Status: approved
 
 *Note on Change #117 (2026-11-14): SEO and sharing metadata in
 `index.html` (RF-11…RF-14) — **closed**: T19 approved by the reviewer and by
 the user (tests `0025a21` + feat `f17cd78`; QA on `dist/` ✓). The
 `Status` went back to `implemented`.*
+
+*Note on Change 2026-11-17 (open): the user's request — the accent comes off the
+surname, `Ibáñez` → `Ibañez`, in the `<title>`, `og:title` and JSON-LD `name` of
+`index.html`, in `profile.name` of `src/content/cv.{en,es}.json`, in the
+testimonial quote of `cv.en.json` and in `public/og-image.png` (regenerated from
+the current PNG differing **only** in the surname; 1200×630 kept). One task
+closes it: **T24**, `foundation`, no red between tasks: `test(Foundation): T24`
+changes the three literals of `anti-flash.test.ts` (red) and `feat(Foundation): T24`
+carries `index.html` + both content files + the new PNG; the reviewer runs
+`validate:content` and checks the image visually. Historical records keep
+`Ibáñez`; in documents the new spelling goes **only inside backticks, quotes or a
+code block** (its `ñ` trips the documentation guard). The `Status` returns to
+`implemented` when T24 closes.*
 
 Piece of F1 (decision #84): it leaves the app ready for F2–F4 to build
 components with TDD. The scope is derived **only** from
@@ -101,7 +114,7 @@ Structure F1 creates at the root (it is not a visual component):
 package.json · package-lock.json · .nvmrc (26, #110) · .gitignore
 index.html                  ← `<html lang="en">` + meta theme-color #eceef4
                               + inline anti-flash script in <head> (foundations/theming.md, verbatim)
-                              + `<title>Juan Manuel Ibáñez · Frontend Engineer</title>` (name and role, not the repo's; #115)
+                              + `<title>Juan Manuel Ibañez · Frontend Engineer</title>` (name and role, not the repo's; #115; accent removed by the user's Change 2026-11-17)
                               + `<link rel="icon" type="image/svg+xml" href="/favicon.svg">` (F5 Change 2026-10-08, finding D4: the browser requested /favicon.ico → 404)
                               + `<link rel="apple-touch-icon" href="/apple-touch-icon.png">` (#115)
                               + Sharing metadata (#117, RF-11…RF-14). Placement approved
@@ -112,10 +125,12 @@ index.html                  ← `<html lang="en">` + meta theme-color #eceef4
                                 the JSON-LD block go **after the anti-flash and the icons
                                 block**, before `</head>` (RF-13).
                                 "Sharing metadata" table — exact literals set by
-                                the user in #117; the T19 test verifies them; they are not edited:
+                                the user in #117; the T19 test verifies them; they are not edited
+                                (except the surname literals `Ibáñez` → `Ibañez`, set by the
+                                user in Change 2026-11-17 and verified by T24):
                                   <meta name="description" content="Frontend Engineer with 7+ years in React and TypeScript: design systems, accessibility and AI-assisted development." />
                                   <meta property="og:type" content="profile" />
-                                  <meta property="og:title" content="Juan Manuel Ibáñez · Frontend Engineer" />
+                                  <meta property="og:title" content="Juan Manuel Ibañez · Frontend Engineer" />
                                   <meta property="og:description" content="React · TypeScript · Design Systems · Accessibility" />
                                   <meta property="og:url" content="https://jmibann.github.io/cv-agentic/" />
                                   <meta property="og:image" content="https://jmibann.github.io/cv-agentic/og-image.png" />
@@ -123,7 +138,7 @@ index.html                  ← `<html lang="en">` + meta theme-color #eceef4
                                   <link rel="canonical" href="https://jmibann.github.io/cv-agentic/" />
                                   <script type="application/ld+json">
                                     { "@context": "https://schema.org", "@type": "Person",
-                                      "name": "Juan Manuel Ibáñez", "jobTitle": "Frontend Engineer",
+                                      "name": "Juan Manuel Ibañez", "jobTitle": "Frontend Engineer",
                                       "url": "https://jmibann.github.io/cv-agentic/",
                                       "sameAs": ["https://github.com/jmibann",
                                                  "https://www.linkedin.com/in/juanmanuelibanez"] }
@@ -156,8 +171,11 @@ public/favicon.svg          ← app-style icon (#115, replaces the plain hexagon
 public/apple-touch-icon.png ← the same design at 180×180, a full-bleed square (iOS rounds the
                               corners), for "Add to Home Screen" (#115)
 public/og-image.png         ← sharing image, a real 1200×630 PNG (RF-14, #117). The
-                              user provided and approved it and it is **not regenerated or modified**:
-                              it goes untouched into the `feat(Foundation): T19` commit. Referenced
+                              user provided and approved it and it went untouched into the
+                              `feat(Foundation): T19` commit. Change 2026-11-17: the user approves a
+                              regenerated variant differing **only** in the surname ("Ibáñez" →
+                              "Ibañez"), made from the current PNG; it goes untouched into
+                              `feat(Foundation): T24` (no further edits). Referenced
                               only by the absolute URL of `og:image` (not by `assetUrl`: the
                               metadata HTML is static and Vite does not rewrite those URLs)
 src/main.tsx                ← imports ../tokens/tokens.css (the only import, relative
@@ -459,8 +477,10 @@ decision #91):** provisional text in Poppins on `--color-bg`; with
   table in Anatomy (#117, condition 1), nor `hreflang`, `og:locale`
   or per-language metadata: "SEO per language" stays open in
   `docs/BACKLOG.md`.
-- Do not regenerate or modify `public/og-image.png` (the user provided it;
-  it goes untouched into `feat(Foundation): T19`).
+- Do not regenerate or modify `public/og-image.png` beyond the user's Change
+  2026-11-17: the only permitted variant is the regenerated one differing only in the
+  surname ("Ibáñez" → "Ibañez"), which goes untouched into `feat(Foundation): T24`;
+  any other difference → stop and ask.
 - Do not touch the anti-flash script or its test "verbatim from theming.md" (the
   placement of the new `<meta>` tags does not require it), or `foundations/theming.md`.
 - Do not rewrite the metadata URLs as relative or with `assetUrl`: they are
