@@ -37,10 +37,11 @@ cannot change the API or weaken tests without going through the user.
 | F4 | ResumePage | [pages/ResumePage/spec.md](pages/ResumePage/spec.md) | SectionTitle, ResumeSection, SkillList, LocaleProvider (`useCv`, `useLocale`) |
 | F4 | AppLayout | [layout/AppLayout/spec.md](layout/AppLayout/spec.md) | everything above, including useHashTab, AboutPage and ResumePage |
 
-Outside the table: `specs/motion/proposal.md` is an approved **cross-cutting
-proposal** for motion (decision #106), not a piece: it has no
-`spec.md`/`plan.md`/`tasks.md` yet. When they are approved, its pieces will enter
-this table under the `motion` category.
+Outside the table: `specs/motion/proposal.md` is the approved **cross-cutting
+proposal** for motion (decision #106), not a piece: it was delivered **4/4**
+(2026-11-13) as Changes inside existing pieces (Foundation T18, AppLayout, Sidebar,
+TestimonialDialog) and is marked IMPLEMENTED. There is no `motion` category and no
+piece of it will enter this table.
 
 **Who builds each phase:** F1 → `foundation`. F2 and F3 → `component-builder`. F4 →
 `integrator`, in the order of the table: `useHashTab` → pages → AppLayout.

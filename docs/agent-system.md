@@ -118,7 +118,15 @@ phase gates remain open; the system stays operational for maintenance
 with the same 5 agents, the `sdd` skill and the `/sdd-*` commands. Work opened as of
 2026-11-15: deploy base (§XIV), **real CV** with its spec Change (§XV, #109),
 **visual QA approved** (§XVI) and **CI** (§XVII: Node 26 LTS from `.nvmrc`, #110;
-`lint` → `test` → `build` before publishing, #111) and **real testimonials** (§XVIII–§XIX, #112–#113) , **Resume in one column** (§XX, #114) and **favicon + title** (§XXI, #115) closed; **motion COMPLETE 4/4** (§XXIV–§XXVII, #106/#116 — #116 is a permanent rule in `foundations/motion.md` and `AGENTS.md`) and **SEO and Open Graph metadata** (§XXVIII, #117: the first reopening of a closed piece for a new request — spec→plan→T19→QA on `dist/`—) and the **Projects section in Resume** (§XXIX, #118: `projects` collection in the schema and the content) closed as well; plus the **avatar in WebP** (§XXXI, #119) and the **public README in English with the status in `docs/STATUS.md`** (§XXXII, #120); all pushed and published. Only what is
+`lint` → `test` → `build` before publishing, #111) and **real testimonials** (§XVIII–§XIX, #112–#113) , **Resume in one column** (§XX, #114) and **favicon + title** (§XXI, #115) closed; **motion COMPLETE 4/4** (§XXIV–§XXVII, #106/#116 — #116 is a permanent rule in `foundations/motion.md` and `AGENTS.md`) and **SEO and Open Graph metadata** (§XXVIII, #117: the first reopening of a closed piece for a new request — spec→plan→T19→QA on `dist/`—) and the **Projects section in Resume** (§XXIX, #118: `projects` collection in the schema and the content) closed as well; plus the **avatar in WebP** (§XXXI, #119) and the **public README in English with the status in `docs/STATUS.md`** (§XXXII, #120); then **code in English** (§XXXV, #121), **documentation in English**
+(§XXXVI, #122), **one shell command per call** (§XXXVII, #123) and **delegate on a
+denied edit** (§XXXVIII, #124) as rules; the **surname Change** (§XXXIX) and the
+**full audit with the English policy beyond `src/`** (§XL: Foundation T25 +
+`npm audit fix`) closed as Changes. The pending item of #122 is closed with evidence:
+the agents ran two complete flows with the translated prompts (orchestrator +
+foundation + reviewer, 2026-11-17). The avatar was replaced by the user (`8e22f67`:
+no background, 512×512 alpha). Push and publish of the latest commits are in the
+user's hands. Only what is
 postponed in the BACKLOG remains ("SEO per language", PDF per language, images,
 automated contrast…).
 The workflow `.github/workflows/deploy.yml` is maintained by the user (no agent
