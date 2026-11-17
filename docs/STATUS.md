@@ -7,7 +7,7 @@ Personal CV site (**React + TypeScript + Vite + CSS Modules**, responsive,
 light/dark, en/es) built by OpenCode agents with
 **spec-driven development**.
 
-## Current status (2026-11-16)
+## Current status (2026-11-17)
 
 | What | Status |
 |---|---|
@@ -43,6 +43,7 @@ light/dark, en/es) built by OpenCode agents with
 | **README in English (2026-11-15)** | ✅ **#120**: the root `README.md` presents the repo in English (the user's text, diagram of the agent system, light/dark capture); this board moved to `docs/STATUS.md` and the agents point here. |
 | **Code in English (2026-11-15)** | ✅ **#121**: "why-only" comments in English in all the code (`.ts`/`.tsx` 54 % → 12 % of comment, CSS 66 % → 15 %, tests 44 % → 3 %), error messages in English and guard test `src/test/comments.test.ts` (Foundation T22). Code identical byte for byte without comments; suite **485/42**. The internal documentation was translated afterwards (#122). Pushed and published. |
 | **Documentation in English (2026-11-16)** | ✅ **#122**: the 117 kit documents (`AGENTS.md`, `docs/`, `foundations/`, `specs/`, `.opencode/`) translated in full, with the structural terms in English (`Status`, `Requirements (EARS)`, `Done when`, gate, `Open items`); the agents talk to the user in English; L1 amended; the guard test also covers the documents (Foundation T23). Suite **487/42**. Pending: run the OpenCode agents once with the translated prompts. |
+| **Surname without the accent (2026-11-17)** | ✅ **Change CLOSED** in Foundation (single task T24): `Ibáñez` → `Ibañez` in the `<title>`, `og:title` and JSON-LD `name` of `index.html`, in `profile.name` of `cv.{en,es}.json`, in the testimonial quote of `cv.en.json` and in `public/og-image.png` (the user provided the regenerated variant: the accent is the only difference, 1200×630, committed untouched in the `feat`). `comments.test.ts` untouched (its whitelist keeps the accented form for the historical records); in documents the new spelling goes only inside backticks, quotes or code blocks. Commits `73d6c59` `86bac00` `ed2949f` `29ad713` `bad7180` `ec85c1a`; suite **487/42**, validate:content and build ✓; detail §XXXIX. |
 | Post-delivery / next work (2026-11-15) | Published on GitHub Pages (metadata #117, Projects section #118 and WebP avatar #119 verified on the served site; README #120 verified on GitHub). General audit §XXXIII: dependencies up to date within the ranges. No blocking items pending; the optional ones of the **Open items** table of `docs/diagnostics.md` remain (debts of form, StrictMode/F1-F2, three points of the user: PDF, GitHub "About", PageSpeed) and what is postponed in `docs/BACKLOG.md`. |
 
 Detail and decisions: [docs/diagnostics.md](diagnostics.md).
@@ -69,7 +70,8 @@ The F1–F5 process closed; the site was **delivered and green** (487 tests,
 build, validate:content, QA in the browser and on paper; latest work:
 Node 26 LTS and quality gates in the deploy, 2026-11-12; motion 4/4, 2026-11-13;
 SEO and Open Graph metadata #117 and Projects section #118, 2026-11-14;
-avatar in WebP #119, 2026-11-15; code #121 and documentation #122 in English, 2026-11-16).
+avatar in WebP #119, code #121 and documentation #122 in English, 2026-11-15/16;
+surname without the accent (Foundation T24), 2026-11-17).
 To reopen work, the flow lives in the `sdd` skill and the agents in
 `.opencode/agents/`:
 

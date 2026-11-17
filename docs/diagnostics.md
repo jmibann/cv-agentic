@@ -2,7 +2,7 @@
 
 Minimal log of the project (decisions **#86** and **#98**): one entry for each
 closing of an F gate and for each rules decision, with the relevant hashes.
-Last update: **2026-11-17** (#124, delegate on a denied edit §XXXVIII; #123, one shell command per call §XXXVII; #122, documentation in English §XXXVI). The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
+Last update: **2026-11-17** (surname Change §XXXIX; #124, delegate on a denied edit §XXXVIII; #123, one shell command per call §XXXVII; #122, documentation in English §XXXVI). The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
 
 What is live does not live here: status → `docs/STATUS.md` ("Current status") · memory →
 `docs/memory.md` · decisions #1–#124 → `docs/README.md` · QA of F5 → `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
@@ -45,87 +45,56 @@ of the entry); the detail stays in git.
 
 ## Entries
 
+### §XXXIX · 2026-11-17 — Closing of the surname Change (Foundation T24)
+- What: accent off the surname in the live literals — `Ibáñez` → `Ibañez` — in the `<title>`/`og:title`/JSON-LD `name` of `index.html`, `profile.name` of `cv.{en,es}.json`, the testimonial quote of `cv.en.json` and `public/og-image.png` (user-provided regenerated variant: the accent is the only difference, 1200×630, committed untouched in the `feat`). `comments.test.ts` untouched; historical records keep the accented form; in documents the new spelling goes only inside backticks, quotes or code blocks (its `ñ` trips the documentation guard).
+- Checks: lint · typecheck · test (487/42) · validate:content · build · reviewer per-task and full review APPROVED (image compared visually with the pre-Change PNG; `dist/og-image.png` identical; PDF reference unaffected).
+- Commits: `73d6c59` (spec) · `86bac00` (plan/tasks) · `ed2949f` (test, red ×3) · `29ad713` (feat) · `bad7180` (marking) · `ec85c1a` (closing).
+- Opens: —; closes: the surname Change opened by #124 (§XXXVIII).
+
 ### §XXXVIII · 2026-11-17 — Decision #124: delegate on a denied edit
 - What: the orchestrator prompt says that `Permission denied: edit` on code, tests, content or config is its config working, so it delegates the task instead of asking for wider permissions; the `Ibañez` surname change goes through a Change of Foundation; the edit permissions do not change.
 - Checks: lint · typecheck · test (487/42); orchestrator permission block byte-identical.
 - Decisions: #124 → `docs/README.md`.
 - Opens: Change of Foundation for the surname without the accent; closes: the confirmation of #123 (the orchestrator ran lint, typecheck and test one by one without denials).
+
 ### 2026-11-16 · §XXXVII — Decision #123: one shell command per call · #123 · `git show f07aba1:docs/diagnostics.md`
-
 ### 2026-11-16 · §XXXVI — Closing of #122: all the documentation in English · #122 · `git show 0904234:docs/diagnostics.md`
-
 ### 2026-11-15 · §XXXV — Closing of #121: code 100 % in English, "why-only" comments · #121 · `git show 4b1a48f:docs/diagnostics.md`
-
 ### 2026-11-15 · §XXXIV — Decision #121: "why-only" comments in English (rules) · #121 · `git show 6405b72:docs/diagnostics.md`
-
 ### 2026-11-15 · §XXXIII — General audit and cleanup (deps in range, docs up to date) · — · `git show f450e4e:docs/diagnostics.md`
-
 ### 2026-11-15 · §XXXII — Public README in English and status board to `docs/STATUS.md` · #120 · `git show f836812:docs/diagnostics.md`
-
 ### 2026-11-15 · §XXXI — Change #119: the site's avatar in WebP · #119 · `git show 6f06934:docs/diagnostics.md`
-
 ### 2026-11-14 · §XXX — Documentation cleanup after #117 and #118 (audit) · — · `git show e0b6104:docs/diagnostics.md`
-
 ### 2026-11-14 · §XXIX — Change #118: `projects` collection and Projects section in Resume · #118 · `git show b22655a:docs/diagnostics.md`
-
 ### 2026-11-14 · §XXVIII — Closing of Change #117 (Foundation: SEO and sharing metadata) · #117 · `git show 3d22bf8:docs/diagnostics.md`
-
 ### 2026-11-13 · §XXVII — Closing of Motion change 4 and of the motion system (4/4) · #116 · `git show 0bab158:docs/diagnostics.md`
-
 ### 2026-11-13 · §XXVI — Closing of Motion change 3 (Sidebar, expansion of contacts) · — · `git show 5ac25ff:docs/diagnostics.md`
-
 ### 2026-11-13 · §XXV — Closing of Motion change 2 (AppLayout, panel entrance) · — · `git show de5f32a:docs/diagnostics.md`
-
 ### 2026-11-13 · §XXIV — Closing of Motion change stage 1 (Foundation T18) · #116 · `git show fd3d1d1:docs/diagnostics.md`
-
 ### 2026-11-13 · §XXIII — Motion stage 1 gate + documentation cleanup · #116 · `git show aca2b59:docs/diagnostics.md`
-
 ### 2026-11-12 · §XXII — Documentation cleanup (audit finding closed) · — · `git show a783d69:docs/diagnostics.md`
-
 ### 2026-11-12 · §XXI — App-style favicon and real title · #115 · `git show de87d04:docs/diagnostics.md`
-
 ### 2026-11-12 · §XX — ResumePage in a single column, Experience first · #114 · `git show 31d7ee9:docs/diagnostics.md`
-
 ### 2026-11-12 · §XIX — TestimonialCard: avatar anchored at the top · #113 · `git show c240dd8:docs/diagnostics.md`
-
 ### 2026-11-12 · §XVIII — Real testimonials + Change of TestimonialCard · #112 · `git show 36be49c:docs/diagnostics.md`
-
 ### 2026-11-12 · §XVII — CI: Node 26 LTS and quality gates in the deploy · #110–#111 · `git show a9849b7:docs/diagnostics.md`
-
 ### 2026-11-11 · §XVI — Visual QA after the content (focused pass) · — · `git show bbb70b9:docs/diagnostics.md`
-
 ### 2026-11-11 · §XV — Real content, tests and download CTA · #107–#109 · `git show 0c5c54b:docs/diagnostics.md`
-
 ### 2026-11-11 · §XIV — GitHub Pages deploy + motion proposal · #106–#108 · `git show 3496bb7:docs/diagnostics.md`
-
 ### 2026-11-06 · §XIII — Bug fix ControlsBar T4 (alignment) · — · `git show 47cd6da:docs/diagnostics.md`
-
 ### 2026-10-08 · §XII — Closing of F5 (end of the F1–F5 process) · #104–#105 · `git show 31d8f27:docs/diagnostics.md`
-
 ### 2026-10-08 · §XI — Closing of F4 · #103 · `git show 133b1e8:docs/diagnostics.md`
-
 ### 2026-10-07 · Closing of F3 · #99–#102 · `git show 7f52303:docs/diagnostics.md`
-
 ### 2026-10-06 · Decision #102 — L2: English subject, Spanish body with no accents · #102 · `git show 3da32b9:docs/diagnostics.md`
-
 ### 2026-10-06 · Closing of F2 · #99–#101 · `git show 2c086fb:docs/diagnostics.md`
-
 ### 2026-10-05 · Decision #101 — inspection-only tasks: red not required · #101 · `git show 81ef2ff:docs/diagnostics.md`
-
 ### 2026-10-05 · Decision #100 — `allowExportNames` extended to `BRAND_NAMES` · #100 · `git show d5f5bff:docs/diagnostics.md`
-
 ### 2026-10-05 · Decision #99 — canonical P2 assertion pattern · #99 · `git show e28fe86:docs/diagnostics.md`
-
 ### 2026-10-05 — Maintenance rule of the log · #98 · `git show 4730d8d:docs/diagnostics.md`
-
 ### 2026-10-03 · §VIII — Closing of F1 · — · `git show 1865d86:docs/diagnostics.md`
-
 ### 2026-10-03 · §VII — F1 up to T5 · #96 · `git show dd7b35b:docs/diagnostics.md`
-
 ### 2026-10-02 · Post-audit findings 1–3 and decision #95 · #95 · `git show dd7b35b:docs/diagnostics.md` (§VI)
-
 ### 2026-10-02 · Audits of the agentic system (sections R–V) · #75–#94 · `git show dd7b35b:docs/diagnostics.md`
-
 ### 2026-10-02 · Process decisions #67–#74 (sections K–Q) · #67–#74 · `git show dd7b35b:docs/diagnostics.md`
 
 ## Historical index — initial audit (2026-09-29 → 2026-10-01)
