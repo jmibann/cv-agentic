@@ -1,23 +1,25 @@
 # Foundation
-Status: approved
+Status: implemented
 
 *Note on Change #117 (2026-11-14): SEO and sharing metadata in
 `index.html` (RF-11…RF-14) — **closed**: T19 approved by the reviewer and by
 the user (tests `0025a21` + feat `f17cd78`; QA on `dist/` ✓). The
 `Status` went back to `implemented`.*
 
-*Note on Change 2026-11-17 (open): the user's request — the accent comes off the
+*Note on Change 2026-11-17 (2026-11-17): the user's request — the accent comes off the
 surname, `Ibáñez` → `Ibañez`, in the `<title>`, `og:title` and JSON-LD `name` of
 `index.html`, in `profile.name` of `src/content/cv.{en,es}.json`, in the
 testimonial quote of `cv.en.json` and in `public/og-image.png` (regenerated from
 the current PNG differing **only** in the surname; 1200×630 kept). One task
-closes it: **T24**, `foundation`, no red between tasks: `test(Foundation): T24`
-changes the three literals of `anti-flash.test.ts` (red) and `feat(Foundation): T24`
-carries `index.html` + both content files + the new PNG; the reviewer runs
-`validate:content` and checks the image visually. Historical records keep
-`Ibáñez`; in documents the new spelling goes **only inside backticks, quotes or a
-code block** (its `ñ` trips the documentation guard). The `Status` returns to
-`implemented` when T24 closes.*
+closed it: **T24**, `foundation`, no red between tasks: `test(Foundation): T24`
+changed the three literals of `anti-flash.test.ts` (red, `ed2949f`) and
+`feat(Foundation): T24` (`29ad713`) carried `index.html` + both content files +
+the user-provided PNG, committed untouched; the reviewer ran `validate:content`
+and checked the image visually against the pre-Change version. Historical
+records keep `Ibáñez`; in documents the new spelling goes **only inside
+backticks, quotes or a code block** (its `ñ` trips the documentation guard).
+Reviewer APPROVED (task + full review: 487/42, build ✓, `dist/` inspected); the
+user closed the gate 2026-11-17 and the `Status` returned to `implemented`.*
 
 Piece of F1 (decision #84): it leaves the app ready for F2–F4 to build
 components with TDD. The scope is derived **only** from
