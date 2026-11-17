@@ -259,3 +259,52 @@ Unit of delegation: one task = `test(Foundation): T19` (red) +
 - Code commits: `test(Foundation): T19` (red; explicit `git add` of the
   test file) → `feat(Foundation): T19` (`index.html` + `public/og-image.png`
   with an explicit `git add public/og-image.png`; the `feat` does not touch tests).
+
+# Plan of Change 2026-11-17 — surname without the accent
+
+The accent comes off the surname in the live literals ("Ibáñez" → "Ibañez"):
+`index.html` (`<title>`, `og:title`, JSON-LD `name`), `profile.name` of
+`src/content/cv.{en,es}.json`, the testimonial quote of `cv.en.json` and
+`public/og-image.png` (a regenerated variant differing only in the surname).
+Historical records and the root `README.md` are not touched.
+
+## Files of the Change (grouped by task)
+
+| Task | Files | Responsibility | Owner |
+|---|---|---|---|
+| T24 | `src/test/anti-flash.test.ts` · `index.html` · `src/content/cv.{en,es}.json` · `public/og-image.png` | RF-11/RF-12: the three literals of `index.html` and the three hardcoded literals of the test; RF-7: `profile.name` (en/es) and the quote of `cv.en.json`; RF-14: the new 1200×630 PNG goes untouched into the `feat` | `foundation` |
+
+## Decisions of the Change (with the discarded alternative)
+
+1. **A single task, no red between tasks (the user's instruction):** `foundation`
+   holds the whole scope. *Discarded:* splitting into a `foundation` task and an
+   `integrator` content task — the test cross-checks the JSON-LD `name` against
+   `profile.name` of `cv.en.json`, so the split would leave the suite red between tasks.
+2. **The test commit changes the three existing literals** (a user-approved Change;
+   nothing is weakened: same assertions, new spelling). *Discarded:* adding a parallel
+   test (it would leave a test contradicting the spec).
+3. **`src/test/comments.test.ts` is not touched:** its whitelist keeps the accented
+   form for the historical records; the bare new spelling trips the `ñ` of the SPANISH
+   class, so in documents it goes only inside backticks, quotes or code blocks
+   (the user's rule).
+4. **Historical records keep the accented form** (`docs/README.md` #115,
+   `docs/qa-report.md`, `specs/motion/proposal.md`, closed tasks) and the root
+   `README.md` stays as it is (the user's decision).
+
+## Execution and coverage
+
+- Order: a single task **T24**.
+- Coverage: RF-11 → the literals of `<title>` and `og:title` (the equality test
+  already holds); RF-12 → the JSON-LD `name` literal + the existing cross-check with
+  `cv.en.json`; RF-7 → `profile.name` en/es + the quote of `cv.en.json`
+  (`validate:content` + the existing parity tests); RF-14 → the PNG keeps 1200×630
+  (signature + IHDR, existing test) + the reviewer's visual check (no accent in the
+  surname, the rest identical to the current PNG).
+- Code commits: `test(Foundation): T24` (red; the three literals of
+  `anti-flash.test.ts`; explicit `git add` of the test file) → `feat(Foundation): T24`
+  (`index.html` + `src/content/cv.{en,es}.json` + `public/og-image.png` with an
+  explicit `git add public/og-image.png`; the `feat` does not touch tests).
+- The reviewer: per task and at closing — lint/typecheck/test,
+  `npm run validate:content`, `npm run build` (closing of the piece, #80) and the
+  visual check of the image (reads `public/og-image.png` and compares it with the
+  pre-Change version in git).
