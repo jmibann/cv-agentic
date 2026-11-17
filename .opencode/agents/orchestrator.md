@@ -227,6 +227,11 @@ update at the gates and when marking tasks (`docs/STATUS.md`,
   listed is denied, so a chained line fails as a whole (`Permission denied: shell`).
   That message is the permission rule, not the user: do not retry the same line;
   split it, or report the command you could not run.
+- **`Permission denied: edit` on code, tests, content or config is your config
+  working** (decision #124): those paths belong to foundation, component-builder and
+  integrator. Delegate the task, do not ask the user to widen your permissions,
+  and do not claim the denial is global unless you probed an allowed path
+  (for example docs/memory.md).
 - Do not invent scope: what is not in the kit is not built
   (see `docs/DESIGN.md` → "Out of scope" and `docs/BACKLOG.md`).
 - Report results as they are: if something failed or was skipped, say so.

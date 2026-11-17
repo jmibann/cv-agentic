@@ -2,11 +2,10 @@
 
 Minimal log of the project (decisions **#86** and **#98**): one entry for each
 closing of an F gate and for each rules decision, with the relevant hashes.
-Last update: **2026-11-16** (#123, one shell command per call §XXXVII; #122, documentation in English §XXXVI; #121, code in English §XXXV). The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
+Last update: **2026-11-17** (#124, delegate on a denied edit §XXXVIII; #123, one shell command per call §XXXVII; #122, documentation in English §XXXVI). The F1–F5 process stays closed (§XII); flow and owners in "Maintenance mode" of `docs/agent-system.md`.
 
 What is live does not live here: status → `docs/STATUS.md` ("Current status") · memory →
-`docs/memory.md` · decisions #1–#123 → `docs/README.md` · QA of F5 →
-`docs/qa-report.md` · motion → `specs/motion/proposal.md`.
+`docs/memory.md` · decisions #1–#124 → `docs/README.md` · QA of F5 → `docs/qa-report.md` · motion → `specs/motion/proposal.md`.
 
 Owner: orchestrator (`edit` by path). The piece gates do not touch this
 file. Cap: **150 lines** (pruning #98).
@@ -46,11 +45,12 @@ of the entry); the detail stays in git.
 
 ## Entries
 
-### §XXXVII · 2026-11-16 — Decision #123: one shell command per call
-- What: the five agent prompts say to run each shell command on its own (no `&&`, `;`, pipes or redirections) and that `Permission denied: shell` comes from the permission rule, not the user; the bash permissions do not change.
-- Checks: lint · typecheck · test (487/42); agent permission blocks byte-identical.
-- Decisions: #123 → `docs/README.md`.
-- Opens: confirm in an OpenCode session that the orchestrator runs the checks without denials; closes: —.
+### §XXXVIII · 2026-11-17 — Decision #124: delegate on a denied edit
+- What: the orchestrator prompt says that `Permission denied: edit` on code, tests, content or config is its config working, so it delegates the task instead of asking for wider permissions; the `Ibañez` surname change goes through a Change of Foundation; the edit permissions do not change.
+- Checks: lint · typecheck · test (487/42); orchestrator permission block byte-identical.
+- Decisions: #124 → `docs/README.md`.
+- Opens: Change of Foundation for the surname without the accent; closes: the confirmation of #123 (the orchestrator ran lint, typecheck and test one by one without denials).
+### 2026-11-16 · §XXXVII — Decision #123: one shell command per call · #123 · `git show f07aba1:docs/diagnostics.md`
 
 ### 2026-11-16 · §XXXVI — Closing of #122: all the documentation in English · #122 · `git show 0904234:docs/diagnostics.md`
 
