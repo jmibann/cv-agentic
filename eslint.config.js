@@ -50,7 +50,7 @@ export default tseslint.config(
         {
           selector: "Literal[value=/(#[0-9a-fA-F]{3,8}\\b|rgb\\(|hsl\\()/]",
           message:
-            "Colores literales prohibidos en .tsx: usá tokens CSS (--color-*, --gradient-*). Ver docs/DESIGN.md → regla dura 1.",
+            "Literal colors are not allowed in .tsx: use CSS tokens (--color-*, --gradient-*). See docs/DESIGN.md → hard rule 1.",
         },
       ],
     },

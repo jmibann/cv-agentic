@@ -1,14 +1,14 @@
 // GENERATED — do not edit. Regenerate with: npm run build:validator
-// Declaraciones escritas por src/scripts/build-validator.ts (el código
-// standalone de ajv no emite tipos).
+// Declarations written by src/scripts/build-validator.ts (the ajv standalone
+// code emits no types).
 
 import type { ErrorObject } from "ajv";
 
 import type { CvData } from "./cv.types.generated";
 
 /**
- * Type guard compilada por ajv (modo standalone) desde data/cv.schema.json.
- * Tras una llamada fallida, `validateCv.errors` lista los errores.
+ * Type guard compiled by ajv (standalone mode) from data/cv.schema.json.
+ * After a failed call, `validateCv.errors` lists the errors.
  */
 export declare function validateCv(data: unknown): data is CvData;
 

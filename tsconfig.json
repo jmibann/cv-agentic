@@ -1,7 +1,7 @@
 {
-  // Un solo tsconfig para todo el proyecto (decisión #63): src/, data/ y
-  // vite.config.ts. Sin baseUrl (deprecado en TS 6): los paths relativos
-  // resuelven contra este archivo.
+  // A single tsconfig for the whole project: src/, data/ and vite.config.ts.
+  // No baseUrl (deprecated in TS 6): the relative paths resolve against
+  // this file.
   "compilerOptions": {
     "target": "ES2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
@@ -9,14 +9,14 @@
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
 
-    // Opciones declaradas explícitamente porque su default cambió (o cambia)
-    // en TS 6: no depender del default (foundation.md p.3).
+    // Options declared explicitly because their default changed (or changes)
+    // in TS 6: never rely on the defaults here.
     "types": ["vite/client", "node"],
-    // true: los tipos de @testing-library/jest-dom 7 y Vitest 5 declaran
-    // `Assertion` con type parameters incompatibles entre sus propios `.d.ts`
-    // de terceros (TS2428). El flag no es requisito del kit ni lo fija
-    // docs/README.md; el código propio (src/, data/, vite.config.ts) se sigue
-    // chequeando contra esos tipos.
+    // true: the types of @testing-library/jest-dom 7 and Vitest 5 declare
+    // `Assertion` with type parameters incompatible between their own
+    // third-party `.d.ts` files (TS2428). The flag is not a requirement of the
+    // kit and docs/README.md does not fix it; the project's own code (src/,
+    // data/, vite.config.ts) is still checked against those types.
     "skipLibCheck": true,
 
     "strict": true,
