@@ -18,6 +18,9 @@ const ROOTS = [
   "vite.config.ts",
   "eslint.config.js",
   "index.html",
+  // Parsed as JSONC trivia by the TS parser: the comments between the options
+  // reach the check like in any script root.
+  "tsconfig.json",
 ];
 
 const CHECKED = /\.(ts|tsx|js|css|html)$/;
@@ -107,6 +110,47 @@ describe("source comments policy", () => {
 
   it("has no internal references in comments (requirement, task or decision ids)", () => {
     expect(offenders(INTERNAL_REFERENCE)).toEqual([]);
+  });
+});
+
+// Text shipped inside string literals of the tooling files is user- or
+// build-facing, not prose: the ESLint rule message and the comments emitted
+// into the generated d.ts. The fix belongs in the emitting template, so the
+// generated files themselves stay out of the scan.
+const STRINGS_ROOTS = ["eslint.config.js", "src/scripts/build-validator.ts"];
+
+function literalStrings(file: string): string[] {
+  const text = readFileSync(join(REPO_ROOT, file), "utf8");
+  const kind = file.endsWith(".js") ? ts.ScriptKind.JS : ts.ScriptKind.TS;
+  const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, kind);
+  const found: string[] = [];
+  const visit = (node: ts.Node): void => {
+    // `text` is the content without the delimiters; the head, middle and tail
+    // nodes carry the static parts of an interpolated template literal.
+    if (
+      ts.isStringLiteral(node) ||
+      ts.isNoSubstitutionTemplateLiteral(node) ||
+      ts.isTemplateHead(node) ||
+      ts.isTemplateMiddle(node) ||
+      ts.isTemplateTail(node)
+    ) {
+      found.push(node.text);
+    }
+    node.getChildren(source).forEach(visit);
+  };
+  visit(source);
+  return found;
+}
+
+describe("tooling string literals policy", () => {
+  it("has no Spanish in the string literals of the tooling files", () => {
+    expect(
+      STRINGS_ROOTS.flatMap((file) =>
+        literalStrings(file)
+          .filter((literal) => SPANISH.test(literal))
+          .map((literal) => `${file}: ${literal.replace(/\s+/g, " ").slice(0, 80)}`),
+      ),
+    ).toEqual([]);
   });
 });
 
